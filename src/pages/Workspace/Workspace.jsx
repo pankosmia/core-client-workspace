@@ -77,8 +77,8 @@ const Workspace = () => {
       []
     );
     useEffect(() => {
-      setSelectedFontClass(fontClass.font_class)
-    },[fontClass.font_class])
+      setSelectedFontClass(fontClass.font_set)
+    },[fontClass.font_set])
 
     return <>
         <Header
