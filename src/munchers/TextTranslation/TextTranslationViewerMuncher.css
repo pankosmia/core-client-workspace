@@ -1,6 +1,6 @@
 p {
     margin: 0;
-    padding: 0;
+    padding: 0 5pt;
 }
 
 .bare-text {
@@ -19,7 +19,6 @@ p {
 
 .usfm-p, .usfm-m, .usfm-q, .usfm-q1 {
     font-size: 18pt;
-    line-height: 24pt;
     padding-bottom: 18pt;
 }
 
@@ -29,7 +28,6 @@ p {
 
 .usfm-c {
     font-size: 60pt;
-    line-height: 60pt;
 }
 
 .usfm-v {
@@ -43,16 +41,13 @@ p {
 
 .usfm-mt {
     font-size: 48pt;
-    line-height: 60pt;
 }
 
 .usfm-s {
     font-size: 36pt;
-    line-height: 36pt;
 }
 .usfm-s2 {
     font-size: 24pt;
-    line-height: 36pt;
 }
 .usfm-add {
     font-style: italic;

@@ -1,6 +1,6 @@
 p {
     margin: 0;
-    padding: 0;
+    padding: 0 5pt;
 }
 
 .bare-text {
@@ -19,12 +19,10 @@ p {
 
 .usfm-p, .usfm-m {
     font-size: 18pt;
-    line-height: 18pt;
 }
 
 .usfm-c {
     font-size: 60pt;
-    line-height: 60pt;
 }
 
 .usfm-v {
@@ -38,12 +36,10 @@ p {
 
 .usfm-mt {
     font-size: 48pt;
-    line-height: 48pt;
 }
 
 .usfm-s {
     font-size: 36pt;
-    line-height: 36pt;
 }
 
 .usfm-unknown {
