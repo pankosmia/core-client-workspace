@@ -38,7 +38,6 @@ const uploadJsonIngredient = async (repoPath, ingredientPath, jsonData) => {
 function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
     const {systemBcv} = useContext(BcvContext);
     const {debugRef} = useContext(DebugContext);
-    // const i18n = useContext(I18nContext);
     const [state, setState] = useState({
         usj: {
             working: null,

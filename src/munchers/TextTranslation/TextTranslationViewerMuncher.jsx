@@ -7,7 +7,6 @@ import {getJson, debugContext, bcvContext} from "pithekos-lib";
 function TextTranslationViewerMuncher({metadata, selectedFontClass}) {
     const {systemBcv} = useContext(bcvContext);
     const {debugRef} = useContext(debugContext);
-    // const i18n = useContext(i18nContext);
     const [state, setState] = useState({
         usj: {
             working: null,

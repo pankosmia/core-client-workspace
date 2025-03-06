@@ -17,7 +17,7 @@ function WorkspacePicker({repos}) {
     const [repoData, setRepoData] = useState({});
     const [rows, setRows] = useState([]);
     const {debugRef} = useContext(debugContext);
-    const i18n = useContext(i18nContext);
+    const {i18nRef} = useContext(i18nContext);
     const navigate = useNavigate();
 
     const getAllData = async () => {
@@ -41,7 +41,7 @@ function WorkspacePicker({repos}) {
                 {
                     name: v.name,
                     description: v.description,
-                    flavor: doI18n(`flavors:names:${v.flavor_type}/${v.flavor}`, i18n),
+                    flavor: doI18n(`flavors:names:${v.flavor_type}/${v.flavor}`, i18nRef.current),
                     local_path: k,
                     selected: <Checkbox
                         size="small"
@@ -142,7 +142,7 @@ function WorkspacePicker({repos}) {
                                 <Grid2 item size={11}>
                                     <Box>
                                         <Typography variant="body2">
-                                            {row.flavor}
+                                            {doI18n(`pages:core-local-workspace:flavor`, i18nRef.current)}{" "}{row.flavor}
                                         </Typography>
                                         <Typography variant="body2">
                                             {row.local_path}

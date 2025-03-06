@@ -13,6 +13,9 @@
       "en": "Manage and edit local resources",
       "fr": "Gérer et modifier des ressources locales",
       "id": "Kelola dan edit sumber daya lokal"
+    },
+    "flavor": {
+      "en": "flavor"
     }
   }
 }

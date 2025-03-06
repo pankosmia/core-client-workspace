@@ -14,7 +14,7 @@ function BcvNotesViewerMuncher({metadata}) {
     const [ingredient, setIngredient] = useState([]);
     const {systemBcv} = useContext(BcvContext);
     const {debugRef} = useContext(DebugContext);
-    const i18n = useContext(I18nContext);
+    const {i18nRef} = useContext(I18nContext);
 
     const getAllData = async () => {
             const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -41,7 +41,7 @@ function BcvNotesViewerMuncher({metadata}) {
     return (
         <Box>
             <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
-            <h6>{doI18n("munchers:bcv_notes_viewer:title", i18n)}</h6>
+            <h6>{doI18n("munchers:bcv_notes_viewer:title", i18nRef.current)}</h6>
             <div>
                 {ingredient &&
                     <Markdown>{

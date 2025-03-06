@@ -8,7 +8,7 @@ function TastelessMuncher({metadata}) {
     const [sbMetadata, setSbMetadata] = useState();
     const [showMetadata, setShowMetadata] = useState(false);
     const {debugRef} = useContext(DebugContext);
-    const i18n = useContext(I18nContext);
+    const {i18nRef} = useContext(I18nContext);
 
     const getAllData = async () => {
         const sbMetadataLink = `/burrito/metadata/raw/${metadata.local_path}`;
@@ -30,10 +30,10 @@ function TastelessMuncher({metadata}) {
             <Grid2 container spacing={2}>
                 <Grid2 size={12}>
                     <h5>{metadata.name}</h5>
-                    <p><b>{doI18n("munchers:tasteless:title", i18n)}</b></p>
+                    <p><b>{doI18n("munchers:tasteless:title", i18nRef.current)}</b></p>
                     {metadata.description.length > 0 &&
                         <p>Description: {metadata.description}</p>}
-                    <p>Flavor: {doI18n(`flavors:names:${metadata.flavor_type}/${metadata.flavor}`, i18n)}</p>
+                    <p>Flavor: {doI18n(`flavors:names:${metadata.flavor_type}/${metadata.flavor}`, i18nRef.current)}</p>
                     <p>Source: {metadata.local_path}</p>
                 </Grid2>
                 {sbMetadata &&
@@ -45,7 +45,7 @@ function TastelessMuncher({metadata}) {
                                 endIcon={showMetadata ? <UnfoldLessIcon/> : <UnfoldMoreIcon/>}
                                 onClick={() => setShowMetadata(!showMetadata)}
                             >
-                                {doI18n("munchers:tasteless:show_metadata", i18n)}
+                                {doI18n("munchers:tasteless:show_metadata", i18nRef.current)}
                             </Button>
                         </Grid2>
                         {showMetadata &&

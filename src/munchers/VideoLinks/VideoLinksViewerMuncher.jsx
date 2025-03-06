@@ -16,7 +16,7 @@ function VideoLinksViewerMuncher({metadata}) {
     const {enableNet} = useContext(NetContext);
     const {systemBcv} = useContext(BcvContext);
     const {debugRef} = useContext(DebugContext);
-    const i18n = useContext(I18nContext);
+    const {i18nRef} = useContext(I18nContext);
 
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -53,9 +53,9 @@ function VideoLinksViewerMuncher({metadata}) {
             <Typography variant="h5">
                 {`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}
             </Typography>
-            <Typography variant="h6">{doI18n("munchers:video_links_viewer:title", i18n)}</Typography>
+            <Typography variant="h6">{doI18n("munchers:video_links_viewer:title", i18nRef.current)}</Typography>
             <Grid2 container spacing={2}>
-              {verseNotes.length === 0 && doI18n("munchers:video_links_viewer:no_content", i18n)}
+              {verseNotes.length === 0 && doI18n("munchers:video_links_viewer:no_content", i18nRef.current)}
               {
                   verseNotes.length > 0 && enableNet &&
                       verseNotes.map(
@@ -63,7 +63,7 @@ function VideoLinksViewerMuncher({metadata}) {
                               <Grid2 size={6}>
                                   <video width="320" height="240" controls>
                                       <source src={note} type="video/mp4"/>
-                                      {doI18n("munchers:video_links_viewer:offline_mode", i18n)}
+                                      {doI18n("munchers:video_links_viewer:offline_mode", i18nRef.current)}
                                   </video>
                               </Grid2>
                       ) 

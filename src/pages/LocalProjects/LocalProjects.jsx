@@ -7,7 +7,7 @@ import {Header, debugContext, i18nContext, getJson} from "pithekos-lib";
 function LocalProjects() {
     const [repos, setRepos] = useState([]);
     const debugValue = useContext(debugContext);
-    const i18n = useContext(i18nContext);
+    const {i18nRef} = useContext(i18nContext);
     const getRepoList = async () => {
         const response = await getJson("/git/list-local-repos", debugValue.debugRef.current);
         if (response.ok) {
@@ -22,7 +22,7 @@ function LocalProjects() {
         []
     );
 
-    return Object.keys(i18n).length === 0 ?
+    return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
         <>
             <Header

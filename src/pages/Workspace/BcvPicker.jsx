@@ -10,13 +10,13 @@ import {
 function BcvPicker() {
     const [newRef, setNewRef] = useState("");
     const {systemBcv} = useContext(BcvContext);
-    const i18n = useContext(I18nContext);
+    const {i18nRef} = useContext(I18nContext);
     return <Box>
         <Typography variant="h6">{`${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}`}</Typography>
         <TextField
             sx={{backgroundColor: "#DDCCEE"}}
             id="outlined-basic"
-            label={doI18n("components:header:new_reference", i18n)}
+            label={doI18n("components:header:new_reference", i18nRef.current)}
             size="small"
             variant="outlined"
             value={newRef}
