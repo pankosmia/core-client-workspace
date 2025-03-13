@@ -60,11 +60,11 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
         () => {
             if (
                 (!state.usj.working && !state.usj.incoming) ||
-                state.navigation.bookCode !== bcvRef.current.book_code ||
-                state.navigation.chapterNum !== bcvRef.current.chapter
+                state.navigation.bookCode !== bcvRef.current.bookCode ||
+                state.navigation.chapterNum !== bcvRef.current.chapterNum
             ) {
                 console.log("useEffect", "Fetch new USFM", state.usj.working, bcvRef.current);
-                const usfmLink = `/burrito/ingredient/as-usj/${metadata.local_path}?ipath=${bcvRef.current.book_code}.usfm`;
+                const usfmLink = `/burrito/ingredient/as-usj/${metadata.local_path}?ipath=${bcvRef.current.bookCode}.usfm`;
                 getJson(usfmLink, debugRef.current)
                     .then(
                         res => {
@@ -77,9 +77,9 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
                                             incoming: res.json
                                         },
                                         navigation: {
-                                            bookCode: bcvRef.current.book_code,
-                                            chapterNum: bcvRef.current.chapter,
-                                            verseNum: bcvRef.current.verse
+                                            bookCode: bcvRef.current.bookCode,
+                                            chapterNum: bcvRef.current.chapterNum,
+                                            verseNum: bcvRef.current.verseNum
                                         }
                                     }
                                 );
@@ -164,7 +164,7 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
      const onSave = (usj) => {
         console.log("onSave", usj);
         if(usj.content.length > 0) {
-            uploadJsonIngredient(metadata.local_path, bcvRef.current.book_code + ".usj", usj);
+            uploadJsonIngredient(metadata.local_path, bcvRef.current.bookCode + ".usj", usj);
         }
     }
 
@@ -182,7 +182,7 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
     return state.usj.working ? <Editor
         usj={state.usj.working}
         editable={true}
-        bookCode={bcvRef.current.book_code} onSave={onSave} onHistoryChange={onHistoryChange}/> : <div>Loading data...</div>;
+        bookCode={bcvRef.current.bookCode} onSave={onSave} onHistoryChange={onHistoryChange}/> : <div>Loading data...</div>;
 }
 
 export default TextTranslationEditorMuncher;
