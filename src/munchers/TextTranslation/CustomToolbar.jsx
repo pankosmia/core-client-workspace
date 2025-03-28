@@ -1,51 +1,75 @@
-import { ImPilcrow } from 'react-icons/im';
-import { RiInputCursorMove } from 'react-icons/ri';
+import { useMemo } from "react";
+
+import {
+  ContextMenuTriggerButton,
+  EnhancedCursorToggleButton,
+  FormatButton,
+  MarkerInfo,
+  RedoButton,
+  SaveButton,
+  ScriptureReferenceInfo,
+  ToolbarContainer,
+  ToolbarSection,
+  UndoButton,
+  ViewButton,
+} from "@scriptural/react";
+
+import { ImPilcrow } from "react-icons/im";
+import { RiInputCursorMove } from "react-icons/ri";
 import {
   MdOutlineUndo,
   MdOutlineRedo,
   MdSave,
   MdViewAgenda,
   MdKeyboardCommandKey,
-} from 'react-icons/md';
+} from "react-icons/md";
 
-import {
-  ContextMenuTriggerButton,
-  EnhancedCursorToggleButton,
-  FormatButton,
-  HistoryButtons,
-  MarkerInfo,
-  SaveButton,
-  ScriptureReferenceInfo,
-  ToolbarContainer,
-  ToolbarSection,
-  ViewButton,
-} from '@scriptural/react';
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { ButtonExpandNotes } from "./plugins/ButtonExpandNotes";
 
 export function CustomToolbar({ onSave }) {
+  const [editor] = useLexicalComposerContext();
+  const editable = useMemo(() => editor.isEditable(), [editor]);
   return (
     <ToolbarContainer>
       <ToolbarSection>
-        <HistoryButtons
-          undoIconComponent={<MdOutlineUndo size={20} />}
-          redoIconComponent={<MdOutlineRedo size={20} />}
-        />
-        <hr />
-        <SaveButton onSave={onSave} saveIconComponent={<MdSave size={20} />} />
-        <hr />
-        <ViewButton viewIconComponent={<MdViewAgenda size={16} />} />
-        <FormatButton formatIconComponent={<ImPilcrow />} />
-        <EnhancedCursorToggleButton
-          enhancedCursorIconComponent={<RiInputCursorMove size={18} />}
-        />
+        {editable ? (
+          <>
+            <UndoButton title="undo">
+              <MdOutlineUndo size={20} />
+            </UndoButton>
+            <RedoButton title="redo">
+              <MdOutlineRedo size={20} />
+            </RedoButton>
+            <hr />
+            <SaveButton onSave={onSave} title="save">
+              <MdSave size={20} />
+            </SaveButton>
+            <hr />
+          </>
+        ) : null}
+        <ViewButton title="toggle block view">
+          <MdViewAgenda size={16} />
+        </ViewButton>
+        <FormatButton title="toggle markup">
+          <ImPilcrow />
+        </FormatButton>
+        {editable && (
+          <EnhancedCursorToggleButton title="toggle enhanced cursor">
+            <RiInputCursorMove size={18} />
+          </EnhancedCursorToggleButton>
+        )}
+        <ButtonExpandNotes defaultState={editable ? false : true} />
         <hr />
       </ToolbarSection>
       <ToolbarSection>
-        <ContextMenuTriggerButton
-          contextMenuTriggerIconComponent={<MdKeyboardCommandKey size={18} />}
-        />
+        {editable && (
+          <ContextMenuTriggerButton title="set context menu trigger key">
+            <MdKeyboardCommandKey size={18} />
+          </ContextMenuTriggerButton>
+        )}
         <MarkerInfo />
         <ScriptureReferenceInfo />
-        <hr />
       </ToolbarSection>
     </ToolbarContainer>
   );
