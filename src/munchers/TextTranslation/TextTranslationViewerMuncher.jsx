@@ -5,7 +5,7 @@ import {Grid2} from "@mui/material";
 import {getJson, debugContext, bcvContext} from "pithekos-lib";
 
 function TextTranslationViewerMuncher({metadata, selectedFontClass}) {
-    const {systemBcv} = useContext(bcvContext);
+    const {bcvRef} = useContext(bcvContext);
     const {debugRef} = useContext(debugContext);
     const [state, setState] = useState({
         usj: {
@@ -27,11 +27,11 @@ function TextTranslationViewerMuncher({metadata, selectedFontClass}) {
         () => {
             if (
                     (!state.usj.working && !state.usj.incoming) ||
-                    state.navigation.bookCode !== systemBcv.bookCode ||
-                    state.navigation.chapterNum !== systemBcv.chapterNum
+                    state.navigation.bookCode !== bcvRef.current.bookCode ||
+                    state.navigation.chapterNum !== bcvRef.current.chapterNum
             ) {
-                console.log("useEffect", "Fetch new USFM", state.usj.working, systemBcv.bookCode);
-                const usfmLink = `/burrito/ingredient/as-usj/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`;
+                console.log("useEffect", "Fetch new USFM", state.usj.working, bcvRef.current.bookCode);
+                const usfmLink = `/burrito/ingredient/as-usj/${metadata.local_path}?ipath=${bcvRef.current.bookCode}.usfm`;
                 getJson(usfmLink, debugRef.current)
                     .then(
                         res => {
@@ -44,9 +44,9 @@ function TextTranslationViewerMuncher({metadata, selectedFontClass}) {
                                             incoming: res.json
                                         },
                                         navigation: {
-                                            bookCode: systemBcv.bookCode,
-                                            chapterNum: systemBcv.chapterNum,
-                                            verseNum: systemBcv.verseNum
+                                            bookCode: bcvRef.current.bookCode,
+                                            chapterNum: bcvRef.current.chapterNum,
+                                            verseNum: bcvRef.current.verseNum
                                         }
                                     }
                                 );
@@ -56,7 +56,7 @@ function TextTranslationViewerMuncher({metadata, selectedFontClass}) {
                         }).catch(err => console.log("TextTranslation fetch error", err));
             }
         },
-        [systemBcv, state, metadata, debugRef]
+        [bcvRef, state, metadata, debugRef]
     );
 
     // Move incoming USJ to working and increment updates
