@@ -36,7 +36,7 @@ const uploadJsonIngredient = async (repoPath, ingredientPath, jsonData) => {
 }
 
 function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
-    const {systemBcv, bcvRef} = useContext(BcvContext);
+    const {bcvRef} = useContext(BcvContext);
     const {debugRef} = useContext(DebugContext);
     const [state, setState] = useState({
         usj: {
@@ -89,7 +89,7 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
                         }).catch(err => console.log("TextTranslation fetch error", err));
             }
         },
-        [systemBcv, state, metadata, debugRef]
+        [bcvRef, state, metadata, debugRef]
     );
 
     // Move incoming USJ to working and increment updates
