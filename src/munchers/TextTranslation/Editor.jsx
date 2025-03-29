@@ -1,16 +1,19 @@
-import { ScripturalEditorComposer } from "@scriptural/react";
-import { HistoryPlugin } from "@scriptural/react/internal-packages/shared-react/plugins/History/HistoryPlugin";
-import "@scriptural/react/styles/nodes-menu.css";
-import "./scriptural-editor.css";
-import "./custom-editor.css";
-import {
-  CursorHandlerPlugin,
-} from "@scriptural/react/plugins/CursorHandlerPlugin";
-import { ScripturalNodesMenuPlugin } from "@scriptural/react/plugins/ScripturalNodesMenuPlugin";
-import { DEFAULT_SCRIPTURAL_BASE_SETTINGS, useBaseSettings } from "@scriptural/react/plugins/BaseSettingsPlugin";
-
 import { useMemo } from "react";
+
+import {
+  ScripturalEditorComposer,
+  HistoryPlugin,
+  CursorHandlerPlugin,
+  ScripturalNodesMenuPlugin,
+  DEFAULT_SCRIPTURAL_BASE_SETTINGS,
+  useBaseSettings
+} from "@scriptural/react";
+import "@scriptural/react/styles/scriptural-editor.css";
+import "@scriptural/react/styles/nodes-menu.css";
+
+import "./editor.css";
 import { CustomToolbar } from "./CustomToolbar";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 function onError(error) {
   console.error(error);
@@ -18,8 +21,7 @@ function onError(error) {
 
 export default function Editor({
   usj,
-  /** The lexical state to use as the initial state of the editor whe want to resume work from a previous editor session. */ 
-  initialLexicalState,
+  initialState,
   bookCode,
   editable = true,
   children,
@@ -32,36 +34,46 @@ export default function Editor({
       usj,
       onError,
       editable,
-      initialLexicalState,
+      initialLexicalState: initialState,
       initialSettings: {
         ...DEFAULT_SCRIPTURAL_BASE_SETTINGS,
         onSave,
       },
     };
-  }, [usj, editable, bookCode, initialLexicalState, onSave]);
+  }, [usj, editable, onSave, bookCode, initialState]);
 
   return (
-    <ScripturalEditorComposer initialConfig={initialConfig}>
-      <EditorPlugins onSave={onSave} onHistoryChange={onHistoryChange}/>
-      {children}
-    </ScripturalEditorComposer>
+    <div className="editor-wrapper prose">
+      <ScripturalEditorComposer initialConfig={initialConfig}>
+        <EditorPlugins onSave={onSave} onHistoryChange={onHistoryChange} />
+        {children}
+      </ScripturalEditorComposer>
+    </div>
   );
 }
 
-function EditorPlugins({ onSave, onHistoryChange }) {
+function EditorPlugins({
+  onSave,
+  onHistoryChange,
+}) {
   const { enhancedCursorPosition, contextMenuTriggerKey } = useBaseSettings();
-
+  const [editor] = useLexicalComposerContext();
+  const editable = useMemo(() => editor.isEditable(), [editor]);
   return (
     <>
-      <CustomToolbar onSave={onSave}/>
-      {enhancedCursorPosition && (
-        <CursorHandlerPlugin
-          updateTags={["history-merge"]}
-          canContainPlaceHolder={(node) => node.getType() !== "graft"}
-        />
+      <CustomToolbar onSave={onSave} />
+      {editable && (
+        <>
+          {enhancedCursorPosition && (
+            <CursorHandlerPlugin
+              updateTags={["history-merge", "skip-toggle-nodes"]}
+              canContainPlaceHolder={(node) => node.getType() !== "graft"}
+            />
+          )}
+          <ScripturalNodesMenuPlugin trigger={contextMenuTriggerKey} />
+          <HistoryPlugin onChange={onHistoryChange} />
+        </>
       )}
-      <ScripturalNodesMenuPlugin trigger={contextMenuTriggerKey} />
-      <HistoryPlugin onChange={onHistoryChange}/>
     </>
   );
 }
