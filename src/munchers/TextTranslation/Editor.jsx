@@ -14,6 +14,7 @@ import "@scriptural/react/styles/nodes-menu.css";
 import "./editor.css";
 import { CustomToolbar } from "./CustomToolbar";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import ReferenceSyncPlugin from "./plugins/ReferenceSyncPlugin";
 
 function onError(error) {
   console.error(error);
@@ -71,6 +72,7 @@ function EditorPlugins({
             />
           )}
           <ScripturalNodesMenuPlugin trigger={contextMenuTriggerKey} />
+          <ReferenceSyncPlugin />
           <HistoryPlugin onChange={onHistoryChange} />
         </>
       )}
