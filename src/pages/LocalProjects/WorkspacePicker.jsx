@@ -11,13 +11,14 @@ import {
 import DeleteProjectButton from "./DeleteProjectButton";
 import {EditNote} from "@mui/icons-material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {debugContext, i18nContext, getJson, doI18n} from "pithekos-lib";
+import {debugContext, i18nContext, currentProjectContext, getJson, doI18n} from "pithekos-lib";
 
 function WorkspacePicker({repos}) {
     const [repoData, setRepoData] = useState({});
     const [rows, setRows] = useState([]);
     const {debugRef} = useContext(debugContext);
     const {i18nRef} = useContext(i18nContext);
+    const {currentProjectRef} = useContext(currentProjectContext);
     const navigate = useNavigate();
 
     const getAllData = async () => {
@@ -103,6 +104,7 @@ function WorkspacePicker({repos}) {
         overflowX: "hidden",
         overflowY: "auto",
     }}>
+        Project: {!currentProjectRef.current ? "None": `Source: ${currentProjectRef.current.source}, Org: ${currentProjectRef.current.organization}, Project: ${currentProjectRef.current.project}`}
         {
             rows.map(
                 (row, n) =>
