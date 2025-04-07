@@ -1,6 +1,6 @@
 import React from 'react';
 import {createRoot} from "react-dom/client";
-import {Spa} from "pithekos-lib";
+import {SpaContainer} from "pithekos-lib";
 import './index.css';
 import {createHashRouter, RouterProvider} from "react-router-dom";
 import LocalProjects from "./pages/LocalProjects/LocalProjects";
@@ -19,7 +19,7 @@ const router = createHashRouter([
 
 createRoot(document.getElementById("root"))
     .render(
-        <Spa>
+        <SpaContainer>
             <RouterProvider router={router}/>
-        </Spa>
+        </SpaContainer>
     );
