@@ -1,26 +1,24 @@
 import {useEffect, useState, useContext} from "react";
 import "./TextTranslationEditorMuncher.css";
-import { bcvContext as BcvContext, debugContext as DebugContext, getJson } from "pithekos-lib";
+import {bcvContext as BcvContext, debugContext, debugContext as DebugContext, getJson, postJson} from "pithekos-lib";
 
 import Editor from "./Editor";
 import { useAppReferenceHandler } from "./useAppReferenceHandler";
 
-const uploadJsonIngredient = async (repoPath, ingredientPath, jsonData) => {
+const uploadJsonIngredient = async (repoPath, ingredientPath, jsonData, debugBool) => {
     // Convert JSON object to a file
     const jsonString = JSON.stringify(jsonData, null, 2);
-    const file = new Blob([jsonString], { type: 'application/json' });
+    // const file = new Blob([jsonString], { type: 'application/json' });
 
     // Create form data and append the file
-    const formData = new FormData();
-    formData.append('file', file, 'ingredient.json');
+    // const formData = new FormData();
+    // formData.append('file', file, 'ingredient.json');
 
     try {
-        const response = await fetch(
+        const response = await postJson(
             `/burrito/ingredient/as-usj/${repoPath}?ipath=${ingredientPath}`,
-            {
-                method: 'POST',
-                body: formData
-            }
+            jsonString,
+            debugBool
         );
 
         const data = await response.json();
@@ -165,7 +163,7 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
      const onSave = (usj) => {
         console.log("onSave", usj);
         if(usj.content.length > 0) {
-            uploadJsonIngredient(metadata.local_path, bcvRef.current.bookCode + ".usj", usj);
+            uploadJsonIngredient(metadata.local_path, bcvRef.current.bookCode + ".usfm", usj, debugRef.current);
         }
     }
 
