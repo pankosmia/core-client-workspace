@@ -3,6 +3,7 @@ import "./TextTranslationEditorMuncher.css";
 import { bcvContext as BcvContext, debugContext as DebugContext, getJson } from "pithekos-lib";
 
 import Editor from "./Editor";
+import { useAppReferenceHandler } from "./useAppReferenceHandler";
 
 const uploadJsonIngredient = async (repoPath, ingredientPath, jsonData) => {
     // Convert JSON object to a file
@@ -179,10 +180,19 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
         console.log("onHistoryChange", recoverableState);
     }
 
-    return state.usj.working ? <Editor
-        usj={state.usj.working}
-        editable={true}
-        bookCode={bcvRef.current.bookCode} onSave={onSave} onHistoryChange={onHistoryChange}/> : <div>Loading data...</div>;
+    const { referenceHandler } = useAppReferenceHandler();
+
+    return state.usj.working
+        ? <Editor
+            usj={state.usj.working}
+            editable={true}
+            bookCode={bcvRef.current.bookCode}
+            onSave={onSave}
+            onHistoryChange={onHistoryChange}
+            scriptureReferenceHandler={referenceHandler}
+            referenceHandlerSource="text-translation-editor"
+        />
+        : <div>Loading data...</div>;
 }
 
 export default TextTranslationEditorMuncher;

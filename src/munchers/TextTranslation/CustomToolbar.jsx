@@ -1,8 +1,10 @@
 import { useMemo } from "react";
+import { FindReplaceDialog } from "./FindReplaceDialog";
 
 import {
   ContextMenuTriggerButton,
   EnhancedCursorToggleButton,
+  FindReplacePlugin,
   FormatButton,
   MarkerInfo,
   RedoButton,
@@ -11,6 +13,7 @@ import {
   ToolbarContainer,
   ToolbarSection,
   UndoButton,
+  useFindReplace,
   ViewButton,
 } from "@scriptural/react";
 
@@ -22,10 +25,25 @@ import {
   MdSave,
   MdViewAgenda,
   MdKeyboardCommandKey,
+  MdSearch,
 } from "react-icons/md";
 
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ButtonExpandNotes } from "./plugins/ButtonExpandNotes";
+
+function SearchButton() {
+  const { isVisible, setIsVisible } = useFindReplace();
+
+  return (
+    <button
+      onClick={() => setIsVisible(!isVisible)}
+      title="find and replace"
+      className="toolbar-button"
+    >
+      <MdSearch size={18} />
+    </button>
+  );
+}
 
 export function CustomToolbar({ onSave }) {
   const [editor] = useLexicalComposerContext();
@@ -46,6 +64,10 @@ export function CustomToolbar({ onSave }) {
               <MdSave size={20} />
             </SaveButton>
             <hr />
+            <FindReplacePlugin>
+              <SearchButton />
+              <FindReplaceDialog />
+            </FindReplacePlugin>
           </>
         ) : null}
         <ViewButton title="toggle block view">

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import {
   ScripturalEditorComposer,
@@ -6,7 +6,8 @@ import {
   CursorHandlerPlugin,
   ScripturalNodesMenuPlugin,
   DEFAULT_SCRIPTURAL_BASE_SETTINGS,
-  useBaseSettings
+  useBaseSettings,
+  ScrollToReferencePlugin,
 } from "@scriptural/react";
 import "@scriptural/react/styles/scriptural-editor.css";
 import "@scriptural/react/styles/nodes-menu.css";
@@ -28,7 +29,11 @@ export default function Editor({
   children,
   onSave,
   onHistoryChange,
+  scriptureReferenceHandler,
+  referenceHandlerSource,
+  enableScrollToReference = true,
 }) {
+
   const initialConfig = useMemo(() => {
     return {
       bookCode,
@@ -43,10 +48,11 @@ export default function Editor({
     };
   }, [usj, editable, onSave, bookCode, initialState]);
 
+
   return (
     <div className="editor-wrapper prose">
-      <ScripturalEditorComposer initialConfig={initialConfig}>
-        <EditorPlugins onSave={onSave} onHistoryChange={onHistoryChange} />
+      <ScripturalEditorComposer initialConfig={initialConfig} scriptureReferenceHandler={scriptureReferenceHandler}>
+        <EditorPlugins onSave={onSave} onHistoryChange={onHistoryChange} enableScrollToReference={enableScrollToReference} />
         {children}
       </ScripturalEditorComposer>
     </div>
@@ -56,6 +62,7 @@ export default function Editor({
 function EditorPlugins({
   onSave,
   onHistoryChange,
+  enableScrollToReference = true,
 }) {
   const { enhancedCursorPosition, contextMenuTriggerKey } = useBaseSettings();
   const [editor] = useLexicalComposerContext();
@@ -75,6 +82,9 @@ function EditorPlugins({
           <ReferenceSyncPlugin />
           <HistoryPlugin onChange={onHistoryChange} />
         </>
+      )}
+      {enableScrollToReference && (
+        <ScrollToReferencePlugin scrollBehavior="smooth" scrollOffset={80} />
       )}
     </>
   );
