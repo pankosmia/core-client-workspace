@@ -143,7 +143,7 @@ function TextTranslationViewerMuncher({metadata, selectedFontClass}) {
 
     return state.rendered ?
         <div className={selectedFontClass}>
-            <Grid2 container spacing={2}>
+            <Grid2 container spacing={2} className="header">
                 {
                     Object.entries(state.rendered.headers).map(
                         (h, n) => <>

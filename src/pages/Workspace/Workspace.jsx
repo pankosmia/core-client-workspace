@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
 import WorkspaceCard from "./WorkspaceCard";
 import BcvPicker from "./BcvPicker";
@@ -10,7 +10,7 @@ import {
 } from 'react-tile-pane'
 import {Header} from "pithekos-lib";
 import {IconButton} from "@mui/material";
-import {getAndSetJson} from "pithekos-lib";
+import {typographyContext} from "pithekos-lib";
 
 const paneStyle = {
     width: '100%',
@@ -34,6 +34,7 @@ const BackToProjects = () => {
 
 }
 const Workspace = () => {
+    const { typographyRef } = useContext(typographyContext);
     const locationState = Object.entries(useLocation().state);
     const resources = locationState
         .map(kv => {
@@ -66,19 +67,8 @@ const Workspace = () => {
         rootPane.children.pop();
     }
     const paneList = createTilePanes(tileElements)[0];
-    const [selectedFontClass, setSelectedFontClass] = useState('');
-    const [fontClass, setFontClass] = useState([]);
-    useEffect(
-      () => {
-          getAndSetJson({
-              url: "/settings/typography",
-              setter: setFontClass
-          }).then()},
-      []
-    );
-    useEffect(() => {
-      setSelectedFontClass(fontClass.font_set)
-    },[fontClass.font_set])
+
+    const selectedFontClass = typographyRef.current.font_set;
 
     return <>
         <Header
