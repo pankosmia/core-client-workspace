@@ -3,21 +3,27 @@
   "require": {
     "net": false
   },
+  "exclude_from_menu": true,
+  "exclude_from_dashboard": true,
   "i18n": {
     "title": {
       "ar": "مساحة العمل المحلية ",
-      "en": "Local Workspace",
-      "fr": "Espace de Travail Local",
+      "en": "Configure Workspace",
+      "fr": "Configurer Espace de Travail Local",
       "id": "Ruang Kerja Lokal"
     },
     "summary": {
       "ar": "تسييير و تغيير الموارد المحلية",
-      "en": "Manage and edit local resources",
-      "fr": "Gérer et modifier des ressources locales",
+      "en": "Edit your content",
+      "fr": "Editer votre contenu",
       "id": "Kelola dan edit sumber daya lokal"
     },
     "flavor": {
       "en": "flavor"
+    },
+    "editing": {
+      "en": "Editing",
+      "fr": "Edition de"
     }
   }
 }

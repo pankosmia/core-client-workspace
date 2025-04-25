@@ -3,13 +3,13 @@ import {createRoot} from "react-dom/client";
 import {SpaContainer} from "pithekos-lib";
 import './index.css';
 import {createHashRouter, RouterProvider} from "react-router-dom";
-import LocalProjects from "./pages/LocalProjects/LocalProjects";
+import ConfigureWorkspace from "./pages/ConfigureWorkspace/ConfigureWorkspace";
 import Workspace from "./pages/Workspace/Workspace";
 
 const router = createHashRouter([
     {
         path: "/",
-        element: <LocalProjects/>,
+        element: <ConfigureWorkspace/>,
     },
     {
         path: "/workspace/*",
