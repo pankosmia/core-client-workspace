@@ -1,42 +1,22 @@
 import {useEffect, useState, useContext} from "react";
 import "./TextTranslationEditorMuncher.css";
-import {bcvContext as BcvContext, debugContext, debugContext as DebugContext, getJson, postJson} from "pithekos-lib";
+import {
+    bcvContext as BcvContext,
+    debugContext as DebugContext,
+    getJson,
+    postJson,
+    i18nContext as I18nContext,
+    doI18n
+} from "pithekos-lib";
+import {enqueueSnackbar} from "notistack";
 
 import Editor from "./Editor";
-import { useAppReferenceHandler } from "./useAppReferenceHandler";
-
-const uploadJsonIngredient = async (repoPath, ingredientPath, jsonData, debugBool) => {
-    // Convert JSON object to a file
-    const jsonString = JSON.stringify(jsonData, null, 2);
-    // const file = new Blob([jsonString], { type: 'application/json' });
-
-    // Create form data and append the file
-    // const formData = new FormData();
-    // formData.append('file', file, 'ingredient.json');
-
-    try {
-        const response = await postJson(
-            `/burrito/ingredient/as-usj/${repoPath}?ipath=${ingredientPath}`,
-            jsonString,
-            debugBool
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.reason || 'Upload failed');
-        }
-
-        return data;
-    } catch (error) {
-        console.error('Error uploading ingredient:', error);
-        throw error;
-    }
-}
+import {useAppReferenceHandler} from "./useAppReferenceHandler";
 
 function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
     const {bcvRef} = useContext(BcvContext);
     const {debugRef} = useContext(DebugContext);
+    const {i18nRef} = useContext(I18nContext);
     const [state, setState] = useState({
         usj: {
             working: null,
@@ -53,6 +33,30 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
         firstBodyPara: null
     });
 
+    const uploadJsonIngredient = async (repoPath, ingredientPath, jsonData, debugBool) => {
+        // Convert JSON object to a file
+        const jsonString = JSON.stringify(jsonData, null, 2);
+
+        const response = await postJson(
+            `/burrito/ingredient/as-usj/${repoPath}?ipath=${ingredientPath}`,
+            jsonString,
+            debugBool
+        );
+
+        if (response.ok) {
+            enqueueSnackbar(
+                `${doI18n("pages:core-local-workspace:saved", i18nRef.current)}`,
+                {variant: "success"}
+            );
+            return response.json;
+        } else {
+            enqueueSnackbar(
+                `${doI18n("pages:core-local-workspace:save_error", i18nRef.current)}: ${response.status}`,
+                {variant: "error"}
+            );
+            throw new Error(`Failed to save: ${response.status}, ${response.error}`);
+        }
+    }
 
     // Fetch new USFM as USJ, put in incoming
     useEffect(
@@ -160,14 +164,14 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
         [state]
     );
 
-     const onSave = (usj) => {
+    const onSave = (usj) => {
         console.log("onSave", usj);
-        if(usj.content.length > 0) {
+        if (usj.content.length > 0) {
             uploadJsonIngredient(metadata.local_path, bcvRef.current.bookCode + ".usfm", usj, debugRef.current);
         }
     }
 
-    const onHistoryChange = ({ editorState }) => {
+    const onHistoryChange = ({editorState}) => {
 
         /**
          * editorState is a LexicalEditorState object.
@@ -178,7 +182,7 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
         console.log("onHistoryChange", recoverableState);
     }
 
-    const { referenceHandler } = useAppReferenceHandler();
+    const {referenceHandler} = useAppReferenceHandler();
 
     return state.usj.working
         ? <Editor

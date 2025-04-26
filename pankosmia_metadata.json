@@ -24,6 +24,14 @@
     "editing": {
       "en": "Editing",
       "fr": "Edition de"
+    },
+    "saved": {
+      "en": "Saved!",
+      "fr": "Enregistré !"
+    },
+    "save_error": {
+      "en": "Could not save!",
+      "fr": "Enregistrement a échoué !"
     }
   }
 }
