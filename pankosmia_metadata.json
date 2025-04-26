@@ -8,9 +8,9 @@
   "i18n": {
     "title": {
       "ar": "مساحة العمل المحلية ",
-      "en": "Configure Workspace",
-      "fr": "Configurer Espace de Travail Local",
-      "id": "Ruang Kerja Lokal"
+      "en": "Workspace",
+      "fr": "Espace de Travail",
+      "id": "Ruang Kerja"
     },
     "summary": {
       "ar": "تسييير و تغيير الموارد المحلية",
