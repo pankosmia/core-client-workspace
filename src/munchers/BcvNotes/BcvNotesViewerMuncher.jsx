@@ -45,7 +45,7 @@ function BcvNotesViewerMuncher({metadata}) {
             <div>
                 {ingredient &&
                     <Markdown>{
-                        verseNotes.length > 0 ? verseNotes.join("\n\n") : "No notes found for this verse"
+                        verseNotes.length > 0 ? verseNotes.join("\n***\n") : "No notes found for this verse"
                     }</Markdown>}
             </div>
         </Box>
