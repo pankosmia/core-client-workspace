@@ -4,6 +4,7 @@ import TextTranslationViewerMuncher from "../../munchers/TextTranslation/TextTra
 import BcvNotesViewerMuncher from "../../munchers/BcvNotes/BcvNotesViewerMuncher";
 import BcvQuestionsViewerMuncher from "../../munchers/BcvQuestions/BcvQuestionsViewerMuncher";
 import BcvArticlesViewerMuncher from "../../munchers/BcvArticles/BcvArticlesViewerMuncher";
+import BcvImagesViewerMuncher from "../../munchers/BcvImages/BcvImagesViewerMuncher";
 import TastelessMuncher from "../../munchers/Tasteless/TastelessMuncher";
 import './tiles_styles.css'
 import VideoLinksViewerMuncher from "../../munchers/VideoLinks/VideoLinksViewerMuncher";
@@ -45,6 +46,15 @@ function WorkspaceCard({metadata, style}) {
             />
         </div>
     }
+    /*
+    if (metadata.flavor.toLowerCase() === "x-bcvimages") {
+        return <div style={style} dir={scriptDirectionString}>
+            <BcvImagesViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
+     */
     if (metadata.flavor === "x-videolinks") {
         return <div style={style} dir={scriptDirectionString}>
           <VideoLinksViewerMuncher
