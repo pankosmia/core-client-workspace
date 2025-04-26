@@ -11,10 +11,11 @@ function BcvPicker() {
     const [newRef, setNewRef] = useState("");
     const {bcvRef} = useContext(BcvContext);
     const {i18nRef} = useContext(I18nContext);
+    const isValid = newRef.length === 3 && newRef.trim().toUpperCase() === newRef;
     return <Box>
-        <Typography variant="h6">{`${bcvRef.current.bookCode} ${bcvRef.current.chapterNum}:${bcvRef.current.verseNum}`}</Typography>
+        <Typography variant="h6">{bcvRef.current.bookCode}</Typography>
         <TextField
-            sx={{backgroundColor: "#DDCCEE"}}
+            sx={{backgroundColor: isValid ? "#DFD" : "#FDD"}}
             id="outlined-basic"
             label={doI18n("components:header:new_reference", i18nRef.current)}
             size="small"
@@ -28,20 +29,8 @@ function BcvPicker() {
             }
             onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                    console.log("newRef", newRef);
-                    const [bookCode, cv] = newRef.split(" ");
-                    console.log(`Book '${bookCode}', CV '${cv}'`);
-                    if (bookCode && cv && bookCode.length === 3) {
-                        let [c, v] = cv.split(":");
-                        if (c && v) {
-                            c = parseInt(c);
-                            v = parseInt(v);
-                            console.log(`C '${c}', V '${v}'`);
-                            if (typeof c === "number" && typeof v === "number" && c>0 && v > 0 && c <= 150 && v <= 176) {
-                                console.log("FETCH");
-                                postEmptyJson(`/navigation/bcv/${bookCode}/${c}/${v}`);
-                            }
-                        }
+                    if (isValid) {
+                        postEmptyJson(`/navigation/bcv/${newRef}/1/1`);
                     }
                     setNewRef("");
                     e.preventDefault();

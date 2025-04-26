@@ -29,6 +29,8 @@ function TextTranslationViewerMuncher({metadata, selectedFontClass}) {
                     const result = pk.gqlQuerySync(query);
                     console.log(result);
                     setVerseText(result.data.docSets[0].documents[0].mainSequence.blocks);
+                } else {
+                    setVerseText([]);
                 }
             };
             getVerseText().then();

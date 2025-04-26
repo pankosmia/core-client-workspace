@@ -88,6 +88,16 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
                                 );
                             } else {
                                 console.log(`TextTranslation returned status ${res.status}`);
+                                setState(
+                                    {
+                                        ...state,
+                                        usj: {
+                                            ...state.usj,
+                                            working: null,
+                                        },
+                                        rerenderNeeded: false
+                                    });
+
                             }
                         }).catch(err => console.log("TextTranslation fetch error", err));
             }

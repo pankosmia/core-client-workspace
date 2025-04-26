@@ -18,16 +18,18 @@ function BcvArticlesViewerMuncher({metadata}) {
     const {i18nRef} = useContext(I18nContext);
 
     const getAllData = async () => {
-            const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
-            let response = await getText(ingredientLink, debugRef.current);
-            if (response.ok) {
-                setIngredient(
-                    response.text
-                        .split("\n")
-                        .map(l => l.split("\t").map(f => f.replace(/\\n/g, "\n\n")))
-                );
-            }
-        };
+        const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
+        let response = await getText(ingredientLink, debugRef.current);
+        if (response.ok) {
+            setIngredient(
+                response.text
+                    .split("\n")
+                    .map(l => l.split("\t").map(f => f.replace(/\\n/g, "\n\n")))
+            );
+        } else {
+            setIngredient([]);
+        }
+    };
 
     useEffect(
         () => {
@@ -41,7 +43,7 @@ function BcvArticlesViewerMuncher({metadata}) {
             const doVerseNotes = async () => {
                 let ret = [];
                 for (const row of ingredient
-                .filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)) {
+                    .filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)) {
                     let payloadLink = row[5];
                     let payloadResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${payloadLink.slice(2)}.md`);
                     if (payloadResponse.ok) {

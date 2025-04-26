@@ -17,16 +17,18 @@ function BcvNotesViewerMuncher({metadata}) {
     const {i18nRef} = useContext(I18nContext);
 
     const getAllData = async () => {
-            const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
-            let response = await getText(ingredientLink, debugRef.current);
-            if (response.ok) {
-            }
+        const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
+        let response = await getText(ingredientLink, debugRef.current);
+        if (response.ok) {
             setIngredient(
                 response.text
                     .split("\n")
                     .map(l => l.split("\t").map(f => f.replace(/\\n/g, "\n\n")))
             );
-        };
+        } else {
+            setIngredient([])
+        }
+    };
 
     useEffect(
         () => {
