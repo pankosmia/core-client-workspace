@@ -11,13 +11,13 @@ function ConfigureWorkspace() {
     const {i18nRef} = useContext(i18nContext);
     const {currentProjectRef} = useContext(currentProjectContext);
 
-    const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - 64);
+    const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - 48);
     const [selectedResources, setSelectedResources] = useState([]);
 
     const navigate = useNavigate();
 
     const handleWindowResize = useCallback(() => {
-            setMaxWindowHeight(window.innerHeight - 64);
+            setMaxWindowHeight(window.innerHeight - 48);
         }
     );
 
