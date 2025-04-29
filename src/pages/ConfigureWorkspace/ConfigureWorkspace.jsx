@@ -50,14 +50,14 @@ function ConfigureWorkspace() {
     );
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
-        <>
+        <Box>
             <Header
                 titleKey="pages:core-local-workspace:title"
                 requireNet={false}
                 currentId="core-local-workspace"
             />
-            <Box sx={{p: 1, backgroundColor: "#EEE"}}>
-                <Grid2 container spacing={1} sx={{maxHeight: maxWindowHeight, backgroundColor: "#EEE"}}>
+            <Box sx={{p: 1, backgroundColor: "#EEE", maxHeight: maxWindowHeight}}>
+                <Grid2 container spacing={1} sx={{backgroundColor: "#EEE"}}>
                     <Grid2 item size={11} sx={{backgroundColor: "#FFF"}}>
                         <Typography variant="h5">
                             {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
@@ -137,7 +137,7 @@ function ConfigureWorkspace() {
                     }
                 </Grid2>
             </Box>
-        </>
+        </Box>
 }
 
 export default ConfigureWorkspace;
