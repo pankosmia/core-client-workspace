@@ -3,9 +3,9 @@ import {
   bcvContext as BcvContext,
   postEmptyJson,
 } from "pithekos-lib";
-import React, { useCallback, useContext, useEffect, useRef } from 'react'
+import { useCallback, useContext, useEffect, useRef } from 'react'
 
-export default function ReferenceSyncPlugin() {
+export  function ReferenceSyncPlugin() {
   const {
     scriptureReference: editorBcv,
     setScriptureReference: setEditorBcv

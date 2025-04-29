@@ -1,15 +1,12 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FindReplaceDialog } from "./FindReplaceDialog";
 
 import {
-  ContextMenuTriggerButton,
-  EnhancedCursorToggleButton,
   FindReplacePlugin,
   FormatButton,
-  MarkerInfo,
   RedoButton,
   SaveButton,
-  ScriptureReferenceInfo,
+  ScripturalNodesMenuPlugin,
   ToolbarContainer,
   ToolbarSection,
   UndoButton,
@@ -18,7 +15,6 @@ import {
 } from "@scriptural/react";
 
 import { ImPilcrow } from "react-icons/im";
-import { RiInputCursorMove } from "react-icons/ri";
 import {
   MdOutlineUndo,
   MdOutlineRedo,
@@ -30,6 +26,8 @@ import {
 
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ButtonExpandNotes } from "./plugins/ButtonExpandNotes";
+import CustomMarkersToolbar from "./plugins/CustomMarkersToolbar";
+import { TriggerKeyDialog } from "./TriggerKeyDialog";
 
 function SearchButton() {
   const { isVisible, setIsVisible } = useFindReplace();
@@ -45,54 +43,97 @@ function SearchButton() {
   );
 }
 
+function TriggerKeyButton({
+  triggerKeyCombo,
+  onClick,
+  className,
+}) {
+  return (
+    <button
+      className={"toolbar-button " + (className ? className : "")}
+      onClick={onClick}
+      title="Set trigger key combination"
+    >
+      <MdKeyboardCommandKey size={18} />
+      <span style={{ marginLeft: "4px", fontSize: "12px" }}>{triggerKeyCombo}</span>
+    </button>
+  );
+}
+
+
 export function CustomToolbar({ onSave }) {
   const [editor] = useLexicalComposerContext();
   const editable = useMemo(() => editor.isEditable(), [editor]);
+
+  const [triggerKeyCombo, setTriggerKeyCombo] = useState("\\");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Define the markers to show in the toolbar
+  const markerGroups = {
+    ChapterVerse: ["c", "v"],
+    Prose: ["p", "m"],
+    Poetry: ["q1", "q2"],
+    Headings: ["mt", "s", "s2", "s3"],
+  };
+
+  const openDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+  };
+
   return (
-    <ToolbarContainer>
-      <ToolbarSection>
-        {editable ? (
-          <>
-            <UndoButton title="undo">
-              <MdOutlineUndo size={20} />
-            </UndoButton>
-            <RedoButton title="redo">
-              <MdOutlineRedo size={20} />
-            </RedoButton>
-            <hr />
-            <SaveButton onSave={onSave} title="save">
-              <MdSave size={20} />
-            </SaveButton>
-            <hr />
-            <FindReplacePlugin>
-              <SearchButton />
-              <FindReplaceDialog />
-            </FindReplacePlugin>
-          </>
-        ) : null}
-        <ViewButton title="toggle block view">
-          <MdViewAgenda size={16} />
-        </ViewButton>
-        <FormatButton title="toggle markup">
-          <ImPilcrow />
-        </FormatButton>
-        {editable && (
-          <EnhancedCursorToggleButton title="toggle enhanced cursor">
-            <RiInputCursorMove size={18} />
-          </EnhancedCursorToggleButton>
-        )}
-        <ButtonExpandNotes defaultState={editable ? false : true} />
-        <hr />
-      </ToolbarSection>
-      <ToolbarSection>
-        {editable && (
-          <ContextMenuTriggerButton title="set context menu trigger key">
-            <MdKeyboardCommandKey size={18} />
-          </ContextMenuTriggerButton>
-        )}
-        <MarkerInfo />
-        <ScriptureReferenceInfo />
-      </ToolbarSection>
-    </ToolbarContainer>
+    <>
+      <TriggerKeyDialog
+        isOpen={isDialogOpen}
+        onClose={closeDialog}
+        currentTrigger={triggerKeyCombo}
+        onTriggerChange={setTriggerKeyCombo}
+      />
+
+      {editable ? (
+        <FindReplacePlugin>
+          <div className="flex flex-col">
+            <ToolbarContainer>
+              <ToolbarSection className="w-full">
+                <UndoButton title="undo">
+                  <MdOutlineUndo size={20} />
+                </UndoButton>
+                <RedoButton title="redo">
+                  <MdOutlineRedo size={20} />
+                </RedoButton>
+                <hr />
+                <SaveButton onSave={onSave} title="save">
+                  <MdSave size={20} />
+                </SaveButton>
+                <hr />
+                <ViewButton title="toggle block view">
+                  <MdViewAgenda size={16} />
+                </ViewButton>
+                <FormatButton title="toggle markup">
+                  <ImPilcrow />
+                </FormatButton>
+
+                <ButtonExpandNotes defaultState={false} />
+                <hr />
+                <TriggerKeyButton
+                  triggerKeyCombo={triggerKeyCombo}
+                  onClick={openDialog}
+                  className="ml-auto"
+                />
+                <SearchButton />
+              </ToolbarSection>
+
+              <CustomMarkersToolbar customMarkers={markerGroups} />
+            </ToolbarContainer>
+          </div>
+          {/* The FindReplaceDialog is also a child of FindReplacePlugin */}
+          <FindReplaceDialog />
+          <ScripturalNodesMenuPlugin trigger={triggerKeyCombo} />
+        </FindReplacePlugin>
+      ) : null}
+    </>
   );
 }
