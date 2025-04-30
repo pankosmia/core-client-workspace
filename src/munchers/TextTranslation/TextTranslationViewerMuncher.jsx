@@ -26,7 +26,6 @@ function TextTranslationViewerMuncher({metadata, selectedFontClass}) {
                     );
                     const query = `{docSets { documents { mainSequence { blocks(withScriptureCV: "${systemBcv.chapterNum}:${systemBcv.verseNum}") {text items {type subType payload}}}}}}`;
                     const result = pk.gqlQuerySync(query);
-                    console.log(result);
                     setVerseText(result.data.docSets[0].documents[0].mainSequence.blocks);
                 } else {
                     setVerseText([]);

@@ -3,6 +3,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import WorkspaceCard from "./WorkspaceCard";
 import BcvPicker from "./BcvPicker";
 import ArrowBack from "@mui/icons-material/ArrowBack";
+import {Box} from "@mui/material";
 import {
     createTilePanes,
     TileContainer,
@@ -21,7 +22,7 @@ const paneStyle = {
 const BackToProjects = () => {
     const navigate = useNavigate();
     return <IconButton
-        sx={{"color": "#FFF"}}
+        sx={{"color": "#FFF", m:0}}
         onClick={
             (e) => {
                 navigate("/");
@@ -75,7 +76,7 @@ const Workspace = () => {
             titleKey="pages:core-local-workspace:title"
             requireNet={false}
             currentId="core-local-workspace"
-            widget={<><BackToProjects/><BcvPicker/></>}
+            widget={<BcvPicker/>}
         />
         <div className={selectedFontClass}>
           <TileProvider
