@@ -56,7 +56,7 @@ function BcvPicker() {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
             onClick={event => setAnchorEl(event.currentTarget)}
-            sx={{backgroundColor: "#9E9E9E", ml: 4, pt: 0, pb: 0, borderRadius: 2}}
+            sx={{backgroundColor: "#E0E0E0", color: "#000", ml: 4}}
         >
             {doI18n(`scripture:books:${bcvRef.current.bookCode}`, i18nRef.current)}
         </Button>
