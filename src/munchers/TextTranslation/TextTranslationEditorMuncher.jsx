@@ -8,6 +8,7 @@ import {
     i18nContext as I18nContext,
     doI18n
 } from "pithekos-lib";
+import md5sum from 'md5';
 import {enqueueSnackbar} from "notistack";
 
 import Editor from "./Editor";
@@ -91,7 +92,8 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
     const {referenceHandler} = useAppReferenceHandler();
 
     return usj ? <Editor
-            usj={{...usj}}
+            key={md5sum(JSON.stringify(usj))}
+            usj={usj}
             editable={true}
             bookCode={bcvRef.current && bcvRef.current.bookCode}
             onSave={onSave}
