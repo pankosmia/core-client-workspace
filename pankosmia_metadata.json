@@ -32,6 +32,10 @@
     "save_error": {
       "en": "Could not save!",
       "fr": "Enregistrement a échoué !"
+    },
+    "load_error": {
+      "en": "Could not load",
+      "fr": "Le chargement a échoué"
     }
   }
 }
