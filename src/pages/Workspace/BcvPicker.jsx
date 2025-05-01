@@ -73,10 +73,10 @@ function BcvPicker() {
                 contentBooks.map((b, n) =>
                     <MenuItem
                         key={n}
-                        disabled={b === (bcvRef.current && bcvRef.current.bookCode)}
+                        disabled={b === (!bcvRef.current && bcvRef.current.bookCode)}
                         onClick={
                             () => {
-                                postEmptyJson(`/settings/bcv/${b}/1/1`, debugContext.current)
+                                postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current)
                                     .then(() => setAnchorEl(null));
                             }
                         }
