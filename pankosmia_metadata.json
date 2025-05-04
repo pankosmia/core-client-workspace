@@ -22,8 +22,8 @@
       "en": "flavor"
     },
     "editing": {
-      "en": "Editing",
-      "fr": "Edition de"
+      "en": "Edit",
+      "fr": "Editer"
     },
     "saved": {
       "en": "Saved!",
@@ -36,6 +36,10 @@
     "load_error": {
       "en": "Could not load",
       "fr": "Le chargement a échoué"
+    },
+    "choose_resources": {
+      "en": "Choose resources to display in your workspace",
+      "fr": "Choisissez des ressources qui seront affichées sur votre plan de travail"
     }
   }
 }
