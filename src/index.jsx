@@ -9,7 +9,7 @@ import Workspace from "./pages/Workspace/Workspace";
 const router = createHashRouter([
     {
         path: "/",
-        element: <ConfigureWorkspace/>,
+        element: <ConfigureWorkspace/>
     },
     {
         path: "/workspace/*",

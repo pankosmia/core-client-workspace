@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext, useCallback} from "react";
+import React, {useState, useEffect, useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n} from "pithekos-lib";
 import {Grid2, IconButton, Stack, Box, Typography, Checkbox} from "@mui/material";
@@ -11,22 +11,9 @@ function ConfigureWorkspace() {
     const {i18nRef} = useContext(i18nContext);
     const {currentProjectRef} = useContext(currentProjectContext);
 
-    const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - 80);
     const [selectedResources, setSelectedResources] = useState([]);
 
     const navigate = useNavigate();
-
-    const handleWindowResize = useCallback(() => {
-            setMaxWindowHeight(window.innerHeight - 80);
-        }
-    );
-
-    useEffect(() => {
-        window.addEventListener('resize', handleWindowResize);
-        return () => {
-            window.removeEventListener('resize', handleWindowResize);
-        };
-    }, [handleWindowResize]);
 
     const getRepoList = async () => {
         const listResponse = await getJson("/git/list-local-repos", debugRef.current);
@@ -51,12 +38,14 @@ function ConfigureWorkspace() {
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
         <Box>
-            <Header
-                titleKey="pages:core-local-workspace:title"
-                requireNet={false}
-                currentId="core-local-workspace"
-            />
-            <Box sx={{p: 1, backgroundColor: "#EEE", maxHeight: maxWindowHeight}}>
+            <Box style={{position: 'fixed', width: '100%'}}>
+              <Header
+                  titleKey="pages:core-local-workspace:title"
+                  requireNet={false}
+                  currentId="core-local-workspace"
+              />
+            </Box>
+            <Box sx={{p: 1, backgroundColor: "#EEE"}} style={{position: 'fixed', top: '48px', bottom: 0, overflow: 'scroll'}}>
                 <Grid2 container spacing={1} sx={{backgroundColor: "#EEE"}}>
                     <Grid2 item size={11} sx={{backgroundColor: "#FFF"}}>
                         <Typography variant="h5">
