@@ -45,51 +45,53 @@ function ConfigureWorkspace() {
                     currentId="core-local-workspace"
                 />
             </Box>
-            <Box style={{position: 'fixed', top: '48px', bottom: 0, overflow: 'scroll'}}>
-                <Fab
-                    variant="extended"
-                    size="small"
-                    aria-label={doI18n("pages:content:add", i18nRef.current)}
-                    sx={{
-                        margin: 0,
-                        top: 68,
-                        right: 20,
-                        bottom: "auto",
-                        left: "auto",
-                        position: 'fixed',
-                        backgroundColor: "#DAB1DA",
-                        color: "#OOO"
-                    }}
-                    onClick={
-                        (e) => {
-                            console.log(currentProjectRef.current);
-                            let stateEntries = repos
-                                .map(r => [r.path, r])
-                                .filter(re => selectedResources.includes(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
-                                .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
-                                    ...re[1],
-                                    primary: true
-                                }] : re)
-                            navigate(
-                                "/workspace",
-                                {
-                                    state: Object.fromEntries(stateEntries)
-                                }
-                            );
-                            e.stopPropagation();
-                        }
-                    }
-                >
-                    <Typography variant="body2">
-                        {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
-                    </Typography>
-                    <PlayArrowIcon/>
-                </Fab>
+            <Box style={{position: 'fixed', width: '100%'}}>
+              <Fab
+                  variant="extended"
+                  size="small"
+                  aria-label={doI18n("pages:content:add", i18nRef.current)}
+                  sx={{
+                      margin: 0,
+                      top: 64,
+                      right: 16,
+                      bottom: "auto",
+                      left: "auto",
+                      position: 'fixed',
+                      backgroundColor: "#DAB1DA",
+                      color: "#OOO"
+                  }}
+                  onClick={
+                      (e) => {
+                          console.log(currentProjectRef.current);
+                          let stateEntries = repos
+                              .map(r => [r.path, r])
+                              .filter(re => selectedResources.includes(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
+                              .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
+                                  ...re[1],
+                                  primary: true
+                              }] : re)
+                          navigate(
+                              "/workspace",
+                              {
+                                  state: Object.fromEntries(stateEntries)
+                              }
+                          );
+                          e.stopPropagation();
+                      }
+                  }
+              >
+                  <Typography variant="body2">
+                      {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
+                  </Typography>
+                  <PlayArrowIcon/>
+              </Fab>
+            </Box>
+            <Box style={{position: 'fixed', top: '105px', bottom: 0, overflow: 'scroll', marginBottom: "16px",}}>
                 <Grid2
                     container
                     spacing={1}
                     sx={{
-                        ml: "20px",
+                        ml: "16px",
                         '--Grid-borderWidth': '1px',
                         borderTop: 'var(--Grid-borderWidth) solid',
                         borderLeft: 'var(--Grid-borderWidth) solid',
