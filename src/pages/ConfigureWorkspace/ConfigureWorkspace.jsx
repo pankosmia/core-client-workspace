@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n} from "pithekos-lib";
-import {Grid2, IconButton, Stack, Box, Typography, Checkbox, Fab} from "@mui/material";
+import {Grid2, Stack, Box, Typography, Checkbox, Fab} from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import dateFormat from 'dateformat';
 
@@ -101,6 +101,11 @@ function ConfigureWorkspace() {
                         }
                     }}
                 >
+                    <Grid2 item size={12}>
+                        <Typography variant="h6">
+                            {doI18n("pages:core-local-workspace:choose_resources", i18nRef.current)}
+                        </Typography>
+                    </Grid2>
                     {
                         repos
                             .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
