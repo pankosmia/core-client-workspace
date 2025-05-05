@@ -19,10 +19,15 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
     const {debugRef} = useContext(DebugContext);
     const {i18nRef} = useContext(I18nContext);
     const [usj, setUsj] = useState(null);
+    const [contentChanged, _setContentChanged] = useState(false);
     const [bookCode, setBookCode] = useState(
         (bcvRef.current && bcvRef.current.bookCode) ||
         "TIT"
     )
+    const setContentChanged = nv => {
+        console.log("setContentChanged", nv);
+        _setContentChanged(nv);
+    }
 
     // Fetch new USFM as USJ, put in incoming
     useEffect(
@@ -62,6 +67,7 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
                 `${doI18n("pages:core-local-workspace:saved", i18nRef.current)}`,
                 {variant: "success"}
             );
+            setContentChanged(false);
             return response.json;
         } else {
             enqueueSnackbar(
@@ -87,7 +93,17 @@ function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
          */
         const recoverableState = editorState.toJSON();
         debugRef && debugRef.current && console.log("onHistoryChange", recoverableState);
+        setContentChanged(true);
     }
+
+    useEffect(() => {
+        const onBeforeUnload = ev => {
+            ev.preventDefault();
+        };
+        window.addEventListener('beforeunload', onBeforeUnload);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
 
     const {referenceHandler} = useAppReferenceHandler();
 
