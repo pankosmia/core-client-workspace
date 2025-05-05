@@ -40,6 +40,10 @@
     "choose_resources": {
       "en": "Choose resources to display in your workspace",
       "fr": "Choisissez des ressources qui seront affichées sur votre plan de travail"
+    },
+    "save_your_work": {
+      "en": "Save your work before leaving this page!",
+      "fr": "Enregistrez votre travail avant de quitter cette page !"
     }
   }
 }
