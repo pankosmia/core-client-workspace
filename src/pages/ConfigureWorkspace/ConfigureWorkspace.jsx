@@ -86,7 +86,7 @@ function ConfigureWorkspace() {
                   <PlayArrowIcon/>
               </Fab>
             </Box>
-            <Box style={{position: 'fixed', top: '105px', bottom: 0, overflow: 'scroll', marginBottom: "16px",}}>
+            <Box style={{position: 'fixed', top: '105px', bottom: 0, overflow: 'scroll', marginBottom: "16px", width: '100%'}}>
                 <Grid2
                     container
                     spacing={1}
