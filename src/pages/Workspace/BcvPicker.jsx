@@ -1,5 +1,5 @@
 import React, {useState, useContext, useEffect} from "react";
-import {Box, Button, MenuItem, Menu} from "@mui/material";
+import {Box, Button, MenuItem, Menu, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Typography} from "@mui/material";
 import {
     bcvContext as BcvContext,
     i18nContext as I18nContext,
@@ -46,6 +46,19 @@ function BcvPicker() {
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
+    const [book, setBook] = useState('');
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleClickOpen = () => {
+        setIsOpen(true);
+    };
+    const handleClickClose = () => {
+        setIsOpen(false);
+    };
+    const handleClickChange = (b) => {
+        postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current)
+                                    .then(() => setAnchorEl(null));
+    };
 
     return <Box sx={{m: 0}}>
         <Button
@@ -76,8 +89,8 @@ function BcvPicker() {
                         disabled={b === (!bcvRef.current && bcvRef.current.bookCode)}
                         onClick={
                             () => {
-                                postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current)
-                                    .then(() => setAnchorEl(null));
+                                setBook(b);
+                                handleClickOpen();
                             }
                         }
                     >
@@ -86,6 +99,31 @@ function BcvPicker() {
                 )
             }
         </Menu>
+        <Dialog
+                open={isOpen}
+                onClose={handleClickClose}
+                slotProps={{
+                    paper: {
+                        component: 'form',
+                    },
+                }}
+            >
+                <DialogTitle><b>Switch to book</b></DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        <Typography>
+                            Are you sure you want to this book?
+                        </Typography>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClickClose}>{doI18n("components:header:cancel", i18nRef.current)}</Button>
+                    <Button onClick={() => {
+                        handleClickChange(book);
+                        handleClickClose()
+                    }}>{doI18n("components:header:accept", i18nRef.current)}</Button>
+                </DialogActions>
+            </Dialog>
     </Box>
 }
 
