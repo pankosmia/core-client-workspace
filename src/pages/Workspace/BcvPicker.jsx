@@ -9,6 +9,7 @@ import {
     doI18n,
     postEmptyJson,
     debugContext,
+    bcvContext,
 } from "pithekos-lib";
 
 function BcvPicker() {
@@ -49,15 +50,17 @@ function BcvPicker() {
     const [book, setBook] = useState('');
     const [isOpen, setIsOpen] = useState(false);
 
-    const handleClickOpen = () => {
+    const handleOpen = () => {
         setIsOpen(true);
     };
-    const handleClickClose = () => {
+    const handleClose = () => {
         setIsOpen(false);
+        setAnchorEl(null);
+        setBook('');
     };
-    const handleClickChange = (b) => {
-        postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current)
-                                    .then(() => setAnchorEl(null));
+    const handleChange = (b) => {
+        postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current).then();
+        handleClose();
     };
 
     return <Box sx={{m: 0}}>
@@ -86,11 +89,11 @@ function BcvPicker() {
                 contentBooks.map((b, n) =>
                     <MenuItem
                         key={n}
-                        disabled={b === (!bcvRef.current && bcvRef.current.bookCode)}
+                        disabled={b === (bcvRef.current && bcvRef.current.bookCode)}
                         onClick={
                             () => {
                                 setBook(b);
-                                handleClickOpen();
+                                handleOpen();
                             }
                         }
                     >
@@ -101,27 +104,26 @@ function BcvPicker() {
         </Menu>
         <Dialog
                 open={isOpen}
-                onClose={handleClickClose}
+                onClose={handleClose}
                 slotProps={{
                     paper: {
                         component: 'form',
                     },
                 }}
             >
-                <DialogTitle><b>Switch to book</b></DialogTitle>
+                <DialogTitle><b>{doI18n("components:core-local-workspace:change_book", i18nRef.current)}</b></DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         <Typography>
-                            Are you sure you want to this book?
+                            {doI18n("components:core-local-workspace:change_book_question", i18nRef.current)}
                         </Typography>
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClickClose}>{doI18n("components:header:cancel", i18nRef.current)}</Button>
+                    <Button onClick={handleClose}>{doI18n("components:core-local-workspace:cancel", i18nRef.current)}</Button>
                     <Button onClick={() => {
-                        handleClickChange(book);
-                        handleClickClose()
-                    }}>{doI18n("components:header:accept", i18nRef.current)}</Button>
+                        handleChange(book);
+                    }}>{doI18n("components:core-local-workspace:accept", i18nRef.current)}</Button>
                 </DialogActions>
             </Dialog>
     </Box>
