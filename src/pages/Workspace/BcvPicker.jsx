@@ -1,5 +1,5 @@
 import React, {useState, useContext, useEffect} from "react";
-import {Box, Button, MenuItem, Menu} from "@mui/material";
+import {Box, Button, MenuItem, Menu, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Typography} from "@mui/material";
 import {
     bcvContext as BcvContext,
     i18nContext as I18nContext,
@@ -9,6 +9,7 @@ import {
     doI18n,
     postEmptyJson,
     debugContext,
+    bcvContext,
 } from "pithekos-lib";
 
 function BcvPicker() {
@@ -46,6 +47,21 @@ function BcvPicker() {
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
+    const [book, setBook] = useState('');
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleOpen = () => {
+        setIsOpen(true);
+    };
+    const handleClose = () => {
+        setIsOpen(false);
+        setAnchorEl(null);
+        setBook('');
+    };
+    const handleChange = (b) => {
+        postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current).then();
+        handleClose();
+    };
 
     return <Box sx={{m: 0}}>
         <Button
@@ -73,11 +89,11 @@ function BcvPicker() {
                 contentBooks.map((b, n) =>
                     <MenuItem
                         key={n}
-                        disabled={b === (!bcvRef.current && bcvRef.current.bookCode)}
+                        disabled={b === (bcvRef.current && bcvRef.current.bookCode)}
                         onClick={
                             () => {
-                                postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current)
-                                    .then(() => setAnchorEl(null));
+                                setBook(b);
+                                handleOpen();
                             }
                         }
                     >
@@ -86,6 +102,30 @@ function BcvPicker() {
                 )
             }
         </Menu>
+        <Dialog
+                open={isOpen}
+                onClose={handleClose}
+                slotProps={{
+                    paper: {
+                        component: 'form',
+                    },
+                }}
+            >
+                <DialogTitle><b>{doI18n("components:core-local-workspace:change_book", i18nRef.current)}</b></DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        <Typography>
+                            {doI18n("components:core-local-workspace:change_book_question", i18nRef.current)}
+                        </Typography>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>{doI18n("components:core-local-workspace:cancel", i18nRef.current)}</Button>
+                    <Button onClick={() => {
+                        handleChange(book);
+                    }}>{doI18n("components:core-local-workspace:accept", i18nRef.current)}</Button>
+                </DialogActions>
+            </Dialog>
     </Box>
 }
 

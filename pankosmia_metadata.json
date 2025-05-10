@@ -44,6 +44,26 @@
     "save_your_work": {
       "en": "Save your work before leaving this page!",
       "fr": "Enregistrez votre travail avant de quitter cette page !"
+    },
+    "change_book": {
+      "en": "Change book",
+      "fr": "Changer de livre",
+      "es": "Cambiar de libro"
+    },
+    "change_book_question": {
+      "en": "You are about to change to a different book. This will discard any unsaved changes you have made to the current book. Do you wish to continue?",
+      "fr": "Vous êtes sur le point de changer de livre. Cette opération annulera toutes les modifications non sauvegardées que vous avez apportées au livre actuel. Souhaitez-vous continuer ?",
+      "es": "Está a punto de cambiar de libro. Esto descartará cualquier cambio no guardado que haya realizado en el libro actual. ¿Desea continuar?"
+    },
+    "accept": {
+      "en": "Accept",
+      "fr": "Accepter",
+      "es": "Aceptar"
+    },
+    "cancel": {
+      "en": "Cancel",
+      "fr": "Annuler",
+      "es": "Cancelar"
     }
   }
 }
