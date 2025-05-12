@@ -111,19 +111,19 @@ function BcvPicker() {
                     },
                 }}
             >
-                <DialogTitle><b>{doI18n("components:core-local-workspace:change_book", i18nRef.current)}</b></DialogTitle>
+                <DialogTitle><b>{doI18n("pages:core-local-workspace:change_book", i18nRef.current)}</b></DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         <Typography>
-                            {doI18n("components:core-local-workspace:change_book_question", i18nRef.current)}
+                            {doI18n("pages:core-local-workspace:change_book_question", i18nRef.current)}
                         </Typography>
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>{doI18n("components:core-local-workspace:cancel", i18nRef.current)}</Button>
+                    <Button onClick={handleClose}>{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
                     <Button onClick={() => {
                         handleChange(book);
-                    }}>{doI18n("components:core-local-workspace:accept", i18nRef.current)}</Button>
+                    }}>{doI18n("pages:core-local-workspace:accept", i18nRef.current)}</Button>
                 </DialogActions>
             </Dialog>
     </Box>
