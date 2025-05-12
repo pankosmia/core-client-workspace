@@ -48,6 +48,7 @@ function ConfigureWorkspace() {
             <Box style={{position: 'fixed', width: '100%'}}>
               <Fab
                   variant="extended"
+                  color="secondary"
                   size="small"
                   aria-label={doI18n("pages:content:add", i18nRef.current)}
                   sx={{
@@ -56,9 +57,7 @@ function ConfigureWorkspace() {
                       right: 16,
                       bottom: "auto",
                       left: "auto",
-                      position: 'fixed',
-                      backgroundColor: "#DAB1DA",
-                      color: "#OOO"
+                      position: 'fixed'
                   }}
                   onClick={
                       (e) => {
@@ -114,7 +113,7 @@ function ConfigureWorkspace() {
                             .map(
                                 ((rep, n) => {
                                         return <>
-                                            <Grid2 key={`${n}-name`} item size={4} sx={{backgroundColor: "#FFF"}}>
+                                            <Grid2 key={`${n}-name`} item size={4}>
                                                 <Stack>
                                                     <Box><b>{`${rep.name} (${rep.abbreviation})`}</b></Box>
                                                     {rep.description !== rep.name &&
@@ -122,25 +121,25 @@ function ConfigureWorkspace() {
                                                     }
                                                 </Stack>
                                             </Grid2>
-                                            <Grid2 key={`${n}-language`} item size={1} sx={{backgroundColor: "#FFF"}}>
+                                            <Grid2 key={`${n}-language`} item size={1}>
                                                 {rep.language_code}
                                             </Grid2>
-                                            <Grid2 key={`${n}-flavor`} item size={2} sx={{backgroundColor: "#FFF"}}>
+                                            <Grid2 key={`${n}-flavor`} item size={2}>
                                                 {rep.flavor}
                                             </Grid2>
-                                            <Grid2 key={`${n}-source`} item size={2} sx={{backgroundColor: "#FFF"}}>
+                                            <Grid2 key={`${n}-source`} item size={2}>
                                                 {
                                                     rep.path.startsWith("_local_") ?
                                                         "Local" :
                                                         rep.path.split("/").slice(0, 2).join(" ")
                                                 }
                                             </Grid2>
-                                            <Grid2 key={`${n}-date`} item size={2} sx={{backgroundColor: "#FFF"}}>
+                                            <Grid2 key={`${n}-date`} item size={2}>
                                                 {dateFormat(rep.generated_date, "mmm d yyyy")}
                                             </Grid2>
                                             <Grid2 key={`${n}-actions`} item size={1} display="flex"
                                                    justifyContent="flex-end" alignItems="center"
-                                                   sx={{backgroundColor: "#FFF"}}>
+                                                   >
                                                 <Checkbox
                                                     checked={selectedResources.includes(rep.path)}
                                                     onChange={

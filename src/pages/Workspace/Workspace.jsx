@@ -19,21 +19,7 @@ const paneStyle = {
     overflow: 'scroll'
 }
 
-const BackToProjects = () => {
-    const navigate = useNavigate();
-    return <IconButton
-        sx={{"color": "#FFF", m:0}}
-        onClick={
-            (e) => {
-                navigate("/");
-                e.stopPropagation();
-            }
-        }
-    >
-        <ArrowBack/>
-    </IconButton>
 
-}
 const Workspace = () => {
     const { typographyRef } = useContext(typographyContext);
     const locationState = Object.entries(useLocation().state);
