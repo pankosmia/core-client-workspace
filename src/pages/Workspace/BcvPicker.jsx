@@ -1,5 +1,5 @@
 import React, {useState, useContext, useEffect} from "react";
-import {Box, Button, MenuItem, Menu} from "@mui/material";
+import {Box, Button, MenuItem, Menu, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Typography} from "@mui/material";
 import {
     bcvContext as BcvContext,
     i18nContext as I18nContext,
@@ -9,6 +9,7 @@ import {
     doI18n,
     postEmptyJson,
     debugContext,
+    bcvContext,
 } from "pithekos-lib";
 
 function BcvPicker() {
@@ -44,27 +45,49 @@ function BcvPicker() {
         [currentProjectRef]
     )
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
+    const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
+    const menuIsOpen = Boolean(menuAnchorEl);
+    const [book, setBook] = useState('');
+    const [dialogIsOpen, setDialogIsOpen] = useState(false);
+
+    const handleMenuOpen = (target) => {
+        setMenuAnchorEl(target);
+    };
+    const handleMenuClose = () => {
+        setMenuAnchorEl(null);
+    };
+    const handleDialogOpen = (b) => {
+        handleMenuClose();
+        setBook(b);
+        setDialogIsOpen(true);
+    };
+    const handleDialogClose = () => {
+        setDialogIsOpen(false);
+        setBook('');
+    };
+    const handleChangeBook = (b) => {
+        postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current).then();
+        handleDialogClose();
+    };
 
     return <Box sx={{m: 0}}>
         <Button
             id="book-button"
             variant="contained"
             size="small"
-            aria-controls={open ? 'book-button-menu' : undefined}
+            aria-controls={menuIsOpen ? 'book-button-menu' : undefined}
             aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-            onClick={event => setAnchorEl(event.currentTarget)}
+            aria-expanded={menuIsOpen ? 'true' : undefined}
+            onClick={event => handleMenuOpen(event.currentTarget)}
             sx={{backgroundColor: "#E0E0E0", color: "#000", ml: 4}}
         >
             {doI18n(`scripture:books:${bcvRef.current.bookCode}`, i18nRef.current)}
         </Button>
         <Menu
             id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={() => setAnchorEl(null)}
+            anchorEl={menuAnchorEl}
+            open={menuIsOpen}
+            onClose={() => handleMenuClose()}
             MenuListProps={{
                 'aria-labelledby': 'basic-button',
             }}
@@ -73,12 +96,9 @@ function BcvPicker() {
                 contentBooks.map((b, n) =>
                     <MenuItem
                         key={n}
-                        disabled={b === (!bcvRef.current && bcvRef.current.bookCode)}
+                        disabled={b === (bcvRef.current && bcvRef.current.bookCode)}
                         onClick={
-                            () => {
-                                postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current)
-                                    .then(() => setAnchorEl(null));
-                            }
+                            () => handleDialogOpen(b)
                         }
                     >
                         {doI18n(`scripture:books:${b}`, i18nRef.current)}
@@ -86,6 +106,30 @@ function BcvPicker() {
                 )
             }
         </Menu>
+        <Dialog
+                open={dialogIsOpen}
+                onClose={handleDialogClose}
+                slotProps={{
+                    paper: {
+                        component: 'form',
+                    },
+                }}
+            >
+                <DialogTitle><b>{doI18n("pages:core-local-workspace:change_book", i18nRef.current)}</b></DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        <Typography>
+                            {doI18n("pages:core-local-workspace:change_book_question", i18nRef.current)}
+                        </Typography>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDialogClose}>{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
+                    <Button onClick={() => {
+                        handleChangeBook(book);
+                    }}>{doI18n("pages:core-local-workspace:accept", i18nRef.current)}</Button>
+                </DialogActions>
+            </Dialog>
     </Box>
 }
 
