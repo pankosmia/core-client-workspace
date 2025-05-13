@@ -45,22 +45,29 @@ function BcvPicker() {
         [currentProjectRef]
     )
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
+    const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
+    const menuIsOpen = Boolean(menuAnchorEl);
     const [book, setBook] = useState('');
-    const [isOpen, setIsOpen] = useState(false);
+    const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
-    const handleOpen = () => {
-        setIsOpen(true);
+    const handleMenuOpen = (target) => {
+        setMenuAnchorEl(target);
     };
-    const handleClose = () => {
-        setIsOpen(false);
-        setAnchorEl(null);
+    const handleMenuClose = () => {
+        setMenuAnchorEl(null);
+    };
+    const handleDialogOpen = (b) => {
+        handleMenuClose();
+        setBook(b);
+        setDialogIsOpen(true);
+    };
+    const handleDialogClose = () => {
+        setDialogIsOpen(false);
         setBook('');
     };
-    const handleChange = (b) => {
+    const handleChangeBook = (b) => {
         postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current).then();
-        handleClose();
+        handleDialogClose();
     };
 
     return <Box sx={{m: 0}}>
@@ -68,19 +75,19 @@ function BcvPicker() {
             id="book-button"
             variant="contained"
             size="small"
-            aria-controls={open ? 'book-button-menu' : undefined}
+            aria-controls={menuIsOpen ? 'book-button-menu' : undefined}
             aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-            onClick={event => setAnchorEl(event.currentTarget)}
+            aria-expanded={menuIsOpen ? 'true' : undefined}
+            onClick={event => handleMenuOpen(event.currentTarget)}
             sx={{backgroundColor: "#E0E0E0", color: "#000", ml: 4}}
         >
             {doI18n(`scripture:books:${bcvRef.current.bookCode}`, i18nRef.current)}
         </Button>
         <Menu
             id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={() => setAnchorEl(null)}
+            anchorEl={menuAnchorEl}
+            open={menuIsOpen}
+            onClose={() => handleMenuClose()}
             MenuListProps={{
                 'aria-labelledby': 'basic-button',
             }}
@@ -91,10 +98,7 @@ function BcvPicker() {
                         key={n}
                         disabled={b === (bcvRef.current && bcvRef.current.bookCode)}
                         onClick={
-                            () => {
-                                setBook(b);
-                                handleOpen();
-                            }
+                            () => handleDialogOpen(b)
                         }
                     >
                         {doI18n(`scripture:books:${b}`, i18nRef.current)}
@@ -103,8 +107,8 @@ function BcvPicker() {
             }
         </Menu>
         <Dialog
-                open={isOpen}
-                onClose={handleClose}
+                open={dialogIsOpen}
+                onClose={handleDialogClose}
                 slotProps={{
                     paper: {
                         component: 'form',
@@ -120,9 +124,9 @@ function BcvPicker() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
+                    <Button onClick={handleDialogClose}>{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
                     <Button onClick={() => {
-                        handleChange(book);
+                        handleChangeBook(book);
                     }}>{doI18n("pages:core-local-workspace:accept", i18nRef.current)}</Button>
                 </DialogActions>
             </Dialog>
