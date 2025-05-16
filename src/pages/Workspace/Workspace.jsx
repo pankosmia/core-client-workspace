@@ -1,16 +1,14 @@
-import React, { useContext } from 'react';
-import {useLocation, useNavigate} from "react-router-dom";
+import { useContext } from 'react';
+import {useLocation} from "react-router-dom";
 import WorkspaceCard from "./WorkspaceCard";
 import BcvPicker from "./BcvPicker";
-import ArrowBack from "@mui/icons-material/ArrowBack";
-import {Box} from "@mui/material";
+import {useDetectRender} from 'font-detect-rhl';
 import {
     createTilePanes,
     TileContainer,
     TileProvider,
 } from 'react-tile-pane'
 import {Header} from "pithekos-lib";
-import {IconButton} from "@mui/material";
 import {typographyContext} from "pithekos-lib";
 
 const paneStyle = {
@@ -55,7 +53,10 @@ const Workspace = () => {
     }
     const paneList = createTilePanes(tileElements)[0];
 
-    const selectedFontClass = typographyRef.current.font_set;
+    const testFont = [{ name: 'Pankosmia-Awami Nastaliq for Graphite Test' }];
+    const renderType = useDetectRender({fonts:testFont});
+    const isGraphite = (renderType[0].detectedRender === 'RenderingGraphite')
+    const selectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
 
     return <>
         <Header
