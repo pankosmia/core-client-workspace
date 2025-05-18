@@ -54,7 +54,7 @@ const Workspace = () => {
     const paneList = createTilePanes(tileElements)[0];
     
     const isGraphite = GraphiteTest()
-    /** adjSelectedFontClass is reshaped for the presence or absence of Graphite. */
+    /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
     const adjSelectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
 
     return <>
