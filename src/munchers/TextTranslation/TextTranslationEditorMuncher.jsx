@@ -14,7 +14,7 @@ import {enqueueSnackbar} from "notistack";
 import Editor from "./Editor";
 import {useAppReferenceHandler} from "./useAppReferenceHandler";
 
-function TextTranslationEditorMuncher({metadata, selectedFontClass}) {
+function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
     const {bcvRef} = useContext(BcvContext);
     const {debugRef} = useContext(DebugContext);
     const {i18nRef} = useContext(I18nContext);

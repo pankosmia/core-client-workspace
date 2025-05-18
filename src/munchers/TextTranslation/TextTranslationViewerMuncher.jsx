@@ -4,7 +4,7 @@ import {Proskomma} from 'proskomma-core';
 
 import {getText, debugContext, bcvContext} from "pithekos-lib";
 
-function TextTranslationViewerMuncher({metadata, selectedFontClass}) {
+function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
     const {systemBcv} = useContext(bcvContext);
     const {debugRef} = useContext(debugContext);
     const [verseText, setVerseText] = useState([]);
@@ -46,7 +46,7 @@ function TextTranslationViewerMuncher({metadata, selectedFontClass}) {
         }
     }
 
-    return <div className={selectedFontClass}>
+    return <div className={adjSelectedFontClass}>
         {
             verseText.length > 0 ?
                 verseText.map(b => <p style={{marginBottom: "1em"}}>{b.items.map(i => renderItem(i))}</p>) :

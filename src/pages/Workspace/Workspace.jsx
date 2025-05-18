@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import {useLocation} from "react-router-dom";
 import WorkspaceCard from "./WorkspaceCard";
 import BcvPicker from "./BcvPicker";
-import {useDetectRender} from 'font-detect-rhl';
+import GraphiteTest from "./GraphiteTest";
 import {
     createTilePanes,
     TileContainer,
@@ -52,11 +52,10 @@ const Workspace = () => {
         rootPane.children.pop();
     }
     const paneList = createTilePanes(tileElements)[0];
-
-    const testFont = [{ name: 'Pankosmia-Awami Nastaliq for Graphite Test' }];
-    const renderType = useDetectRender({fonts:testFont});
-    const isGraphite = (renderType[0].detectedRender === 'RenderingGraphite')
-    const selectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
+    
+    const isGraphite = GraphiteTest()
+    /** adjSelectedFontClass is reshaped for the presence or absence of Graphite. */
+    const adjSelectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
 
     return <>
         <Header
@@ -65,7 +64,7 @@ const Workspace = () => {
             currentId="core-local-workspace"
             widget={<BcvPicker/>}
         />
-        <div className={selectedFontClass}>
+        <div className={adjSelectedFontClass}>
           <TileProvider
               tilePanes={paneList}
               rootNode={rootPane}
