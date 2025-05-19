@@ -1,16 +1,14 @@
-import React, { useContext } from 'react';
-import {useLocation, useNavigate} from "react-router-dom";
+import { useContext } from 'react';
+import {useLocation} from "react-router-dom";
 import WorkspaceCard from "./WorkspaceCard";
 import BcvPicker from "./BcvPicker";
-import ArrowBack from "@mui/icons-material/ArrowBack";
-import {Box} from "@mui/material";
+import GraphiteTest from "./GraphiteTest";
 import {
     createTilePanes,
     TileContainer,
     TileProvider,
 } from 'react-tile-pane'
 import {Header} from "pithekos-lib";
-import {IconButton} from "@mui/material";
 import {typographyContext} from "pithekos-lib";
 
 const paneStyle = {
@@ -54,8 +52,10 @@ const Workspace = () => {
         rootPane.children.pop();
     }
     const paneList = createTilePanes(tileElements)[0];
-
-    const selectedFontClass = typographyRef.current.font_set;
+    
+    const isGraphite = GraphiteTest()
+    /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
+    const adjSelectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
 
     return <>
         <Header
@@ -64,7 +64,7 @@ const Workspace = () => {
             currentId="core-local-workspace"
             widget={<BcvPicker/>}
         />
-        <div className={selectedFontClass}>
+        <div className={adjSelectedFontClass}>
           <TileProvider
               tilePanes={paneList}
               rootNode={rootPane}
