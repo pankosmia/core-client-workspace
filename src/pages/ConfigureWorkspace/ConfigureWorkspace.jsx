@@ -1,7 +1,8 @@
 import React, {useState, useEffect, useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n} from "pithekos-lib";
-import {Grid2, Stack, Box, Typography, Checkbox, Fab} from "@mui/material";
+import {Grid2, Stack, Box, Typography, Checkbox, Fab, Masonry} from "@mui/material";
+import { styled } from '@mui/material/styles';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import dateFormat from 'dateformat';
 
@@ -14,6 +15,17 @@ function ConfigureWorkspace() {
     const [selectedResources, setSelectedResources] = useState([]);
 
     const navigate = useNavigate();
+
+    const Item = styled(Paper)(({ theme }) => ({
+        backgroundColor: '#fff',
+        ...theme.typography.body2,
+        padding: theme.spacing(0.5),
+        textAlign: 'center',
+        color: (theme.vars || theme).palette.text.secondary,
+        ...theme.applyStyles('dark', {
+            backgroundColor: '#1A2027',
+        }),
+    }));
 
     const getRepoList = async () => {
         const listResponse = await getJson("/git/list-local-repos", debugRef.current);
@@ -86,9 +98,10 @@ function ConfigureWorkspace() {
               </Fab>
             </Box>
             <Box style={{position: 'fixed', top: '105px', bottom: 0, overflow: 'scroll', marginBottom: "16px", width: '100%'}}>
-                <Grid2
+                <Masonry
                     container
                     spacing={1}
+                    columns={1}
                     sx={{
                         ml: "16px",
                         '--Grid-borderWidth': '1px',
@@ -102,42 +115,42 @@ function ConfigureWorkspace() {
                         }
                     }}
                 >
-                    <Grid2 item size={12}>
+                    <Item sx={ 2 }>
                         <Typography variant="h6">
                             {doI18n("pages:core-local-workspace:choose_resources", i18nRef.current)}
                         </Typography>
-                    </Grid2>
+                    </Item>
                     {
                         repos
                             .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
                             .map(
                                 ((rep, n) => {
                                         return <>
-                                            <Grid2 key={`${n}-name`} item size={4}>
+                                            <Item key={`${n}-name`} sx={ 4 }>
                                                 <Stack>
                                                     <Box><b>{`${rep.name} (${rep.abbreviation})`}</b></Box>
                                                     {rep.description !== rep.name &&
                                                         <Box>{rep.description}</Box>
                                                     }
                                                 </Stack>
-                                            </Grid2>
-                                            <Grid2 key={`${n}-language`} item size={1}>
+                                            </Item>
+                                            <Item key={`${n}-language`} sx={ 1 }>
                                                 {rep.language_code}
-                                            </Grid2>
-                                            <Grid2 key={`${n}-flavor`} item size={2}>
+                                            </Item>
+                                            <Item key={`${n}-flavor`} sx={ 2 }>
                                                 {rep.flavor}
-                                            </Grid2>
-                                            <Grid2 key={`${n}-source`} item size={2}>
+                                            </Item>
+                                            <Item key={`${n}-source`} sx={ 2 }>
                                                 {
                                                     rep.path.startsWith("_local_") ?
                                                         "Local" :
                                                         rep.path.split("/").slice(0, 2).join(" ")
                                                 }
-                                            </Grid2>
-                                            <Grid2 key={`${n}-date`} item size={2}>
+                                            </Item>
+                                            <Item key={`${n}-date`} sx={ 2 }>
                                                 {dateFormat(rep.generated_date, "mmm d yyyy")}
-                                            </Grid2>
-                                            <Grid2 key={`${n}-actions`} item size={1} display="flex"
+                                            </Item>
+                                            <Item key={`${n}-actions`} sx={ 1 } display="flex"
                                                    justifyContent="flex-end" alignItems="center"
                                                    >
                                                 <Checkbox
@@ -151,13 +164,13 @@ function ConfigureWorkspace() {
                                                     }
                                                     inputProps={{'aria-label': 'controlled'}}
                                                 />
-                                            </Grid2>
+                                            </Item>
                                         </>
                                     }
                                 )
                             )
                     }
-                </Grid2>
+                </Masonry>
             </Box>
         </Box>
 }
