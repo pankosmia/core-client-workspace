@@ -119,5 +119,5 @@ function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
         />
         : <div>Loading data...</div>;
 }
-
+console.log("nous sommes ici editeur ");
 export default TextTranslationEditorMuncher;
