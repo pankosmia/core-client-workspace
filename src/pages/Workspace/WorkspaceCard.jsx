@@ -8,6 +8,7 @@ import BcvImagesViewerMuncher from "../../munchers/BcvImages/BcvImagesViewerMunc
 import TastelessMuncher from "../../munchers/Tasteless/TastelessMuncher";
 import './tiles_styles.css'
 import VideoLinksViewerMuncher from "../../munchers/VideoLinks/VideoLinksViewerMuncher";
+import BNotesViewerMuncher from "../../munchers/BNotes/BNotesViewerMuncher";
 
 function WorkspaceCard({metadata, style}) {
     const scriptDirectionString =  metadata.script_direction === 'rtl' ? 'rtl' : 'ltr';
@@ -28,6 +29,13 @@ function WorkspaceCard({metadata, style}) {
     if (metadata.flavor.toLowerCase() === "x-bcvnotes") {
         return <div style={style} dir={scriptDirectionString}>
             <BcvNotesViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
+    if (metadata.flavor.toLowerCase() === "x-bnotes") {
+        return <div style={style} dir={scriptDirectionString}>
+            <BNotesViewerMuncher
                 metadata={metadata}
             />
         </div>

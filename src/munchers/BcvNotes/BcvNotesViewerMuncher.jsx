@@ -37,9 +37,23 @@ function BcvNotesViewerMuncher({metadata}) {
         [systemBcv]
     );
 
+    const cvInRange = (cv, range) => {
+        const [cvC, cvV] = cv.split(":");
+        const [rangeC, rangeV] = range.split(":");
+        if (cvC !== rangeC) {
+            return false;
+        }
+        if (rangeV.includes("-")) {
+            const [fromV, toV] = rangeV.split("-").map(v => parseInt(v));
+            return (cvV >= fromV && cvV <= toV)
+        } else {
+            return (cvV === rangeV);
+        }
+    }
+
     const verseNotes = ingredient
-        .filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)
-        .map(l => l[6]);
+        .filter(l => cvInRange(`${systemBcv.chapterNum}:${systemBcv.verseNum}`, l[0]))
+        .map(l => l[6] || l[5]);
     return (
         <Box>
             <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
