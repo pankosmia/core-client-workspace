@@ -54,5 +54,4 @@ function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
         }
     </div>
 }
-console.log("nous sommes ici viewer")
 export default TextTranslationViewerMuncher;

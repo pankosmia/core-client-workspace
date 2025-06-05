@@ -50,9 +50,8 @@ function BcvNotesViewerMuncher({metadata}) {
                         verseNotes.length > 0 ? verseNotes.join("\n***\n") : "No notes found for this verse"
                     }</Markdown>}
             </div>
-            <p>premier muncher </p>
         </Box>
     );
 }
-console.log("nous sommes ici vue")
+
 export default BcvNotesViewerMuncher;
