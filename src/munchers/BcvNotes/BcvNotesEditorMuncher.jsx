@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Paper, TextField, ButtonGroup, Button, CardContent, ListSubheader, TextareaAutosize, List, ListItemButton, ListItemIcon, ListItemText, Collapse, FormControl, FormLabel } from "@mui/material";
+import { Box, Paper, TextField, ButtonGroup, Button, ToggleButton,ToggleButtonGroup, CardContent, ListSubheader, TextareaAutosize, List, ListItemButton, ListItemIcon, ListItemText, Collapse, FormControl, FormLabel } from "@mui/material";
 import { ExpandLess, ExpandMore, StarBorder } from "@mui/icons-material"
 import Markdown from 'react-markdown';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
@@ -19,8 +19,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { i18nRef } = useContext(I18nContext);
     const [open, setOpen] = useState(true);
     const [stateButtonNote, setStateButtonNote] = useState('write');
-    const [mode, setMode] = useState('');
-
+    const [notes, setNotes] = useState();
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
         let response = await getText(ingredientLink, debugRef.current);
@@ -132,14 +131,13 @@ function BcvNotesViewerMuncher({ metadata }) {
                         <TextField fullWidth label="Quote" margin="normal" value={referenceQuoteNotes} />
                         <TextField fullWidth label="Occurence" margin="normal" value={referenceOccurrenceNotes} />
 
-                        <ButtonGroup
-                            disableElevation
-                            variant="contained"
-                            aria-label="Disabled button group"
+                        <ToggleButtonGroup
+                            exclusive
+                            aria-label="Platform"
                         >
-                            <Button onClick={() => setStateButtonNote('write')}>Write </Button>
-                            <Button onClick={() => setStateButtonNote('preview')} > Preview </Button>
-                        </ButtonGroup>
+                            <ToggleButton onClick={() => setStateButtonNote('write')}>Write</ToggleButton>
+                            <ToggleButton onClick={() => setStateButtonNote('preview')} > Preview</ToggleButton>
+                        </ToggleButtonGroup>
 
                         {stateButtonNote === 'write' ? (
                             <FormControl fullWidth margin="normal">
@@ -147,6 +145,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                                 <TextareaAutosize
                                     minRows={4}
                                     value={verseNotes}
+                                    onChange={(e) => setNotes(e.target.value)}
                                     style={{
                                         width: '100%',
                                         maxHeight: '300px',
