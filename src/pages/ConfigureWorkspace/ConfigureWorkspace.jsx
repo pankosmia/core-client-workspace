@@ -1,7 +1,8 @@
 import React, {useState, useEffect, useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n} from "pithekos-lib";
-import {Grid2, Stack, Box, Typography, Checkbox, Fab, Masonry} from "@mui/material";
+import {Stack, Box, Typography, Checkbox, Fab} from "@mui/material";
+import { Masonry } from '@mui/lab';
 import { styled } from '@mui/material/styles';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import dateFormat from 'dateformat';
@@ -16,7 +17,9 @@ function ConfigureWorkspace() {
 
     const navigate = useNavigate();
 
-    const Item = styled(Paper)(({ theme }) => ({
+    const heights = [30, 30, 30, 30, 30, 30];
+
+/*      const Item = styled(Box)(({ theme }) => ({
         backgroundColor: '#fff',
         ...theme.typography.body2,
         padding: theme.spacing(0.5),
@@ -25,8 +28,8 @@ function ConfigureWorkspace() {
         ...theme.applyStyles('dark', {
             backgroundColor: '#1A2027',
         }),
-    }));
-
+    })); */
+ 
     const getRepoList = async () => {
         const listResponse = await getJson("/git/list-local-repos", debugRef.current);
         if (listResponse.ok) {
@@ -98,59 +101,46 @@ function ConfigureWorkspace() {
               </Fab>
             </Box>
             <Box style={{position: 'fixed', top: '105px', bottom: 0, overflow: 'scroll', marginBottom: "16px", width: '100%'}}>
+                <Typography variant="h6">
+                    {doI18n("pages:core-local-workspace:choose_resources", i18nRef.current)}
+                </Typography>
                 <Masonry
                     container
-                    spacing={1}
-                    columns={1}
-                    sx={{
-                        ml: "16px",
-                        '--Grid-borderWidth': '1px',
-                        borderTop: 'var(--Grid-borderWidth) solid',
-                        borderLeft: 'var(--Grid-borderWidth) solid',
-                        borderColor: 'divider',
-                        '& > div': {
-                            borderRight: 'var(--Grid-borderWidth) solid',
-                            borderBottom: 'var(--Grid-borderWidth) solid',
-                            borderColor: 'divider',
-                        }
-                    }}
+                    spacing={5}
+                    columns={6}
+                   /*    */
                 >
-                    <Item sx={ 2 }>
-                        <Typography variant="h6">
-                            {doI18n("pages:core-local-workspace:choose_resources", i18nRef.current)}
-                        </Typography>
-                    </Item>
                     {
                         repos
                             .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
                             .map(
                                 ((rep, n) => {
                                         return <>
-                                            <Item key={`${n}-name`} sx={ 4 }>
+                                            <Box key={`${n}-name`}  sx={{ backgroudColor:"red" }} >
                                                 <Stack>
                                                     <Box><b>{`${rep.name} (${rep.abbreviation})`}</b></Box>
                                                     {rep.description !== rep.name &&
                                                         <Box>{rep.description}</Box>
                                                     }
                                                 </Stack>
-                                            </Item>
-                                            <Item key={`${n}-language`} sx={ 1 }>
+                                            </Box>
+                                            <Box key={`${n}-language`} sx={ 30 }>
                                                 {rep.language_code}
-                                            </Item>
-                                            <Item key={`${n}-flavor`} sx={ 2 }>
+                                            </Box>
+                                            <Box key={`${n}-flavor`} sx={ 30 }>
                                                 {rep.flavor}
-                                            </Item>
-                                            <Item key={`${n}-source`} sx={ 2 }>
+                                            </Box>
+                                            <Box key={`${n}-source`} sx={ 30 }>
                                                 {
                                                     rep.path.startsWith("_local_") ?
                                                         "Local" :
                                                         rep.path.split("/").slice(0, 2).join(" ")
                                                 }
-                                            </Item>
-                                            <Item key={`${n}-date`} sx={ 2 }>
+                                            </Box>
+                                            <Box key={`${n}-date`} sx={ 30 }>
                                                 {dateFormat(rep.generated_date, "mmm d yyyy")}
-                                            </Item>
-                                            <Item key={`${n}-actions`} sx={ 1 } display="flex"
+                                            </Box>
+                                            <Box key={`${n}-actions`} sx={ 30 } display="flex"
                                                    justifyContent="flex-end" alignItems="center"
                                                    >
                                                 <Checkbox
@@ -162,9 +152,8 @@ function ConfigureWorkspace() {
                                                                 [...selectedResources, rep.path]
                                                         )
                                                     }
-                                                    inputProps={{'aria-label': 'controlled'}}
                                                 />
-                                            </Item>
+                                            </Box> 
                                         </>
                                     }
                                 )
