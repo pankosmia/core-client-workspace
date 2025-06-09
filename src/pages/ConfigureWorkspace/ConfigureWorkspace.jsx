@@ -107,7 +107,7 @@ function ConfigureWorkspace() {
                 <Masonry
                     container
                     spacing={5}
-                    columns={6}
+                    columns={{ xs: 1, md: 2, lg: 3, xl: 4 }}
                     sx={{ paddingLeft: 4, paddingRight: 4 }}
                 >
                     {
@@ -115,17 +115,15 @@ function ConfigureWorkspace() {
                             .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
                             .map(
                                 ((rep, n) => {
-                                        return <Card>
+                                        return <Card sx={{ minWidth: 300, minHeight: 300 }}>
                                             <CardActionArea 
                                                 sx={{
-                                                    height: 300,
-                                                    width: 300,
+                                                    height: "100%",
+                                                    width: "100%", 
                                                     display: 'flex',
                                                     alignItems: 'flex-start',
                                                     flexDirection: 'column',
                                                     justifyContent: 'space-between',
-                                                    p: 1,
-                                                    m: 1,
                                                     position:'relative'
                                                   }}
                                                 onClick={
@@ -158,12 +156,12 @@ function ConfigureWorkspace() {
                                                         {/* <Typography key={`${n}-date`}>
                                                             {dateFormat(rep.generated_date, "mmm d yyyy")}
                                                         </Typography> */}
-                                                        <Typography key={`${n}-language`} sx={{ position: 'absolute', bottom: 8, color: 'text.secondary', fontSize: 14 }}>
-                                                            {`language: ${rep.language_code}`}
+                                                        <Typography key={`${n}-language`} sx={{ position: 'absolute', bottom: "3%", color: 'text.secondary', fontSize: 14 }}>
+                                                            {`${doI18n("pages:core-local-workspace:language", i18nRef.current, debugRef.current)}: ${rep.language_code}`}
                                                         </Typography>
                                                         <Checkbox
                                                             disableRipple
-                                                            sx={{ position: 'absolute', bottom: 0, left: 220 }}
+                                                            sx={{ position: 'absolute', bottom: "0%", left: "45%" }}
                                                             checked={selectedResources.includes(rep.path)}
                                                             onChange={
                                                                 () => setSelectedResources(
