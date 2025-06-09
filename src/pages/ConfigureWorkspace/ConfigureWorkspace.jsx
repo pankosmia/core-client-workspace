@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n} from "pithekos-lib";
-import {Stack, Box, Typography, Checkbox, Fab} from "@mui/material";
+import {Stack, Box, Typography, Checkbox, Fab, Card, CardContent, CardActionArea} from "@mui/material";
 import { Masonry } from '@mui/lab';
 import { styled } from '@mui/material/styles';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -101,60 +101,81 @@ function ConfigureWorkspace() {
               </Fab>
             </Box>
             <Box style={{position: 'fixed', top: '105px', bottom: 0, overflow: 'scroll', marginBottom: "16px", width: '100%'}}>
-                <Typography variant="h6">
+                <Typography variant="h5" color='black' sx={{ paddingBottom: 5, paddingLeft: 6 }}>
                     {doI18n("pages:core-local-workspace:choose_resources", i18nRef.current)}
                 </Typography>
                 <Masonry
                     container
                     spacing={5}
                     columns={6}
-                   /*    */
+                    sx={{ paddingLeft: 4, paddingRight: 4 }}
                 >
                     {
                         repos
                             .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
                             .map(
                                 ((rep, n) => {
-                                        return <>
-                                            <Box key={`${n}-name`}  sx={{ backgroudColor:"red" }} >
-                                                <Stack>
-                                                    <Box><b>{`${rep.name} (${rep.abbreviation})`}</b></Box>
-                                                    {rep.description !== rep.name &&
-                                                        <Box>{rep.description}</Box>
-                                                    }
-                                                </Stack>
-                                            </Box>
-                                            <Box key={`${n}-language`} sx={ 30 }>
-                                                {rep.language_code}
-                                            </Box>
-                                            <Box key={`${n}-flavor`} sx={ 30 }>
-                                                {rep.flavor}
-                                            </Box>
-                                            <Box key={`${n}-source`} sx={ 30 }>
-                                                {
-                                                    rep.path.startsWith("_local_") ?
-                                                        "Local" :
-                                                        rep.path.split("/").slice(0, 2).join(" ")
+                                        return <Card>
+                                            <CardActionArea 
+                                                sx={{
+                                                    height: 300,
+                                                    width: 300,
+                                                    display: 'flex',
+                                                    alignItems: 'flex-start',
+                                                    flexDirection: 'column',
+                                                    justifyContent: 'space-between',
+                                                    p: 1,
+                                                    m: 1,
+                                                    position:'relative'
+                                                  }}
+                                                onClick={
+                                                    () => setSelectedResources(
+                                                        selectedResources.includes(rep.path) ?
+                                                            [...selectedResources].filter(s => s !== rep.path) :
+                                                            [...selectedResources, rep.path]
+                                                    )
                                                 }
-                                            </Box>
-                                            <Box key={`${n}-date`} sx={ 30 }>
-                                                {dateFormat(rep.generated_date, "mmm d yyyy")}
-                                            </Box>
-                                            <Box key={`${n}-actions`} sx={ 30 } display="flex"
-                                                   justifyContent="flex-end" alignItems="center"
-                                                   >
-                                                <Checkbox
-                                                    checked={selectedResources.includes(rep.path)}
-                                                    onChange={
-                                                        () => setSelectedResources(
-                                                            selectedResources.includes(rep.path) ?
-                                                                [...selectedResources].filter(s => s !== rep.path) :
-                                                                [...selectedResources, rep.path]
-                                                        )
-                                                    }
-                                                />
-                                            </Box> 
-                                        </>
+                                            >
+                                                <CardContent>
+                                                        <Typography key={`${n}-name`}  sx={{ backgroudColor:"red" }} >
+                                                            <Stack>
+                                                                <Box><b>{`${rep.name} (${rep.abbreviation})`}</b></Box>
+                                                                {rep.description !== rep.name &&
+                                                                    <Box sx={{ height: 100, overflow:'auto'}}>{rep.description}</Box>
+                                                                }
+                                                            </Stack>
+                                                        </Typography>
+                                                        {/*  <Typography key={`${n}-flavor`}>
+                                                                {rep.flavor}
+                                                            </Typography> */}
+                                                        {/* <Typography key={`${n}-source`}>
+                                                            {
+                                                                rep.path.startsWith("_local_") ?
+                                                                    "Local" :
+                                                                    rep.path.split("/").slice(0, 2).join(" ")
+                                                            }
+                                                        </Typography> */}
+                                                        {/* <Typography key={`${n}-date`}>
+                                                            {dateFormat(rep.generated_date, "mmm d yyyy")}
+                                                        </Typography> */}
+                                                        <Typography key={`${n}-language`} sx={{ position: 'absolute', bottom: 8, color: 'text.secondary', fontSize: 14 }}>
+                                                            {`language: ${rep.language_code}`}
+                                                        </Typography>
+                                                        <Checkbox
+                                                            disableRipple
+                                                            sx={{ position: 'absolute', bottom: 0, left: 220 }}
+                                                            checked={selectedResources.includes(rep.path)}
+                                                            onChange={
+                                                                () => setSelectedResources(
+                                                                    selectedResources.includes(rep.path) ?
+                                                                        [...selectedResources].filter(s => s !== rep.path) :
+                                                                        [...selectedResources, rep.path]
+                                                                )
+                                                            }
+                                                        />
+                                                </CardContent>
+                                            </CardActionArea>
+                                        </Card>
                                     }
                                 )
                             )
