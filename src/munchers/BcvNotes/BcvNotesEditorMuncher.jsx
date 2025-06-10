@@ -19,10 +19,10 @@ import {
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
-    const { systemBcv } = useContext(BcvContext);
+    const { systemBcv, setSystemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const { i18nRef } = useContext(I18nContext);
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     const [stateButtonNote, setStateButtonNote] = useState('write');
     const [currentRow, setCurrentRow] = useState('');
     const [currentNote, setCurrentNote] = useState('');
@@ -31,8 +31,10 @@ function BcvNotesViewerMuncher({ metadata }) {
     const [currentSupportReference, setCurrentSupportReference] = useState('');
     const [currentQuote, setCurrentQuote] = useState('');
     const [currentOccurrence, setCurrentOccurrence] = useState('');
+    const [currentChapter, setCurrentChapter] = useState('');
+    const [currentVerse, setCurrentVerse] = useState('');
     const [value, setValue] = useState('');
-
+    const [contentChanged, _setContentChanged] = useState(false);
     const [page, setPage] = useState(4)
 
     const getAllData = async () => {
@@ -48,13 +50,13 @@ function BcvNotesViewerMuncher({ metadata }) {
             setIngredient([])
         }
     };
-
     useEffect(
         () => {
             getAllData().then();
         },
         [systemBcv]
     );
+
 
     const handleClick = () => {
         setOpen(!open);
@@ -96,16 +98,61 @@ function BcvNotesViewerMuncher({ metadata }) {
         }
     }, [ingredient, systemBcv]);
 
+    const setContentChanged = nv => {
+        console.log("setContentChanged", nv);
+        _setContentChanged(nv);
+    }
+
     const handleChange = (e) => {
-        setCurrentNote(e.target.value);
+        const { name, value } = e.target;
+
+        if (name === "note") {
+            setCurrentNote(value);
+            setContentChanged(true);
+        } else if (name === "reference") {
+            setCurrentReference(value);
+            setContentChanged(true);
+            const [chapter, verse] = value.split(":").map(Number);
+            if (!isNaN(chapter) && !isNaN(verse)) {
+                setSystemBcv({
+                    ...systemBcv,
+                    chapterNum: chapter,
+                    verseNum: verse
+                });
+                const newCurrentRow = ingredient.find(l => l[0] === value);
+                if (newCurrentRow) {
+                    setCurrentRow(newCurrentRow[1]);
+                    setCurrentTags(newCurrentRow[2]);
+                    setCurrentSupportReference(newCurrentRow[3]);
+                    setCurrentQuote(newCurrentRow[4]);
+                    setCurrentOccurrence(newCurrentRow[5]);
+                    setCurrentNote(newCurrentRow[6]);
+                }
+            } else {
+                console.warn("Référence invalide :", value);
+            }
+        }
     };
+
+    const chapters = [systemBcv.chapterNum]
+    const verses = currentChapter
+        ? ingredient.filter(item => item[0].startsWith(`${currentChapter}:`))
+        : [];
+
+
+    useEffect(() => {
+        if (systemBcv?.chapterNum && systemBcv?.verseNum) {
+            const ref = `${systemBcv.chapterNum}:${systemBcv.verseNum}`;
+            setCurrentChapter(systemBcv.chapterNum);
+            setCurrentVerse(ref);
+        }
+    }, [systemBcv]);
 
     const handleSave = () => {
         console.log("Ligne actuelle modifiée :", currentRow);
     }
     const handlePage = (event, value) => {
         setPage(value);
-
         const row = ingredient[value - 1];
         if (row) {
             setCurrentReference(row[0] || "");
@@ -117,6 +164,65 @@ function BcvNotesViewerMuncher({ metadata }) {
             setCurrentNote(row[6] || "");
         }
     };
+    // const handleChangeSystemBcv = (reference,id) => {
+    //     setCurrentVerse(reference);
+    //     setContentChanged(true);
+
+    //     const [chapter, verse] = reference.split(':').map(Number);
+
+    //     if (!isNaN(chapter) && !isNaN(verse)) {
+    //         setSystemBcv({
+    //             ...systemBcv,
+    //             chapterNum: chapter,
+    //             verseNum: verse
+    //         });
+
+    //         const newCurrentRow = ingredient.find(l => l[0] === reference);
+    //         if (newCurrentRow) {
+    //             setCurrentRow(newCurrentRow[1]);
+    //             setCurrentTags(newCurrentRow[2]);
+    //             setCurrentSupportReference(newCurrentRow[3]);
+    //             setCurrentQuote(newCurrentRow[4]);
+    //             setCurrentOccurrence(newCurrentRow[5]);
+    //             setCurrentNote(newCurrentRow[6]);
+    //         }
+    //     } else {
+    //         console.warn("Référence invalide :", reference);
+    //     }
+    // };
+
+    const handleChangeSystemBcv = (reference, id) => {
+        setCurrentVerse(reference);
+        setContentChanged(true);
+
+        const [chapter, verse] = reference.split(':').map(Number);
+
+        if (!isNaN(chapter) && !isNaN(verse)) {
+            setSystemBcv({
+                ...systemBcv,
+                chapterNum: chapter,
+                verseNum: verse
+            });
+
+            const newCurrentRow = ingredient.find(l => l[0] === reference && l[1] === id);
+            if (newCurrentRow) {
+                
+                    //setCurrentRow(newCurrentRow[1])
+                    setCurrentRow(newCurrentRow[2]);
+                    setCurrentTags(newCurrentRow[3]);
+                    setCurrentSupportReference(newCurrentRow[4]);
+                    setCurrentQuote(newCurrentRow[5]);
+                    setCurrentOccurrence(newCurrentRow[6]);
+                    setCurrentNote(newCurrentRow[7]);
+                } else {
+                    console.warn("L'ID trouvé ne correspond pas à l'ID passé pour la référence :", reference, "ID passé:", id);
+                }
+        } else {
+            console.warn("Référence invalide :", reference);
+        }
+        console.log("L'ID trouvé ne correspond pas à l'ID passé pour la référence :", reference, "ID passé:", id);
+    };
+
     const Search = styled('div')(({ theme }) => ({
         position: 'relative',
         borderRadius: theme.shape.borderRadius,
@@ -147,7 +253,6 @@ function BcvNotesViewerMuncher({ metadata }) {
         color: 'inherit',
         '& .MuiInputBase-input': {
             padding: theme.spacing(1, 1, 1, 0),
-            // vertical padding + font size from searchIcon
             paddingLeft: `calc(1em + ${theme.spacing(4)})`,
             transition: theme.transitions.create('width'),
             width: '100%',
@@ -178,7 +283,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                 justifyContent="center"
                 alignItems="center"
                 width="100%"
-                gap={2} 
+                gap={2}
                 padding={2}>
                 <Search>
                     <SearchIconWrapper>
@@ -206,16 +311,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                 </ToggleButtonGroup>
             </Box>
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
-                <List
-                    sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
-                    component="nav"
-                    aria-labelledby="nested-list-subheader"
-                    subheader={
-                        <ListSubheader component="div" id="nested-list-subheader">
-                            Chapitre par livre selectionné
-                        </ListSubheader>
-                    }
-                >
+                <List>
                     <ListItemButton onClick={handleClick}>
                         <ListItemIcon>
                             <AutoStoriesIcon />
@@ -223,20 +319,54 @@ function BcvNotesViewerMuncher({ metadata }) {
                         <ListItemText primary="Chapter" />
                         {open ? <ExpandLess /> : <ExpandMore />}
                     </ListItemButton>
+
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <List component="div" disablePadding>
-                            <ListItemButton sx={{ pl: 4 }}>
-                                <ListItemIcon>
-                                    <StickyNote2Icon />
-                                </ListItemIcon>
-                                <ListItemText primary="Verse" />
-                            </ListItemButton>
+                            {chapters.map(chap => (
+                                <>
+                                    <ListItemButton
+                                        key={chap}
+                                        sx={{ pl: 4 }}
+                                        selected={chap === currentChapter}
+                                        onClick={() => {
+                                            setCurrentChapter(chap);
+                                            setCurrentVerse(null);
+                                        }}
+                                    >
+                                        <ListItemText primary={`Chapitre ${chap}`} />
+                                    </ListItemButton>
+
+                                    {chap === currentChapter && (
+                                        <Collapse in timeout="auto" unmountOnExit>
+                                            <List component="div" disablePadding>
+                                                {verses.map(v => (
+                                                    <ListItemButton
+                                                        key={v[0]}
+                                                        sx={{
+                                                            maxHeight: '50px',
+                                                            overflowY: 'auto',
+                                                            pl: 8,
+                                                        }}
+                                                        selected={v[0] === currentVerse}
+                                                        onClick={() => handleChangeSystemBcv(v[0], v[1])}
+                                                    >
+                                                        <ListItemText primary={`Verset ${v[0].split(':')[1]} - ${v[1]}`} />
+                                                    </ListItemButton>
+                                                ))}
+
+                                            </List>
+                                        </Collapse>
+                                    )}
+                                </>
+                            ))}
                         </List>
                     </Collapse>
                 </List>
+
+
                 <CardContent sx={{ flex: 2 }}>
                     <Paper sx={{ padding: 2 }}>
-                        <TextField fullWidth label="Reference" margin="normal" value={currentReference} />
+                        <TextField fullWidth label="Reference" margin="normal" name="reference" onChange={handleChange} value={currentReference} />
                         <TextField fullWidth label="Id" margin="normal" value={currentRow} />
                         <TextField fullWidth label="Tags" margin="normal" value={currentTags} />
                         <TextField fullWidth label="Support Reference" margin="normal" value={currentSupportReference} />
@@ -267,6 +397,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                             <FormControl fullWidth margin="normal">
                                 <TextareaAutosize
                                     minRows={4}
+                                    name="note"
                                     value={currentNote}
                                     onChange={handleChange}
                                     style={{
