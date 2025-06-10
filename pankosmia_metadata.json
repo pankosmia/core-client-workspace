@@ -64,6 +64,11 @@
       "en": "Cancel",
       "fr": "Annuler",
       "es": "Cancelar"
+    },
+    "language": {
+      "en": "Language",
+      "fr": "Langue",
+      "es": "Lenguaje"
     }
   }
 }

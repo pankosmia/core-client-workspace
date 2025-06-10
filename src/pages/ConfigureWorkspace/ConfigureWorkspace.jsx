@@ -1,7 +1,9 @@
 import React, {useState, useEffect, useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n} from "pithekos-lib";
-import {Grid2, Stack, Box, Typography, Checkbox, Fab} from "@mui/material";
+import {Stack, Box, Typography, Checkbox, Fab, Card, CardContent, CardActionArea, CardHeader, IconButton} from "@mui/material";
+import { Masonry } from '@mui/lab';
+import { styled } from '@mui/material/styles';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import dateFormat from 'dateformat';
 
@@ -15,6 +17,19 @@ function ConfigureWorkspace() {
 
     const navigate = useNavigate();
 
+    const heights = [30, 30, 30, 30, 30, 30];
+
+/*      const Item = styled(Box)(({ theme }) => ({
+        backgroundColor: '#fff',
+        ...theme.typography.body2,
+        padding: theme.spacing(0.5),
+        textAlign: 'center',
+        color: (theme.vars || theme).palette.text.secondary,
+        ...theme.applyStyles('dark', {
+            backgroundColor: '#1A2027',
+        }),
+    })); */
+ 
     const getRepoList = async () => {
         const listResponse = await getJson("/git/list-local-repos", debugRef.current);
         if (listResponse.ok) {
@@ -86,78 +101,105 @@ function ConfigureWorkspace() {
               </Fab>
             </Box>
             <Box style={{position: 'fixed', top: '105px', bottom: 0, overflow: 'scroll', marginBottom: "16px", width: '100%'}}>
-                <Grid2
+                <Typography variant="h5" color='black' sx={{ paddingBottom: 5, paddingLeft: 6 }}>
+                    {doI18n("pages:core-local-workspace:choose_resources", i18nRef.current)}
+                </Typography>
+                <Masonry
                     container
-                    spacing={1}
-                    sx={{
-                        ml: "16px",
-                        '--Grid-borderWidth': '1px',
-                        borderTop: 'var(--Grid-borderWidth) solid',
-                        borderLeft: 'var(--Grid-borderWidth) solid',
-                        borderColor: 'divider',
-                        '& > div': {
-                            borderRight: 'var(--Grid-borderWidth) solid',
-                            borderBottom: 'var(--Grid-borderWidth) solid',
-                            borderColor: 'divider',
-                        }
-                    }}
+                    spacing={5}
+                    columns={{ xs: 1, md: 2, lg: 3, xl: 4 }}
+                    sx={{ paddingLeft: 4, paddingRight: 4 }}
                 >
-                    <Grid2 item size={12}>
-                        <Typography variant="h6">
-                            {doI18n("pages:core-local-workspace:choose_resources", i18nRef.current)}
-                        </Typography>
-                    </Grid2>
                     {
                         repos
                             .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
                             .map(
                                 ((rep, n) => {
-                                        return <>
-                                            <Grid2 key={`${n}-name`} item size={4}>
-                                                <Stack>
-                                                    <Box><b>{`${rep.name} (${rep.abbreviation})`}</b></Box>
-                                                    {rep.description !== rep.name &&
-                                                        <Box>{rep.description}</Box>
-                                                    }
-                                                </Stack>
-                                            </Grid2>
-                                            <Grid2 key={`${n}-language`} item size={1}>
-                                                {rep.language_code}
-                                            </Grid2>
-                                            <Grid2 key={`${n}-flavor`} item size={2}>
-                                                {rep.flavor}
-                                            </Grid2>
-                                            <Grid2 key={`${n}-source`} item size={2}>
-                                                {
-                                                    rep.path.startsWith("_local_") ?
-                                                        "Local" :
-                                                        rep.path.split("/").slice(0, 2).join(" ")
+                                        return <Card /* sx={{ minWidth: 300, minHeight: 300 }} */>
+                                            <CardActionArea 
+                                                sx={{
+                                                    height: "100%",
+                                                    width: "100%", 
+                                                    display: 'flex',
+                                                    alignItems: 'flex-start',
+                                                    flexDirection: 'column',
+                                                    justifyContent: 'space-between',
+                                                    position:'relative',
+                                                    borderWidth: 1,
+                                                    borderColor: "#9E9E9E"
+                                                  }}
+                                                onClick={
+                                                    () => setSelectedResources(
+                                                        selectedResources.includes(rep.path) ?
+                                                            [...selectedResources].filter(s => s !== rep.path) :
+                                                            [...selectedResources, rep.path]
+                                                    )
                                                 }
-                                            </Grid2>
-                                            <Grid2 key={`${n}-date`} item size={2}>
-                                                {dateFormat(rep.generated_date, "mmm d yyyy")}
-                                            </Grid2>
-                                            <Grid2 key={`${n}-actions`} item size={1} display="flex"
-                                                   justifyContent="flex-end" alignItems="center"
-                                                   >
-                                                <Checkbox
-                                                    checked={selectedResources.includes(rep.path)}
-                                                    onChange={
-                                                        () => setSelectedResources(
-                                                            selectedResources.includes(rep.path) ?
-                                                                [...selectedResources].filter(s => s !== rep.path) :
-                                                                [...selectedResources, rep.path]
-                                                        )
+                                            >
+                                                <CardHeader
+                                                    action={
+                                                        <Checkbox
+                                                            disableRipple
+                                                            sx={{ position: 'absolute', top:"5%", right: "5%" }}
+                                                            checked={selectedResources.includes(rep.path)}
+                                                            onChange={
+                                                                () => setSelectedResources(
+                                                                    selectedResources.includes(rep.path) ?
+                                                                        [...selectedResources].filter(s => s !== rep.path) :
+                                                                        [...selectedResources, rep.path]
+                                                                )
+                                                            }
+                                                        />
                                                     }
-                                                    inputProps={{'aria-label': 'controlled'}}
+                                                    title={<Typography key={`${n}-name`}><b>{`${rep.name} (${rep.abbreviation})`}</b></Typography>}
+                                                    subheader={
+                                                        <Typography key={`${n}-language`} sx={{ color: 'text.secondary', fontSize: 14 }}>
+                                                            {`${doI18n("pages:core-local-workspace:language", i18nRef.current, debugRef.current)}: ${rep.language_code}    -    ${rep.flavor}`}
+                                                        </Typography>
+                                                    }
                                                 />
-                                            </Grid2>
-                                        </>
+                                                <CardContent>
+                                                    <Stack>
+                                                        <Typography key={`${n}-name`} variant="body2"/*  sx={{ backgroundColor:"red" }} */ >
+                                                            {rep.description !== rep.name &&
+                                                                <Box /* sx={{ height: 100, overflow:'auto'}} */>{rep.description}</Box>
+                                                            }
+                                                        </Typography>
+                                                        {/* <Typography key={`${n}-flavor`} variant="body2" >
+                                                            {rep.flavor}
+                                                        </Typography> */}
+                                                        {/* <Typography key={`${n}-source`}>
+                                                            {
+                                                                rep.path.startsWith("_local_") ?
+                                                                    "Local" :
+                                                                    rep.path.split("/").slice(0, 2).join(" ")
+                                                            }
+                                                        </Typography> */}
+                                                        {/* <Typography key={`${n}-date`}>
+                                                            {dateFormat(rep.generated_date, "mmm d yyyy")}
+                                                        </Typography> */}
+                                                        
+                                                        {/* <Checkbox
+                                                            disableRipple
+                                                            sx={{ position: 'absolute', bottom: "90%", left: "90%" }}
+                                                            checked={selectedResources.includes(rep.path)}
+                                                            onChange={
+                                                                () => setSelectedResources(
+                                                                    selectedResources.includes(rep.path) ?
+                                                                        [...selectedResources].filter(s => s !== rep.path) :
+                                                                        [...selectedResources, rep.path]
+                                                                )
+                                                            }
+                                                        /> */}
+                                                    </Stack>
+                                                </CardContent>
+                                            </CardActionArea>
+                                        </Card>
                                     }
                                 )
                             )
                     }
-                </Grid2>
+                </Masonry>
             </Box>
         </Box>
 }
