@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n} from "pithekos-lib";
-import {Stack, Box, Typography, Checkbox, Fab, Card, CardContent, CardActionArea} from "@mui/material";
+import {Stack, Box, Typography, Checkbox, Fab, Card, CardContent, CardActionArea, CardHeader, IconButton} from "@mui/material";
 import { Masonry } from '@mui/lab';
 import { styled } from '@mui/material/styles';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -115,7 +115,7 @@ function ConfigureWorkspace() {
                             .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
                             .map(
                                 ((rep, n) => {
-                                        return <Card sx={{ minWidth: 300, minHeight: 300 }}>
+                                        return <Card /* sx={{ minWidth: 300, minHeight: 300 }} */>
                                             <CardActionArea 
                                                 sx={{
                                                     height: "100%",
@@ -124,7 +124,9 @@ function ConfigureWorkspace() {
                                                     alignItems: 'flex-start',
                                                     flexDirection: 'column',
                                                     justifyContent: 'space-between',
-                                                    position:'relative'
+                                                    position:'relative',
+                                                    borderWidth: 1,
+                                                    borderColor: "#9E9E9E"
                                                   }}
                                                 onClick={
                                                     () => setSelectedResources(
@@ -134,18 +136,38 @@ function ConfigureWorkspace() {
                                                     )
                                                 }
                                             >
-                                                <CardContent>
-                                                        <Typography key={`${n}-name`}  sx={{ backgroudColor:"red" }} >
-                                                            <Stack>
-                                                                <Box><b>{`${rep.name} (${rep.abbreviation})`}</b></Box>
-                                                                {rep.description !== rep.name &&
-                                                                    <Box sx={{ height: 100, overflow:'auto'}}>{rep.description}</Box>
-                                                                }
-                                                            </Stack>
+                                                <CardHeader
+                                                    action={
+                                                        <Checkbox
+                                                            disableRipple
+                                                            sx={{ position: 'absolute', top:"5%", right: "5%" }}
+                                                            checked={selectedResources.includes(rep.path)}
+                                                            onChange={
+                                                                () => setSelectedResources(
+                                                                    selectedResources.includes(rep.path) ?
+                                                                        [...selectedResources].filter(s => s !== rep.path) :
+                                                                        [...selectedResources, rep.path]
+                                                                )
+                                                            }
+                                                        />
+                                                    }
+                                                    title={<Typography key={`${n}-name`}><b>{`${rep.name} (${rep.abbreviation})`}</b></Typography>}
+                                                    subheader={
+                                                        <Typography key={`${n}-language`} sx={{ color: 'text.secondary', fontSize: 14 }}>
+                                                            {`${doI18n("pages:core-local-workspace:language", i18nRef.current, debugRef.current)}: ${rep.language_code}    -    ${rep.flavor}`}
                                                         </Typography>
-                                                        {/*  <Typography key={`${n}-flavor`}>
-                                                                {rep.flavor}
-                                                            </Typography> */}
+                                                    }
+                                                />
+                                                <CardContent>
+                                                    <Stack>
+                                                        <Typography key={`${n}-name`} variant="body2"/*  sx={{ backgroundColor:"red" }} */ >
+                                                            {rep.description !== rep.name &&
+                                                                <Box /* sx={{ height: 100, overflow:'auto'}} */>{rep.description}</Box>
+                                                            }
+                                                        </Typography>
+                                                        {/* <Typography key={`${n}-flavor`} variant="body2" >
+                                                            {rep.flavor}
+                                                        </Typography> */}
                                                         {/* <Typography key={`${n}-source`}>
                                                             {
                                                                 rep.path.startsWith("_local_") ?
@@ -156,12 +178,10 @@ function ConfigureWorkspace() {
                                                         {/* <Typography key={`${n}-date`}>
                                                             {dateFormat(rep.generated_date, "mmm d yyyy")}
                                                         </Typography> */}
-                                                        <Typography key={`${n}-language`} sx={{ position: 'absolute', bottom: "3%", color: 'text.secondary', fontSize: 14 }}>
-                                                            {`${doI18n("pages:core-local-workspace:language", i18nRef.current, debugRef.current)}: ${rep.language_code}`}
-                                                        </Typography>
-                                                        <Checkbox
+                                                        
+                                                        {/* <Checkbox
                                                             disableRipple
-                                                            sx={{ position: 'absolute', bottom: "0%", left: "45%" }}
+                                                            sx={{ position: 'absolute', bottom: "90%", left: "90%" }}
                                                             checked={selectedResources.includes(rep.path)}
                                                             onChange={
                                                                 () => setSelectedResources(
@@ -170,7 +190,8 @@ function ConfigureWorkspace() {
                                                                         [...selectedResources, rep.path]
                                                                 )
                                                             }
-                                                        />
+                                                        /> */}
+                                                    </Stack>
                                                 </CardContent>
                                             </CardActionArea>
                                         </Card>
