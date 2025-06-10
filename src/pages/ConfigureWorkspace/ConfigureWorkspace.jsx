@@ -73,7 +73,6 @@ function ConfigureWorkspace() {
                     }}
                     onClick={
                         (e) => {
-                            console.log(currentProjectRef.current);
                             let stateEntries = repos
                                 .map(r => [r.path, r])
                                 .filter(re => selectedResources.includes(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
@@ -122,7 +121,7 @@ function ConfigureWorkspace() {
                                             <CardActionArea
                                                 sx={{
                                                     backgroundColor: selectedResources.includes(rep.path) ? "#FFF" : "#DDD",
-                                                    color: selectedResources.includes(rep.path) ? "#000" : "#555"
+                                                    color: selectedResources.includes(rep.path) ? "#000" : "#555" ? "#000" : "#555"
                                                 }}
                                                 onClick={
                                                     () => setSelectedResources(
@@ -142,7 +141,7 @@ function ConfigureWorkspace() {
                                                         justifyContent: 'space-between',
                                                     }}
                                                 >
-                                                    <Typography key={`${n}-name`} variant="h6">
+                                                    <Typography key={`${n}-name`} variant="h6" sx={{color: selectedResources.includes(rep.path) ? "secondary.main" : "#555" }}>
                                                         {`${rep.name} (${rep.abbreviation})`}
                                                     </Typography>
                                                     {rep.description !== rep.name &&
