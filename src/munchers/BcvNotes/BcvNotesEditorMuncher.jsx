@@ -1,13 +1,11 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Paper, TextField, Button, ToggleButton, Pagination, ToggleButtonGroup, CardContent, ListSubheader, TextareaAutosize, List, ListItemButton, ListItemIcon, ListItemText, Collapse, FormControl, FormLabel } from "@mui/material";
+import './BcvNotesMuncher.css'
+import { Box, Paper, TextField, Button, ToggleButton, Pagination, ToggleButtonGroup, CardContent, TextareaAutosize, List, ListItemButton, ListItemIcon, ListItemText, Collapse, FormControl, FormLabel } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 import Markdown from 'react-markdown';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
-import StickyNote2Icon from '@mui/icons-material/StickyNote2';
-import SearchIcon from '@mui/icons-material/Search';
-
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
@@ -70,39 +68,6 @@ function BcvNotesViewerMuncher({ metadata }) {
         _setContentChanged(nv);
     }
 
-    // Change la valeur de la note ou de la reference
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-
-        if (name === "note") {
-            setCurrentNote(value);
-            setContentChanged(true);
-        } else if (name === "reference") {
-            setCurrentReference(value);
-            setContentChanged(true);
-            const [chapter, verse] = value.split(":").map(Number);
-            if (!isNaN(chapter) && !isNaN(verse)) {
-                setSystemBcv({
-                    ...systemBcv,
-                    chapterNum: chapter,
-                    verseNum: verse
-                });
-                const newCurrentRow = ingredient.find(l => l[0] === value);
-                if (newCurrentRow) {
-                    setCurrentReference(newCurrentRow[0])
-                    setCurrentRow(newCurrentRow[1]);
-                    setCurrentTags(newCurrentRow[2]);
-                    setCurrentSupportReference(newCurrentRow[3]);
-                    setCurrentQuote(newCurrentRow[4]);
-                    setCurrentOccurrence(newCurrentRow[5]);
-                    setCurrentNote(newCurrentRow[6]);
-                }
-            } else {
-                console.warn("Référence invalide :", value);
-            }
-        }
-    };
-
     // Permet d'afficher tous les versets selon un chapitre selectionné 
     const chapters = [systemBcv.chapterNum]
     const verses = currentChapter
@@ -128,37 +93,62 @@ function BcvNotesViewerMuncher({ metadata }) {
             setCurrentNote(row[6] || "");
         }
     };
-    console.log("current verse", currentVerse)
-    // Permet de changement de l'affichage des données en fonction du chapitre/ verset selectionnés 
-    const handleChangeSystemBcv = (reference, id) => {
-        setCurrentVerse({reference, id} );
+
+    // Change les données selon si on choisit le verset ou si on écrit manuellement la référence 
+    const HandleChangeVerse = (reference, id = null) => {
+        setCurrentVerse({ reference, id });
         setContentChanged(true);
         const [chapter, verse] = reference.split(':').map(Number);
+
         if (!isNaN(chapter) && !isNaN(verse)) {
             setSystemBcv({
                 ...systemBcv,
                 chapterNum: chapter,
-                verseNum: verse
+                verseNum: verse,
             });
-            const newCurrentRow = ingredient.find(l => l[0] === reference && l[1] === id);
+
+            let newCurrentRow;
+            if (id !== null) {
+                newCurrentRow = ingredient.find(l => l[0] === reference && l[1] === id);
+            } else {
+                newCurrentRow = ingredient.find(l => l[0] === reference);
+            }
 
             if (newCurrentRow) {
-                    setCurrentReference(newCurrentRow[0])
-                    setCurrentRow(newCurrentRow[1])
-                    setCurrentTags(newCurrentRow[2]);
-                    setCurrentSupportReference(newCurrentRow[3]);
-                    setCurrentQuote(newCurrentRow[4]);
-                    setCurrentOccurrence(newCurrentRow[5]);
-                    setCurrentNote(newCurrentRow[6]);
-                } else {
-                    console.log("L'ID trouvé ne correspond pas à l'ID passé pour la référence 1 :", reference, "ID passé:", id);
+                setCurrentReference(newCurrentRow[0]);
+                setCurrentRow(newCurrentRow[1]);
+                setCurrentTags(newCurrentRow[2]);
+                setCurrentSupportReference(newCurrentRow[3]);
+                setCurrentQuote(newCurrentRow[4]);
+                setCurrentOccurrence(newCurrentRow[5]);
+                setCurrentNote(newCurrentRow[6]);
+
+                if (id === null) {
+                    setCurrentVerse({ reference, id: newCurrentRow[1] });
                 }
+            } else {
+                console.warn("Référence ou ID non trouvée :", reference, id);
+            }
         } else {
-            console.log("Référence invalide :", reference);
+            console.warn("Référence invalide :", reference);
         }
     };
 
+    const handleChangeSystemBcv = (reference, id) => {
+        HandleChangeVerse(reference, id);
+    };
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        if (name === "note") {
+            setCurrentNote(value);
+            setContentChanged(true);
+        } else if (name === "reference") {
+            setCurrentReference(value);
+            setContentChanged(true);
+            HandleChangeVerse(value);
+        }
+    };
 
     return (
         <Box sx={{
@@ -168,7 +158,7 @@ function BcvNotesViewerMuncher({ metadata }) {
             flexDirection: 'column',
         }}
         >
-            <SearchNavBar/>
+            <SearchNavBar />
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
                 <List>
                     <ListItemButton onClick={handleClick}>
@@ -180,7 +170,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                     </ListItemButton>
 
                     <Collapse in={open} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding>
+                        <List component="div" disablePadding >
                             {chapters.map(chap => (
                                 <>
                                     <ListItemButton
@@ -196,13 +186,15 @@ function BcvNotesViewerMuncher({ metadata }) {
 
                                     {chap === currentChapter && (
                                         <Collapse in timeout="auto" unmountOnExit>
-                                            <List component="div" disablePadding>
+                                            <List component="div" disablePadding sx={{
+                                                maxHeight: '800px',
+                                                overflowY: 'auto',
+                                                height: 'auto',
+                                            }}>
                                                 {verses.map(v => (
                                                     <ListItemButton
                                                         key={v[0]}
                                                         sx={{
-                                                            maxHeight: '50px',
-                                                            overflowY: 'auto',
                                                             pl: 8,
                                                         }}
                                                         selected={v[0] === currentVerse.reference && v[1] === currentVerse.id}
@@ -249,7 +241,6 @@ function BcvNotesViewerMuncher({ metadata }) {
                             </ToggleButtonGroup>
                         </div>
 
-
                         {stateButtonNote === 'write' ? (
                             <FormControl fullWidth margin="normal">
                                 <TextareaAutosize
@@ -257,18 +248,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                                     name="note"
                                     value={currentNote}
                                     onChange={handleChange}
-                                    style={{
-                                        width: '100%',
-                                        maxHeight: '300px',
-                                        padding: '16.5px 14px',
-                                        borderRadius: 4,
-                                        border: '1px solid rgba(0, 0, 0, 0.23)',
-                                        fontFamily: 'Roboto, sans-serif',
-                                        fontSize: '16px',
-                                        lineHeight: '1.5',
-                                        resize: 'vertical',
-                                        boxSizing: 'border-box',
-                                    }}
+                                    className="text-aera"
 
                                 />
                             </FormControl>

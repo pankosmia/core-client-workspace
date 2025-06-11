@@ -1,5 +1,5 @@
 import {useEffect, useState, useContext} from "react";
-import "./TextTranslationViewerMuncher.css";
+import "./TextTranslationEditorMuncher.css";
 import {Proskomma} from 'proskomma-core';
 
 import {getText, debugContext, bcvContext} from "pithekos-lib";
