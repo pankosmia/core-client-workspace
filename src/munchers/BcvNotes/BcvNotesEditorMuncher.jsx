@@ -7,8 +7,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import SearchIcon from '@mui/icons-material/Search';
-import { styled, alpha } from '@mui/material/styles';
-import InputBase from '@mui/material/InputBase';
+
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
@@ -16,6 +15,7 @@ import {
     doI18n,
     getText
 } from "pithekos-lib";
+import SearchNavBar from "../../components/searchNavBar";
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
@@ -32,11 +32,12 @@ function BcvNotesViewerMuncher({ metadata }) {
     const [currentQuote, setCurrentQuote] = useState('');
     const [currentOccurrence, setCurrentOccurrence] = useState('');
     const [currentChapter, setCurrentChapter] = useState('');
-    const [currentVerse, setCurrentVerse] = useState('');
+    const [currentVerse, setCurrentVerse] = useState({ reference: '', id: '' });
     const [value, setValue] = useState('');
     const [contentChanged, _setContentChanged] = useState(false);
     const [page, setPage] = useState(4)
 
+    // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
         let response = await getText(ingredientLink, debugRef.current);
@@ -50,6 +51,7 @@ function BcvNotesViewerMuncher({ metadata }) {
             setIngredient([])
         }
     };
+    // utilisation de la fonction getAllData
     useEffect(
         () => {
             getAllData().then();
@@ -57,52 +59,18 @@ function BcvNotesViewerMuncher({ metadata }) {
         [systemBcv]
     );
 
-
+    // permet d'ouvrir et fermer le menu des chapitres
     const handleClick = () => {
         setOpen(!open);
     };
-    // const referenceNotes = ingredient
-    //     .filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)
-    //     .map(l => l[0]);
-    // const referenceIdNotes = ingredient
-    //     .filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)
-    //     .map(l => l[1]);
-    // const referenceTagsNotes = ingredient
-    //     .filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)
-    //     .map(l => l[2]);
-    // const referenceSupportNotes = ingredient
-    //     .filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)
-    //     .map(l => l[3]);
-    // const referenceQuoteNotes = ingredient
-    //     .filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)
-    //     .map(l => l[4]);
-    // const referenceOccurrenceNotes = ingredient
-    //     .filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)
-    //     .map(l => l[5]);
-    // const verseNotes = ingredient
-    //     .filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)
-    //     .map(l => l[6]);
 
-    useEffect(() => {
-        const newCurrentRow = ingredient.find(
-            l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`
-        );
-        if (newCurrentRow) {
-            setCurrentReference(newCurrentRow[0])
-            setCurrentRow(newCurrentRow[1]);
-            setCurrentTags(newCurrentRow[2]);
-            setCurrentSupportReference(newCurrentRow[3]);
-            setCurrentQuote(newCurrentRow[4]);
-            setCurrentOccurrence(newCurrentRow[5]);
-            setCurrentNote(newCurrentRow[6]);
-        }
-    }, [ingredient, systemBcv]);
-
+    // Montre le changement d'état du contenu 
     const setContentChanged = nv => {
         console.log("setContentChanged", nv);
         _setContentChanged(nv);
     }
 
+    // Change la valeur de la note ou de la reference
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -121,6 +89,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                 });
                 const newCurrentRow = ingredient.find(l => l[0] === value);
                 if (newCurrentRow) {
+                    setCurrentReference(newCurrentRow[0])
                     setCurrentRow(newCurrentRow[1]);
                     setCurrentTags(newCurrentRow[2]);
                     setCurrentSupportReference(newCurrentRow[3]);
@@ -134,23 +103,18 @@ function BcvNotesViewerMuncher({ metadata }) {
         }
     };
 
+    // Permet d'afficher tous les versets selon un chapitre selectionné 
     const chapters = [systemBcv.chapterNum]
     const verses = currentChapter
         ? ingredient.filter(item => item[0].startsWith(`${currentChapter}:`))
         : [];
 
-
-    useEffect(() => {
-        if (systemBcv?.chapterNum && systemBcv?.verseNum) {
-            const ref = `${systemBcv.chapterNum}:${systemBcv.verseNum}`;
-            setCurrentChapter(systemBcv.chapterNum);
-            setCurrentVerse(ref);
-        }
-    }, [systemBcv]);
-
+    // Permet de sauvegarder les changements apportées dans les notes (pas commencé)
     const handleSave = () => {
         console.log("Ligne actuelle modifiée :", currentRow);
     }
+
+    // Permet le changement des données en fonction du changement de la page
     const handlePage = (event, value) => {
         setPage(value);
         const row = ingredient[value - 1];
@@ -164,103 +128,37 @@ function BcvNotesViewerMuncher({ metadata }) {
             setCurrentNote(row[6] || "");
         }
     };
-    // const handleChangeSystemBcv = (reference,id) => {
-    //     setCurrentVerse(reference);
-    //     setContentChanged(true);
-
-    //     const [chapter, verse] = reference.split(':').map(Number);
-
-    //     if (!isNaN(chapter) && !isNaN(verse)) {
-    //         setSystemBcv({
-    //             ...systemBcv,
-    //             chapterNum: chapter,
-    //             verseNum: verse
-    //         });
-
-    //         const newCurrentRow = ingredient.find(l => l[0] === reference);
-    //         if (newCurrentRow) {
-    //             setCurrentRow(newCurrentRow[1]);
-    //             setCurrentTags(newCurrentRow[2]);
-    //             setCurrentSupportReference(newCurrentRow[3]);
-    //             setCurrentQuote(newCurrentRow[4]);
-    //             setCurrentOccurrence(newCurrentRow[5]);
-    //             setCurrentNote(newCurrentRow[6]);
-    //         }
-    //     } else {
-    //         console.warn("Référence invalide :", reference);
-    //     }
-    // };
-
+    console.log("current verse", currentVerse)
+    // Permet de changement de l'affichage des données en fonction du chapitre/ verset selectionnés 
     const handleChangeSystemBcv = (reference, id) => {
-        setCurrentVerse(reference);
+        setCurrentVerse({reference, id} );
         setContentChanged(true);
-
         const [chapter, verse] = reference.split(':').map(Number);
-
         if (!isNaN(chapter) && !isNaN(verse)) {
             setSystemBcv({
                 ...systemBcv,
                 chapterNum: chapter,
                 verseNum: verse
             });
-
             const newCurrentRow = ingredient.find(l => l[0] === reference && l[1] === id);
+
             if (newCurrentRow) {
-                
-                    //setCurrentRow(newCurrentRow[1])
-                    setCurrentRow(newCurrentRow[2]);
-                    setCurrentTags(newCurrentRow[3]);
-                    setCurrentSupportReference(newCurrentRow[4]);
-                    setCurrentQuote(newCurrentRow[5]);
-                    setCurrentOccurrence(newCurrentRow[6]);
-                    setCurrentNote(newCurrentRow[7]);
+                    setCurrentReference(newCurrentRow[0])
+                    setCurrentRow(newCurrentRow[1])
+                    setCurrentTags(newCurrentRow[2]);
+                    setCurrentSupportReference(newCurrentRow[3]);
+                    setCurrentQuote(newCurrentRow[4]);
+                    setCurrentOccurrence(newCurrentRow[5]);
+                    setCurrentNote(newCurrentRow[6]);
                 } else {
-                    console.warn("L'ID trouvé ne correspond pas à l'ID passé pour la référence :", reference, "ID passé:", id);
+                    console.log("L'ID trouvé ne correspond pas à l'ID passé pour la référence 1 :", reference, "ID passé:", id);
                 }
         } else {
-            console.warn("Référence invalide :", reference);
+            console.log("Référence invalide :", reference);
         }
-        console.log("L'ID trouvé ne correspond pas à l'ID passé pour la référence :", reference, "ID passé:", id);
     };
 
-    const Search = styled('div')(({ theme }) => ({
-        position: 'relative',
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: alpha(theme.palette.common.white, 0.15),
-        '&:hover': {
-            backgroundColor: alpha(theme.palette.common.white, 0.25),
-        },
-        marginRight: theme.spacing(2),
-        marginLeft: 0,
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            marginLeft: theme.spacing(3),
-            width: 'auto',
-        },
-    }));
 
-    const SearchIconWrapper = styled('div')(({ theme }) => ({
-        padding: theme.spacing(0, 2),
-        height: '100%',
-        position: 'absolute',
-        pointerEvents: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    }));
-
-    const StyledInputBase = styled(InputBase)(({ theme }) => ({
-        color: 'inherit',
-        '& .MuiInputBase-input': {
-            padding: theme.spacing(1, 1, 1, 0),
-            paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-            transition: theme.transitions.create('width'),
-            width: '100%',
-            [theme.breakpoints.up('md')]: {
-                width: '20ch',
-            },
-        },
-    }));
 
     return (
         <Box sx={{
@@ -270,46 +168,7 @@ function BcvNotesViewerMuncher({ metadata }) {
             flexDirection: 'column',
         }}
         >
-            {/* <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
-            <h6>{doI18n("munchers:bcv_notes_viewer:title", i18nRef.current)}</h6>
-            <div>
-                {ingredient &&
-                    <Markdown>{
-                        verseNotes.length > 0 ? verseNotes.join("\n***\n") : "No notes found for this verse"}
-                    </Markdown>}
-            </div> */}
-
-            <Box display="flex"
-                justifyContent="center"
-                alignItems="center"
-                width="100%"
-                gap={2}
-                padding={2}>
-                <Search>
-                    <SearchIconWrapper>
-                        <SearchIcon />
-                    </SearchIconWrapper>
-                    <StyledInputBase
-                        placeholder="Search notes ...."
-                        inputProps={{ 'aria-label': 'search' }}
-                        border="#FFF"
-                    />
-                </Search>
-                <ToggleButtonGroup
-                    exclusive
-                    aria-label="Platform"
-                    size="small"
-                    value={value}
-                    onChange={(event, newValue) => {
-                        if (newValue !== null) {
-                            setValue(newValue);
-                        }
-                    }}
-                >
-                    <ToggleButton value="book">Book</ToggleButton>
-                    <ToggleButton value="chapter">Chapter</ToggleButton>
-                </ToggleButtonGroup>
-            </Box>
+            <SearchNavBar/>
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
                 <List>
                     <ListItemButton onClick={handleClick}>
@@ -330,7 +189,6 @@ function BcvNotesViewerMuncher({ metadata }) {
                                         selected={chap === currentChapter}
                                         onClick={() => {
                                             setCurrentChapter(chap);
-                                            setCurrentVerse(null);
                                         }}
                                     >
                                         <ListItemText primary={`Chapitre ${chap}`} />
@@ -347,7 +205,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                                                             overflowY: 'auto',
                                                             pl: 8,
                                                         }}
-                                                        selected={v[0] === currentVerse}
+                                                        selected={v[0] === currentVerse.reference && v[1] === currentVerse.id}
                                                         onClick={() => handleChangeSystemBcv(v[0], v[1])}
                                                     >
                                                         <ListItemText primary={`Verset ${v[0].split(':')[1]} - ${v[1]}`} />
@@ -362,7 +220,6 @@ function BcvNotesViewerMuncher({ metadata }) {
                         </List>
                     </Collapse>
                 </List>
-
 
                 <CardContent sx={{ flex: 2 }}>
                     <Paper sx={{ padding: 2 }}>
