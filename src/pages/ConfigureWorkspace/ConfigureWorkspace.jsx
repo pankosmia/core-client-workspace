@@ -11,7 +11,7 @@ import {
     CardContent,
     CardActionArea,
     CardHeader,
-    IconButton
+    IconButton, ButtonGroup, Button
 } from "@mui/material";
 import {Masonry} from '@mui/lab';
 import {styled} from '@mui/material/styles';
@@ -24,6 +24,7 @@ function ConfigureWorkspace() {
     const {currentProjectRef} = useContext(currentProjectContext);
 
     const [selectedResources, setSelectedResources] = useState([]);
+    const [language, setLanguage] = useState("");
 
     const navigate = useNavigate();
 
@@ -47,6 +48,20 @@ function ConfigureWorkspace() {
         },
         []
     );
+
+    const flavorTypes = {
+        textTranslation: "scripture",
+        "x-bcvnotes": "parascriptural",
+        "x-bnotes": "parascriptural",
+        "x-bcvarticles": "parascriptural",
+        "x-bcvquestions": "parascriptural",
+        "x-bcvimages": "parascriptural",
+        "x-juxtalinear": "scripture",
+        "x-parallel": "parascriptural"
+    };
+
+    const languages = Array.from(new Set(repos.map(r => r.language_code))).sort();
+
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
         <Box>
@@ -104,9 +119,29 @@ function ConfigureWorkspace() {
                 marginBottom: "16px",
                 width: '100%'
             }}>
-                <Typography variant="h5" color='black' sx={{paddingBottom: 5, paddingLeft: 6}}>
-                    {doI18n("pages:core-local-workspace:choose_resources", i18nRef.current)}
-                </Typography>
+                <Box sx={{mb:3}}>
+                    <ButtonGroup>
+                        <Button
+                            onClick={() => setLanguage("")}
+                            variant={language === "" ? "contained" : "outlined"}
+                            color="secondary"
+                        >
+                            {`* (${selectedResources.length}/${repos.length})`}
+                        </Button>
+                        {
+                            languages
+                                .map(
+                                    ce => <Button
+                                        onClick={() => setLanguage(ce)}
+                                        variant={language === ce ? "contained" : "outlined"}
+                                        color="secondary"
+                                    >
+                                        {ce}
+                                    </Button>
+                                )
+                        }
+                    </ButtonGroup>
+                </Box>
                 <Masonry
                     container
                     spacing={3}
@@ -114,6 +149,7 @@ function ConfigureWorkspace() {
                 >
                     {
                         repos
+                            .filter(r => ["", r.language_code].includes(language))
                             .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
                             .map(
                                 ((rep, n) => {
@@ -141,7 +177,8 @@ function ConfigureWorkspace() {
                                                         justifyContent: 'space-between',
                                                     }}
                                                 >
-                                                    <Typography key={`${n}-name`} variant="h6" sx={{color: selectedResources.includes(rep.path) ? "secondary.main" : "#555" }}>
+                                                    <Typography key={`${n}-name`} variant="h6"
+                                                                sx={{color: selectedResources.includes(rep.path) ? "secondary.main" : "#555"}}>
                                                         {`${rep.name} (${rep.abbreviation})`}
                                                     </Typography>
                                                     {rep.description !== rep.name &&
@@ -153,7 +190,11 @@ function ConfigureWorkspace() {
                                                         {rep.language_code}
                                                     </Typography>
                                                     <Typography key={`${n}-flavor`} variant="body">
-                                                        {rep.flavor}
+                                                        {
+                                                            flavorTypes[rep.flavor] ?
+                                                                doI18n(`flavors:names:${flavorTypes[rep.flavor]}/${rep.flavor}`, i18nRef.current) :
+                                                                rep.flavor
+                                                        }
                                                     </Typography>
                                                 </CardContent>
                                             </CardActionArea>
