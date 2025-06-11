@@ -2,19 +2,16 @@ import React, {useState, useEffect, useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n} from "pithekos-lib";
 import {
-    Stack,
     Box,
     Typography,
-    Checkbox,
     Fab,
     Card,
     CardContent,
     CardActionArea,
-    CardHeader,
-    IconButton, ButtonGroup, Button
+    ButtonGroup,
+    Button
 } from "@mui/material";
 import {Masonry} from '@mui/lab';
-import {styled} from '@mui/material/styles';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 function ConfigureWorkspace() {
@@ -157,7 +154,7 @@ function ConfigureWorkspace() {
                                             <CardActionArea
                                                 sx={{
                                                     backgroundColor: selectedResources.includes(rep.path) ? "#FFF" : "#DDD",
-                                                    color: selectedResources.includes(rep.path) ? "#000" : "#555" ? "#000" : "#555"
+                                                    color: selectedResources.includes(rep.path) ? "#000" : "#555"
                                                 }}
                                                 onClick={
                                                     () => setSelectedResources(
