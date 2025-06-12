@@ -24,7 +24,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { i18nRef } = useContext(I18nContext);
     const [open, setOpen] = useState(false);
     const [stateButtonNote, setStateButtonNote] = useState('write');
-    const [currentRow, setCurrentRow] = useState('');
+    const [currentRow, setCurrentRow] = useState({n:'', content:[]});
     const [currentNote, setCurrentNote] = useState('');
     const [currentReference, setCurrentReference] = useState('');
     const [currentTags, setCurrentTags] = useState('');
@@ -66,23 +66,29 @@ function BcvNotesViewerMuncher({ metadata }) {
             currentVerse.reference === "" &&
             currentVerse.id === ""
         ) {
-            const newCurrentRow = ingredient.find(
-                l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`
-            );
-            if (newCurrentRow) {
-                setCurrentReference(newCurrentRow[0])
-                setCurrentRow(newCurrentRow[1]);
-                setCurrentTags(newCurrentRow[2]);
-                setCurrentSupportReference(newCurrentRow[3]);
-                setCurrentQuote(newCurrentRow[4]);
-                setCurrentOccurrence(newCurrentRow[5]);
-                setCurrentNote(newCurrentRow[6]);
-            }
+            const ColumName = ingredient.map(l=>l[0])
+            console.log("colum name",ColumName)
+            // if (newCurrentRow) {
+            //     setCurrentReference(newCurrentRow[0])
+            //     setCurrentRow(newCurrentRow[1]);
+            //     setCurrentTags(newCurrentRow[2]);
+            //     setCurrentSupportReference(newCurrentRow[3]);
+            //     setCurrentQuote(newCurrentRow[4]);
+            //     setCurrentOccurrence(newCurrentRow[5]);
+            //     setCurrentNote(newCurrentRow[6]);
+            // }
         }
 
-
-
     }, [ingredient, systemBcv]);
+
+    const updatedContent = (nCol,nVal ) => {
+        let vals = currentRow.content
+        vals[nCol] = nVal
+        return {
+            n : currentRow["n"],
+            content : vals
+        }
+    }
 
     // permet d'ouvrir et fermer le menu des chapitres
     const handleClick = () => {
@@ -98,7 +104,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     // Permet d'afficher tous les versets selon un chapitre selectionné 
     const chapters = [systemBcv.chapterNum]
     const verses = currentChapter
-        ? ingredient.filter(item => item[0].startsWith(`${currentChapter}:`))
+        ? ingredient.filter(l => l[0].startsWith(`${currentChapter}:`))
         : [];
 
     // Permet le changement des données en fonction du changement de la page
