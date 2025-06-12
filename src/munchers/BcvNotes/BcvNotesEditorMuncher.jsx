@@ -11,55 +11,11 @@ import {
     debugContext as DebugContext,
     bcvContext as BcvContext,
     doI18n,
-    getText
+    getText,
+    postJson
 } from "pithekos-lib";
 import SearchNavBar from "../../components/searchNavBar";
 import { enqueueSnackbar } from "notistack";
-
-async function postText(url, body, debug = false, contentType = "multipart/form-data") {
-    try {
-        const response = await fetch(
-            url,
-            {
-                method: "POST",
-                headers: { "Content-Type": contentType },
-                body
-            });
-        if (!response.ok) {
-            const result = {
-                url,
-                ok: false,
-                status: response.status,
-                error: await response.text
-            };
-            if (debug) {
-                console.log("postText", result);
-            }
-            return result;
-        }
-        const result = {
-            url,
-            ok: true,
-            status: response.status,
-            json: await response.json()
-        };
-        if (debug) {
-            console.log("postText", result);
-        }
-        return result;
-    } catch (err) {
-        const result = {
-            url,
-            ok: false,
-            status: 0,
-            error: err.message
-        };
-        if (debug) {
-            console.log("postText", result);
-        }
-        return result;
-    }
-}
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
@@ -218,8 +174,16 @@ function BcvNotesViewerMuncher({ metadata }) {
     };
 
     const uploadTsvIngredient = async (tsvData, debugBool) => {
-        const payload = "toto"
-        const response = await postText(
+        const tsvString = tsvData
+            .map(
+                r => r.map(
+                    c => c.replace(/\n/g, "\\n")
+                )
+            )
+            .map(r => r.join("\t"))
+            .join("\n");
+        const payload = JSON.stringify({payload: tsvString});
+        const response = await postJson(
             `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`,
             payload,
             debugBool
@@ -241,7 +205,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     // Permet de sauvegarder les changements apportées dans les notes 
     const handleSave = () => {
         if (currentNote.length > 0) {
-            uploadTsvIngredient(currentNote)
+            uploadTsvIngredient(ingredient)
         }
     }
     return (
