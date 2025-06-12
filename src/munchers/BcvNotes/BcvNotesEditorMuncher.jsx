@@ -14,6 +14,52 @@ import {
     getText
 } from "pithekos-lib";
 import SearchNavBar from "../../components/searchNavBar";
+import { enqueueSnackbar } from "notistack";
+
+async function postText(url, body, debug = false, contentType = "multipart/form-data") {
+    try {
+        const response = await fetch(
+            url,
+            {
+                method: "POST",
+                headers: { "Content-Type": contentType },
+                body
+            });
+        if (!response.ok) {
+            const result = {
+                url,
+                ok: false,
+                status: response.status,
+                error: await response.text
+            };
+            if (debug) {
+                console.log("postText", result);
+            }
+            return result;
+        }
+        const result = {
+            url,
+            ok: true,
+            status: response.status,
+            json: await response.json()
+        };
+        if (debug) {
+            console.log("postText", result);
+        }
+        return result;
+    } catch (err) {
+        const result = {
+            url,
+            ok: false,
+            status: 0,
+            error: err.message
+        };
+        if (debug) {
+            console.log("postText", result);
+        }
+        return result;
+    }
+}
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
@@ -35,6 +81,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     const [contentChanged, _setContentChanged] = useState(false);
     const [page, setPage] = useState(4)
 
+    console.log("current verse", currentVerse)
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -57,6 +104,30 @@ function BcvNotesViewerMuncher({ metadata }) {
         [systemBcv]
     );
 
+    // Inialisation des données au départ 
+    useEffect(() => {
+        if (
+            currentVerse.reference === "" &&
+            currentVerse.id === ""
+        ) {
+            const newCurrentRow = ingredient.find(
+                l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`
+            );
+            if (newCurrentRow) {
+                setCurrentReference(newCurrentRow[0])
+                setCurrentRow(newCurrentRow[1]);
+                setCurrentTags(newCurrentRow[2]);
+                setCurrentSupportReference(newCurrentRow[3]);
+                setCurrentQuote(newCurrentRow[4]);
+                setCurrentOccurrence(newCurrentRow[5]);
+                setCurrentNote(newCurrentRow[6]);
+            }
+        }
+
+
+
+    }, [ingredient, systemBcv]);
+
     // permet d'ouvrir et fermer le menu des chapitres
     const handleClick = () => {
         setOpen(!open);
@@ -74,11 +145,6 @@ function BcvNotesViewerMuncher({ metadata }) {
         ? ingredient.filter(item => item[0].startsWith(`${currentChapter}:`))
         : [];
 
-    // Permet de sauvegarder les changements apportées dans les notes (pas commencé)
-    const handleSave = () => {
-        console.log("Ligne actuelle modifiée :", currentRow);
-    }
-
     // Permet le changement des données en fonction du changement de la page
     const handlePage = (event, value) => {
         setPage(value);
@@ -95,7 +161,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     };
 
     // Change les données selon si on choisit le verset ou si on écrit manuellement la référence 
-    const HandleChangeVerse = (reference, id = null) => {
+    const handleChangeVerse = (reference, id = null) => {
         setCurrentVerse({ reference, id });
         setContentChanged(true);
         const [chapter, verse] = reference.split(':').map(Number);
@@ -135,9 +201,10 @@ function BcvNotesViewerMuncher({ metadata }) {
     };
 
     const handleChangeSystemBcv = (reference, id) => {
-        HandleChangeVerse(reference, id);
+        handleChangeVerse(reference, id);
     };
 
+    // Permet une modification des notes ou de la reference
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === "note") {
@@ -146,10 +213,37 @@ function BcvNotesViewerMuncher({ metadata }) {
         } else if (name === "reference") {
             setCurrentReference(value);
             setContentChanged(true);
-            HandleChangeVerse(value);
+            handleChangeVerse(value);
         }
     };
 
+    const uploadTsvIngredient = async (tsvData, debugBool) => {
+        const payload = "toto"
+        const response = await postText(
+            `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`,
+            payload,
+            debugBool
+        );
+        if (response.ok) {
+            enqueueSnackbar(
+                `${doI18n("pages:core-local-workspace:saved", i18nRef.current)}`,
+                { variant: "success" }
+            );
+            setContentChanged(false);
+        } else {
+            enqueueSnackbar(
+                `${doI18n("pages:core-local-workspace:save_error", i18nRef.current)}: ${response.status}`,
+                { variant: "error" }
+            );
+            throw new Error(`Failed to save: ${response.status}, ${response.error}`);
+        }
+    }
+    // Permet de sauvegarder les changements apportées dans les notes 
+    const handleSave = () => {
+        if (currentNote.length > 0) {
+            uploadTsvIngredient(currentNote)
+        }
+    }
     return (
         <Box sx={{
             minHeight: '100vh',

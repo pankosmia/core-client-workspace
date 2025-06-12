@@ -61,6 +61,7 @@ function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
             jsonString,
             debugBool
         );
+        console.log("response",response)
 
         if (response.ok) {
             enqueueSnackbar(
