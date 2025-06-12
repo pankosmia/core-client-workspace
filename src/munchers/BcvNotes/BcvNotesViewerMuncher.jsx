@@ -54,6 +54,7 @@ function BcvNotesViewerMuncher({metadata}) {
     const verseNotes = ingredient
         .filter(l => cvInRange(`${systemBcv.chapterNum}:${systemBcv.verseNum}`, l[0]))
         .map(l => l[6] || l[5]);
+
     return (
         <Box>
             <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
