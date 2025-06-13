@@ -24,7 +24,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { i18nRef } = useContext(I18nContext);
     const [open, setOpen] = useState(false);
     const [stateButtonNote, setStateButtonNote] = useState('write');
-    const [currentRow, setCurrentRow] = useState({n:'', content:[]});
+    const [currentRow, setCurrentRow] = useState({ n: '', content: [] });
     const [currentNote, setCurrentNote] = useState('');
     const [currentReference, setCurrentReference] = useState('');
     const [currentTags, setCurrentTags] = useState('');
@@ -61,32 +61,38 @@ function BcvNotesViewerMuncher({ metadata }) {
     );
 
     // Inialisation des données au départ 
-    useEffect(() => {
-        if (
-            currentVerse.reference === "" &&
-            currentVerse.id === ""
-        ) {
-            const ColumName = ingredient.map(l=>l[0])
-            console.log("colum name",ColumName)
-            // if (newCurrentRow) {
-            //     setCurrentReference(newCurrentRow[0])
-            //     setCurrentRow(newCurrentRow[1]);
-            //     setCurrentTags(newCurrentRow[2]);
-            //     setCurrentSupportReference(newCurrentRow[3]);
-            //     setCurrentQuote(newCurrentRow[4]);
-            //     setCurrentOccurrence(newCurrentRow[5]);
-            //     setCurrentNote(newCurrentRow[6]);
-            // }
-        }
+    // useEffect(() => {
+    //     if (
+    //         currentVerse.reference === "" &&
+    //         currentVerse.id === ""
+    //     ) {
+    //         const ColumName = ingredient.map(ligne => [...ligne]);
+    //         console.log("colum name", ColumName)
+    //         // if (newCurrentRow) {
+    //         //     setCurrentReference(newCurrentRow[0])
+    //         //     setCurrentRow(newCurrentRow[1]);
+    //         //     setCurrentTags(newCurrentRow[2]);
+    //         //     setCurrentSupportReference(newCurrentRow[3]);
+    //         //     setCurrentQuote(newCurrentRow[4]);
+    //         //     setCurrentOccurrence(newCurrentRow[5]);
+    //         //     setCurrentNote(newCurrentRow[6]);
+    //         // }
+    //     }
 
-    }, [ingredient, systemBcv]);
+    // }, [ingredient, systemBcv]);
 
-    const updatedContent = (nCol,nVal ) => {
+    const columnNames = ingredient[0];
+
+    console.log("column names", columnNames)
+
+    const oneRow = ingredient.slice(1).filter(line => line[1] === "mh4h")[0];
+    console.log("one row", oneRow)
+    const updatedContent = (nCol, nVal) => {
         let vals = currentRow.content
         vals[nCol] = nVal
         return {
-            n : currentRow["n"],
-            content : vals
+            n: currentRow["n"],
+            content: vals
         }
     }
 
@@ -188,7 +194,7 @@ function BcvNotesViewerMuncher({ metadata }) {
             )
             .map(r => r.join("\t"))
             .join("\n");
-        const payload = JSON.stringify({payload: tsvString});
+        const payload = JSON.stringify({ payload: tsvString });
         const response = await postJson(
             `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`,
             payload,
@@ -267,7 +273,11 @@ function BcvNotesViewerMuncher({ metadata }) {
                                                         <ListItemText primary={`Verset ${v[0].split(':')[1]} - ${v[1]}`} />
                                                     </ListItemButton>
                                                 ))}
-
+                                                {columnNames.map((col, index) => (
+                                                    <>
+                                                        <TextField value={col} key={index} />
+                                                    </>
+                                                ))}
                                             </List>
                                         </Collapse>
                                     )}
@@ -276,15 +286,8 @@ function BcvNotesViewerMuncher({ metadata }) {
                         </List>
                     </Collapse>
                 </List>
-
                 <CardContent sx={{ flex: 2 }}>
                     <Paper sx={{ padding: 2 }}>
-                        <TextField fullWidth label="Reference" margin="normal" name="reference" onChange={handleChange} value={currentReference} />
-                        <TextField fullWidth label="Id" margin="normal" value={currentRow} />
-                        <TextField fullWidth label="Tags" margin="normal" value={currentTags} />
-                        <TextField fullWidth label="Support Reference" margin="normal" value={currentSupportReference} />
-                        <TextField fullWidth label="Quote" margin="normal" value={currentQuote} />
-                        <TextField fullWidth label="Occurence" margin="normal" value={currentOccurrence} />
 
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                             <FormLabel>Note</FormLabel>
