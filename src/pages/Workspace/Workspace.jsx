@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import {useLocation} from "react-router-dom";
 import WorkspaceCard from "./WorkspaceCard";
 import BcvPicker from "./BcvPicker";
@@ -57,6 +57,20 @@ const Workspace = () => {
     /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
     const adjSelectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
 
+    const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - 48);
+
+    const handleWindowResize = useCallback(() => {
+        setMaxWindowHeight(window.innerHeight - 48);
+    }, []);
+
+
+    useEffect(() => {
+        window.addEventListener('resize', handleWindowResize);
+        return () => {
+            window.removeEventListener('resize', handleWindowResize);
+        };
+    }, [handleWindowResize]);
+
     return <>
         <Header
             titleKey="pages:core-local-workspace:title"
@@ -69,7 +83,7 @@ const Workspace = () => {
               tilePanes={paneList}
               rootNode={rootPane}
           >
-              <div style={{width: '100vw', height: '100vh'}}>
+              <div style={{width: '100vw', height: maxWindowHeight}}>
                   <TileContainer/>
               </div>
           </TileProvider>
