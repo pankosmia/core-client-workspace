@@ -1,10 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import './BcvNotesMuncher.css'
-import { Box, Paper, TextField, Button, ToggleButton, Pagination, ToggleButtonGroup, CardContent, TextareaAutosize, List, ListItemButton, ListItemIcon, ListItemText, Collapse, FormControl, FormLabel } from "@mui/material";
+import { Box, TextField, Button, ToggleButton, ToggleButtonGroup, CardContent, TextareaAutosize, List, ListItemButton, ListItemIcon, ListItemText, Collapse, FormControl, FormLabel } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
-import Markdown from 'react-markdown';
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
-import CreateIcon from '@mui/icons-material/Create';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import {
     i18nContext as I18nContext,
@@ -23,31 +20,27 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { debugRef } = useContext(DebugContext);
     const { i18nRef } = useContext(I18nContext);
     const [open, setOpen] = useState(false);
-    const [stateButtonNote, setStateButtonNote] = useState('write');
-    const [currentRow, setCurrentRow] = useState({ n: '', content: [] });
+    const [currentRow, setCurrentRow] = useState({ n: 1, content: [] });
     const [currentNote, setCurrentNote] = useState('');
-    const [currentReference, setCurrentReference] = useState('');
-    const [currentTags, setCurrentTags] = useState('');
-    const [currentSupportReference, setCurrentSupportReference] = useState('');
-    const [currentQuote, setCurrentQuote] = useState('');
-    const [currentOccurrence, setCurrentOccurrence] = useState('');
     const [currentChapter, setCurrentChapter] = useState('');
     const [currentVerse, setCurrentVerse] = useState({ reference: '', id: '' });
     const [value, setValue] = useState('');
     const [contentChanged, _setContentChanged] = useState(false);
     const [page, setPage] = useState(4)
 
-    console.log("current verse", currentVerse)
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
         let response = await getText(ingredientLink, debugRef.current);
         if (response.ok) {
+            const newIngredient = response.text
+                .split("\n")
+                .map(l => l.split("\t").map(f => f.replace(/\\n/g, "\n\n")))
             setIngredient(
-                response.text
-                    .split("\n")
-                    .map(l => l.split("\t").map(f => f.replace(/\\n/g, "\n\n")))
+                newIngredient
             );
+            console.log("newINgredient", newIngredient)
+            setCurrentRow({ n: 1, content: [...newIngredient[1]] })
         } else {
             setIngredient([])
         }
@@ -81,12 +74,10 @@ function BcvNotesViewerMuncher({ metadata }) {
 
     // }, [ingredient, systemBcv]);
 
-    const columnNames = ingredient[0];
-
-    console.log("column names", columnNames)
+    const columnNames = ingredient[0] || [];
 
     const oneRow = ingredient.slice(1).filter(line => line[1] === "mh4h")[0];
-    console.log("one row", oneRow)
+
     const updatedContent = (nCol, nVal) => {
         let vals = currentRow.content
         vals[nCol] = nVal
@@ -108,82 +99,11 @@ function BcvNotesViewerMuncher({ metadata }) {
     }
 
     // Permet d'afficher tous les versets selon un chapitre selectionné 
-    const chapters = [systemBcv.chapterNum]
+    const bookCode = [systemBcv.chapterNum]
     const verses = currentChapter
         ? ingredient.filter(l => l[0].startsWith(`${currentChapter}:`))
         : [];
 
-    // Permet le changement des données en fonction du changement de la page
-    const handlePage = (event, value) => {
-        setPage(value);
-        const row = ingredient[value - 1];
-        if (row) {
-            setCurrentReference(row[0] || "");
-            setCurrentRow(row[1] || "");
-            setCurrentTags(row[2] || "");
-            setCurrentSupportReference(row[3] || "");
-            setCurrentQuote(row[4] || "");
-            setCurrentOccurrence(row[5] || "");
-            setCurrentNote(row[6] || "");
-        }
-    };
-
-    // Change les données selon si on choisit le verset ou si on écrit manuellement la référence 
-    const handleChangeVerse = (reference, id = null) => {
-        setCurrentVerse({ reference, id });
-        setContentChanged(true);
-        const [chapter, verse] = reference.split(':').map(Number);
-
-        if (!isNaN(chapter) && !isNaN(verse)) {
-            setSystemBcv({
-                ...systemBcv,
-                chapterNum: chapter,
-                verseNum: verse,
-            });
-
-            let newCurrentRow;
-            if (id !== null) {
-                newCurrentRow = ingredient.find(l => l[0] === reference && l[1] === id);
-            } else {
-                newCurrentRow = ingredient.find(l => l[0] === reference);
-            }
-
-            if (newCurrentRow) {
-                setCurrentReference(newCurrentRow[0]);
-                setCurrentRow(newCurrentRow[1]);
-                setCurrentTags(newCurrentRow[2]);
-                setCurrentSupportReference(newCurrentRow[3]);
-                setCurrentQuote(newCurrentRow[4]);
-                setCurrentOccurrence(newCurrentRow[5]);
-                setCurrentNote(newCurrentRow[6]);
-
-                if (id === null) {
-                    setCurrentVerse({ reference, id: newCurrentRow[1] });
-                }
-            } else {
-                console.warn("Référence ou ID non trouvée :", reference, id);
-            }
-        } else {
-            console.warn("Référence invalide :", reference);
-        }
-    };
-
-    const handleChangeSystemBcv = (reference, id) => {
-        handleChangeVerse(reference, id);
-    };
-
-    // Permet une modification des notes ou de la reference
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        if (name === "note") {
-            setCurrentNote(value);
-            setContentChanged(true);
-        } else if (name === "reference") {
-            setCurrentReference(value);
-            setContentChanged(true);
-            handleChangeVerse(value);
-        }
-    };
 
     const uploadTsvIngredient = async (tsvData, debugBool) => {
         const tsvString = tsvData
@@ -220,6 +140,7 @@ function BcvNotesViewerMuncher({ metadata }) {
             uploadTsvIngredient(ingredient)
         }
     }
+
     return (
         <Box sx={{
             minHeight: '100vh',
@@ -241,7 +162,7 @@ function BcvNotesViewerMuncher({ metadata }) {
 
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <List component="div" disablePadding >
-                            {chapters.map(chap => (
+                            {bookCode.map(chap => (
                                 <>
                                     <ListItemButton
                                         key={chap}
@@ -257,7 +178,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                                     {chap === currentChapter && (
                                         <Collapse in timeout="auto" unmountOnExit>
                                             <List component="div" disablePadding sx={{
-                                                maxHeight: '800px',
+                                                maxHeight: '400px',
                                                 overflowY: 'auto',
                                                 height: 'auto',
                                             }}>
@@ -273,11 +194,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                                                         <ListItemText primary={`Verset ${v[0].split(':')[1]} - ${v[1]}`} />
                                                     </ListItemButton>
                                                 ))}
-                                                {columnNames.map((col, index) => (
-                                                    <>
-                                                        <TextField value={col} key={index} />
-                                                    </>
-                                                ))}
+
                                             </List>
                                         </Collapse>
                                     )}
@@ -287,60 +204,55 @@ function BcvNotesViewerMuncher({ metadata }) {
                     </Collapse>
                 </List>
                 <CardContent sx={{ flex: 2 }}>
-                    <Paper sx={{ padding: 2 }}>
+                    <>
+                        {(
+                            <List component="div" disablePadding sx={{
+                                maxHeight: '800px',
+                                overflowY: 'auto',
+                                height: 'auto',
+                            }}>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                            <FormLabel>Note</FormLabel>
+                                {columnNames.map((column, n) => (
+                                    <>
+                                        <FormControl fullWidth margin="normal" key={n}>
+                                            <FormLabel
+                                                sx={{
+                                                    fontWeight: 'bold',
+                                                    fontSize: '1.1rem',
+                                                    mb: 1,
+                                                }}
+                                            >
+                                                {column}
+                                            </FormLabel>
+                                            <TextField
+                                                value={currentRow.content[n]}
+                                                variant="outlined"
+                                                fullWidth
+                                                size="small"
+                                            />
 
-                            <ToggleButtonGroup
-                                exclusive
-                                aria-label="Platform"
-                                size="small"
-                                value={value}
-                                onChange={(event, newValue) => {
-                                    if (newValue !== null) {
-                                        setValue(newValue);
-                                    }
-                                }}
-                            >
-                                <ToggleButton value='write' onClick={() => setStateButtonNote('write')}><CreateIcon /></ToggleButton>
-                                <ToggleButton value='preview' onClick={() => setStateButtonNote('preview')}><RemoveRedEyeIcon /></ToggleButton>
-                            </ToggleButtonGroup>
-                        </div>
+                                            {
+                                                column === 'Note' ? (
+                                                    <p>Test reussi </p>
+                                                ) : (
+                                                    <p>test non reussi </p>
+                                                )
+                                            }
+                                        </FormControl>
 
-                        {stateButtonNote === 'write' ? (
-                            <FormControl fullWidth margin="normal">
-                                <TextareaAutosize
-                                    minRows={4}
-                                    name="note"
-                                    value={currentNote}
-                                    onChange={handleChange}
-                                    className="text-aera"
+                                    </>
+                                ))}
+                            </List>
 
-                                />
-                            </FormControl>
-                        ) : (
-                            <Markdown>{
-                                currentNote.length > 0
-                                    ? currentNote
-                                    : "No notes found for this verse"}
-                            </Markdown>
                         )}
-                        <Button onClick={handleSave} variant="contained" sx={{ mt: 2 }}>Modifier</Button>
-                    </Paper>
-                    <Pagination
-                        count={ingredient.length}
-                        page={page}
-                        onChange={handlePage}
-                        size="small"
-                        variant="outlined"
-                        shape="rounded"
-                    />
+                    </>
+
                 </CardContent>
             </Box>
         </Box >
 
     );
+
 }
 
 export default BcvNotesViewerMuncher;
