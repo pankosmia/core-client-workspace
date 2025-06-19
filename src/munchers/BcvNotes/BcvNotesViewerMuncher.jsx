@@ -57,17 +57,12 @@ function BcvNotesViewerMuncher({metadata}) {
     const verseIds = filteredIngredient.map(l => l[1]);
     const verseSupReferences = filteredIngredient.map(l => l[3]);
 
-    /* console.log("verseNotes: ")
+    /* 
     console.log(verseNotes);
-    console.log(" ");
-    console.log("metadata: ")
     console.log(metadata); 
-    console.log(" ");
-    console.log("systemBcv: ")
     console.log(systemBcv);  */
-    console.log(" ");
-    console.log("ingredient: ")
-    console.log(ingredient); 
+/*     console.log(ingredient);  */
+/*  console.log(verseSupReferences); */
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -77,11 +72,12 @@ function BcvNotesViewerMuncher({metadata}) {
                 container
                 direction="row"
                 sx={{
-                    justifyContent: "space-between",
-                    alignItems: "flex-start"
+                    display:"flex",
+                    justifyContent: "center",
+                    alignItems: "center"
                  }}
             >   
-                <Grid2 item size={6}>
+                <Grid2 item size={3} sx={{ paddingLeft:"10%" }}>
                     <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</Typography>
                 </Grid2>
                 <Grid2 item size={12}>
@@ -91,7 +87,7 @@ function BcvNotesViewerMuncher({metadata}) {
                             ?
                             verseNotes
                                 .map((v, n) => {
-                                    return `* (**${verseIds[n]}**) ${v}. (${verseSupReferences[n].replace("rc://*/ta/man/translate/", "")})`
+                                    return `* (**${verseIds[n]}**) ${v}${!(verseSupReferences[n] === "") ? ` (${verseSupReferences[n].replace("rc://*/ta/man/translate/", "")})` : ""}`
                                 })
                                 .join("\n")
                             :
