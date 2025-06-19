@@ -3,10 +3,10 @@ import { Box, List, ListItemButton, ListItemIcon, ListItemText, Collapse } from 
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
-function SearchWithVerses({ systemBcv, ingredient }) {
+function SearchWithVerses({ systemBcv, ingredient, setCurrentRow }) {
 
     const [currentChapter, setCurrentChapter] = useState('');
-    const [currentVerse, setCurrentVerse] = useState({ reference: '', id: '' });
+    const [currentVerse, setCurrentVerse] = useState();
     const [open, setOpen] = useState(false);
 
     // Permet d'afficher tous les versets selon un chapitre selectionné
@@ -18,6 +18,17 @@ function SearchWithVerses({ systemBcv, ingredient }) {
     const handleClick = () => {
         setOpen(!open);
     };
+    const handleChangeSystemBcv = (verseRef) => {
+        const index = ingredient.findIndex(l => l[0] === verseRef);
+        if (index !== -1) {
+            setCurrentVerse(verseRef); 
+            setCurrentRow({
+                n: index,
+                content: ingredient[index],
+            });
+        }
+    };
+
 
     return (
         <Box sx={{
@@ -39,7 +50,7 @@ function SearchWithVerses({ systemBcv, ingredient }) {
 
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <List component="div" disablePadding sx={{
-                            maxHeight:'800px',
+                            maxHeight: '800px',
                             overflowY: 'auto',
                             height: 'auto',
                         }}>
@@ -69,7 +80,7 @@ function SearchWithVerses({ systemBcv, ingredient }) {
                                                             pl: 8,
                                                         }}
                                                         selected={v[0] === currentVerse}
-                                                        onClick={() => handleChangeSystemBcv(v[0], v[1])}
+                                                        onClick={() => handleChangeSystemBcv(v[0])}
                                                     >
                                                         <ListItemText primary={`Verset ${v[0].split(':')[1]} - ${v[1]}`} />
                                                     </ListItemButton>

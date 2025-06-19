@@ -16,11 +16,10 @@ import EditorNote from "../../components/EditorNote";
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
-    const { systemBcv, setSystemBcv } = useContext(BcvContext);
+    const { systemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const { i18nRef } = useContext(I18nContext);
     const [currentRow, setCurrentRow] = useState({ n: 1, content: [] });
-    const [currentNote, setCurrentNote] = useState('');
     const [contentChanged, _setContentChanged] = useState(false);
 
     // Récupération des données du tsv
@@ -53,21 +52,32 @@ function BcvNotesViewerMuncher({ metadata }) {
         },
         [systemBcv]
     );
+
     // Inialisation des données au départ
     const columnNames = ingredient[0] || [];
     //const oneRow = ingredient.slice(1).filter(line => line[1] === "mh4h")[0];
 
-    const changeCell = (n, v) => {
-        const newRow = currentRow
-        newRow.content[n] = v
-        setContentChanged(currentRow(newRow))
-    }
-    const nextRow = n => {
-        const newRow = currentRow
-        newRow.n = n + 1
-        newRow.content = ingredient[n + 1]
-        console.log("next row", newRow)
-    }
+     const changeCell = () => {
+        const newRow = currentRow.n - 1;
+
+        if (ingredient.length > 1 && ingredient[newRow]) {
+            setCurrentRow({
+                n: newRow,
+                content: ingredient[newRow]
+            });
+        }
+    };
+    const nextRow = () => {
+        const newRow = currentRow.n + 1;
+
+        if (ingredient.length > 0 && ingredient[newRow]) {
+            setCurrentRow({
+                n: newRow,
+                content: ingredient[newRow]
+            });
+        }
+    };
+
     // const updatedContent = (nCol, nVal) => {
     //     let vals = currentRow.content
     //     vals[nCol] = nVal
@@ -115,7 +125,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     }
     // Permet de sauvegarder les changements apportées dans les notes 
     const handleSave = () => {
-        if (currentNote.length > 0) {
+        if (currentRow.content[n].length > 0) {
             uploadTsvIngredient(ingredient)
         }
     }
@@ -128,9 +138,9 @@ function BcvNotesViewerMuncher({ metadata }) {
             flexDirection: 'column',
         }}
         >
-            <SearchNavBar getAllData={getAllData}/>
+            <SearchNavBar getAllData={getAllData} />
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
-                <SearchWithVerses systemBcv={systemBcv} ingredient={ingredient}/>
+                <SearchWithVerses systemBcv={systemBcv} ingredient={ingredient} setCurrentRow={setCurrentRow} />
                 <CardContent sx={{ flex: 2 }}>
                     <>
                         {(
@@ -138,7 +148,6 @@ function BcvNotesViewerMuncher({ metadata }) {
                                 overflowY: 'auto',
                                 height: 'auto',
                             }}>
-
                                 {columnNames.map((column, n) => (
                                     <>
                                         <FormControl fullWidth margin="normal" key={n}>
@@ -151,26 +160,29 @@ function BcvNotesViewerMuncher({ metadata }) {
                                             >
                                                 {column}
                                             </FormLabel>
-                                            <TextField
-                                                value={currentRow.content[n]}
-                                                variant="outlined"
-                                                fullWidth
-                                                size="small"
-                                            />
-                                            {
-                                                column === 'Note' ? (
-                                                    <EditorNote currentRow={currentRow} columnNames = {columnNames} />
+                                            {column === 'Note' ? (
+                                                <EditorNote
+                                                    currentRow={currentRow}
+                                                    columnNames={columnNames}
 
-                                                ) : (
-                                                    <p></p>
-                                                )
-                                            }
+                                                />
+                                            ) : (
+                                                <TextField
+                                                    value={currentRow.content[n] || ''}
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    size="small"
+                                                />
+                                            )}
+
                                         </FormControl>
                                     </>
                                 ))}
-                                <Button onClick={nextRow} variant="contained" sx={{ mt: 2 }}>Modifier</Button>
+                                <Button onClick={handleSave} variant="contained" sx={{ mt: 2 }}>Modifier</Button>
                             </List>
                         )}
+                        <Button onClick={changeCell} variant="contained" sx={{ mt: 2 }}>prédécent </Button>
+                        <Button onClick={nextRow} variant="contained" sx={{ mt: 2 }}>suivant</Button>
                     </>
 
                 </CardContent>

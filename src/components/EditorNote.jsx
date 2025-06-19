@@ -1,16 +1,15 @@
-import { useEffect, useState, useContext } from "react";
+import {useState } from "react";
 import Markdown from 'react-markdown';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
-import { Box, TextField, Button, ToggleButton, ToggleButtonGroup, CardContent, TextareaAutosize, List, ListItemButton, ListItemIcon, ListItemText, Collapse, FormControl, FormLabel } from "@mui/material";
+import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl } from "@mui/material";
 
-// Permet une modification des notes ou de la reference
+
 function EditorNote({ currentRow, columnNames }) {
-    //   const [contentChanged, _setContentChanged] = useState(false);
+    
     const [stateButtonNote, setStateButtonNote] = useState('write');
     const [value, setValue] = useState('');
     console.log(currentRow)
-
     return (
         <Box sx={{ padding: 2 }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
@@ -31,29 +30,31 @@ function EditorNote({ currentRow, columnNames }) {
             </div>
             {columnNames
                 .filter((column) => column === "Note")
-                .map((column, n) => (
-                    <>
-                        {stateButtonNote === 'write' ? (
-                            <FormControl fullWidth margin="normal"  key={n}>
-                                <TextareaAutosize
-                                    minRows={4}
-                                    name={column}
-                                    value={currentRow.content[n] || ''}
-                                    className="text-aera"
-                                // onChange={handleChange}
-                                />
-                            </FormControl>
-                          
-                        ) : (
-                            <Markdown>
-                                {currentRow.content[n].length > 0
-                                    ? currentRow.content[n]
-                                    : "No notes found for this verse"}
-                            </Markdown>
-                        )}
-                    </>
-                ))}
-            {/* <Button onClick={nextRow} variant="contained" sx={{ mt: 2 }}>Enregistrer</Button> */}
+                .map((column) => {
+                    const noteIndex = columnNames.indexOf("Note");
+                    return (
+                        <>
+                            {stateButtonNote === 'write' ? (
+                                <FormControl fullWidth margin="normal" key={noteIndex}>
+                                    <TextareaAutosize
+                                        minRows={4}
+                                        name={column}
+                                        value={currentRow.content[noteIndex] || ''}
+                                        className="text-aera"
+                                    // onChange={handleChange}
+                                    />
+                                </FormControl>
+                            ) : (
+                                <Markdown>
+                                    {currentRow.content[noteIndex]?.length > 0
+                                        ? currentRow.content[noteIndex]
+                                        : "No notes found for this verse"}
+                                </Markdown>
+                            )}
+                        </>
+                    );
+                })}
+
         </Box>
     )
 
