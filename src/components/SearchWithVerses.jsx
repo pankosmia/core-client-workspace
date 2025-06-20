@@ -29,7 +29,6 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRow }) {
         }
     };
 
-
     return (
         <Box sx={{
             minHeight: '100vh',
@@ -65,7 +64,7 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRow }) {
                                             setCurrentVerse(null);
                                         }}
                                     >
-                                        <ListItemText primary={`Chapitre ${chap}`} />
+                                        <ListItemText primary={`Chapitre ${chap}`}/>
                                     </ListItemButton>
 
                                     {chap === currentChapter && (
@@ -82,7 +81,7 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRow }) {
                                                         selected={v[0] === currentVerse}
                                                         onClick={() => handleChangeSystemBcv(v[0])}
                                                     >
-                                                        <ListItemText primary={`Verset ${v[0].split(':')[1]} - ${v[1]}`} />
+                                                        <ListItemText primary={`Verset ${v[0].split(':')[1]} - ${v[1]}`}/>
                                                     </ListItemButton>
                                                 ))}
 
@@ -95,7 +94,7 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRow }) {
                     </Collapse>
                 </List>
             </Box>
-        </Box >
+        </Box>
 
     );
 }

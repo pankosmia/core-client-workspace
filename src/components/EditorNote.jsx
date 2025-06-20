@@ -1,17 +1,18 @@
-import {useState } from "react";
+import { useState } from "react";
 import Markdown from 'react-markdown';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
 import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl } from "@mui/material";
+import { List } from "lucide-react";
 
 
-function EditorNote({ currentRow, columnNames }) {
-    
+function EditorNote({ currentRow, columnNames, onChangeNote }) {
+
     const [stateButtonNote, setStateButtonNote] = useState('write');
     const [value, setValue] = useState('');
     console.log(currentRow)
     return (
-        <Box sx={{ padding: 2 }}>
+        <Box>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <ToggleButtonGroup
                     exclusive
@@ -36,13 +37,20 @@ function EditorNote({ currentRow, columnNames }) {
                         <>
                             {stateButtonNote === 'write' ? (
                                 <FormControl fullWidth margin="normal" key={noteIndex}>
-                                    <TextareaAutosize
-                                        minRows={4}
-                                        name={column}
-                                        value={currentRow.content[noteIndex] || ''}
-                                        className="text-aera"
-                                    // onChange={handleChange}
-                                    />
+                                    <Box
+                                        sx={{
+                                            maxHeight: '500px',
+                                            overflowY: 'auto',
+                                        }}
+                                    >
+                                        <TextareaAutosize
+                                            name={column}
+                                            value={currentRow.content[noteIndex] || ''}
+                                            className="text-aera"
+                                            onChange={onChangeNote}
+
+                                        />
+                                    </Box>
                                 </FormControl>
                             ) : (
                                 <Markdown>

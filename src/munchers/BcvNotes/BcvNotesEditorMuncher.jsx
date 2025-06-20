@@ -12,7 +12,7 @@ import {
 import SearchNavBar from "../../components/SearchNavBar";
 import SearchWithVerses from "../../components/SearchWithVerses";
 import { enqueueSnackbar } from "notistack";
-import EditorNote from "../../components/EditorNote";
+import EditorLine from "../../components/EditorLine"
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
@@ -29,11 +29,12 @@ function BcvNotesViewerMuncher({ metadata }) {
         if (response.ok) {
             const newIngredient = response.text
                 .split("\n")
-                .map(l => l.split("\t").map(f => f.replace(/\\n/g, "\n\n")))
+                .map(l => l.split("\t")
+                    .map(f => f.replace(/(\\n){2,}/g, "\n\n"))
+                )
             setIngredient(
                 newIngredient
             );
-            console.log("newINgredient", newIngredient)
             if (newIngredient.length > 0) {
                 setCurrentRow({ n: 1, content: [...newIngredient[1]] })
             } else {
@@ -44,7 +45,7 @@ function BcvNotesViewerMuncher({ metadata }) {
             setIngredient([])
         }
     };
-
+    console.log("ingredient", ingredient)
     // utilisation de la fonction getAllData
     useEffect(
         () => {
@@ -53,13 +54,9 @@ function BcvNotesViewerMuncher({ metadata }) {
         [systemBcv]
     );
 
-    // Inialisation des données au départ
-    const columnNames = ingredient[0] || [];
-    //const oneRow = ingredient.slice(1).filter(line => line[1] === "mh4h")[0];
-
-     const changeCell = () => {
+    // changer de page -1 
+    const previousRow = () => {
         const newRow = currentRow.n - 1;
-
         if (ingredient.length > 1 && ingredient[newRow]) {
             setCurrentRow({
                 n: newRow,
@@ -67,9 +64,10 @@ function BcvNotesViewerMuncher({ metadata }) {
             });
         }
     };
+
+    // changer de page +1 
     const nextRow = () => {
         const newRow = currentRow.n + 1;
-
         if (ingredient.length > 0 && ingredient[newRow]) {
             setCurrentRow({
                 n: newRow,
@@ -123,70 +121,32 @@ function BcvNotesViewerMuncher({ metadata }) {
             throw new Error(`Failed to save: ${response.status}, ${response.error}`);
         }
     }
-    // Permet de sauvegarder les changements apportées dans les notes 
-    const handleSave = () => {
-        if (currentRow.content[n].length > 0) {
-            uploadTsvIngredient(ingredient)
-        }
-    }
-
     return (
         <Box sx={{
-            minHeight: '100vh',
+            minHeight: '100px',
             padding: 2,
             display: 'flex',
             flexDirection: 'column',
+            height:"auto"
         }}
         >
             <SearchNavBar getAllData={getAllData} />
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
                 <SearchWithVerses systemBcv={systemBcv} ingredient={ingredient} setCurrentRow={setCurrentRow} />
-                <CardContent sx={{ flex: 2 }}>
-                    <>
-                        {(
-                            <List component="div" disablePadding sx={{
-                                overflowY: 'auto',
-                                height: 'auto',
-                            }}>
-                                {columnNames.map((column, n) => (
-                                    <>
-                                        <FormControl fullWidth margin="normal" key={n}>
-                                            <FormLabel
-                                                sx={{
-                                                    fontWeight: 'bold',
-                                                    fontSize: '1.1rem',
-                                                    mb: 1,
-                                                }}
-                                            >
-                                                {column}
-                                            </FormLabel>
-                                            {column === 'Note' ? (
-                                                <EditorNote
-                                                    currentRow={currentRow}
-                                                    columnNames={columnNames}
-
-                                                />
-                                            ) : (
-                                                <TextField
-                                                    value={currentRow.content[n] || ''}
-                                                    variant="outlined"
-                                                    fullWidth
-                                                    size="small"
-                                                />
-                                            )}
-
-                                        </FormControl>
-                                    </>
-                                ))}
-                                <Button onClick={handleSave} variant="contained" sx={{ mt: 2 }}>Modifier</Button>
-                            </List>
-                        )}
-                        <Button onClick={changeCell} variant="contained" sx={{ mt: 2 }}>prédécent </Button>
-                        <Button onClick={nextRow} variant="contained" sx={{ mt: 2 }}>suivant</Button>
-                    </>
-
-                </CardContent>
+                <EditorLine
+                    currentRow={currentRow} ingredient={ingredient} setIngredient={setIngredient} setCurrentRow={setCurrentRow}
+                />
             </Box>
+            <Box sx={{ display: 'flex', gap: 2, padding: 5, justifyContent:"center" }}>
+                <Button onClick={previousRow} variant="contained" sx={{ mt: 2 }}>
+                    précédent
+                </Button>
+                <Button onClick={nextRow} variant="contained" sx={{ mt: 2 }}>
+                    suivant
+                </Button>
+            </Box>
+
+
         </Box >
     );
 }
