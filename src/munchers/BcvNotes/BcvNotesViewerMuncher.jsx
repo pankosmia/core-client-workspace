@@ -66,8 +66,6 @@ function BcvNotesViewerMuncher({metadata}) {
 
     return (
         <Box sx={{ flexGrow: 1 }}>
-{/*         <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
-            <h6>{doI18n("munchers:bcv_notes_viewer:title", i18nRef.current)}</h6> */}
             <Grid2 
                 container
                 direction="row"
@@ -77,7 +75,15 @@ function BcvNotesViewerMuncher({metadata}) {
                     alignItems: "center"
                  }}
             >   
-                <Grid2 item size={3} sx={{ paddingLeft:"10%" }}>
+                <Grid2
+                    item 
+                    size={3} 
+                    sx={{
+                        display:"flex",
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}
+                >
                     <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</Typography>
                 </Grid2>
                 <Grid2 item size={12}>
