@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
 import {useLocation} from "react-router-dom";
+import {Box} from "@mui/material";
 import WorkspaceCard from "./WorkspaceCard";
 import BcvPicker from "./BcvPicker";
 import GraphiteTest from "./GraphiteTest";
@@ -16,7 +17,6 @@ const paneStyle = {
     height: '100%',
     overflow: 'scroll'
 }
-
 
 const Workspace = () => {
     const { typographyRef } = useContext(typographyContext);
@@ -57,20 +57,6 @@ const Workspace = () => {
     /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
     const adjSelectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
 
-    const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - 48);
-
-    const handleWindowResize = useCallback(() => {
-        setMaxWindowHeight(window.innerHeight - 48);
-    }, []);
-
-
-    useEffect(() => {
-        window.addEventListener('resize', handleWindowResize);
-        return () => {
-            window.removeEventListener('resize', handleWindowResize);
-        };
-    }, [handleWindowResize]);
-
     return <>
         <Header
             titleKey="pages:core-local-workspace:title"
@@ -83,9 +69,9 @@ const Workspace = () => {
               tilePanes={paneList}
               rootNode={rootPane}
           >
-              <div style={{width: '100vw', height: maxWindowHeight}}>
+              <Box style={{position: 'fixed', top: '48px', bottom: 0, right: 0, overflow: 'scroll', width: '100vw'}}>
                   <TileContainer/>
-              </div>
+              </Box>
           </TileProvider>
         </div>
     </>

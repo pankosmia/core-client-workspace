@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from "react";
+import {useState, useEffect, useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n} from "pithekos-lib";
 import {
@@ -69,7 +69,7 @@ function ConfigureWorkspace() {
                     currentId="core-local-workspace"
                 />
             </Box>
-            <Box style={{width: '100%'}}>
+            <Box style={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
                 <Fab
                     variant="extended"
                     color="secondary"
@@ -116,6 +116,7 @@ function ConfigureWorkspace() {
                 marginBottom: "16px",
                 width: '100%'
             }}>
+              <Box sx={{ml: 2}}>
                 <Box sx={{mb:3}}>
                     <ButtonGroup>
                         <Button
@@ -201,6 +202,7 @@ function ConfigureWorkspace() {
                             )
                     }
                 </Masonry>
+              </Box>
             </Box>
         </Box>
 }
