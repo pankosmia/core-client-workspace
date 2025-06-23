@@ -78,6 +78,7 @@ function EditorLine({ currentRow, ingredient, setIngredient, setCurrentRow, meta
 
     const handleSaveTsv =()=>{
         uploadTsvIngredient([...ingredient])
+        console.log("ingredient",ingredient)
     }
     // Permet d'annuler les modications faites sur le TSV 
     const handleCancel = (rowN) => {
