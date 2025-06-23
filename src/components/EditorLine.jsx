@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { TextField, Button, FormControl, FormLabel, List,Box } from "@mui/material";
+import { TextField, Button, FormControl, FormLabel, Box } from "@mui/material";
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
@@ -10,11 +10,13 @@ import {
 import { enqueueSnackbar } from "notistack";
 import EditorNote from "../components/EditorNote"
 
-function EditorLine({ currentRow, ingredient, setIngredient, setCurrentRow }) {
+function EditorLine({ currentRow, ingredient, setIngredient, setCurrentRow, metadata }) {
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
     const [contentChanged, _setContentChanged] = useState(false);
     const [changeCellValue, setChangeCellValue] = useState(false);
+
+
     // Inialisation des données au départ
     const columnNames = ingredient[0] || [];
     //const oneRow = ingredient.slice(1).filter(line => line[1] === "mh4h")[0];
@@ -26,23 +28,11 @@ function EditorLine({ currentRow, ingredient, setIngredient, setCurrentRow }) {
             content: [...currentRow.content]
         };
         newCurrentRow.content[n] = newCellValue;
-        // setIngredient(newRow);
         setCurrentRow(newCurrentRow);
         setChangeCellValue(true);
     };
-    console.log("changement de valeur", changeCellValue)
-
-    // const updatedContent = (nCol, nVal) => {
-    //     let vals = currentRow.content
-    //     vals[nCol] = nVal
-    //     return {
-    //         n: currentRow["n"],
-    //         content: vals
-    //     }
-    // }
 
     // Montre le changement d'état du contenu 
-
     const setContentChanged = nv => {
         console.log("setContentChanged", nv);
         _setContentChanged(nv);
@@ -79,69 +69,78 @@ function EditorLine({ currentRow, ingredient, setIngredient, setCurrentRow }) {
         }
     }
     // Permet de sauvegarder les changements apportées dans les notes 
-    const handleSave = () => {
-        if (currentRow.content[n].length > 0) {
-            uploadTsvIngredient(ingredient)
-        }
-    }
+    const handleSaveRow = (rowN) => {
+        const newIngredient = [...ingredient]
+        newIngredient[rowN] = currentRow.content
+        setIngredient(newIngredient);
+        console.log("newcurrentrow", newIngredient)
+    };
 
-    const handleCancel = () => {
-        setIngredient(ingredient);
+    const handleSaveTsv =()=>{
+        uploadTsvIngredient([...ingredient])
+    }
+    // Permet d'annuler les modications faites sur le TSV 
+    const handleCancel = (rowN) => {
+        const newRowValue = ingredient[rowN]
+        const newCurrentRow = {
+            ...currentRow,
+            content: [...newRowValue]
+        };
+        setCurrentRow(newCurrentRow);
+        console.log("newcurrentrow", newCurrentRow)
     };
 
     return (
         <Box>
             {columnNames.map((column, n) => (
-                <>
-                    <FormControl fullWidth margin="normal" key={n}>
-                        <FormLabel
-                            sx={{
-                                fontWeight: 'bold',
-                                fontSize: '1.1rem',
-                                mb: 1,
-                            }}
-                        >
-                            {column}
-                        </FormLabel>
-                        {column === 'Note' ? (
-                            <EditorNote
-                                currentRow={currentRow}
-                                columnNames={columnNames}
-                                onChangeNote={(e) => changeCell(e, n)}
+                <FormControl fullWidth margin="normal" key={n}>
+                    {column === 'Note' ? (
+                        <EditorNote
+                            currentRow={currentRow}
+                            columnNames={columnNames}
+                            onChangeNote={(e) => changeCell(e, n)}
 
-                            />
-                        ) : (
-                            <TextField
-                                value={currentRow.content[n] || ''}
-                                variant="outlined"
-                                fullWidth
-                                size="small"
-                                onChange={(e) => changeCell(e, n)}
+                        />
+                    ) : (
+                        <TextField
+                            label={column}
+                            value={currentRow.content[n] || ''}
+                            variant="outlined"
+                            fullWidth
+                            size="small"
+                            onChange={(e) => changeCell(e, n)}
+                        />
+                    )}
 
-                            />
-                        )}
-
-                    </FormControl>
-                </>
+                </FormControl>
             ))}
-            <Box sx={{display: 'flex', gap: 2, padding: 5}}>
+            <Box sx={{ display: 'flex', gap: 2, padding: 2 }}>
                 <Button
-                    onClick={handleSave}
+                    onClick={() => handleSaveRow(currentRow.n)}
                     variant="contained"
                     disabled={!changeCellValue}
                     sx={{
                         mt: 2,
                         backgroundColor: changeCellValue ? 'primary' : 'grey.400',
                         color: 'white',
-                        
+
                     }}
                 >
-                    Enregistrer
+                    ok
                 </Button>
-                <Button onClick={handleCancel} variant="contained" disabled={!changeCellValue} sx={{ mt: 2,
-                        backgroundColor: changeCellValue ? 'primary' : 'grey.400',
-                        color: 'white', }}>Annuler</Button>
+                <Button onClick={() => handleCancel(currentRow.n)} variant="contained" disabled={!changeCellValue} sx={{
+                    mt: 2,
+                    backgroundColor: changeCellValue ? 'primary' : 'grey.400',
+                    color: 'white',
+                }}>Annuler</Button>
+
+                <Button onClick={() => handleSaveTsv()} variant="contained" disabled={!changeCellValue} sx={{
+                    mt: 2,
+                    backgroundColor: changeCellValue ? 'primary' : 'grey.400',
+                    color: 'white',
+                }}>Sauvegarder le TSV </Button>
             </Box>
+            
         </Box>
     );
 }

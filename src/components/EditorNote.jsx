@@ -2,18 +2,15 @@ import { useState } from "react";
 import Markdown from 'react-markdown';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
-import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl } from "@mui/material";
-import { List } from "lucide-react";
-
+import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl, FormLabel } from "@mui/material";
 
 function EditorNote({ currentRow, columnNames, onChangeNote }) {
 
     const [stateButtonNote, setStateButtonNote] = useState('write');
     const [value, setValue] = useState('');
-    console.log(currentRow)
     return (
         <Box>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <div>
                 <ToggleButtonGroup
                     exclusive
                     aria-label="Platform"
@@ -37,20 +34,15 @@ function EditorNote({ currentRow, columnNames, onChangeNote }) {
                         <>
                             {stateButtonNote === 'write' ? (
                                 <FormControl fullWidth margin="normal" key={noteIndex}>
-                                    <Box
-                                        sx={{
-                                            maxHeight: '500px',
-                                            overflowY: 'auto',
-                                        }}
-                                    >
+                                   <FormLabel>Note </FormLabel>
                                         <TextareaAutosize
                                             name={column}
+                                            fullWidth
                                             value={currentRow.content[noteIndex] || ''}
-                                            className="text-aera"
+                                            //className="text-aera"
                                             onChange={onChangeNote}
 
                                         />
-                                    </Box>
                                 </FormControl>
                             ) : (
                                 <Markdown>

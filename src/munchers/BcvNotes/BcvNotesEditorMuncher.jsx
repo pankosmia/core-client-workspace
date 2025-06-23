@@ -1,6 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import './BcvNotesMuncher.css'
-import { Box, TextField, Button, ToggleButton, ToggleButtonGroup, CardContent, TextareaAutosize, List, ListItemButton, ListItemIcon, ListItemText, Collapse, FormControl, FormLabel } from "@mui/material";
+import { Box, TextField, Button, ToggleButton, ToggleButtonGroup, CardContent, TextareaAutosize, List, ListItemButton, ListItemIcon, ListItemText, Collapse, FormControl, FormLabel, Stack } from "@mui/material";
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
@@ -45,7 +44,6 @@ function BcvNotesViewerMuncher({ metadata }) {
             setIngredient([])
         }
     };
-    console.log("ingredient", ingredient)
     // utilisation de la fonction getAllData
     useEffect(
         () => {
@@ -122,22 +120,18 @@ function BcvNotesViewerMuncher({ metadata }) {
         }
     }
     return (
-        <Box sx={{
-            minHeight: '100px',
+        <Stack sx={{
             padding: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            height:"auto"
         }}
         >
             <SearchNavBar getAllData={getAllData} />
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
                 <SearchWithVerses systemBcv={systemBcv} ingredient={ingredient} setCurrentRow={setCurrentRow} />
                 <EditorLine
-                    currentRow={currentRow} ingredient={ingredient} setIngredient={setIngredient} setCurrentRow={setCurrentRow}
+                    currentRow={currentRow} ingredient={ingredient} setIngredient={setIngredient} setCurrentRow={setCurrentRow} metadata={metadata}
                 />
             </Box>
-            <Box sx={{ display: 'flex', gap: 2, padding: 5, justifyContent:"center" }}>
+            <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
                 <Button onClick={previousRow} variant="contained" sx={{ mt: 2 }}>
                     précédent
                 </Button>
@@ -145,9 +139,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                     suivant
                 </Button>
             </Box>
-
-
-        </Box >
+        </Stack >
     );
 }
 
