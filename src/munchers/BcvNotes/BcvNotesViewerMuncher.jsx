@@ -61,8 +61,11 @@ function BcvNotesViewerMuncher({metadata}) {
     console.log(verseNotes);
     console.log(metadata); 
     console.log(systemBcv);  */
-/*     console.log(ingredient);  */
+    console.log(ingredient);  
+    console.log(filteredIngredient);  
 /*  console.log(verseSupReferences); */
+    console.log(systemBcv.chapterNum);
+    console.log(systemBcv.verseNum);
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -93,7 +96,7 @@ function BcvNotesViewerMuncher({metadata}) {
                             ?
                             verseNotes
                                 .map((v, n) => {
-                                    return `* (**${verseIds[n]}**) ${v}${!(verseSupReferences[n] === "") ? ` (${verseSupReferences[n].replace("rc://*/ta/man/translate/", "")})` : ""}`
+                                    return `* (**${verseIds[n]}**) ${v.replace(". \n\n\n\n ", ". \n\n * ")}${!(verseSupReferences[n] === "") ? ` (${verseSupReferences[n].replace("rc://*/ta/man/translate/", "")})` : ""}`
                                 })
                                 .join("\n")
                             :
