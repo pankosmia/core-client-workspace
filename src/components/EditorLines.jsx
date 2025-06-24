@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { TextField, Button, FormControl, FormLabel, Box } from "@mui/material";
+import { TextField, Button, FormControl, Box } from "@mui/material";
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
@@ -8,9 +8,9 @@ import {
     postJson
 } from "pithekos-lib";
 import { enqueueSnackbar } from "notistack";
-import EditorNote from "../components/EditorNote"
+import EditorNote from "./EditorNote"
 
-function EditorLine({ currentRow, ingredient, setIngredient, setCurrentRow, metadata }) {
+function EditorLines ({ currentRow, ingredient, setIngredient, setCurrentRow, metadata }) {
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
     const [contentChanged, _setContentChanged] = useState(false);
@@ -19,8 +19,8 @@ function EditorLine({ currentRow, ingredient, setIngredient, setCurrentRow, meta
 
     // Inialisation des données au départ
     const columnNames = ingredient[0] || [];
-    //const oneRow = ingredient.slice(1).filter(line => line[1] === "mh4h")[0];
 
+    // Permet la modification d'une note
     const changeCell = (event, n) => {
         const newCellValue = event.target.value;
         const newCurrentRow = {
@@ -38,7 +38,7 @@ function EditorLine({ currentRow, ingredient, setIngredient, setCurrentRow, meta
         _setContentChanged(nv);
     }
 
-    // Met à jour le fichier 
+    // Met à jour le fichier TSV
     const uploadTsvIngredient = async (tsvData, debugBool) => {
         const tsvString = tsvData
             .map(
@@ -68,6 +68,7 @@ function EditorLine({ currentRow, ingredient, setIngredient, setCurrentRow, meta
             throw new Error(`Failed to save: ${response.status}, ${response.error}`);
         }
     }
+
     // Permet de sauvegarder les changements apportées dans les notes 
     const handleSaveRow = (rowN) => {
         const newIngredient = [...ingredient]
@@ -76,11 +77,12 @@ function EditorLine({ currentRow, ingredient, setIngredient, setCurrentRow, meta
         console.log("newcurrentrow", newIngredient)
     };
 
+    // Permet de sauvegarder dans le fichier TSV 
     const handleSaveTsv =()=>{
         uploadTsvIngredient([...ingredient])
-        console.log("ingredient",ingredient)
     }
-    // Permet d'annuler les modications faites sur le TSV 
+
+    // Permet d'annuler les modications faites sur la note 
     const handleCancel = (rowN) => {
         const newRowValue = ingredient[rowN]
         const newCurrentRow = {
@@ -90,7 +92,7 @@ function EditorLine({ currentRow, ingredient, setIngredient, setCurrentRow, meta
         setCurrentRow(newCurrentRow);
         console.log("newcurrentrow", newCurrentRow)
     };
-
+    
     return (
         <Box>
             {columnNames.map((column, n) => (
@@ -146,4 +148,4 @@ function EditorLine({ currentRow, ingredient, setIngredient, setCurrentRow, meta
     );
 }
 
-export default EditorLine;
+export default EditorLines;

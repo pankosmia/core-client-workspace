@@ -39,7 +39,6 @@ function EditorNote({ currentRow, columnNames, onChangeNote }) {
                                             name={column}
                                             fullWidth
                                             value={currentRow.content[noteIndex] || ''}
-                                            //className="text-aera"
                                             onChange={onChangeNote}
 
                                         />

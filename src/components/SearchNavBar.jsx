@@ -6,7 +6,6 @@ import InputBase from '@mui/material/InputBase';
 
 function SearchNavBar() {
     const [value, setValue] = useState('');
-    const [contentChanged, _setContentChanged] = useState(false);
 
     const Search = styled('div')(({ theme }) => ({
         position: 'relative',
