@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Box, Fab, Menu, MenuItem } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import EditorLines from "./EditorLines";
 
 function AddLine() {
     const [openedModal, setOpenedModal] = useState(null);
@@ -26,7 +27,7 @@ function AddLine() {
                 >
                     <AddIcon sx={{ mr: 1 }} onClick={handleCreateForm} />
                 </Fab>
-                {/* <Menu
+                <Menu
                     anchorEl={createAnchorEl}
                     open={!!createAnchorEl}
                     onClose={handleCreateClose}
@@ -35,10 +36,12 @@ function AddLine() {
                         onClick={handleCreateForm}>
                     </MenuItem>
 
-                </Menu> */}
+                </Menu>
+                {/* <EditorLines open={openedModal === 'new-form'}
+                    closeModal={() => setOpenedModal(null)} /> */}
             </Box>
 
-            
+
         </>
     );
 }

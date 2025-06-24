@@ -56,7 +56,7 @@ function SaveTsvIngredient({ingredient, metadata}) {
     console.log("ingredient 2", ingredient)
     }
     return (
-        <Button onClick={() => handleSaveTsv(ingredient)} variant="contained" sx={{
+        <Button onClick={() => handleSaveTsv()} variant="contained" sx={{
             mt: 2,
 
         }}>Sauvegarder le TSV </Button>

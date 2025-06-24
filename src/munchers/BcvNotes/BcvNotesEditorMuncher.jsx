@@ -10,6 +10,7 @@ import SearchWithVerses from "../../components/SearchWithVerses";
 import EditorLines from "../../components/EditorLines"
 import AddLine from "../../components/AddLine";
 import SaveTsvIngredient from "../../components/SaveTsvIngredient";
+//import "./BcvNotesMuncher.css";
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
@@ -83,8 +84,8 @@ function BcvNotesViewerMuncher({ metadata }) {
                     currentRow={currentRow} ingredient={ingredient} setIngredient={setIngredient} setCurrentRow={setCurrentRow} metadata={metadata}
                 />
             </Box>
-            <SaveTsvIngredient ingredient={ingredient} metadata={metadata} setIngredient={setIngredient} />
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
+            <SaveTsvIngredient ingredient={ingredient} metadata={metadata} setIngredient={setIngredient} />
                 <Button onClick={previousRow} variant="contained" sx={{ mt: 2 }}>
                     précédent
                 </Button>

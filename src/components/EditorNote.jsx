@@ -3,7 +3,6 @@ import Markdown from 'react-markdown';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
 import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl, FormLabel } from "@mui/material";
-
 function EditorNote({ currentRow, columnNames, onChangeNote }) {
 
     const [stateButtonNote, setStateButtonNote] = useState('write');
@@ -40,6 +39,7 @@ function EditorNote({ currentRow, columnNames, onChangeNote }) {
                                             fullWidth
                                             value={currentRow.content[noteIndex] || ''}
                                             onChange={onChangeNote}
+                                          
 
                                         />
                                 </FormControl>
