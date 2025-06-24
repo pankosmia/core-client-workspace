@@ -1,5 +1,4 @@
-import EditorLines from "./EditorLines";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
@@ -8,15 +7,13 @@ import {
     postJson
 } from "pithekos-lib";
 import { enqueueSnackbar } from "notistack";
-export default function SaveTsvIngredient(setIngredient,ingredient,metadata) {
+import { Button } from "@mui/material";
+
+function SaveTsvIngredient({ingredient, metadata}) {
 
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
-    // Montre le changement d'état du contenu 
-    const setContentChanged = nv => {
-        console.log("setContentChanged", nv);
-        _setContentChanged(nv);
-    }
+    const [contentChanged, _setContentChanged] = useState(false);
 
     // Met à jour le fichier TSV
     const uploadTsvIngredient = async (tsvData, debugBool) => {
@@ -48,13 +45,21 @@ export default function SaveTsvIngredient(setIngredient,ingredient,metadata) {
             throw new Error(`Failed to save: ${response.status}, ${response.error}`);
         }
     }
-
+    // Montre le changement d'état du contenu 
+    const setContentChanged = nv => {
+        console.log("setContentChanged", nv);
+        _setContentChanged(nv);
+    }
     // Permet de sauvegarder dans le fichier TSV 
     const handleSaveTsv = () => {
         uploadTsvIngredient([...ingredient])
+    console.log("ingredient 2", ingredient)
     }
-
     return (
-        <EditorLines handleSaveTsv={handleSaveTsv} />
+        <Button onClick={() => handleSaveTsv(ingredient)} variant="contained" sx={{
+            mt: 2,
+
+        }}>Sauvegarder le TSV </Button>
     )
 }
+export default SaveTsvIngredient;
