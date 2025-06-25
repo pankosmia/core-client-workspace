@@ -53,7 +53,6 @@ function SaveTsvIngredient({ingredient, metadata}) {
     // Permet de sauvegarder dans le fichier TSV 
     const handleSaveTsv = () => {
         uploadTsvIngredient([...ingredient])
-    console.log("ingredient 2", ingredient)
     }
     return (
         <Button onClick={() => handleSaveTsv()} variant="contained" sx={{

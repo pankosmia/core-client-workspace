@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { TextField, Button, FormControl, Box, Dialog } from "@mui/material";
-import EditorNote from "./EditorNote"
+import { TextField, Button, FormControl, Box } from "@mui/material";
+import EditorNoteLines from "./EditorNoteLines"
 
-function EditorLines({ currentRow, ingredient, setIngredient, setCurrentRow, open, closeModal }) {
-    const handleClose = () => {
-        closeModal();
-    }
+function EditorLines({ currentRow, ingredient, setIngredient, setCurrentRow }) {
+
     const [changeCellValue, setChangeCellValue] = useState(false);
-    const [stateEditorLines, setStateEditorLines] = useState("editor")
+
     // Inialisation des données au départ
     const columnNames = ingredient[0] || [];
 
@@ -44,52 +42,49 @@ function EditorLines({ currentRow, ingredient, setIngredient, setCurrentRow, ope
 
 
     return (
-            <Box>
-                {columnNames.map((column, n) => (
-                    <FormControl fullWidth margin="normal" key={n}>
-                        {column === 'Note' ? (
-                            <EditorNote
-                                currentRow={currentRow}
-                                columnNames={columnNames}
-                                onChangeNote={(e) => changeCell(e, n)}
+        <Box>
+            {columnNames.map((column, n) => (
+                <FormControl fullWidth margin="normal" key={n}>
+                    {column === 'Note' ? (
+                        <EditorNoteLines
+                            currentRow={currentRow}
+                            columnNames={columnNames}
+                            onChangeNote={(e) => changeCell(e, n)}
 
-                            />
-                        ) : (
-                            <TextField
-                                label={column}
-                                value={currentRow.content[n] || ''}
-                                variant="outlined"
-                                fullWidth
-                                size="small"
-                                onChange={(e) => changeCell(e, n)}
-                            />
-                        )}
+                        />
+                    ) : (
+                        <TextField
+                            label={column}
+                            value={currentRow.content[n] || ''}
+                            variant="outlined"
+                            fullWidth
+                            size="small"
+                            onChange={(e) => changeCell(e, n)}
+                        />
+                    )}
 
-                    </FormControl>
-                ))}
-                <Box sx={{ display: 'flex', gap: 2, padding: 2 }}>
-                    <Button
-                        onClick={() => handleSaveRow(currentRow.n)}
-                        variant="contained"
-                        disabled={!changeCellValue}
-                        sx={{
-                            mt: 2,
-                            backgroundColor: changeCellValue ? 'primary' : 'grey.400',
-                            color: 'white',
-
-                        }}
-                    >
-                        Ok
-                    </Button>
-
-                    <Button onClick={() => handleCancel(currentRow.n)} variant="contained" disabled={!changeCellValue} sx={{
+                </FormControl>
+            ))}
+            <Box sx={{ display: 'flex', gap: 2, padding: 2 }}>
+                <Button
+                    onClick={() => handleSaveRow(currentRow.n)}
+                    variant="contained"
+                    disabled={!changeCellValue}
+                    sx={{
                         mt: 2,
                         backgroundColor: changeCellValue ? 'primary' : 'grey.400',
                         color: 'white',
-                    }}>Annuler</Button>
-
-                </Box>
+                    }}
+                >
+                    Ok
+                </Button>
+                <Button onClick={() => handleCancel(currentRow.n)} variant="contained" disabled={!changeCellValue} sx={{
+                    mt: 2,
+                    backgroundColor: changeCellValue ? 'primary' : 'grey.400',
+                    color: 'white',
+                }}>Annuler</Button>
             </Box>
+        </Box>
     );
 }
 

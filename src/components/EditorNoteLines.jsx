@@ -3,28 +3,28 @@ import Markdown from 'react-markdown';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
 import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl, FormLabel } from "@mui/material";
-function EditorNote({ currentRow, columnNames, onChangeNote }) {
+
+function EditorNoteLines({ currentRow, columnNames, onChangeNote }) {
 
     const [stateButtonNote, setStateButtonNote] = useState('write');
     const [value, setValue] = useState('');
     return (
-        <Box>
-            <div>
-                <ToggleButtonGroup
-                    exclusive
-                    aria-label="Platform"
-                    size="small"
-                    value={value}
-                    onChange={(event, newValue) => {
-                        if (newValue !== null) {
-                            setValue(newValue);
-                        }
-                    }}
-                >
-                    <ToggleButton value='write' onClick={() => setStateButtonNote('write')}><CreateIcon /></ToggleButton>
-                    <ToggleButton value='preview' onClick={() => setStateButtonNote('preview')}><RemoveRedEyeIcon /></ToggleButton>
-                </ToggleButtonGroup>
-            </div>
+        <Box sx={{border:"2px"}}>
+            <FormLabel>Note </FormLabel>
+            <ToggleButtonGroup
+                exclusive
+                aria-label="Platform"
+                size="small"
+                value={value}
+                onChange={(event, newValue) => {
+                    if (newValue !== null) {
+                        setValue(newValue);
+                    }
+                }}
+            >
+                <ToggleButton value='write' onClick={() => setStateButtonNote('write')}><CreateIcon /></ToggleButton>
+                <ToggleButton value='preview' onClick={() => setStateButtonNote('preview')}><RemoveRedEyeIcon /></ToggleButton>
+            </ToggleButtonGroup>
             {columnNames
                 .filter((column) => column === "Note")
                 .map((column) => {
@@ -33,15 +33,12 @@ function EditorNote({ currentRow, columnNames, onChangeNote }) {
                         <>
                             {stateButtonNote === 'write' ? (
                                 <FormControl fullWidth margin="normal" key={noteIndex}>
-                                   <FormLabel>Note </FormLabel>
-                                        <TextareaAutosize
-                                            name={column}
-                                            fullWidth
-                                            value={currentRow.content[noteIndex] || ''}
-                                            onChange={onChangeNote}
-                                          
-
-                                        />
+                                    <TextareaAutosize
+                                        name={column}
+                                        fullWidth
+                                        value={currentRow.content[noteIndex] || ''}
+                                        onChange={onChangeNote}
+                                    />
                                 </FormControl>
                             ) : (
                                 <Markdown>
@@ -59,4 +56,4 @@ function EditorNote({ currentRow, columnNames, onChangeNote }) {
 
 }
 
-export default EditorNote;
+export default EditorNoteLines;

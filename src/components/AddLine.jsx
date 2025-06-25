@@ -1,20 +1,18 @@
 import { useState } from "react";
 import { Box, Fab, Menu, MenuItem } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import EditorLines from "./EditorLines";
+import EditorOneLine from "./EditorOneLine";
 
-function AddLine() {
+function AddLine({currentRow, setCurrentRow, ingredient, setIngredient}) {
+
     const [openedModal, setOpenedModal] = useState(null);
     const [createAnchorEl, setCreateAnchorEl] = useState(null);
 
     const handleCreateForm = () => {
-        setOpenedModal("new-form");
+        setOpenedModal("editor");
         setCreateAnchorEl(null);
     };
 
-    const handleCreateClose = () => {
-        setCreateAnchorEl(null);
-    };
     return (
         <>
             <Box>
@@ -22,25 +20,19 @@ function AddLine() {
                     variant="extended"
                     color="primary"
                     size="small"
-                    onClick={event => setCreateAnchorEl(event.currentTarget)}
+                    onClick={(event) => {
+                        setCreateAnchorEl(event.currentTarget);
+                        handleCreateForm();
+                    }}
                     sx={{ ml: 2 }}
                 >
-                    <AddIcon sx={{ mr: 1 }} onClick={handleCreateForm} />
+                    <AddIcon sx={{ mr: 1 }} />
+                    Add
                 </Fab>
-                <Menu
-                    anchorEl={createAnchorEl}
-                    open={!!createAnchorEl}
-                    onClose={handleCreateClose}
-                >
-                    <MenuItem
-                        onClick={handleCreateForm}>
-                    </MenuItem>
 
-                </Menu>
-                {/* <EditorLines open={openedModal === 'new-form'}
-                    closeModal={() => setOpenedModal(null)} /> */}
+                <EditorOneLine open={openedModal === 'editor'}
+                    closeModal={() => setOpenedModal(null)} currentRow={currentRow} setCurrentRow={setCurrentRow} ingredient={ingredient} setIngredient={setIngredient} />
             </Box>
-
 
         </>
     );
