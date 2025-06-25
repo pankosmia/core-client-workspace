@@ -41,9 +41,6 @@ function BcvQuestionsViewerMuncher({metadata}) {
     const verseQuestions = filteredIngredient.map(l => l[5]);
     const verseAnswers = filteredIngredient.map(l => l[6]);
 
-    console.log(verseQuestions);
-    console.log(ingredient);
-
     return (
         <Box sx={{ flexGrow: 1 }}>
             <Grid2
