@@ -28,7 +28,6 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRow }) {
             });
         }
     };
-    console.log("ingredient chapter",ingredient)
     return (
 
         <Box>

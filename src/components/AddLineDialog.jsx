@@ -7,8 +7,6 @@ function AddLineDialog({ open, closeModal, setCurrentRow, currentRow, ingredient
     const [changeCellValue, setChangeCellValue] = useState(false);
     const [addCurrentRow, setAddCurrentRow] = useState({ n: 1, content: [] });
 
-    const columnNames = ingredient[0] || [];
-
     const handleClose = () => {
         closeModal();
     }
@@ -27,12 +25,11 @@ function AddLineDialog({ open, closeModal, setCurrentRow, currentRow, ingredient
     };
 
     // Permet de sauvegarder la nouvelle note
-    const handleSaveNewTsvRow = () => {
+    const handleSaveNewTsvRow = (rowN) => {
     const newIngredientNote = [...ingredient];
     const newLines = [...addCurrentRow.content]; 
-    newIngredientNote.splice(newLines);
+    newIngredientNote.push(newLines);
     setIngredient(newIngredientNote);
-    console.log("Nouvel état des ingrédients :", newIngredientNote);
     };
 
     return (
@@ -41,7 +38,12 @@ function AddLineDialog({ open, closeModal, setCurrentRow, currentRow, ingredient
             open={open}
             onClose={handleClose}>
 
-            <LineForm mode="Add" valeur="" addCurrentRow={addCurrentRow} changeCell={changeCell} currentRow={currentRow} setCurrentRow={setCurrentRow} ingredient={ingredient} setIngredient={setIngredient} />
+            <LineForm 
+                mode="Add"
+                currentRow="" 
+                ingredient={ingredient}
+                saveFunction={handleSaveNewTsvRow}
+            />
             <Box sx={{ display: 'flex', gap: 2, padding: 2 }}>
                 <Button
                     onClick={() => handleSaveNewTsvRow(currentRow.n)}

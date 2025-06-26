@@ -5,7 +5,7 @@ import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 
 function SearchNavBar() {
-    const [value, setValue] = useState('');
+    const [value, setValue] = useState('book');
 
     const Search = styled('div')(({ theme }) => ({
         position: 'relative',

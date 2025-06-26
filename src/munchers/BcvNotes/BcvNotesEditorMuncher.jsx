@@ -51,7 +51,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     // changer de page -1 
     const previousRow = () => {
         const newRow = currentRow.n - 1;
-        if (ingredient.length > 1 && ingredient[newRow]) {
+        if (newRow>= 1 &&ingredient.length > 1 && ingredient[newRow]) {
             setCurrentRow({
                 n: newRow,
                 content: ingredient[newRow]
@@ -60,15 +60,20 @@ function BcvNotesViewerMuncher({ metadata }) {
     };
 
     // changer de page +1 
-    const nextRow = () => {
-        const newRow = currentRow.n + 1;
-        if (ingredient.length > 0 && ingredient[newRow]) {
-            setCurrentRow({
-                n: newRow,
-                content: ingredient[newRow]
-            });
-        }
-    };
+   const nextRow = () => {
+    const newRow = currentRow.n + 1;
+    const CurrentchapterNum = ingredient[newRow][0].split(":")[0]
+    if (
+        ingredient[newRow] &&
+       CurrentchapterNum <= systemBcv.chapterNum
+    ) {
+        setCurrentRow({
+            n: newRow,
+            content: ingredient[newRow]
+        });
+    }
+};
+
 
     return (
         <Stack sx={{
@@ -86,7 +91,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                 />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-            <SaveTsvButton ingredient={ingredient} metadata={metadata} setIngredient={setIngredient} />
+            <SaveTsvButton ingredient={ingredient} metadata={metadata} setIngredient={setIngredient} currentRow={currentRow}/>
                 <Button onClick={previousRow} variant="contained" sx={{ mt: 2 }}>
                     précédent
                 </Button>
