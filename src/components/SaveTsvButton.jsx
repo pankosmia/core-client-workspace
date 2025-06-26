@@ -9,7 +9,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { Button } from "@mui/material";
 
-function SaveTsvIngredient({ingredient, metadata}) {
+function SaveTsvButton({ingredient, metadata}) {
 
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
@@ -61,4 +61,4 @@ function SaveTsvIngredient({ingredient, metadata}) {
         }}>Sauvegarder le TSV </Button>
     )
 }
-export default SaveTsvIngredient;
+export default SaveTsvButton;

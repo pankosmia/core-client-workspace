@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { TextField, Button, FormControl, Box } from "@mui/material";
-import EditorNoteLines from "./EditorNoteLines"
-
-function EditorLines({ currentRow, ingredient, setIngredient, setCurrentRow }) {
+import MarkdownField from "./MarkdownField"
+import LineForm from "./LineForm";
+function Editor({ currentRow, ingredient, setIngredient, setCurrentRow }) {
 
     const [changeCellValue, setChangeCellValue] = useState(false);
 
@@ -42,30 +42,9 @@ function EditorLines({ currentRow, ingredient, setIngredient, setCurrentRow }) {
 
 
     return (
-        <Box>
-            {columnNames.map((column, n) => (
-                <FormControl fullWidth margin="normal" key={n}>
-                    {column === 'Note' ? (
-                        <EditorNoteLines
-                            currentRow={currentRow}
-                            columnNames={columnNames}
-                            onChangeNote={(e) => changeCell(e, n)}
-
-                        />
-                    ) : (
-                        <TextField
-                            label={column}
-                            value={currentRow.content[n] || ''}
-                            variant="outlined"
-                            fullWidth
-                            size="small"
-                            onChange={(e) => changeCell(e, n)}
-                        />
-                    )}
-
-                </FormControl>
-            ))}
-            <Box sx={{ display: 'flex', gap: 2, padding: 2 }}>
+        <>
+            <Box sx={{ display: 'flex', flexDirection:"column", gap: 2, padding: 2 }}>
+            <LineForm mode='editor' valeur="1" changeCell={changeCell} currentRow={currentRow} setCurrentRow={setCurrentRow} ingredient={ingredient} setIngredient={setIngredient} />
                 <Button
                     onClick={() => handleSaveRow(currentRow.n)}
                     variant="contained"
@@ -84,8 +63,9 @@ function EditorLines({ currentRow, ingredient, setIngredient, setCurrentRow }) {
                     color: 'white',
                 }}>Annuler</Button>
             </Box>
-        </Box>
+        </>
+
     );
 }
 
-export default EditorLines;
+export default Editor;

@@ -4,12 +4,12 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
 import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl, FormLabel } from "@mui/material";
 
-function EditorNoteLines({ currentRow, columnNames, onChangeNote }) {
+function MarkdownField({ currentRow, columnNames, onChangeNote, addCurrentRow, valeur }) {
 
     const [stateButtonNote, setStateButtonNote] = useState('write');
     const [value, setValue] = useState('');
     return (
-        <Box sx={{border:"2px"}}>
+        <Box sx={{ border: "2px" }}>
             <FormLabel>Note </FormLabel>
             <ToggleButtonGroup
                 exclusive
@@ -32,21 +32,39 @@ function EditorNoteLines({ currentRow, columnNames, onChangeNote }) {
                     return (
                         <>
                             {stateButtonNote === 'write' ? (
-                                <FormControl fullWidth margin="normal" key={noteIndex}>
-                                    <TextareaAutosize
-                                        name={column}
-                                        fullWidth
-                                        value={currentRow.content[noteIndex] || ''}
-                                        onChange={onChangeNote}
-                                    />
+                                <FormControl fullWidth margin="normal">
+                                    {valeur === "" ? (
+                                        <TextareaAutosize
+                                            name={column}
+                                            value={addCurrentRow.content[noteIndex]|| ""}
+                                            onChange={onChangeNote}
+                                            minRows={4}
+                                           
+                                        />
+                                    ) : (
+                                        <TextareaAutosize
+                                            name={column}
+                                            value={currentRow.content[noteIndex]}
+                                            onChange={onChangeNote}
+                                            minRows={4}
+                                        />
+                                    )}
                                 </FormControl>
+                            ) : valeur === "" ? (
+                                <Markdown>
+                                    {/* {//addCurrentRow.content[noteIndex]?.length > 0
+                                        ? //addCurrentRow.content[noteIndex]
+                                        : "Aucune note ajoutée pour ce verset."} */}
+                                    {"Aucune note ajoutée pour ce verset."}
+                                </Markdown>
                             ) : (
                                 <Markdown>
                                     {currentRow.content[noteIndex]?.length > 0
                                         ? currentRow.content[noteIndex]
-                                        : "No notes found for this verse"}
+                                        : "Aucune note disponible pour ce verset."}
                                 </Markdown>
                             )}
+
                         </>
                     );
                 })}
@@ -56,4 +74,4 @@ function EditorNoteLines({ currentRow, columnNames, onChangeNote }) {
 
 }
 
-export default EditorNoteLines;
+export default MarkdownField;

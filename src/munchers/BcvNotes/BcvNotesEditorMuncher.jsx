@@ -7,10 +7,9 @@ import {
 } from "pithekos-lib";
 import SearchNavBar from "../../components/SearchNavBar";
 import SearchWithVerses from "../../components/SearchWithVerses";
-import EditorLines from "../../components/EditorLines"
-import AddLine from "../../components/AddLine";
-import SaveTsvIngredient from "../../components/SaveTsvIngredient";
-import EditorOneLine from "../../components/EditorOneLine"
+import Editor from "../../components/Editor"
+import AddFab from "../../components/AddFab";
+import SaveTsvButton from "../../components/SaveTsvButton";
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
@@ -79,16 +78,15 @@ function BcvNotesViewerMuncher({ metadata }) {
             <SearchNavBar getAllData={getAllData} />
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
                 
-                <AddLine currentRow={currentRow} setCurrentRow={setCurrentRow} ingredient={ingredient} setIngredient={setIngredient}/>
+                <AddFab currentRow={currentRow} setCurrentRow={setCurrentRow} ingredient={ingredient} setIngredient={setIngredient}/>
 
                 <SearchWithVerses systemBcv={systemBcv} ingredient={ingredient} setCurrentRow={setCurrentRow} />
-                <EditorLines
-                    currentRow={currentRow} ingredient={ingredient} setIngredient={setIngredient} setCurrentRow={setCurrentRow} metadata={metadata}
+                <Editor
+                    currentRow={currentRow} ingredient={ingredient} setIngredient={setIngredient} setCurrentRow={setCurrentRow} metadata={metadata} mode="edit"
                 />
-                {/* <EditorOneLine currentRow={currentRow} setCurrentRow={setCurrentRow} ingredient={ingredient} setIngredient={setIngredient}/> */}
             </Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-            <SaveTsvIngredient ingredient={ingredient} metadata={metadata} setIngredient={setIngredient} />
+            <SaveTsvButton ingredient={ingredient} metadata={metadata} setIngredient={setIngredient} />
                 <Button onClick={previousRow} variant="contained" sx={{ mt: 2 }}>
                     précédent
                 </Button>
