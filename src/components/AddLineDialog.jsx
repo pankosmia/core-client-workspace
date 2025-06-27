@@ -12,9 +12,9 @@ function AddLineDialog({ open, closeModal, setCurrentRowN, currentRowN, ingredie
     }
 
     // Permet de sauvegarder la nouvelle note
-    const handleSaveNewTsvRow = (rowN) => {
+    const handleSaveNewTsvRow = (rowN,newRow) => {
     const newIngredient = [...ingredient];
-    newIngredient.push(newCurrentRow);
+    newIngredient.push(newRow);
     setIngredient(newIngredient);
     };
 
@@ -27,24 +27,10 @@ function AddLineDialog({ open, closeModal, setCurrentRowN, currentRowN, ingredie
             <TsvLineForm
                 mode="add"
                 currentRow={newCurrentRow}
+                currentRowN={currentRowN}
                 ingredient={ingredient}
                 saveFunction={handleSaveNewTsvRow}
             />
-            <Box sx={{ display: 'flex', gap: 2, padding: 2 }}>
-                <Button
-                    onClick={() => handleSaveNewTsvRow(currentRowN)}
-                    variant="contained"
-                    disabled={!changeCellValue}
-                    sx={{
-                        mt: 2,
-                        backgroundColor: changeCellValue ? 'primary' : 'grey.400',
-                        color: 'white',
-                    }}
-                >
-                    Enregistrer la nouvelle note
-                </Button>
-            </Box>
-
         </Dialog>
     )
 }

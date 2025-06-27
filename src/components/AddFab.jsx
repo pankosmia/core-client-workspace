@@ -1,10 +1,14 @@
-import {useState} from "react";
+import {useState,useContext} from "react";
 import {Box, Fab} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import AddLineDialog from "./AddLineDialog";
+import {
+    i18nContext as I18nContext,
+    doI18n,
+} from "pithekos-lib";
 
 function AddFab({currentRowN, setCurrentRowN, ingredient, setIngredient}) {
-
+    const { i18nRef } = useContext(I18nContext);
     const [openedModal, setOpenedModal] = useState(null);
 
     const handleCreateForm = () => {
@@ -24,7 +28,7 @@ function AddFab({currentRowN, setCurrentRowN, ingredient, setIngredient}) {
                 sx={{ml: 2}}
             >
                 <AddIcon sx={{mr: 1}}/>
-                Add
+                {doI18n("pages:core-local-workspace:add", i18nRef.current)}
             </Fab>
 
             <AddLineDialog

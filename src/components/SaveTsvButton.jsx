@@ -9,7 +9,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { Button } from "@mui/material";
 
-function SaveTsvButton({ingredient, metadata}) {
+function SaveTsvButton({ingredient, metadata, setIngredientHasChanged}) {
 
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
@@ -24,6 +24,7 @@ function SaveTsvButton({ingredient, metadata}) {
                 )
             )
             .map(r => r.join("\t"))
+            .filter(r =>r.trim().length > 0)
             .join("\n");
         const payload = JSON.stringify({ payload: tsvString });
         const response = await postJson(
@@ -56,7 +57,7 @@ function SaveTsvButton({ingredient, metadata}) {
         uploadTsvIngredient([...ingredient])
     }
     return (
-        <Button onClick={() => handleSaveTsv()} variant="contained" sx={{
+        <Button onClick={() => {handleSaveTsv();setIngredientHasChanged(true)}} variant="contained" sx={{
             mt: 2,
 
         }}>Sauvegarder le TSV </Button>

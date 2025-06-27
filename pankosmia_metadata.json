@@ -77,6 +77,14 @@
     "next":{
       "en":"Next",
       "fr":"Suivant"
+    }, 
+    "add":{
+      "en":"Add",
+      "fr":"Ajouter"
+    },
+    "save_note":{
+      "en":"Save note",
+      "fr": "Enregistrez votre nouvelle note"
     }
   }
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Button, Stack, TextField } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
@@ -8,7 +8,7 @@ import {
     doI18n,
 } from "pithekos-lib";
 
-import SearchNavBar from "../../components/SearchNavBar";
+//import SearchNavBar from "../../components/SearchNavBar";
 import SearchWithVerses from "../../components/SearchWithVerses";
 import Editor from "../../components/Editor"
 import AddFab from "../../components/AddFab";
@@ -20,6 +20,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { systemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
+    const [ingredientHasChanged, setIngredientHasChanged]= useState(false);
 
     // Récupération des données du tsv
     const getAllData = async () => {
@@ -69,8 +70,7 @@ function BcvNotesViewerMuncher({ metadata }) {
             padding: 2,
         }}
         >
-            <SearchNavBar getAllData={getAllData} />
-            <TextField value={currentRowN} />
+            {/* <SearchNavBar getAllData={getAllData} /> */}
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
 
                 <AddFab
@@ -92,6 +92,8 @@ function BcvNotesViewerMuncher({ metadata }) {
                     setCurrentRowN={setCurrentRowN}
                     metadata={metadata}
                     mode="edit"
+                    ingredientHasChanged={ingredientHasChanged}
+                    setIngredientHasChanged={setIngredientHasChanged}
                 />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
@@ -99,6 +101,8 @@ function BcvNotesViewerMuncher({ metadata }) {
                     ingredient={ingredient}
                     metadata={metadata}
                     setIngredient={setIngredient}
+                    ingredientHasChanged={ingredientHasChanged}
+                    setIngredientHasChanged={setIngredientHasChanged}
                 />
                 <Button onClick={previousRow} variant="contained" sx={{ mt: 2 }}>
                     {doI18n("pages:core-local-workspace:previous", i18nRef.current)}

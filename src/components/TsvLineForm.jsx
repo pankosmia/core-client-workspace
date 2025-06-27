@@ -1,17 +1,14 @@
 import { Box, FormControl, TextField, Button } from "@mui/material";
 import MarkdownField from "./MarkdownField";
-import {useState, useContext, useEffect} from "react";
+import { useState, useContext, useEffect } from "react";
 import {
     i18nContext as I18nContext,
-    debugContext as DebugContext,
-    bcvContext as BcvContext,
-    getText,
     doI18n,
 } from "pithekos-lib";
 
-function TsvLineForm({ mode, currentRow, ingredient, saveFunction, }) {
+function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, ingredientHasChanged, setIngredientHasChanged }) {
     const { i18nRef } = useContext(I18nContext);
-    const [rowData, setRowData] = useState(Array(7).fill("",0,6))
+    const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const [cellValueChanged, setCellValueChanged] = useState(false);
     const columnNames = ingredient[0] || [];
 
@@ -32,15 +29,16 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, }) {
         newRowData[n] = newCellValue;
         setRowData(newRowData);
         setCellValueChanged(true);
+        setIngredientHasChanged(true);
     };
 
     // Permet d'annuler les modications faites sur la note 
-    const handleCancel = (rowN) => {
-        const newRowData = (mode === "edit" ? [...currentRow] : columnNames.map(() => ""))
+    const handleCancel = () => {
+        const newRowData = (mode === "edit" ? [...currentRow] : Array(7).fill("", 0, 7))
         setRowData(newRowData);
 
     };
-    console.log("rowdata", rowData)
+    //console.log("rowdata", rowData)
     return (
         <Box sx={{ padding: 1, justifyContent: "center" }}>
             {columnNames.map((column, n) => (
@@ -54,7 +52,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, }) {
                         />
                     ) : (
                         <TextField
-                            label={`${mode === "add" ? "Nouvelle " : ""}${column}`}
+                            label={column}
                             value={rowData[n]}
                             variant="outlined"
                             fullWidth
@@ -64,23 +62,26 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, }) {
                     )}
                 </FormControl>
             ))}
-            <Button
-                onClick={() => saveFunction(rowData.n)}
-                variant="contained"
-                disabled={!cellValueChanged}
-                sx={{
+            <Box sx={{display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
+                <Button
+                    onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
+                    variant="contained"
+                    disabled={!cellValueChanged}
+                    sx={{
+                        mt: 2,
+                        backgroundColor: cellValueChanged ? 'primary' : 'grey.400',
+                        color: 'white',
+                    }}
+                >
+                    {mode === "edit" ? `${doI18n("pages:core-local-workspace:editing", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:add", i18nRef.current)}`}
+                </Button>
+                <Button onClick={() => { handleCancel(); setCellValueChanged(false) }} variant="contained" disabled={!cellValueChanged} sx={{
                     mt: 2,
                     backgroundColor: cellValueChanged ? 'primary' : 'grey.400',
                     color: 'white',
-                }}
-            >
-                {doI18n("pages:core-local-workspace:editing", i18nRef.current)}
-            </Button>
-            <Button onClick={() => handleCancel(rowData.n)} variant="contained" disabled={!cellValueChanged} sx={{
-                mt: 2,
-                backgroundColor: cellValueChanged ? 'primary' : 'grey.400',
-                color: 'white',
-            }}>{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
+                }}>{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
+            </Box>
+
         </Box>
 
     )

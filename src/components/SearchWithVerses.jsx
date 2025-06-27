@@ -18,10 +18,10 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN }) {
     const handleClick = () => {
         setOpen(!open);
     };
-    const handleChangeSystemBcv = (verseRef) => {
-        const index = ingredient.findIndex(l => l[0] === verseRef);
+    const handleChangeId = (id) => {
+        const index = ingredient.findIndex(l => l[1] === id);
         if (index !== -1) {
-            setCurrentVerse(verseRef);
+            setCurrentVerse(ingredient[index][0]);
             setCurrentRowN(index);
         }
     };
@@ -49,7 +49,7 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN }) {
                                         setCurrentVerse(null);
                                     }}
                                 >
-                                    <ListItemText primary={`Chapitre ${chap}`} />
+                                    <ListItemText primary={`Chap ${chap}`} />
                                 </ListItemButton>
 
                                 {chap === currentChapter && (
@@ -63,9 +63,9 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN }) {
                                                         overflowY: 'auto',
                                                     }}
                                                     selected={v[0] === currentVerse}
-                                                    onClick={() => handleChangeSystemBcv(v[0])}
+                                                    onClick={() => handleChangeId(v[1])}
                                                 >
-                                                    <ListItemText primary={`Verset ${v[0].split(':')[1]} - ${v[1]}`} />
+                                                    <ListItemText primary={`v ${v[0].split(':')[1]} - ${v[1]}`} />
                                                 </ListItemButton>
                                             ))}
 
