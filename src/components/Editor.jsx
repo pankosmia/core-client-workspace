@@ -1,11 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TextField, Button, FormControl, Box } from "@mui/material";
 import MarkdownField from "./MarkdownField"
 import TsvLineForm from "./TsvLineForm";
 function Editor({ingredient, setIngredient, currentRowN, setCurrentRowN }) {
-    const [currentRow, setCurrentRow] = useState([...ingredient[currentRowN] || []]);
+    const [currentRow, setCurrentRow] = useState([]);
 
-    // Permet de sauvegarder les changements apportés dans les notes 
+    useEffect(
+        () => {
+            if (ingredient.length > 0) {
+                setCurrentRow(ingredient[currentRowN]);
+            }
+        },
+        [ingredient, currentRowN]
+    );
+
+    // Permet de sauvegarder les changements apportés dans les notes
     const handleSaveRow = (rowN) => {
         const newIngredient = [...ingredient]
         newIngredient[rowN] = currentRow

@@ -1,6 +1,6 @@
 import { Box, FormControl, TextField, Button } from "@mui/material";
 import MarkdownField from "./MarkdownField";
-import { useState, useContext } from "react";
+import {useState, useContext, useEffect} from "react";
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
@@ -10,12 +10,20 @@ import {
 } from "pithekos-lib";
 
 function TsvLineForm({ mode, currentRow, ingredient, saveFunction, }) {
-    console.log("currentRow", currentRow, mode)
-    console.log("ingredient", ingredient)
-    const columnNames = ingredient[0] || [];
     const { i18nRef } = useContext(I18nContext);
-    const [rowData, setRowData] = useState(mode === "Edit" ? [...currentRow] : columnNames.map((c) => ""))
+    const [rowData, setRowData] = useState(Array(7).fill("",0,6))
     const [cellValueChanged, setCellValueChanged] = useState(false);
+    const columnNames = ingredient[0] || [];
+
+    useEffect(
+        () => {
+            if (mode === "edit" && ingredient.length > 0) {
+                setRowData(currentRow);
+            }
+        },
+        [ingredient, currentRow, mode]
+    );
+
 
     // Permet la modification d'une note
     const changeCell = (event, n) => {
@@ -28,7 +36,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, }) {
 
     // Permet d'annuler les modications faites sur la note 
     const handleCancel = (rowN) => {
-        const newRowData = (mode === "Edit" ? [...currentRow] : columnNames.map(() => ""))
+        const newRowData = (mode === "edit" ? [...currentRow] : columnNames.map(() => ""))
         setRowData(newRowData);
 
     };
@@ -46,7 +54,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, }) {
                         />
                     ) : (
                         <TextField
-                            label={`${mode === "Add" ? "Nouvelle " : ""}${column}`}
+                            label={`${mode === "add" ? "Nouvelle " : ""}${column}`}
                             value={rowData[n]}
                             variant="outlined"
                             fullWidth
