@@ -69,6 +69,14 @@
       "en": "Language",
       "fr": "Langue",
       "es": "Lenguaje"
+    },
+    "previous":{
+      "en":"Previous",
+      "fr":"Précédent"
+    },
+    "next":{
+      "en":"Next",
+      "fr":"Suivant"
     }
   }
 }

@@ -1,10 +1,13 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Button, Stack, TextField } from "@mui/material";
 import {
+    i18nContext as I18nContext,
     debugContext as DebugContext,
     bcvContext as BcvContext,
     getText,
+    doI18n,
 } from "pithekos-lib";
+
 import SearchNavBar from "../../components/SearchNavBar";
 import SearchWithVerses from "../../components/SearchWithVerses";
 import Editor from "../../components/Editor"
@@ -13,6 +16,7 @@ import SaveTsvButton from "../../components/SaveTsvButton";
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
+    const { i18nRef } = useContext(I18nContext);
     const { systemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
@@ -46,17 +50,18 @@ function BcvNotesViewerMuncher({ metadata }) {
         }
     };
 
+
     // changer de page +1 
-   const nextRow = () => {
-    const newRow = currentRowN + 1;
-    // const currentChapterNum = parseInt(ingredient[newRow][0].split(":")[0])
-    if (
-        ingredient[newRow]
-        // && currentChapterNum <= systemBcv.chapterNum
-    ) {
-        setCurrentRowN(currentRowN + 1);
-    }
-};
+    const nextRow = () => {
+        const newRow = currentRowN + 1;
+        // const currentChapterNum = parseInt(ingredient[newRow][0].split(":")[0])
+        if (
+            ingredient[newRow]
+            // && currentChapterNum <= systemBcv.chapterNum
+        ) {
+            setCurrentRowN(currentRowN + 1);
+        }
+    };
 
 
     return (
@@ -65,8 +70,9 @@ function BcvNotesViewerMuncher({ metadata }) {
         }}
         >
             <SearchNavBar getAllData={getAllData} />
+            <TextField value={currentRowN} />
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
-                
+
                 <AddFab
                     currentRowN={currentRowN}
                     setCurrentRowN={setCurrentRowN}
@@ -89,16 +95,16 @@ function BcvNotesViewerMuncher({ metadata }) {
                 />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-            <SaveTsvButton
-                ingredient={ingredient}
-                metadata={metadata}
-                setIngredient={setIngredient}
-            />
+                <SaveTsvButton
+                    ingredient={ingredient}
+                    metadata={metadata}
+                    setIngredient={setIngredient}
+                />
                 <Button onClick={previousRow} variant="contained" sx={{ mt: 2 }}>
-                    précédent
+                    {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
                 </Button>
                 <Button onClick={nextRow} variant="contained" sx={{ mt: 2 }}>
-                    suivant
+                      {doI18n("pages:core-local-workspace:next", i18nRef.current)}
                 </Button>
             </Box>
         </Stack >

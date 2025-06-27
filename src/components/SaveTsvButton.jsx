@@ -45,6 +45,7 @@ function SaveTsvButton({ingredient, metadata}) {
             throw new Error(`Failed to save: ${response.status}, ${response.error}`);
         }
     }
+    
     // Montre le changement d'état du contenu 
     const setContentChanged = nv => {
         console.log("setContentChanged", nv);

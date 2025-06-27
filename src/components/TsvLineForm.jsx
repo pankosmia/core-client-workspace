@@ -1,11 +1,19 @@
 import { Box, FormControl, TextField, Button } from "@mui/material";
 import MarkdownField from "./MarkdownField";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import {
+    i18nContext as I18nContext,
+    debugContext as DebugContext,
+    bcvContext as BcvContext,
+    getText,
+    doI18n,
+} from "pithekos-lib";
 
 function TsvLineForm({ mode, currentRow, ingredient, saveFunction, }) {
-    console.log("currentRow",currentRow, mode)
-    console.log("ingredient",ingredient)
+    console.log("currentRow", currentRow, mode)
+    console.log("ingredient", ingredient)
     const columnNames = ingredient[0] || [];
+    const { i18nRef } = useContext(I18nContext);
     const [rowData, setRowData] = useState(mode === "Edit" ? [...currentRow] : columnNames.map((c) => ""))
     const [cellValueChanged, setCellValueChanged] = useState(false);
 
@@ -22,9 +30,9 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, }) {
     const handleCancel = (rowN) => {
         const newRowData = (mode === "Edit" ? [...currentRow] : columnNames.map(() => ""))
         setRowData(newRowData);
-        
+
     };
-    console.log("rowdata",rowData)
+    console.log("rowdata", rowData)
     return (
         <Box sx={{ padding: 1, justifyContent: "center" }}>
             {columnNames.map((column, n) => (
@@ -58,13 +66,13 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, }) {
                     color: 'white',
                 }}
             >
-                Ok
+                {doI18n("pages:core-local-workspace:editing", i18nRef.current)}
             </Button>
             <Button onClick={() => handleCancel(rowData.n)} variant="contained" disabled={!cellValueChanged} sx={{
                 mt: 2,
                 backgroundColor: cellValueChanged ? 'primary' : 'grey.400',
                 color: 'white',
-            }}>Annuler</Button>
+            }}>{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
         </Box>
 
     )
