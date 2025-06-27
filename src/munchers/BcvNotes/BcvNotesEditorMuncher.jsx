@@ -15,7 +15,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
     const { systemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
-    const [currentRow, setCurrentRow] = useState({ n: 1, content: [] });
+    const [currentRowN, setCurrentRowN] = useState(1);
 
     // Récupération des données du tsv
     const getAllData = async () => {
@@ -27,17 +27,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                 .map(l => l.split("\t")
                     .map(f => f.replace(/(\\n){2,}/g, "\n\n"))
                 )
-            setIngredient(
-                newIngredient
-            );
-            if (newIngredient.length > 0) {
-                setCurrentRow({ n: 1, content: [...newIngredient[1]] })
-            } else {
-                console.log("ingredient fail")
-                setCurrentRow(null)
-            }
-        } else {
-            setIngredient([])
+            setIngredient(newIngredient);
         }
     };
     // utilisation de la fonction getAllData
@@ -50,27 +40,21 @@ function BcvNotesViewerMuncher({ metadata }) {
 
     // changer de page -1 
     const previousRow = () => {
-        const newRow = currentRow.n - 1;
-        if (newRow>= 1 &&ingredient.length > 1 && ingredient[newRow]) {
-            setCurrentRow({
-                n: newRow,
-                content: ingredient[newRow]
-            });
+        const newRow = currentRowN - 1;
+        if (newRow >= 1 && ingredient.length > 1 && ingredient[newRow]) {
+            setCurrentRowN(currentRowN - 1);
         }
     };
 
     // changer de page +1 
    const nextRow = () => {
-    const newRow = currentRow.n + 1;
-    const CurrentchapterNum = ingredient[newRow][0].split(":")[0]
+    const newRow = currentRowN + 1;
+    // const currentChapterNum = parseInt(ingredient[newRow][0].split(":")[0])
     if (
-        ingredient[newRow] &&
-       CurrentchapterNum <= systemBcv.chapterNum
+        ingredient[newRow]
+        // && currentChapterNum <= systemBcv.chapterNum
     ) {
-        setCurrentRow({
-            n: newRow,
-            content: ingredient[newRow]
-        });
+        setCurrentRowN(currentRowN + 1);
     }
 };
 
@@ -83,15 +67,33 @@ function BcvNotesViewerMuncher({ metadata }) {
             <SearchNavBar getAllData={getAllData} />
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
                 
-                <AddFab currentRow={currentRow} setCurrentRow={setCurrentRow} ingredient={ingredient} setIngredient={setIngredient}/>
+                <AddFab
+                    currentRowN={currentRowN}
+                    setCurrentRowN={setCurrentRowN}
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
+                />
 
-                <SearchWithVerses systemBcv={systemBcv} ingredient={ingredient} setCurrentRow={setCurrentRow} />
+                <SearchWithVerses
+                    systemBcv={systemBcv}
+                    ingredient={ingredient}
+                    setCurrentRowN={setCurrentRowN}
+                />
                 <Editor
-                    currentRow={currentRow} ingredient={ingredient} setIngredient={setIngredient} setCurrentRow={setCurrentRow} metadata={metadata} mode="edit"
+                    currentRowN={currentRowN}
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
+                    setCurrentRowN={setCurrentRowN}
+                    metadata={metadata}
+                    mode="edit"
                 />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-            <SaveTsvButton ingredient={ingredient} metadata={metadata} setIngredient={setIngredient} currentRow={currentRow}/>
+            <SaveTsvButton
+                ingredient={ingredient}
+                metadata={metadata}
+                setIngredient={setIngredient}
+            />
                 <Button onClick={previousRow} variant="contained" sx={{ mt: 2 }}>
                     précédent
                 </Button>

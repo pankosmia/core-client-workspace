@@ -1,35 +1,21 @@
 import { useState } from "react";
-import { Box, Dialog, FormControl, Button } from "@mui/material";
-import LineForm from "./LineForm";
+import { Box, Dialog, Button } from "@mui/material";
+import TsvLineForm from "./TsvLineForm";
 
-function AddLineDialog({ open, closeModal, setCurrentRow, currentRow, ingredient, setIngredient, }) {
+function AddLineDialog({ open, closeModal, setCurrentRowN, currentRowN, ingredient, setIngredient, }) {
 
     const [changeCellValue, setChangeCellValue] = useState(false);
-    const [addCurrentRow, setAddCurrentRow] = useState({ n: 1, content: [] });
+    const [newCurrentRow, setNewCurrentRow] = useState((ingredient[0] || []).map(c => ""));
 
     const handleClose = () => {
         closeModal();
     }
 
-    //Permet d'ajouter une nouvelle note
-    const changeCell = (event, n) => {
-        const addCellTsvValue = event.target.value;
-        const addNewTsvRow = {
-            ...addCurrentRow,
-            content: [...addCurrentRow.content]
-        };
-        addNewTsvRow.content[n] = addCellTsvValue;
-        setAddCurrentRow(addNewTsvRow);
-        setChangeCellValue(true);
-        console.log("addcurrentrow", addCurrentRow)
-    };
-
     // Permet de sauvegarder la nouvelle note
     const handleSaveNewTsvRow = (rowN) => {
-    const newIngredientNote = [...ingredient];
-    const newLines = [...addCurrentRow.content]; 
-    newIngredientNote.push(newLines);
-    setIngredient(newIngredientNote);
+    const newIngredient = [...ingredient];
+    newIngredient.push(newCurrentRow);
+    setIngredient(newIngredient);
     };
 
     return (
@@ -38,15 +24,15 @@ function AddLineDialog({ open, closeModal, setCurrentRow, currentRow, ingredient
             open={open}
             onClose={handleClose}>
 
-            <LineForm 
-                mode="Add"
-                currentRow="" 
+            <TsvLineForm
+                mode="add"
+                currentRow={newCurrentRow}
                 ingredient={ingredient}
                 saveFunction={handleSaveNewTsvRow}
             />
             <Box sx={{ display: 'flex', gap: 2, padding: 2 }}>
                 <Button
-                    onClick={() => handleSaveNewTsvRow(currentRow.n)}
+                    onClick={() => handleSaveNewTsvRow(currentRowN)}
                     variant="contained"
                     disabled={!changeCellValue}
                     sx={{

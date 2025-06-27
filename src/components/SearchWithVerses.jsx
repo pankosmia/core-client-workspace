@@ -3,7 +3,7 @@ import { Box, List, ListItemButton, ListItemIcon, ListItemText, Collapse } from 
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
-function SearchWithVerses({ systemBcv, ingredient, setCurrentRow }) {
+function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN }) {
 
     const [currentChapter, setCurrentChapter] = useState('');
     const [currentVerse, setCurrentVerse] = useState();
@@ -22,10 +22,7 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRow }) {
         const index = ingredient.findIndex(l => l[0] === verseRef);
         if (index !== -1) {
             setCurrentVerse(verseRef);
-            setCurrentRow({
-                n: index,
-                content: ingredient[index],
-            });
+            setCurrentRowN(index);
         }
     };
     return (

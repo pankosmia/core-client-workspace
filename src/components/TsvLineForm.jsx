@@ -2,29 +2,25 @@ import { Box, FormControl, TextField, Button } from "@mui/material";
 import MarkdownField from "./MarkdownField";
 import { useState } from "react";
 
-function LineForm({ mode, currentRow, ingredient, saveFunction, }) {
+function TsvLineForm({ mode, currentRow, ingredient, saveFunction, }) {
     console.log("currentRow",currentRow, mode)
     console.log("ingredient",ingredient)
     const columnNames = ingredient[0] || [];
-    const [rowData, setRowData] = useState(mode === "Edit" ? currentRow : { n: 99, content: columnNames.map((c) => "") })
-    const [changeCellValue, setChangeCellValue] = useState(false);
+    const [rowData, setRowData] = useState(mode === "Edit" ? [...currentRow] : columnNames.map((c) => ""))
+    const [cellValueChanged, setCellValueChanged] = useState(false);
 
     // Permet la modification d'une note
     const changeCell = (event, n) => {
         const newCellValue = event.target.value;
-        const newRowData = {
-            ...rowData,
-            content: [...rowData.content]
-        };
-        newRowData.content[n] = newCellValue;
+        const newRowData = [...rowData];
+        newRowData[n] = newCellValue;
         setRowData(newRowData);
-        setChangeCellValue(true);
-    
+        setCellValueChanged(true);
     };
 
     // Permet d'annuler les modications faites sur la note 
     const handleCancel = (rowN) => {
-        const newRowData = (mode === "Edit" ? currentRow : { n: 1, content: columnNames.map(() => "")})
+        const newRowData = (mode === "Edit" ? [...currentRow] : columnNames.map(() => ""))
         setRowData(newRowData);
         
     };
@@ -35,7 +31,7 @@ function LineForm({ mode, currentRow, ingredient, saveFunction, }) {
                 <FormControl fullWidth margin="normal" key={n}>
                     {column === 'Note' ? (
                         <MarkdownField
-                            value={rowData.content[n]}
+                            value={rowData[n]}
                             columnNames={columnNames}
                             onChangeNote={(e) => changeCell(e, n)}
                             mode={mode}
@@ -43,7 +39,7 @@ function LineForm({ mode, currentRow, ingredient, saveFunction, }) {
                     ) : (
                         <TextField
                             label={`${mode === "Add" ? "Nouvelle " : ""}${column}`}
-                            value={rowData.content[n]}
+                            value={rowData[n]}
                             variant="outlined"
                             fullWidth
                             size="small"
@@ -55,18 +51,18 @@ function LineForm({ mode, currentRow, ingredient, saveFunction, }) {
             <Button
                 onClick={() => saveFunction(rowData.n)}
                 variant="contained"
-                disabled={!changeCellValue}
+                disabled={!cellValueChanged}
                 sx={{
                     mt: 2,
-                    backgroundColor: changeCellValue ? 'primary' : 'grey.400',
+                    backgroundColor: cellValueChanged ? 'primary' : 'grey.400',
                     color: 'white',
                 }}
             >
                 Ok
             </Button>
-            <Button onClick={() => handleCancel(rowData.n)} variant="contained" disabled={!changeCellValue} sx={{
+            <Button onClick={() => handleCancel(rowData.n)} variant="contained" disabled={!cellValueChanged} sx={{
                 mt: 2,
-                backgroundColor: changeCellValue ? 'primary' : 'grey.400',
+                backgroundColor: cellValueChanged ? 'primary' : 'grey.400',
                 color: 'white',
             }}>Annuler</Button>
         </Box>
@@ -74,4 +70,4 @@ function LineForm({ mode, currentRow, ingredient, saveFunction, }) {
     )
 }
 
-export default LineForm;
+export default TsvLineForm;

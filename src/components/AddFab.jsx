@@ -1,16 +1,14 @@
-import { useState } from "react";
-import { Box, Fab, Menu, MenuItem } from "@mui/material";
+import {useState} from "react";
+import {Box, Fab} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import AddLineDialog from "./AddLineDialog";
 
-function AddFab({ currentRow, setCurrentRow, ingredient, setIngredient }) {
+function AddFab({currentRowN, setCurrentRowN, ingredient, setIngredient}) {
 
     const [openedModal, setOpenedModal] = useState(null);
-    const [createAnchorEl, setCreateAnchorEl] = useState(null);
 
     const handleCreateForm = () => {
-        setOpenedModal("editor");
-        setCreateAnchorEl(null);
+        setOpenedModal("add");
     };
 
     return (
@@ -21,17 +19,23 @@ function AddFab({ currentRow, setCurrentRow, ingredient, setIngredient }) {
                 color="primary"
                 size="small"
                 onClick={(event) => {
-                    setCreateAnchorEl(event.currentTarget);
                     handleCreateForm();
                 }}
-                sx={{ ml: 2 }}
+                sx={{ml: 2}}
             >
-                <AddIcon sx={{ mr: 1 }} />
+                <AddIcon sx={{mr: 1}}/>
                 Add
             </Fab>
 
-            <AddLineDialog open={openedModal === 'editor'}
-                closeModal={() => setOpenedModal(null)} currentRow={currentRow} mode="add" setCurrentRow={setCurrentRow} ingredient={ingredient} setIngredient={setIngredient} />
+            <AddLineDialog
+                open={openedModal === 'add'}
+                mode="add"
+                closeModal={() => setOpenedModal(null)}
+                currentRowN={currentRowN}
+                setCurrentRowN={setCurrentRowN}
+                ingredient={ingredient}
+                setIngredient={setIngredient}
+            />
         </Box>
 
     );
