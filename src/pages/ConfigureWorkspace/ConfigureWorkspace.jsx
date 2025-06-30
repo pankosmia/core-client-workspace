@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import {Masonry} from '@mui/lab';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import RadioButtonChecked from '@mui/icons-material/RadioButtonChecked';
+import RadioButtonUnchecked from '@mui/icons-material/RadioButtonUnchecked';
 
 function ConfigureWorkspace() {
     const [repos, setRepos] = useState([]);
@@ -69,7 +71,8 @@ function ConfigureWorkspace() {
                     currentId="core-local-workspace"
                 />
             </Box>
-            <Box style={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
+            <Box
+                style={{mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%'}}>
                 <Fab
                     variant="extended"
                     color="secondary"
@@ -116,93 +119,106 @@ function ConfigureWorkspace() {
                 marginBottom: "16px",
                 width: '100%'
             }}>
-              <Box sx={{ml: 2}}>
-                <Box sx={{mb:3}}>
-                    <ButtonGroup>
-                        <Button
-                            onClick={() => setLanguage("")}
-                            variant={language === "" ? "contained" : "outlined"}
-                            color="secondary"
-                        >
-                            {`* (${selectedResources.length}/${repos.length})`}
-                        </Button>
+                <Box sx={{ml: 2}}>
+                    <Box sx={{mb: 3}}>
+                        <ButtonGroup>
+                            <Button
+                                onClick={() => setLanguage("")}
+                                variant={language === "" ? "contained" : "outlined"}
+                                color="secondary"
+                            >
+                                {`* (${selectedResources.length}/${repos.length})`}
+                            </Button>
+                            {
+                                languages
+                                    .map(
+                                        ce => <Button
+                                            onClick={() => setLanguage(ce)}
+                                            variant={language === ce ? "contained" : "outlined"}
+                                            color="secondary"
+                                        >
+                                            {ce}
+                                        </Button>
+                                    )
+                            }
+                        </ButtonGroup>
+                    </Box>
+                    <Masonry
+                        container
+                        spacing={3}
+                        columns={{xs: 1, md: 2, xl: 3}}
+                    >
                         {
-                            languages
+                            repos
+                                .filter(r => ["", r.language_code].includes(language))
+                                .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
                                 .map(
-                                    ce => <Button
-                                        onClick={() => setLanguage(ce)}
-                                        variant={language === ce ? "contained" : "outlined"}
-                                        color="secondary"
-                                    >
-                                        {ce}
-                                    </Button>
+                                    ((rep, n) => {
+                                            return <Card>
+                                                <CardActionArea
+                                                    sx={{
+                                                        color: selectedResources.includes(rep.path) ? "#000" : "#666"
+                                                    }}
+                                                    onClick={
+                                                        () => setSelectedResources(
+                                                            selectedResources.includes(rep.path) ?
+                                                                [...selectedResources].filter(s => s !== rep.path) :
+                                                                [...selectedResources, rep.path]
+                                                        )
+                                                    }
+                                                >
+                                                    <CardContent
+                                                        sx={{
+                                                            height: "100%",
+                                                            width: "100%",
+                                                            display: 'flex',
+                                                            alignItems: 'flex-start',
+                                                            flexDirection: 'column',
+                                                            justifyContent: 'space-between',
+                                                        }}
+                                                    >
+                                                        <Box
+                                                            sx={{
+                                                                color: selectedResources.includes(rep.path) ? "secondary.main" : "#666",
+                                                                display: "flex",
+                                                                flexDirection: "row-reverse",
+                                                                width: "100%"
+                                                        }}
+                                                        >
+                                                            {
+                                                                selectedResources.includes(rep.path) ?
+                                                                    <RadioButtonChecked sx={{justifyContent: "flex-end"}}/> :
+                                                                    <RadioButtonUnchecked/>
+                                                            }
+                                                        </Box>
+                                                        <Typography key={`${n}-name`} variant="h6"
+                                                                    sx={{color: selectedResources.includes(rep.path) ? "secondary.main" : "#666"}}>
+                                                            {`${rep.name} (${rep.abbreviation})`}
+                                                        </Typography>
+                                                        {rep.description !== rep.name &&
+                                                            <Typography variant="body">
+                                                                {rep.description}
+                                                            </Typography>
+                                                        }
+                                                        <Typography key={`${n}-language`} variant="body">
+                                                            {rep.language_code}
+                                                        </Typography>
+                                                        <Typography key={`${n}-flavor`} variant="body">
+                                                            {
+                                                                flavorTypes[rep.flavor] ?
+                                                                    doI18n(`flavors:names:${flavorTypes[rep.flavor]}/${rep.flavor}`, i18nRef.current) :
+                                                                    rep.flavor
+                                                            }
+                                                        </Typography>
+                                                    </CardContent>
+                                                </CardActionArea>
+                                            </Card>
+                                        }
+                                    )
                                 )
                         }
-                    </ButtonGroup>
+                    </Masonry>
                 </Box>
-                <Masonry
-                    container
-                    spacing={3}
-                    columns={{xs: 1, md: 2, xl: 3}}
-                >
-                    {
-                        repos
-                            .filter(r => ["", r.language_code].includes(language))
-                            .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
-                            .map(
-                                ((rep, n) => {
-                                        return <Card>
-                                            <CardActionArea
-                                                sx={{
-                                                    backgroundColor: selectedResources.includes(rep.path) ? "#FFF" : "#DDD",
-                                                    color: selectedResources.includes(rep.path) ? "#000" : "#555"
-                                                }}
-                                                onClick={
-                                                    () => setSelectedResources(
-                                                        selectedResources.includes(rep.path) ?
-                                                            [...selectedResources].filter(s => s !== rep.path) :
-                                                            [...selectedResources, rep.path]
-                                                    )
-                                                }
-                                            >
-                                                <CardContent
-                                                    sx={{
-                                                        height: "100%",
-                                                        width: "100%",
-                                                        display: 'flex',
-                                                        alignItems: 'flex-start',
-                                                        flexDirection: 'column',
-                                                        justifyContent: 'space-between',
-                                                    }}
-                                                >
-                                                    <Typography key={`${n}-name`} variant="h6"
-                                                                sx={{color: selectedResources.includes(rep.path) ? "secondary.main" : "#555"}}>
-                                                        {`${rep.name} (${rep.abbreviation})`}
-                                                    </Typography>
-                                                    {rep.description !== rep.name &&
-                                                        <Typography variant="body">
-                                                            {rep.description}
-                                                        </Typography>
-                                                    }
-                                                    <Typography key={`${n}-language`} variant="body">
-                                                        {rep.language_code}
-                                                    </Typography>
-                                                    <Typography key={`${n}-flavor`} variant="body">
-                                                        {
-                                                            flavorTypes[rep.flavor] ?
-                                                                doI18n(`flavors:names:${flavorTypes[rep.flavor]}/${rep.flavor}`, i18nRef.current) :
-                                                                rep.flavor
-                                                        }
-                                                    </Typography>
-                                                </CardContent>
-                                            </CardActionArea>
-                                        </Card>
-                                    }
-                                )
-                            )
-                    }
-                </Masonry>
-              </Box>
             </Box>
         </Box>
 }
