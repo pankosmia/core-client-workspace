@@ -5,9 +5,8 @@ import CreateIcon from '@mui/icons-material/Create';
 import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl, FormLabel } from "@mui/material";
 
 function MarkdownField({ currentRow, columnNames, onChangeNote, value }) {
-    const [displayMode, setdisplayMode] = useState('');
+    const [displayMode, setdisplayMode] = useState('write');
 
-    console.log("statebutton",stateButtonNote)
     console.log("displayMode",displayMode)
     return (
         <Box>

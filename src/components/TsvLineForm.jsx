@@ -6,7 +6,7 @@ import {
     doI18n,
 } from "pithekos-lib";
 
-function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, ingredientHasChanged, setIngredientHasChanged }) {
+function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, }) {
     const { i18nRef } = useContext(I18nContext);
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const [cellValueChanged, setCellValueChanged] = useState(false);
@@ -29,7 +29,6 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
         newRowData[n] = newCellValue;
         setRowData(newRowData);
         setCellValueChanged(true);
-        setIngredientHasChanged(true);
     };
 
     // Permet d'annuler les modications faites sur la note 

@@ -9,11 +9,12 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { Button } from "@mui/material";
 
-function SaveTsvButton({ingredient, metadata, setIngredientHasChanged}) {
+function SaveTsvButton({ ingredient, metadata, setIngredientHasChanged, ingredientHasChanged }) {
 
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
     const [contentChanged, _setContentChanged] = useState(false);
+
 
     // Met à jour le fichier TSV
     const uploadTsvIngredient = async (tsvData, debugBool) => {
@@ -24,7 +25,7 @@ function SaveTsvButton({ingredient, metadata, setIngredientHasChanged}) {
                 )
             )
             .map(r => r.join("\t"))
-            .filter(r =>r.trim().length > 0)
+            .filter(r => r.trim().length > 0)
             .join("\n");
         const payload = JSON.stringify({ payload: tsvString });
         const response = await postJson(
@@ -46,7 +47,7 @@ function SaveTsvButton({ingredient, metadata, setIngredientHasChanged}) {
             throw new Error(`Failed to save: ${response.status}, ${response.error}`);
         }
     }
-    
+
     // Montre le changement d'état du contenu 
     const setContentChanged = nv => {
         console.log("setContentChanged", nv);
@@ -57,7 +58,14 @@ function SaveTsvButton({ingredient, metadata, setIngredientHasChanged}) {
         uploadTsvIngredient([...ingredient])
     }
     return (
-        <Button onClick={() => {handleSaveTsv();setIngredientHasChanged(true)}} variant="contained" >Sauvegarder le TSV </Button>
+        <Button
+            disabled={!ingredientHasChanged}
+            variant="contained"
+            sx={{
+                mt: 2,
+                backgroundColor: ingredientHasChanged ? 'primary' : 'grey.400',
+                color: 'white',
+            }} onClick={() => { handleSaveTsv(); setIngredientHasChanged(false) }} >Sauvegarder le TSV </Button>
     )
 }
 export default SaveTsvButton;

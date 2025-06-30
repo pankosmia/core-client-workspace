@@ -13,7 +13,7 @@ import SearchWithVerses from "../../components/SearchWithVerses";
 import Editor from "../../components/Editor"
 import AddFab from "../../components/AddFab";
 import SaveTsvButton from "../../components/SaveTsvButton";
-import SearchNavBar from "../../components/SearchNavBar";
+//import SearchNavBar from "../../components/SearchNavBar";
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
@@ -21,8 +21,9 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { systemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
-    const [ingredientHasChanged, setIngredientHasChanged]= useState(false);
+    const [ingredientValueChanged, setIngredientValueChanged]= useState(false);
 
+console.log("ingredientHasChanged", ingredientValueChanged)
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -71,7 +72,7 @@ function BcvNotesViewerMuncher({ metadata }) {
             padding: 2,
         }}
         >
-            <SearchNavBar getAllData={getAllData} />
+            {/* <SearchNavBar getAllData={getAllData} /> */}
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
 
                 <AddFab
@@ -93,8 +94,8 @@ function BcvNotesViewerMuncher({ metadata }) {
                     setCurrentRowN={setCurrentRowN}
                     metadata={metadata}
                     mode="edit"
-                    ingredientHasChanged={ingredientHasChanged}
-                    setIngredientHasChanged={setIngredientHasChanged}
+                    ingredientHasChanged={ingredientValueChanged}
+                    setIngredientHasChanged={setIngredientValueChanged}
                 />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
@@ -102,8 +103,8 @@ function BcvNotesViewerMuncher({ metadata }) {
                     ingredient={ingredient}
                     metadata={metadata}
                     setIngredient={setIngredient}
-                    ingredientHasChanged={ingredientHasChanged}
-                    setIngredientHasChanged={setIngredientHasChanged}
+                    ingredientHasChanged={ingredientValueChanged}
+                    setIngredientHasChanged={setIngredientValueChanged}
                 />
                 <Button onClick={previousRow} variant="contained" sx={{ mt: 2 }}>
                     {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
