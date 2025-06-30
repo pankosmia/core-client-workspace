@@ -4,7 +4,6 @@ import TsvLineForm from "./TsvLineForm";
 
 function AddLineDialog({ open, closeModal, setCurrentRowN, currentRowN, ingredient, setIngredient, }) {
 
-    const [changeCellValue, setChangeCellValue] = useState(false);
     const [newCurrentRow, setNewCurrentRow] = useState((ingredient[0] || []).map(c => ""));
 
     const handleClose = () => {

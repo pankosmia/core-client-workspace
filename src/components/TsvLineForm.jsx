@@ -6,7 +6,7 @@ import {
     doI18n,
 } from "pithekos-lib";
 
-function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, }) {
+function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, setSaveIngredientValue }) {
     const { i18nRef } = useContext(I18nContext);
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const [cellValueChanged, setCellValueChanged] = useState(false);
@@ -29,6 +29,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
         newRowData[n] = newCellValue;
         setRowData(newRowData);
         setCellValueChanged(true);
+        setSaveIngredientValue(false)
     };
 
     // Permet d'annuler les modications faites sur la note 
@@ -72,7 +73,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                         color: 'white',
                     }}
                 >
-                    {mode === "edit" ? `${doI18n("pages:core-local-workspace:editing", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:add", i18nRef.current)}`}
+                    {mode === "edit" ? `${doI18n("pages:core-local-workspace:editing", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
                 </Button>
                 <Button onClick={() => { handleCancel(); setCellValueChanged(false) }} variant="contained" disabled={!cellValueChanged} sx={{
                     mt: 2,

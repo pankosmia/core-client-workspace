@@ -65,7 +65,7 @@ function SaveTsvButton({ ingredient, metadata, setIngredientHasChanged, ingredie
                 mt: 2,
                 backgroundColor: ingredientHasChanged ? 'primary' : 'grey.400',
                 color: 'white',
-            }} onClick={() => { handleSaveTsv(); setIngredientHasChanged(false) }} >Sauvegarder le TSV </Button>
+            }} onClick={() => { handleSaveTsv(); setIngredientHasChanged(false) }} > {doI18n("pages:core-local-workspace:save_tsv", i18nRef.current)} </Button>
     )
 }
 export default SaveTsvButton;

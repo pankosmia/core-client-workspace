@@ -85,6 +85,9 @@
     "save_note":{
       "en":"Save note",
       "fr": "Enregistrez votre nouvelle note"
+    },
+    "save_tsv":{
+      "fr":"Sauvegarder dans le fichier "
     }
   }
 }

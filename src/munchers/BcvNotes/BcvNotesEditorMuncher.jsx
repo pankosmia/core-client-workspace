@@ -13,7 +13,7 @@ import SearchWithVerses from "../../components/SearchWithVerses";
 import Editor from "../../components/Editor"
 import AddFab from "../../components/AddFab";
 import SaveTsvButton from "../../components/SaveTsvButton";
-//import SearchNavBar from "../../components/SearchNavBar";
+
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
@@ -21,9 +21,10 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { systemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
-    const [ingredientValueChanged, setIngredientValueChanged]= useState(false);
+    const [ingredientValueChanged, setIngredientValueChanged] = useState(false);
+    const [saveIngredientValue, setSaveIngredientValue] = useState(true)
 
-console.log("ingredientHasChanged", ingredientValueChanged)
+    console.log("saveIngredientValue",saveIngredientValue)
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -96,6 +97,8 @@ console.log("ingredientHasChanged", ingredientValueChanged)
                     mode="edit"
                     ingredientHasChanged={ingredientValueChanged}
                     setIngredientHasChanged={setIngredientValueChanged}
+                    saveIngredientValue={saveIngredientValue}
+                    setSaveIngredientValue={setSaveIngredientValue}
                 />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
@@ -104,13 +107,31 @@ console.log("ingredientHasChanged", ingredientValueChanged)
                     metadata={metadata}
                     setIngredient={setIngredient}
                     ingredientHasChanged={ingredientValueChanged}
+                    saveIngredientValue={saveIngredientValue}
                     setIngredientHasChanged={setIngredientValueChanged}
                 />
-                <Button onClick={previousRow} variant="contained" sx={{ mt: 2 }}>
+                <Button
+                    disabled={!saveIngredientValue}
+                    variant="contained"
+                    onClick={() => { previousRow(); setSaveIngredientValue(true) }}
+                    sx={{
+                        mt: 2,
+                        backgroundColor: saveIngredientValue ? 'primary' : 'grey.400',
+                        color: 'white',
+                    }}
+                >
                     {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
                 </Button>
-                <Button onClick={nextRow} variant="contained" sx={{ mt: 2 }}>
-                      {doI18n("pages:core-local-workspace:next", i18nRef.current)}
+                <Button
+                    disabled={!saveIngredientValue}
+                    onClick={()=>{nextRow();setSaveIngredientValue(true)}} variant="contained"
+                    sx={{
+                        mt: 2,
+                        backgroundColor: saveIngredientValue ? 'primary' : 'grey.400',
+                        color: 'white',
+                    }}
+                >
+                    {doI18n("pages:core-local-workspace:next", i18nRef.current)}
                 </Button>
             </Box>
         </Stack >
