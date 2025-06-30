@@ -13,6 +13,7 @@ import SearchWithVerses from "../../components/SearchWithVerses";
 import Editor from "../../components/Editor"
 import AddFab from "../../components/AddFab";
 import SaveTsvButton from "../../components/SaveTsvButton";
+import SearchNavBar from "../../components/SearchNavBar";
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
@@ -70,7 +71,7 @@ function BcvNotesViewerMuncher({ metadata }) {
             padding: 2,
         }}
         >
-            {/* <SearchNavBar getAllData={getAllData} /> */}
+            <SearchNavBar getAllData={getAllData} />
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
 
                 <AddFab

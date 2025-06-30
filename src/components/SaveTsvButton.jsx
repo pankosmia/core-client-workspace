@@ -57,10 +57,7 @@ function SaveTsvButton({ingredient, metadata, setIngredientHasChanged}) {
         uploadTsvIngredient([...ingredient])
     }
     return (
-        <Button onClick={() => {handleSaveTsv();setIngredientHasChanged(true)}} variant="contained" sx={{
-            mt: 2,
-
-        }}>Sauvegarder le TSV </Button>
+        <Button onClick={() => {handleSaveTsv();setIngredientHasChanged(true)}} variant="contained" >Sauvegarder le TSV </Button>
     )
 }
 export default SaveTsvButton;

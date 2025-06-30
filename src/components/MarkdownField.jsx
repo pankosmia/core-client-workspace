@@ -5,11 +5,12 @@ import CreateIcon from '@mui/icons-material/Create';
 import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl, FormLabel } from "@mui/material";
 
 function MarkdownField({ currentRow, columnNames, onChangeNote, value }) {
-
-    const [stateButtonNote, setStateButtonNote] = useState('write');
     const [displayMode, setdisplayMode] = useState('');
+
+    console.log("statebutton",stateButtonNote)
+    console.log("displayMode",displayMode)
     return (
-        <Box sx={{ border: "2px" }}>
+        <Box>
             <FormLabel>Note </FormLabel>
             <ToggleButtonGroup
                 exclusive
@@ -22,23 +23,21 @@ function MarkdownField({ currentRow, columnNames, onChangeNote, value }) {
                     }
                 }}
             >
-                <ToggleButton displayMode='write' onClick={() => setStateButtonNote('write')}><CreateIcon /></ToggleButton>
-                <ToggleButton displayMode='preview' onClick={() => setStateButtonNote('preview')}><RemoveRedEyeIcon /></ToggleButton>
+                <ToggleButton value="write"><CreateIcon /></ToggleButton>
+                <ToggleButton value="preview"><RemoveRedEyeIcon /></ToggleButton>
             </ToggleButtonGroup>
             {columnNames
                 .filter((column) => column === "Note")
                 .map((column) => {
-                    const noteIndex = columnNames.indexOf("Note");
                     return (
                         <>
-                            {stateButtonNote === 'write' ? (
+                            {displayMode === 'write' ? (
                                 <FormControl fullWidth margin="normal">
                                     <TextareaAutosize
                                         name={column}
                                         value={value}
                                         onChange={onChangeNote}
                                         minRows={4}
-
                                     />
                                 </FormControl>
                             ) : (

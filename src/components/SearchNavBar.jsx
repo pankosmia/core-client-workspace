@@ -45,7 +45,7 @@ function SearchNavBar() {
             },
         },
     }));
-
+    console.log("value", value)
     return (
 
         <Box display="flex"

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Dialog, Button } from "@mui/material";
+import { Dialog } from "@mui/material";
 import TsvLineForm from "./TsvLineForm";
 
 function AddLineDialog({ open, closeModal, setCurrentRowN, currentRowN, ingredient, setIngredient, }) {
@@ -12,15 +12,15 @@ function AddLineDialog({ open, closeModal, setCurrentRowN, currentRowN, ingredie
     }
 
     // Permet de sauvegarder la nouvelle note
-    const handleSaveNewTsvRow = (rowN,newRow) => {
-    const newIngredient = [...ingredient];
-    newIngredient.push(newRow);
-    setIngredient(newIngredient);
+    const handleSaveNewTsvRow = (rowN, newRow) => {
+        const newIngredient = [...ingredient];
+        newIngredient.push(newRow);
+        setIngredient(newIngredient);
     };
 
     return (
         <Dialog
-            maxWidth="1000px"
+            fullScreen
             open={open}
             onClose={handleClose}>
 

@@ -54,14 +54,10 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN }) {
 
                                 {chap === currentChapter && (
                                     <Collapse in timeout="auto" unmountOnExit>
-                                        <List sx={{ maxHeight: "600px", overflowY: "auto" }}>
+                                        <List>
                                             {verses.map(v => (
                                                 <ListItemButton
                                                     key={v[0]}
-                                                    sx={{
-                                                        maxHeight: '80px',
-                                                        overflowY: 'auto',
-                                                    }}
                                                     selected={v[0] === currentVerse}
                                                     onClick={() => handleChangeId(v[1])}
                                                 >

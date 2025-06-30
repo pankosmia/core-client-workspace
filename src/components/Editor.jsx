@@ -15,13 +15,6 @@ function Editor({ingredient, setIngredient, currentRowN, setCurrentRowN, ingredi
     );
 
     //Permet de sauvegarder les changements apportés dans les notes
-    // const handleSaveRow = (rowN) => {
-    //     const newIngredient = [...ingredient]
-    //     newIngredient[rowN] = currentRow
-    //     setIngredient(newIngredient);
-    //     console.log("newcurrentrow", newIngredient)
-    // };
-
     const handleSaveRow = (rowN, newRow) => {
         const newIngredient = [...ingredient]
         newIngredient[rowN] = [...newRow]
