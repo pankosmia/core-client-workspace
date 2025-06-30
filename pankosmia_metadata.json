@@ -70,24 +70,27 @@
       "fr": "Langue",
       "es": "Lenguaje"
     },
-    "previous":{
-      "en":"Previous",
-      "fr":"Précédent"
+    "previous": {
+      "en": "Previous",
+      "fr": "Précédent"
     },
-    "next":{
-      "en":"Next",
-      "fr":"Suivant"
-    }, 
-    "add":{
-      "en":"Add",
-      "fr":"Ajouter"
+    "next": {
+      "en": "Next",
+      "fr": "Suivant"
     },
-    "save_note":{
-      "en":"Save note",
+    "add": {
+      "en": "Add",
+      "fr": "Ajouter"
+    },
+    "save_note": {
+      "en": "Save note",
       "fr": "Enregistrez votre nouvelle note"
     },
-    "save_tsv":{
-      "fr":"Sauvegarder dans le fichier "
+    "save_tsv": {
+      "fr": "Sauvegarder dans le fichier "
+    },
+    "new_bcv_note": {
+      "fr": "Nouvelle note"
     }
   }
 }

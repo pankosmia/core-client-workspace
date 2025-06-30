@@ -21,7 +21,7 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN }) {
     const handleChangeId = (id) => {
         const index = ingredient.findIndex(l => l[1] === id);
         if (index !== -1) {
-            setCurrentVerse(ingredient[index][0]);
+            setCurrentVerse(ingredient[index][1]);
             setCurrentRowN(index);
         }
     };
@@ -58,7 +58,7 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN }) {
                                             {verses.map(v => (
                                                 <ListItemButton
                                                     key={v[0]}
-                                                    selected={v[0] === currentVerse}
+                                                    selected={v[1] === currentVerse}
                                                     onClick={() => handleChangeId(v[1])}
                                                 >
                                                     <ListItemText primary={`v ${v[0].split(':')[1]} - ${v[1]}`} />

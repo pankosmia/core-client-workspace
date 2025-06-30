@@ -38,17 +38,18 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
         setRowData(newRowData);
 
     };
-    //console.log("rowdata", rowData)
+    
     return (
-        <Box sx={{ padding: 1, justifyContent: "center" }}>
+        <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
             {columnNames.map((column, n) => (
-                <FormControl fullWidth margin="normal" key={n}>
+                <FormControl fullWidth margin="normal" key={n} >
                     {column === 'Note' ? (
                         <MarkdownField
                             value={rowData[n]}
                             columnNames={columnNames}
                             onChangeNote={(e) => changeCell(e, n)}
                             mode={mode}
+
                         />
                     ) : (
                         <TextField
@@ -58,28 +59,28 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                             fullWidth
                             size="small"
                             onChange={(e) => changeCell(e, n)}
+
                         />
                     )}
                 </FormControl>
+
             ))}
-            <Box sx={{display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
+            <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
                 <Button
                     onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
                     variant="contained"
                     disabled={!cellValueChanged}
                     sx={{
                         mt: 2,
-                        backgroundColor: cellValueChanged ? 'primary' : 'grey.400',
-                        color: 'white',
                     }}
                 >
                     {mode === "edit" ? `${doI18n("pages:core-local-workspace:editing", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
                 </Button>
+
                 <Button onClick={() => { handleCancel(); setCellValueChanged(false) }} variant="contained" disabled={!cellValueChanged} sx={{
-                    mt: 2,
-                    backgroundColor: cellValueChanged ? 'primary' : 'grey.400',
-                    color: 'white',
-                }}>{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
+                    mt: 2,}}
+                    
+                >{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
             </Box>
 
         </Box>

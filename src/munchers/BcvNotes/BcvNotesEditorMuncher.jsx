@@ -24,7 +24,9 @@ function BcvNotesViewerMuncher({ metadata }) {
     const [ingredientValueChanged, setIngredientValueChanged] = useState(false);
     const [saveIngredientValue, setSaveIngredientValue] = useState(true)
 
-    console.log("saveIngredientValue",saveIngredientValue)
+    console.log("ingredient changed", ingredientValueChanged)
+
+
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -79,8 +81,15 @@ function BcvNotesViewerMuncher({ metadata }) {
                 <AddFab
                     currentRowN={currentRowN}
                     setCurrentRowN={setCurrentRowN}
+
                     ingredient={ingredient}
                     setIngredient={setIngredient}
+
+                    ingredientValueChanged={ingredientValueChanged}
+                    setIngredientValueChanged={setIngredientValueChanged}
+
+                    saveIngredientValue={saveIngredientValue}
+                    setSaveIngredientValue={saveIngredientValue}
                 />
 
                 <SearchWithVerses
@@ -90,13 +99,14 @@ function BcvNotesViewerMuncher({ metadata }) {
                 />
                 <Editor
                     currentRowN={currentRowN}
+                    setCurrentRowN={setCurrentRowN}
+
                     ingredient={ingredient}
                     setIngredient={setIngredient}
-                    setCurrentRowN={setCurrentRowN}
-                    metadata={metadata}
-                    mode="edit"
-                    ingredientHasChanged={ingredientValueChanged}
-                    setIngredientHasChanged={setIngredientValueChanged}
+
+                    ingredientValueChanged={ingredientValueChanged}
+                    setIngredientValueChanged={setIngredientValueChanged}
+
                     saveIngredientValue={saveIngredientValue}
                     setSaveIngredientValue={setSaveIngredientValue}
                 />
@@ -106,9 +116,9 @@ function BcvNotesViewerMuncher({ metadata }) {
                     ingredient={ingredient}
                     metadata={metadata}
                     setIngredient={setIngredient}
-                    ingredientHasChanged={ingredientValueChanged}
+                    ingredientValueChanged={ingredientValueChanged}
                     saveIngredientValue={saveIngredientValue}
-                    setIngredientHasChanged={setIngredientValueChanged}
+                    setIngredientValueChanged={setIngredientValueChanged}
                 />
                 <Button
                     disabled={!saveIngredientValue}
@@ -116,8 +126,6 @@ function BcvNotesViewerMuncher({ metadata }) {
                     onClick={() => { previousRow(); setSaveIngredientValue(true) }}
                     sx={{
                         mt: 2,
-                        backgroundColor: saveIngredientValue ? 'primary' : 'grey.400',
-                        color: 'white',
                     }}
                 >
                     {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
@@ -127,8 +135,6 @@ function BcvNotesViewerMuncher({ metadata }) {
                     onClick={()=>{nextRow();setSaveIngredientValue(true)}} variant="contained"
                     sx={{
                         mt: 2,
-                        backgroundColor: saveIngredientValue ? 'primary' : 'grey.400',
-                        color: 'white',
                     }}
                 >
                     {doI18n("pages:core-local-workspace:next", i18nRef.current)}

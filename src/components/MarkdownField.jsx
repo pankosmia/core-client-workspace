@@ -44,7 +44,6 @@ function MarkdownField({ currentRow, columnNames, onChangeNote, value }) {
                                     {value}
                                 </Markdown>
                             )}
-
                         </>
                     );
                 })}
