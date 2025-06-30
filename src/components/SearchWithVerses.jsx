@@ -43,7 +43,7 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN }) {
                             <>
                                 <ListItemButton
                                     key={chap}
-                                    selected={chap === currentChapter}
+                                    //selected={chap === currentChapter}
                                     onClick={() => {
                                         setCurrentChapter(chap);
                                         setCurrentVerse(null);

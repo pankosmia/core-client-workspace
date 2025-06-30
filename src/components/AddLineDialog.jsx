@@ -20,6 +20,7 @@ function AddLineDialog({ open, closeModal,ingredient, setIngredient,currentRowN,
         const newIngredient = [...ingredient];
         newIngredient.push(newRow);
         setIngredient(newIngredient);
+        setIngredientValueChanged(true);
     };
 
     return (

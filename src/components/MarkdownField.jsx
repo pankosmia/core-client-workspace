@@ -9,7 +9,7 @@ function MarkdownField({ currentRow, columnNames, onChangeNote, value }) {
     const [displayMode, setdisplayMode] = useState('write');
     
     return (
-        <Box>
+        <Box sx={{display:"flex", flexDirection:"column", gap:1}}>
             <FormLabel>Note </FormLabel>
             <ToggleButtonGroup
                 exclusive

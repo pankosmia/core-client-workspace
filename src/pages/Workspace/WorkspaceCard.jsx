@@ -49,6 +49,13 @@ function WorkspaceCard({metadata, style}) {
             />
         </div>
     }
+    if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvquestions") {
+        return <div style={style} dir={scriptDirectionString}>
+           <BcvNotesEditorMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
     if (metadata.flavor.toLowerCase() === "x-bcvquestions") {
         return <div style={style} dir={scriptDirectionString}>
             <BcvQuestionsViewerMuncher

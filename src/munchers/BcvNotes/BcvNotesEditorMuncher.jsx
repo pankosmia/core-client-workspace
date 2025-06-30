@@ -24,9 +24,6 @@ function BcvNotesViewerMuncher({ metadata }) {
     const [ingredientValueChanged, setIngredientValueChanged] = useState(false);
     const [saveIngredientValue, setSaveIngredientValue] = useState(true)
 
-    console.log("ingredient changed", ingredientValueChanged)
-
-
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
