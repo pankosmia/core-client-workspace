@@ -6,7 +6,7 @@ import {
     doI18n,
 } from "pithekos-lib";
 
-function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, setSaveIngredientValue }) {
+function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, setSaveIngredientValue, handleDeleteRow }) {
     const { i18nRef } = useContext(I18nContext);
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const [cellValueChanged, setCellValueChanged] = useState(false);
@@ -76,6 +76,17 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                 >
                     {mode === "edit" ? `${doI18n("pages:core-local-workspace:editing", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
                 </Button>
+
+                 {/* <Button
+                    onClick={() => { handleDeleteRow(currentRowN, rowData); setCellValueChanged(false) }}
+                    variant="contained"
+                    disabled={!cellValueChanged}
+                    sx={{
+                        mt: 2,
+                    }}
+                >
+                    {mode === "edit" ? `${doI18n("pages:core-local-workspace:editing", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
+                </Button> */}
 
                 {mode === "edit" && (
                     <Button
