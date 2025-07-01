@@ -20,7 +20,6 @@ function WorkspaceCard({metadata, style}) {
           />
         </div>
     }
-    console.log(metadata);
     if (metadata.flavor === "textTranslation") {
         return <div style={style} dir={scriptDirectionString}>
           <TextTranslationViewerMuncher
@@ -70,7 +69,6 @@ function WorkspaceCard({metadata, style}) {
             />
         </div>
     }
-    /*
     if (metadata.flavor.toLowerCase() === "x-bcvimages") {
         return <div style={style} dir={scriptDirectionString}>
             <BcvImagesViewerMuncher
@@ -78,7 +76,6 @@ function WorkspaceCard({metadata, style}) {
             />
         </div>
     }
-     */
     if (metadata.flavor === "x-videolinks") {
         return <div style={style} dir={scriptDirectionString}>
           <VideoLinksViewerMuncher
