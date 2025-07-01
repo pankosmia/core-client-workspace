@@ -73,21 +73,20 @@ function BcvNotesViewerMuncher({ metadata }) {
         }}
         >
             {/* <SearchNavBar getAllData={getAllData} /> */}
+            <AddFab
+                currentRowN={currentRowN}
+                setCurrentRowN={setCurrentRowN}
+
+                ingredient={ingredient}
+                setIngredient={setIngredient}
+
+                ingredientValueChanged={ingredientValueChanged}
+                setIngredientValueChanged={setIngredientValueChanged}
+
+                saveIngredientValue={saveIngredientValue}
+                setSaveIngredientValue={saveIngredientValue}
+            />
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
-
-                <AddFab
-                    currentRowN={currentRowN}
-                    setCurrentRowN={setCurrentRowN}
-
-                    ingredient={ingredient}
-                    setIngredient={setIngredient}
-
-                    ingredientValueChanged={ingredientValueChanged}
-                    setIngredientValueChanged={setIngredientValueChanged}
-
-                    saveIngredientValue={saveIngredientValue}
-                    setSaveIngredientValue={saveIngredientValue}
-                />
 
                 <SearchWithVerses
                     systemBcv={systemBcv}
@@ -133,7 +132,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                 </Button>
                 <Button
                     disabled={!saveIngredientValue}
-                    onClick={()=>{nextRow();setSaveIngredientValue(true)}} variant="contained"
+                    onClick={() => { nextRow(); setSaveIngredientValue(true) }} variant="contained"
                     sx={{
                         mt: 2,
                     }}

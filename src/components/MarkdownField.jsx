@@ -4,12 +4,12 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
 import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl, FormLabel } from "@mui/material";
 
-function MarkdownField({ currentRow, columnNames, onChangeNote, value }) {
+function MarkdownField({ currentRow, columnNames, onChangeNote, value, mode }) {
 
     const [displayMode, setdisplayMode] = useState('write');
-  
+
     return (
-        <Box sx={{display:"flex", flexDirection:"column", gap:1}}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             <FormLabel>Note </FormLabel>
             <ToggleButtonGroup
                 exclusive
@@ -29,23 +29,26 @@ function MarkdownField({ currentRow, columnNames, onChangeNote, value }) {
                 .filter((column) => column === "Note")
                 .map((column) => {
                     return (
-                        <>
+                        <Box sx={{ maxHeight: "20vh", overflowY: "auto", border: "1px solid grey" }}>
                             {displayMode === 'write' ? (
-                                <FormControl fullWidth margin="normal">
+                                <FormControl fullWidth margin="normal" >
                                     <TextareaAutosize
                                         name={column}
                                         value={value}
                                         onChange={onChangeNote}
                                         minRows={4}
-                                        style={{border:"1px solid grey", borderRadius:"1px", padding:"2px"}}
-                                    />p
+                                        style={{
+                                            border: 'none',
+                                            outline: 'none',
+                                        }}
+                                    />
                                 </FormControl>
                             ) : (
                                 <Markdown>
                                     {value}
                                 </Markdown>
                             )}
-                        </>
+                        </Box>
                     );
                 })}
 
