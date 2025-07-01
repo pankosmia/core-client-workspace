@@ -78,7 +78,7 @@ function BcvNotesViewerMuncher({metadata}) {
                 >
                     <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</Typography>
                 </Grid2>
-                <Grid2 item size={12}>
+                <Grid2 item size={12} sx={{paddingRight:"5%"}}>
                     {ingredient &&
                         <Markdown className='markdown'>{
                             verseNotes.length > 0
