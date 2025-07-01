@@ -3,7 +3,7 @@ import { Box, List, ListItemButton, ListItemIcon, ListItemText, Collapse } from 
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
-function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN }) {
+function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN, setSaveIngredientValue }) {
 
     const [currentChapter, setCurrentChapter] = useState('');
     const [currentVerse, setCurrentVerse] = useState();
@@ -47,6 +47,7 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN }) {
                                     onClick={() => {
                                         setCurrentChapter(chap);
                                         setCurrentVerse(null);
+                                        setSaveIngredientValue(true)
                                     }}
                                 >
                                     <ListItemText primary={`Chap ${chap}`} />

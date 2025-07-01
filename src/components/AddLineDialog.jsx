@@ -34,7 +34,6 @@ function AddLineDialog({ open, closeModal,ingredient, setIngredient,currentRowN,
                         edge="start"
                         color="inherit"
                         onClick={handleClose}
-                    //aria-label={doI18n("pages:content:close", i18nRef.current)}
                     >
                         <CloseIcon />
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">

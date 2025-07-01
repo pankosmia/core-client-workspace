@@ -37,6 +37,7 @@ function MarkdownField({ currentRow, columnNames, onChangeNote, value }) {
                                         value={value}
                                         onChange={onChangeNote}
                                         minRows={4}
+                                        style={{border:"1px solid grey", borderRadius:"1px"}}
                                     />
                                 </FormControl>
                             ) : (

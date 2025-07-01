@@ -93,6 +93,8 @@ function BcvNotesViewerMuncher({ metadata }) {
                     systemBcv={systemBcv}
                     ingredient={ingredient}
                     setCurrentRowN={setCurrentRowN}
+                    setSaveIngredientValue={setSaveIngredientValue}
+
                 />
                 <Editor
                     currentRowN={currentRowN}
@@ -112,8 +114,10 @@ function BcvNotesViewerMuncher({ metadata }) {
                 <SaveTsvButton
                     ingredient={ingredient}
                     metadata={metadata}
+
                     setIngredient={setIngredient}
                     ingredientValueChanged={ingredientValueChanged}
+
                     saveIngredientValue={saveIngredientValue}
                     setIngredientValueChanged={setIngredientValueChanged}
                 />

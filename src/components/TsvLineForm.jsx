@@ -38,7 +38,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
         setRowData(newRowData);
 
     };
-    
+
     return (
         <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
             {columnNames.map((column, n) => (
@@ -77,10 +77,21 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                     {mode === "edit" ? `${doI18n("pages:core-local-workspace:editing", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
                 </Button>
 
-                <Button onClick={() => { handleCancel(); setCellValueChanged(false) }} variant="contained" disabled={!cellValueChanged} sx={{
-                    mt: 2,}}
-                    
-                >{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
+                {mode === "edit" && (
+                    <Button
+                        onClick={() => {
+                            handleCancel();
+                            setCellValueChanged(false);
+                            setSaveIngredientValue(true)
+                        }}
+                        variant="contained"
+                        disabled={!cellValueChanged}
+                        sx={{ mt: 2 }}
+                    >
+                        {doI18n("pages:core-local-workspace:cancel", i18nRef.current)}
+                    </Button>
+                )}
+
             </Box>
 
         </Box>
