@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, List, ListItemButton, ListItemIcon, ListItemText, Collapse } from "@mui/material";
+import { Box, List, ListItemButton, ListItemIcon, ListItemText, Collapse, TextField, FormControl } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
@@ -8,9 +8,14 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN, setSaveIngred
     const [currentChapter, setCurrentChapter] = useState('');
     const [currentVerse, setCurrentVerse] = useState();
     const [open, setOpen] = useState(false);
+    const columnNames = ingredient[0] || [];
+    const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
 
     // Permet d'afficher tous les versets selon un chapitre selectionné
-    const bookCode = [systemBcv.chapterNum]
+    const bookCode = Array.from(
+        new Set(ingredient.map(l => l[0].split(':')[0]))
+    );
+
     const verses = currentChapter
         ? ingredient.filter(l => l[0].startsWith(`${currentChapter}:`))
         : [];
@@ -75,6 +80,25 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN, setSaveIngred
                 </Collapse>
             </List>
         </Box>
+
+        // <Box>
+        //     {columnNames.filter((column) => column === "Reference")
+        //         .map((column, n) => {
+        //             return (
+        //                 <>
+        //                     <FormControl fullWidth margin="normal" key={n}>
+        //                         <TextField
+        //                             label={column}
+        //                             value={rowData[n]}
+        //                             minRows={4}
+        //                             style={{ border: "1px solid grey", borderRadius: "1px" }}
+        //                         />
+        //                     </FormControl>
+
+        //                 </>
+        //             );
+        //         })}
+        // </Box>
 
     );
 }

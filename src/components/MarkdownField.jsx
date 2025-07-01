@@ -7,7 +7,7 @@ import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl, Fo
 function MarkdownField({ currentRow, columnNames, onChangeNote, value }) {
 
     const [displayMode, setdisplayMode] = useState('write');
-    
+  
     return (
         <Box sx={{display:"flex", flexDirection:"column", gap:1}}>
             <FormLabel>Note </FormLabel>
@@ -37,8 +37,8 @@ function MarkdownField({ currentRow, columnNames, onChangeNote, value }) {
                                         value={value}
                                         onChange={onChangeNote}
                                         minRows={4}
-                                        style={{border:"1px solid grey", borderRadius:"1px"}}
-                                    />
+                                        style={{border:"1px solid grey", borderRadius:"1px", padding:"2px"}}
+                                    />p
                                 </FormControl>
                             ) : (
                                 <Markdown>
