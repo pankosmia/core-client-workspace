@@ -1,6 +1,7 @@
 import React from 'react';
 import TextTranslationEditorMuncher from "../../munchers/TextTranslation/TextTranslationEditorMuncher";
 import TextTranslationViewerMuncher from "../../munchers/TextTranslation/TextTranslationViewerMuncher";
+import BcvAudioTranslationViewerMuncher from "../../munchers/BcvAudio/BcvAudioViewerMuncher";
 import BcvNotesViewerMuncher from "../../munchers/BcvNotes/BcvNotesViewerMuncher";
 import BcvNotesEditorMuncher from '../../munchers/BcvNotes/BcvNotesEditorMuncher';
 import BcvQuestionsViewerMuncher from "../../munchers/BcvQuestions/BcvQuestionsViewerMuncher";
@@ -22,11 +23,18 @@ function WorkspaceCard({metadata, style}) {
     }
     if (metadata.flavor === "textTranslation") {
         return <div style={style} dir={scriptDirectionString}>
-          <TextTranslationViewerMuncher
-              metadata={metadata}
-          />
+            <TextTranslationViewerMuncher
+                metadata={metadata}
+            />
         </div>
-  }
+    }
+    if (metadata.flavor === "audioTranslation") {
+        return <div style={style} dir={scriptDirectionString}>
+            <BcvAudioTranslationViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
     if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvnotes") {
         return <div style={style} dir={scriptDirectionString}>
            <BcvNotesEditorMuncher

@@ -50,6 +50,7 @@ function ConfigureWorkspace() {
 
     const flavorTypes = {
         textTranslation: "scripture",
+        audioTranslation: "scripture",
         "x-bcvnotes": "parascriptural",
         "x-bnotes": "parascriptural",
         "x-bcvarticles": "parascriptural",
