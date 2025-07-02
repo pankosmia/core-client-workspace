@@ -1,5 +1,5 @@
 import {useEffect, useState, useContext} from "react";
-import {Box, Grid2, Typography, Accordion, AccordionSummary, AccordionDetails} from "@mui/material";
+import {Box, Grid2, Typography, Accordion, AccordionSummary, AccordionDetails, Card, CardContent} from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Markdown from 'react-markdown';
 
@@ -41,6 +41,7 @@ function BcvQuestionsViewerMuncher({metadata}) {
     const filteredIngredient = ingredient.filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`);
     const verseQuestions = filteredIngredient.map(l => l[5]);
     const verseAnswers = filteredIngredient.map(l => l[6]);
+    console.log(ingredient);
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -68,18 +69,24 @@ function BcvQuestionsViewerMuncher({metadata}) {
                     {ingredient && verseQuestions.length > 0 ?
                         verseQuestions
                             .map((v, n) => {
-                                return <Accordion>
-                                    <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel1-content"
-                                    id={`tword-${n}`}
-                                    >
-                                    <Typography component="span" sx={{fontWeight: "bold"}}>{v}</Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                        {ingredient && <Markdown className='markdown'>{`${verseAnswers[n]}`}</Markdown>}
-                                    </AccordionDetails>
-                                </Accordion>
+                                return (ingredient[1][5].includes("Study Questions")) ? 
+                                    <Card variant="outlined">
+                                        <CardContent>
+                                            <Typography component="span" sx={{fontWeight: "bold"}}>{v}</Typography>
+                                        </CardContent>
+                                    </Card> :
+                                    <Accordion>
+                                        <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon />}
+                                        aria-controls="panel1-content"
+                                        id={`tword-${n}`}
+                                        >
+                                        <Typography component="span" sx={{fontWeight: "bold"}}>{v}</Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            {ingredient && <Markdown className='markdown'>{`${verseAnswers[n]}`}</Markdown>}
+                                        </AccordionDetails>
+                                    </Accordion>
                             })
                         :
                         "No questions found for this verse"
