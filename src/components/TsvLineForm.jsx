@@ -40,9 +40,14 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
         const newCellValue = event.target.value;
         const newRowData = [...rowData];
         newRowData[n] = newCellValue;
+        if(mode ==="add" && newCellValue[0].trim().length > 0  ){
+            setCellValueChanged(true);
+        }else{
+            setCellValueChanged(true)
+        }
         setRowData(newRowData);
-        setCellValueChanged(true);
         setSaveIngredientValue(false)
+        console.log("newcellvalue",newCellValue)
     };
 
     // Permet d'annuler les modications faites sur la note 
@@ -96,7 +101,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
             ))}
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
                 <Button
-                    onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false); handleClose() }}
+                    onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
                     variant="contained"
                     disabled={!cellValueChanged}
                     sx={{
