@@ -21,11 +21,11 @@ function Editor({ingredient, setIngredient, currentRowN, setIngredientValueChang
         setSaveIngredientValue(true)
         setIngredient(newIngredient);
     };
-    const handleDeleteRow =(rowN)=>{
-        const newIngredient = [...ingredient]
-        newIngredient.splice(rowN,1)
-        setIngredient(newIngredient)
-    };
+    // const handleDeleteRow =(rowN)=>{
+    //     const newIngredient = [...ingredient]
+    //     newIngredient.splice(rowN,1)
+    //     setIngredient(newIngredient)
+    // };
 
     
     return <Box sx={{ display: 'flex', flexDirection:"column", gap: 2, padding: 2 }}>
@@ -37,7 +37,6 @@ function Editor({ingredient, setIngredient, currentRowN, setIngredientValueChang
                 setIngredient={setIngredient}
                 saveFunction={handleSaveRow}
                 setSaveIngredientValue={setSaveIngredientValue}
-                handleDeleteRow={handleDeleteRow}
             />
             </Box>;
 }

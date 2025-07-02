@@ -32,8 +32,8 @@ function AddFab({currentRowN, setCurrentRowN, ingredient, setIngredient}) {
             </Fab>
 
             <AddLineDialog
-                open={openedModal === 'add'}
                 mode="add"
+                open={openedModal === 'add'}
                 closeModal={() => setOpenedModal(null)}
                 currentRowN={currentRowN}
                 setCurrentRowN={setCurrentRowN}

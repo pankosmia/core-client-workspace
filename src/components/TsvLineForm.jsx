@@ -30,7 +30,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
         [ingredient, currentRow, mode]
     );
     // Permet d'ouvrir la modal Delete
-    const handleRowDelete = () => {
+    const handleOpenModalDelete = () => {
         setOpenedModalDelete("delete");
     };
 
@@ -123,7 +123,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
 
                 {mode === "edit" && (
                     <IconButton
-                        onClick={() => handleRowDelete() }
+                        onClick={() => handleOpenModalDelete() }
                         sx={{
                             mt: 2,
                         }}
@@ -135,7 +135,14 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                 )}
 
             </Box>
-            <DeleteNote open={openedModalDelete} ingredient={ingredient} setIngredient={setIngredient}  closeModal={() => setOpenedModalDelete(null)} mode="delete"/>
+            <DeleteNote 
+                mode="delete"
+                open={openedModalDelete === "delete"} 
+                closeModal={() => setOpenedModalDelete(null)} 
+                ingredient={ingredient} 
+                setIngredient={setIngredient}
+                rowData = {rowData}
+            />
         </Box>
 
     )

@@ -1,18 +1,16 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from "@mui/material";
-import TsvLineForm from "./TsvLineForm";
 import {
     i18nContext as I18nContext,
     doI18n,
 } from "pithekos-lib";
 
-function DeleteNote({open, ingredient, setIngredient,closeModal }) {
+function DeleteNote({open,closeModal, ingredient, setIngredient, rowData }) {
     const { i18nRef } = useContext(I18nContext);
 
     const handleClose = () => {
         closeModal();
     }
-
 
     const handleDeleteRow = (rowN) => {
         const newIngredient = [...ingredient]
@@ -28,14 +26,13 @@ function DeleteNote({open, ingredient, setIngredient,closeModal }) {
             },
         }}
     >
-        <DialogTitle><b>{doI18n("pages:core-local-workspace:editing", i18nRef.current)}</b></DialogTitle>
+        <DialogTitle><b>Référence de la note : {rowData[0]} - {rowData[1]}</b></DialogTitle>
         <DialogContent>
             <DialogContentText>
                 <Typography variant="h6">
+                    {doI18n("pages:core-local-workspace:delete_note_bcv", i18nRef.current)}
                 </Typography>
-                <Typography>
-                    {doI18n("pages:core-local-workspace:editing", i18nRef.current)}
-                </Typography>
+              
             </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -45,12 +42,11 @@ function DeleteNote({open, ingredient, setIngredient,closeModal }) {
             <Button
                 color="warning"
                 onClick={() => {
-                    handleDeleteRow(rowN);
+                    handleDeleteRow();
                     handleClose();
                 }}
-            >{doI18n("pages:core-local-workspace:editing", i18nRef.current)}</Button>
+            >{doI18n("pages:core-local-workspace:do_delete_button", i18nRef.current)}</Button>
         </DialogActions>
-        <TsvLineForm DeleteNote={DeleteNote} />
     </Dialog>;
 }
 export default DeleteNote;
