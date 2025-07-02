@@ -1,5 +1,5 @@
 import {useEffect, useState, useContext} from "react";
-import {Box} from "@mui/material";
+import {Box, Grid2, Typography} from "@mui/material";
 import Markdown from 'react-markdown';
 
 import {
@@ -51,19 +51,49 @@ function BcvNotesViewerMuncher({metadata}) {
         }
     }
 
-    const verseNotes = ingredient
-        .filter(l => cvInRange(`${systemBcv.chapterNum}:${systemBcv.verseNum}`, l[0]))
-        .map(l => l[6] || l[5]);
+    const filteredIngredient = ingredient.filter(l => cvInRange(`${systemBcv.chapterNum}:${systemBcv.verseNum}`, l[0]));
+    const verseNotes = filteredIngredient.map(l => l[6] || l[5]);
+    const verseIds = filteredIngredient.map(l => l[1]);
+    const verseSupReferences = filteredIngredient.map(l => l[3]);
+
     return (
-        <Box>
-            <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
-            <h6>{doI18n("munchers:bcv_notes_viewer:title", i18nRef.current)}</h6>
-            <div>
-                {ingredient &&
-                    <Markdown>{
-                        verseNotes.length > 0 ? verseNotes.join("\n***\n") : "No notes found for this verse"
-                    }</Markdown>}
-            </div>
+        <Box sx={{ flexGrow: 1 }}>
+            <Grid2 
+                container
+                direction="row"
+                sx={{
+                    display:"flex",
+                    justifyContent: "center",
+                    alignItems: "center"
+                 }}
+            >   
+                <Grid2
+                    item 
+                    size={3} 
+                    sx={{
+                        display:"flex",
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}
+                >
+                    <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</Typography>
+                </Grid2>
+                <Grid2 item size={12} sx={{paddingRight:"5%"}}>
+                    {ingredient &&
+                        <Markdown className='markdown'>{
+                            verseNotes.length > 0
+                            ?
+                            verseNotes
+                                .map((v, n) => {
+                                    return `* (**${verseIds[n]}**) ${v.replace(". \n\n\n\n ", ". \n\n * ")}${!(verseSupReferences[n] === "") ? ` (${verseSupReferences[n].replace("rc://*/ta/man/translate/", "")})` : ""}`
+                                })
+                                .join("\n")
+                            :
+                            "No notes found for this verse"
+                        }</Markdown>
+                    }
+                </Grid2>
+            </Grid2>
         </Box>
     );
 }
