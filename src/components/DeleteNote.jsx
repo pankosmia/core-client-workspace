@@ -1,3 +1,4 @@
+import DeleteIcon from '@mui/icons-material/Delete';
 function DeleteNote({ }) {
 
     return <Dialog

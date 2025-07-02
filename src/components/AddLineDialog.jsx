@@ -2,12 +2,14 @@ import { useState, useContext } from "react";
 import { AppBar, Dialog, IconButton, Toolbar, Typography } from "@mui/material";
 import { Close as CloseIcon } from '@mui/icons-material';
 import TsvLineForm from "./TsvLineForm";
+
+
 import {
     i18nContext as I18nContext,
     doI18n,
 } from "pithekos-lib";
 
-function AddLineDialog({ open, closeModal,ingredient, setIngredient,currentRowN, setCurrentRowN, setIngredientValueChanged, setSaveIngredientValue }) {
+function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRowN, setCurrentRowN, setIngredientValueChanged, setSaveIngredientValue }) {
     const { i18nRef } = useContext(I18nContext);
     const [newCurrentRow, setNewCurrentRow] = useState((ingredient[0] || []).map(c => ""));
 
@@ -18,10 +20,11 @@ function AddLineDialog({ open, closeModal,ingredient, setIngredient,currentRowN,
     // Permet de sauvegarder la nouvelle note
     const handleSaveNewTsvRow = (rowN, newRow) => {
         const newIngredient = [...ingredient];
-        newIngredient.push(newRow);
+        newIngredient.splice(rowN, 0, newRow);
         setIngredient(newIngredient);
-        setIngredientValueChanged(true);
     };
+
+   
 
     return (
         <Dialog
@@ -51,6 +54,7 @@ function AddLineDialog({ open, closeModal,ingredient, setIngredient,currentRowN,
                 setIngredient={setIngredient}
                 saveFunction={handleSaveNewTsvRow}
                 setSaveIngredientValue={setSaveIngredientValue}
+                handleClose ={handleClose}
             />
         </Dialog>
     )

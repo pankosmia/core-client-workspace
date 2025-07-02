@@ -4,13 +4,13 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
 import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl, FormLabel } from "@mui/material";
 
-function MarkdownField({ currentRow, columnNames, onChangeNote, value, mode }) {
+function MarkdownField({ currentRow, columnNames, onChangeNote, value, mode, fieldN }) {
 
     const [displayMode, setdisplayMode] = useState('write');
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <FormLabel>Note </FormLabel>
+            <FormLabel>{columnNames[fieldN]}</FormLabel>
             <ToggleButtonGroup
                 exclusive
                 aria-label="Platform"
@@ -25,32 +25,27 @@ function MarkdownField({ currentRow, columnNames, onChangeNote, value, mode }) {
                 <ToggleButton value="write"><CreateIcon /></ToggleButton>
                 <ToggleButton value="preview"><RemoveRedEyeIcon /></ToggleButton>
             </ToggleButtonGroup>
-            {columnNames
-                .filter((column) => column === "Note")
-                .map((column) => {
-                    return (
-                        <Box sx={{ maxHeight: "20vh", overflowY: "auto", border: "1px solid grey" }}>
-                            {displayMode === 'write' ? (
-                                <FormControl fullWidth margin="normal" >
-                                    <TextareaAutosize
-                                        name={column}
-                                        value={value}
-                                        onChange={onChangeNote}
-                                        minRows={4}
-                                        style={{
-                                            border: 'none',
-                                            outline: 'none',
-                                        }}
-                                    />
-                                </FormControl>
-                            ) : (
-                                <Markdown>
-                                    {value}
-                                </Markdown>
-                            )}
-                        </Box>
-                    );
-                })}
+
+            <Box sx={{ maxHeight: "20vh", overflowY: "auto", border: "1px solid grey" }}>
+                {displayMode === 'write' ? (
+                    <FormControl fullWidth margin="normal" >
+                        <TextareaAutosize
+                            name={columnNames[fieldN]}
+                            value={value}
+                            onChange={onChangeNote}
+                            minRows={4}
+                            style={{
+                                border: 'none',
+                                outline: 'none',
+                            }}
+                        />
+                    </FormControl>
+                ) : (
+                    <Markdown>
+                        {value}
+                    </Markdown>
+                )}
+            </Box>
 
         </Box>
     )
