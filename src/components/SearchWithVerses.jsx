@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, List, ListItemButton, ListItemText, Collapse  } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 
-function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChanged, ingredientValueChanged }) {
+function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChanged, ingredientValueChanged, currentRowN }) {
 
     const [currentChapter, setCurrentChapter] = useState('');
     const [currentVerse, setCurrentVerse] = useState();

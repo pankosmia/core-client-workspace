@@ -15,11 +15,12 @@ function AddLineDialog({ open, ingredient, setIngredient, currentRowN, setIngred
     const [newCurrentRow, setNewCurrentRow] = useState((ingredient[0] || []).map(c => ""));
     const [openedModalCloseLineDialog, setOpenedModalCloseLineDialog] = useState(false)
 
-     // Permet d'ouvrir la modal Delete
+     // Permet d'ouvrir la modal de verfication d'enregistrement de la note
     const handleOpenModalCloseLineDialog = () => {
         setOpenedModalCloseLineDialog("closeModalLineDialog");
     };
 
+    // Permet de fermer la modal principale 
     const handleCloseModalMain = () => {
         closeModal();
     }
@@ -45,7 +46,7 @@ function AddLineDialog({ open, ingredient, setIngredient, currentRowN, setIngred
                     <IconButton
                         edge="start"
                         color="inherit"
-                        onClick={handleOpenModalCloseLineDialog}
+                        onClick={handleCloseModalMain}
                     >
                         <CloseIcon />
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
@@ -65,7 +66,7 @@ function AddLineDialog({ open, ingredient, setIngredient, currentRowN, setIngred
                 setIngredientValueChanged={setIngredientValueChanged}
                 //handleClose ={handleClose}
             />
-        <ModalCLoseLineDialog mode="closeModalLineDialog" open={openedModalCloseLineDialog === "closeModalLineDialog"}  closeModal={() => setOpenedModalCloseLineDialog(null)} handleCloseModalMain={handleCloseModalMain}/>
+        {/* <ModalCLoseLineDialog mode="closeModalLineDialog" open={openedModalCloseLineDialog === "closeModalLineDialog"}  closeModal={() => setOpenedModalCloseLineDialog(null)} handleCloseModalMain={handleCloseModalMain}/> */}
         </Dialog>
 
     )
