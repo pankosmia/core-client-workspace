@@ -8,8 +8,9 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuidv4 } from 'uuid';
 import DeleteNote from "./DeleteNote";
+import ModalCLoseLineDialog from "./ModalCloseLineDialog";
 
-function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, setSaveIngredientTsv,setIngredientValueChanged }) {
+function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, setSaveIngredientTsv, setIngredientValueChanged }) {
     const { i18nRef } = useContext(I18nContext);
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const [cellValueChanged, setCellValueChanged] = useState(false);
@@ -32,7 +33,6 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
     const handleOpenModalDelete = () => {
         setOpenedModalDelete("delete");
     };
-
 
     // Permet la modification d'une note
     const changeCell = (event, n) => {
@@ -68,7 +68,6 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
         }
         return myId
     }
-    
 
     return (
         <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
@@ -106,6 +105,10 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                     disabled={!cellValueChanged}
                     sx={{
                         mt: 2,
+                        "&.Mui-disabled": {
+                            background: "#eaeaea",
+                            color: "#424242"
+                        }
                     }}
                 >
                     {mode === "edit" ? `${doI18n("pages:core-local-workspace:editing", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
@@ -120,7 +123,13 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                         }}
                         variant="contained"
                         disabled={!cellValueChanged}
-                        sx={{ mt: 2 }}
+                        sx={{
+                            mt: 2,
+                            "&.Mui-disabled": {
+                                background: "#eaeaea",
+                                color: "#424242"
+                            }
+                        }}
                     >
                         {doI18n("pages:core-local-workspace:cancel", i18nRef.current)}
                     </Button>
@@ -130,12 +139,10 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                     <IconButton
                         onClick={() => handleOpenModalDelete()}
                         sx={{
-                            mt: 2,
+                            mt: 2
                         }}
-                        color="secondary"
-
                     >
-                        <DeleteIcon size="large" />
+                        <DeleteIcon size="large" color="primary" />
                     </IconButton>
                 )}
 
@@ -150,6 +157,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                 setSaveIngredientTsv={setSaveIngredientTsv}
                 currentRowN={currentRowN}
             />
+            <ModalCLoseLineDialog setCellValueChanged={setCellValueChanged} cellValueChanged={cellValueChanged} />
         </Box>
 
     )

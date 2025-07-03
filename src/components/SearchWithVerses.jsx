@@ -55,7 +55,6 @@ function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChange
                                         <ListItemButton
                                             disabled={!ingredientValueChanged}
                                             key={v[0]}
-                                            selected={v[1] === currentVerse}
                                             onClick={() => {handleChangeId(v[1]); setIngredientValueChanged(true)}}
                                         >
                                             <ListItemText primary={`v ${v[0].split(':')[1]} - ${v[1]}`} />

@@ -41,7 +41,7 @@ function MarkdownField({ currentRow, columnNames, onChangeNote, value, mode, fie
                         />
                     </FormControl>
                 ) : (
-                    <Markdown>
+                    <Markdown fullWidth margin="normal">
                         {value}
                     </Markdown>
                 )}

@@ -8,14 +8,22 @@ import {
     i18nContext as I18nContext,
     doI18n,
 } from "pithekos-lib";
+import ModalCLoseLineDialog from "./ModalCloseLineDialog";
 
-function AddLineDialog({mode, open, closeModal, ingredient, setIngredient, currentRowN, setIngredientValueChanged, setSaveIngredientTsv }) {
+function AddLineDialog({ open, ingredient, setIngredient, currentRowN, setIngredientValueChanged, setSaveIngredientTsv }) {
     const { i18nRef } = useContext(I18nContext);
     const [newCurrentRow, setNewCurrentRow] = useState((ingredient[0] || []).map(c => ""));
+    const [openedModalCloseLineDialog, setOpenedModalCloseLineDialog] = useState(false)
 
-    const handleClose = () => {
+     // Permet d'ouvrir la modal Delete
+    const handleOpenModalCloseLineDialog = () => {
+        setOpenedModalCloseLineDialog("closeModalLineDialog");
+    };
+
+    const handleCloseModalMain = () => {
         closeModal();
     }
+
 
     // Permet de sauvegarder la nouvelle note
     const handleSaveNewTsvRow = (rowN, newRow) => {
@@ -26,19 +34,18 @@ function AddLineDialog({mode, open, closeModal, ingredient, setIngredient, curre
         setIngredient(newIngredient);
     };
 
-   
-
     return (
         <Dialog
             fullScreen
             open={open}
-            onClose={handleClose}>
+            onClose={handleCloseModalMain}
+        >
             <AppBar sx={{ position: 'relative' }}>
                 <Toolbar>
                     <IconButton
                         edge="start"
                         color="inherit"
-                        onClick={handleClose}
+                        onClick={handleOpenModalCloseLineDialog}
                     >
                         <CloseIcon />
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
@@ -58,7 +65,9 @@ function AddLineDialog({mode, open, closeModal, ingredient, setIngredient, curre
                 setIngredientValueChanged={setIngredientValueChanged}
                 //handleClose ={handleClose}
             />
+        <ModalCLoseLineDialog mode="closeModalLineDialog" open={openedModalCloseLineDialog === "closeModalLineDialog"}  closeModal={() => setOpenedModalCloseLineDialog(null)} handleCloseModalMain={handleCloseModalMain}/>
         </Dialog>
+
     )
 }
 

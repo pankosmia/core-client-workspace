@@ -45,7 +45,7 @@ function BcvNotesViewerMuncher({ metadata }) {
         [systemBcv]
     );
 
-    console.log("saveTsv",saveIngredientTsv)
+    console.log("saveTsv", saveIngredientTsv)
     // changer de page -1 
     const previousRow = () => {
         const newRow = currentRowN - 1;
@@ -67,6 +67,13 @@ function BcvNotesViewerMuncher({ metadata }) {
         }
     };
 
+    useEffect(() => {
+        const onBeforeUnload = ev => {
+            ev.preventDefault();
+        };
+        window.addEventListener('beforeunload', onBeforeUnload);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <Stack sx={{
@@ -92,7 +99,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                 <SearchWithVerses
                     ingredient={ingredient}
                     setCurrentRowN={setCurrentRowN}
-                        
+
                     ingredientValueChanged={ingredientValueChanged}
                     setIngredientValueChanged={setIngredientValueChanged}
                 />
@@ -112,10 +119,10 @@ function BcvNotesViewerMuncher({ metadata }) {
 
                     ingredient={ingredient}
                     setIngredient={setIngredient}
-                    
+
                     saveIngredientTsv={saveIngredientTsv}
                     setSaveIngredientTsv={setSaveIngredientTsv}
-                
+
                 />
                 <Button
                     disabled={!ingredientValueChanged}
@@ -123,6 +130,10 @@ function BcvNotesViewerMuncher({ metadata }) {
                     onClick={() => { previousRow(); setIngredientValueChanged(true) }}
                     sx={{
                         mt: 2,
+                        "&.Mui-disabled": {
+                            background: "#eaeaea",
+                            color: "#424242"
+                        }
                     }}
                 >
                     {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
@@ -132,6 +143,10 @@ function BcvNotesViewerMuncher({ metadata }) {
                     onClick={() => { nextRow(); setIngredientValueChanged(true) }} variant="contained"
                     sx={{
                         mt: 2,
+                        "&.Mui-disabled": {
+                            background: "#eaeaea",
+                            color: "#424242"
+                        }
                     }}
                 >
                     {doI18n("pages:core-local-workspace:next", i18nRef.current)}
