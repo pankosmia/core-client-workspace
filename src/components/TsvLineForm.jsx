@@ -9,12 +9,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuidv4 } from 'uuid';
 import DeleteNote from "./DeleteNote";
 
-function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, setSaveIngredientValue, handleClose }) {
+function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, setSaveIngredientTsv, handleClose }) {
     const { i18nRef } = useContext(I18nContext);
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const [cellValueChanged, setCellValueChanged] = useState(false);
     const [openedModalDelete, setOpenedModalDelete] = useState(false);
-
     const columnNames = ingredient[0] || [];
 
     useEffect(
@@ -37,17 +36,20 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
 
     // Permet la modification d'une note
     const changeCell = (event, n) => {
+        console.log("avant")
         const newCellValue = event.target.value;
         const newRowData = [...rowData];
         newRowData[n] = newCellValue;
-        if(mode ==="add" && newCellValue[0].trim().length > 0  ){
-            setCellValueChanged(true);
-        }else{
+        if (newRowData[0].length > 0 && /^[^:]+:[^:]+$/.test(newRowData[0])) {
             setCellValueChanged(true)
+            console.log("row", newRowData[0])
+        } else {
+            setCellValueChanged(false)
+            console.log("apres")
         }
+        setSaveIngredientTsv(false)
         setRowData(newRowData);
-        setSaveIngredientValue(false)
-        console.log("newcellvalue",newCellValue)
+
     };
 
     // Permet d'annuler les modications faites sur la note 
@@ -116,7 +118,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                         onClick={() => {
                             handleCancel();
                             setCellValueChanged(false);
-                            setSaveIngredientValue(true)
+                            setSaveIngredientTsv(true)
                         }}
                         variant="contained"
                         disabled={!cellValueChanged}
@@ -128,7 +130,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
 
                 {mode === "edit" && (
                     <IconButton
-                        onClick={() => handleOpenModalDelete() }
+                        onClick={() => handleOpenModalDelete()}
                         sx={{
                             mt: 2,
                         }}
@@ -140,13 +142,13 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                 )}
 
             </Box>
-            <DeleteNote 
+            <DeleteNote
                 mode="delete"
-                open={openedModalDelete === "delete"} 
-                closeModal={() => setOpenedModalDelete(null)} 
-                ingredient={ingredient} 
+                open={openedModalDelete === "delete"}
+                closeModal={() => setOpenedModalDelete(null)}
+                ingredient={ingredient}
                 setIngredient={setIngredient}
-                rowData = {rowData}
+                rowData={rowData}
             />
         </Box>
 

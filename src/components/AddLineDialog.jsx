@@ -9,7 +9,7 @@ import {
     doI18n,
 } from "pithekos-lib";
 
-function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRowN, setCurrentRowN, setIngredientValueChanged, setSaveIngredientValue }) {
+function AddLineDialog({mode, open, closeModal, ingredient, setIngredient, currentRowN, setIngredientValueChanged, setSaveIngredientTsv }) {
     const { i18nRef } = useContext(I18nContext);
     const [newCurrentRow, setNewCurrentRow] = useState((ingredient[0] || []).map(c => ""));
 
@@ -21,6 +21,8 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
     const handleSaveNewTsvRow = (rowN, newRow) => {
         const newIngredient = [...ingredient];
         newIngredient.splice(rowN, 0, newRow);
+        setIngredientValueChanged(true)
+        setSaveIngredientTsv(true)
         setIngredient(newIngredient);
     };
 
@@ -53,8 +55,9 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                 ingredient={ingredient}
                 setIngredient={setIngredient}
                 saveFunction={handleSaveNewTsvRow}
-                setSaveIngredientValue={setSaveIngredientValue}
-                handleClose ={handleClose}
+                setSaveIngredientTsv={setSaveIngredientTsv}
+                setIngredientValueChanged={setIngredientValueChanged}
+                //handleClose ={handleClose}
             />
         </Dialog>
     )

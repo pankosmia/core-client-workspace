@@ -22,7 +22,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
     const [ingredientValueChanged, setIngredientValueChanged] = useState(false);
-    const [saveIngredientValue, setSaveIngredientValue] = useState(true)
+    const [saveIngredientTsv, setSaveIngredientTsv] = useState(true)
 
     // Récupération des données du tsv
     const getAllData = async () => {
@@ -83,8 +83,8 @@ function BcvNotesViewerMuncher({ metadata }) {
                 ingredientValueChanged={ingredientValueChanged}
                 setIngredientValueChanged={setIngredientValueChanged}
 
-                saveIngredientValue={saveIngredientValue}
-                setSaveIngredientValue={saveIngredientValue}
+                saveIngredientTsv={saveIngredientTsv}
+                setSaveIngredientTsv={setSaveIngredientTsv}
             />
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
 
@@ -92,7 +92,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                     systemBcv={systemBcv}
                     ingredient={ingredient}
                     setCurrentRowN={setCurrentRowN}
-                    setSaveIngredientValue={setSaveIngredientValue}
+                    setSaveIngredientTsv={setSaveIngredientTsv}
 
                 />
                 <Editor
@@ -105,8 +105,8 @@ function BcvNotesViewerMuncher({ metadata }) {
                     ingredientValueChanged={ingredientValueChanged}
                     setIngredientValueChanged={setIngredientValueChanged}
 
-                    saveIngredientValue={saveIngredientValue}
-                    setSaveIngredientValue={setSaveIngredientValue}
+                    saveIngredientTsv={saveIngredientTsv}
+                    setSaveIngredientTsv={setSaveIngredientTsv}
                 />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
@@ -117,13 +117,13 @@ function BcvNotesViewerMuncher({ metadata }) {
                     setIngredient={setIngredient}
                     ingredientValueChanged={ingredientValueChanged}
 
-                    saveIngredientValue={saveIngredientValue}
+                    saveIngredientTsv={saveIngredientTsv}
                     setIngredientValueChanged={setIngredientValueChanged}
                 />
                 <Button
-                    disabled={!saveIngredientValue}
+                    disabled={!saveIngredientTsv}
                     variant="contained"
-                    onClick={() => { previousRow(); setSaveIngredientValue(true) }}
+                    onClick={() => { previousRow(); setSaveIngredientTsv(true) }}
                     sx={{
                         mt: 2,
                     }}
@@ -131,8 +131,8 @@ function BcvNotesViewerMuncher({ metadata }) {
                     {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
                 </Button>
                 <Button
-                    disabled={!saveIngredientValue}
-                    onClick={() => { nextRow(); setSaveIngredientValue(true) }} variant="contained"
+                    disabled={!saveIngredientTsv}
+                    onClick={() => { nextRow(); setSaveIngredientTsv(true) }} variant="contained"
                     sx={{
                         mt: 2,
                     }}

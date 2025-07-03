@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, List, ListItemButton, ListItemIcon, ListItemText, Collapse, TextField, FormControl } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 
-function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN, setSaveIngredientValue }) {
+function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN, setSaveIngredientTsv }) {
 
     const [currentChapter, setCurrentChapter] = useState('');
     const [currentVerse, setCurrentVerse] = useState();
@@ -36,7 +36,7 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN, setSaveIngred
                             onClick={() => {
                                 setCurrentChapter(chap);
                                 setCurrentVerse(null);
-                                setSaveIngredientValue(true);
+                                setSaveIngredientTsv(true);
                                 handleClick()
                             }}
                         >
