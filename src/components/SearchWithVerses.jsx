@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, List, ListItemButton, ListItemText, Collapse  } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 
-function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChanged }) {
+function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChanged, ingredientValueChanged }) {
 
     const [currentChapter, setCurrentChapter] = useState('');
     const [currentVerse, setCurrentVerse] = useState();
@@ -35,12 +35,13 @@ function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChange
                 {bookCode.map(chap => (
                     <>
                         <ListItemButton
+                            disabled={!ingredientValueChanged}
                             key={chap}
                             onClick={() => {
                                 setCurrentChapter(chap);
                                 setCurrentVerse(null);
                                 setIngredientValueChanged(true);
-                                handleClick()
+                                handleClick();
                             }}
                         >
                             <ListItemText primary={`Chap ${chap}`} />
@@ -52,9 +53,10 @@ function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChange
                                 <List>
                                     {verses.map(v => (
                                         <ListItemButton
+                                            disabled={!ingredientValueChanged}
                                             key={v[0]}
                                             selected={v[1] === currentVerse}
-                                            onClick={() => handleChangeId(v[1])}
+                                            onClick={() => {handleChangeId(v[1]); setIngredientValueChanged(true)}}
                                         >
                                             <ListItemText primary={`v ${v[0].split(':')[1]} - ${v[1]}`} />
                                         </ListItemButton>
