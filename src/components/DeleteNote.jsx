@@ -5,7 +5,7 @@ import {
     doI18n,
 } from "pithekos-lib";
 
-function DeleteNote({open,closeModal, ingredient, setIngredient, rowData }) {
+function DeleteNote({open,closeModal, ingredient, setIngredient, rowData, setSaveIngredientTsv, currentRowN }) {
     const { i18nRef } = useContext(I18nContext);
 
     const handleClose = () => {
@@ -15,8 +15,10 @@ function DeleteNote({open,closeModal, ingredient, setIngredient, rowData }) {
     const handleDeleteRow = (rowN) => {
         const newIngredient = [...ingredient]
         newIngredient.splice(rowN, 1)
+        setSaveIngredientTsv(true)
         setIngredient(newIngredient)
     };
+
     return <Dialog
         open={open}
         onClose={handleClose}
@@ -42,7 +44,7 @@ function DeleteNote({open,closeModal, ingredient, setIngredient, rowData }) {
             <Button
                 color="warning"
                 onClick={() => {
-                    handleDeleteRow();
+                    handleDeleteRow(currentRowN);
                     handleClose();
                 }}
             >{doI18n("pages:core-local-workspace:do_delete_button", i18nRef.current)}</Button>

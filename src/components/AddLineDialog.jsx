@@ -55,7 +55,6 @@ function AddLineDialog({mode, open, closeModal, ingredient, setIngredient, curre
                 ingredient={ingredient}
                 setIngredient={setIngredient}
                 saveFunction={handleSaveNewTsvRow}
-                setSaveIngredientTsv={setSaveIngredientTsv}
                 setIngredientValueChanged={setIngredientValueChanged}
                 //handleClose ={handleClose}
             />

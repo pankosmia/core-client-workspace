@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import TsvLineForm from "./TsvLineForm";
-function Editor({ingredient, setIngredient, currentRowN, setCurrentRowN, setIngredientValueChanged, setSaveIngredientTsv, ingredientValueChanged, saveIngredientTsv }) {
+function Editor({ingredient, setIngredient, currentRowN, setIngredientValueChanged, setSaveIngredientTsv }) {
     const [currentRow, setCurrentRow] = useState([]);
 
     useEffect(
@@ -20,6 +20,7 @@ function Editor({ingredient, setIngredient, currentRowN, setCurrentRowN, setIngr
         setIngredientValueChanged(true)
         setSaveIngredientTsv(true)
         setIngredient(newIngredient);
+        console.log("rown edit",rowN)
     };
 
     
@@ -31,6 +32,7 @@ function Editor({ingredient, setIngredient, currentRowN, setCurrentRowN, setIngr
                 ingredient={ingredient}
                 setIngredient={setIngredient}
                 saveFunction={handleSaveRow}
+                setIngredientValueChanged={setIngredientValueChanged}
                 setSaveIngredientTsv={setSaveIngredientTsv}
             />
             </Box>;

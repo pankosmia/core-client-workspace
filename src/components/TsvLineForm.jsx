@@ -9,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuidv4 } from 'uuid';
 import DeleteNote from "./DeleteNote";
 
-function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, setSaveIngredientTsv, handleClose }) {
+function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, setSaveIngredientTsv,setIngredientValueChanged }) {
     const { i18nRef } = useContext(I18nContext);
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const [cellValueChanged, setCellValueChanged] = useState(false);
@@ -36,18 +36,15 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
 
     // Permet la modification d'une note
     const changeCell = (event, n) => {
-        console.log("avant")
         const newCellValue = event.target.value;
         const newRowData = [...rowData];
         newRowData[n] = newCellValue;
         if (newRowData[0].length > 0 && /^[^:]+:[^:]+$/.test(newRowData[0])) {
             setCellValueChanged(true)
-            console.log("row", newRowData[0])
         } else {
             setCellValueChanged(false)
-            console.log("apres")
         }
-        setSaveIngredientTsv(false)
+        setIngredientValueChanged(false)
         setRowData(newRowData);
 
     };
@@ -71,7 +68,8 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
         }
         return myId
     }
-    //console.log("required", rowData[n].every(l => l[0] !== ''))
+    
+
     return (
         <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
             {columnNames.map((column, n) => (
@@ -118,7 +116,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                         onClick={() => {
                             handleCancel();
                             setCellValueChanged(false);
-                            setSaveIngredientTsv(true)
+                            setIngredientValueChanged(true)
                         }}
                         variant="contained"
                         disabled={!cellValueChanged}
@@ -149,6 +147,8 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                 ingredient={ingredient}
                 setIngredient={setIngredient}
                 rowData={rowData}
+                setSaveIngredientTsv={setSaveIngredientTsv}
+                currentRowN={currentRowN}
             />
         </Box>
 

@@ -9,7 +9,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { Button } from "@mui/material";
 
-function SaveTsvButton({ ingredient, metadata, setIngredientValueChanged, ingredientValueChanged }) {
+function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv,saveIngredientTsv }) {
 
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
@@ -59,11 +59,11 @@ function SaveTsvButton({ ingredient, metadata, setIngredientValueChanged, ingred
     }
     return (
         <Button
-            disabled={!ingredientValueChanged}
+            disabled={!saveIngredientTsv}
             variant="contained"
             sx={{
                 mt: 2,
-            }} onClick={() => { handleSaveTsv(); setIngredientValueChanged(false) }} > {doI18n("pages:core-local-workspace:save_tsv", i18nRef.current)} </Button>
+            }} onClick={() => { handleSaveTsv(); setSaveIngredientTsv(false) }} > {doI18n("pages:core-local-workspace:save_tsv", i18nRef.current)} </Button>
     )
 }
 export default SaveTsvButton;

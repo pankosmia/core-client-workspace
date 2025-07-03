@@ -21,8 +21,8 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { systemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
-    const [ingredientValueChanged, setIngredientValueChanged] = useState(false);
-    const [saveIngredientTsv, setSaveIngredientTsv] = useState(true)
+    const [ingredientValueChanged, setIngredientValueChanged] = useState(true);
+    const [saveIngredientTsv, setSaveIngredientTsv] = useState(false)
 
     // Récupération des données du tsv
     const getAllData = async () => {
@@ -45,6 +45,7 @@ function BcvNotesViewerMuncher({ metadata }) {
         [systemBcv]
     );
 
+    console.log("saveTsv",saveIngredientTsv)
     // changer de page -1 
     const previousRow = () => {
         const newRow = currentRowN - 1;
@@ -89,41 +90,37 @@ function BcvNotesViewerMuncher({ metadata }) {
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
 
                 <SearchWithVerses
-                    systemBcv={systemBcv}
                     ingredient={ingredient}
                     setCurrentRowN={setCurrentRowN}
-                    setSaveIngredientTsv={setSaveIngredientTsv}
-
+                        
+                    ingredientValueChanged={ingredientValueChanged}
+                    setIngredientValueChanged={setIngredientValueChanged}
                 />
                 <Editor
                     currentRowN={currentRowN}
-                    setCurrentRowN={setCurrentRowN}
 
                     ingredient={ingredient}
                     setIngredient={setIngredient}
 
-                    ingredientValueChanged={ingredientValueChanged}
                     setIngredientValueChanged={setIngredientValueChanged}
-
-                    saveIngredientTsv={saveIngredientTsv}
                     setSaveIngredientTsv={setSaveIngredientTsv}
                 />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
                 <SaveTsvButton
-                    ingredient={ingredient}
                     metadata={metadata}
 
+                    ingredient={ingredient}
                     setIngredient={setIngredient}
-                    ingredientValueChanged={ingredientValueChanged}
-
+                    
                     saveIngredientTsv={saveIngredientTsv}
-                    setIngredientValueChanged={setIngredientValueChanged}
+                    setSaveIngredientTsv={setSaveIngredientTsv}
+                
                 />
                 <Button
-                    disabled={!saveIngredientTsv}
+                    disabled={!ingredientValueChanged}
                     variant="contained"
-                    onClick={() => { previousRow(); setSaveIngredientTsv(true) }}
+                    onClick={() => { previousRow(); setIngredientValueChanged(true) }}
                     sx={{
                         mt: 2,
                     }}
@@ -131,8 +128,8 @@ function BcvNotesViewerMuncher({ metadata }) {
                     {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
                 </Button>
                 <Button
-                    disabled={!saveIngredientTsv}
-                    onClick={() => { nextRow(); setSaveIngredientTsv(true) }} variant="contained"
+                    disabled={!ingredientValueChanged}
+                    onClick={() => { nextRow(); setIngredientValueChanged(true) }} variant="contained"
                     sx={{
                         mt: 2,
                     }}

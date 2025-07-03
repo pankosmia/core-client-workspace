@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { Box, List, ListItemButton, ListItemIcon, ListItemText, Collapse, TextField, FormControl } from "@mui/material";
+import { Box, List, ListItemButton, ListItemText, Collapse  } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 
-function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN, setSaveIngredientTsv }) {
+function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChanged }) {
 
     const [currentChapter, setCurrentChapter] = useState('');
     const [currentVerse, setCurrentVerse] = useState();
     const [openChapter, setOpenChapter] = useState(false)
 
-    // Permet d'afficher tous les versets selon un chapitre selectionné
+    // Permet d'afficher tous les versets 
     const bookCode = Array.from(
         new Set(ingredient.map(l => l[0].split(':')[0]))
     );
@@ -17,9 +17,11 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN, setSaveIngred
         ? ingredient.filter(l => l[0].startsWith(`${currentChapter}:`))
         : [];
 
+
     const handleClick = () => {
         setOpenChapter(!openChapter);
     };
+
     const handleChangeId = (id) => {
         const index = ingredient.findIndex(l => l[1] === id);
         if (index !== -1) {
@@ -27,6 +29,7 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN, setSaveIngred
             setCurrentRowN(index);
         }
     };
+
     return (
             <List sx={{maxHeight:"70vh",overflowY:"auto"}}>
                 {bookCode.map(chap => (
@@ -36,7 +39,7 @@ function SearchWithVerses({ systemBcv, ingredient, setCurrentRowN, setSaveIngred
                             onClick={() => {
                                 setCurrentChapter(chap);
                                 setCurrentVerse(null);
-                                setSaveIngredientTsv(true);
+                                setIngredientValueChanged(true);
                                 handleClick()
                             }}
                         >
