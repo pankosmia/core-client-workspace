@@ -1,7 +1,9 @@
 import React from 'react';
 import TextTranslationEditorMuncher from "../../munchers/TextTranslation/TextTranslationEditorMuncher";
 import TextTranslationViewerMuncher from "../../munchers/TextTranslation/TextTranslationViewerMuncher";
+import BcvAudioTranslationViewerMuncher from "../../munchers/BcvAudio/BcvAudioViewerMuncher";
 import BcvNotesViewerMuncher from "../../munchers/BcvNotes/BcvNotesViewerMuncher";
+import BcvNotesEditorMuncher from '../../munchers/BcvNotes/BcvNotesEditorMuncher';
 import BcvQuestionsViewerMuncher from "../../munchers/BcvQuestions/BcvQuestionsViewerMuncher";
 import BcvArticlesViewerMuncher from "../../munchers/BcvArticles/BcvArticlesViewerMuncher";
 import BcvImagesViewerMuncher from "../../munchers/BcvImages/BcvImagesViewerMuncher";
@@ -21,11 +23,25 @@ function WorkspaceCard({metadata, style}) {
     }
     if (metadata.flavor === "textTranslation") {
         return <div style={style} dir={scriptDirectionString}>
-          <TextTranslationViewerMuncher
-              metadata={metadata}
-          />
+            <TextTranslationViewerMuncher
+                metadata={metadata}
+            />
         </div>
-  }
+    }
+    if (metadata.flavor === "audioTranslation") {
+        return <div style={style} dir={scriptDirectionString}>
+            <BcvAudioTranslationViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
+    if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvnotes") {
+        return <div style={style} dir={scriptDirectionString}>
+           <BcvNotesEditorMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
     if (metadata.flavor.toLowerCase() === "x-bcvnotes") {
         return <div style={style} dir={scriptDirectionString}>
             <BcvNotesViewerMuncher
@@ -36,6 +52,13 @@ function WorkspaceCard({metadata, style}) {
     if (metadata.flavor.toLowerCase() === "x-bnotes") {
         return <div style={style} dir={scriptDirectionString}>
             <BNotesViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
+    if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvquestions") {
+        return <div style={style} dir={scriptDirectionString}>
+           <BcvNotesEditorMuncher
                 metadata={metadata}
             />
         </div>
@@ -54,7 +77,6 @@ function WorkspaceCard({metadata, style}) {
             />
         </div>
     }
-    /*
     if (metadata.flavor.toLowerCase() === "x-bcvimages") {
         return <div style={style} dir={scriptDirectionString}>
             <BcvImagesViewerMuncher
@@ -62,7 +84,6 @@ function WorkspaceCard({metadata, style}) {
             />
         </div>
     }
-     */
     if (metadata.flavor === "x-videolinks") {
         return <div style={style} dir={scriptDirectionString}>
           <VideoLinksViewerMuncher

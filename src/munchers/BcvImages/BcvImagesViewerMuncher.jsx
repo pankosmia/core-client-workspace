@@ -1,20 +1,19 @@
 import {useEffect, useState, useContext} from "react";
 import {Box, Stack} from "@mui/material";
-import Markdown from 'react-markdown';
 
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
     bcvContext as BcvContext,
     doI18n,
-    getText, getJson
+    getText
 } from "pithekos-lib";
 
 function ImageViewer({metadata, reference}) {
     return <Stack>
         <img
-            src={`/burrito/ingredient/raw/${metadata.local_path}?ipath=${reference.slice(2)}.jpg`}
-            alt="image"
+            src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${reference.slice(2)}.jpg`}
+            alt="resource image"
         />
     </Stack>
 }

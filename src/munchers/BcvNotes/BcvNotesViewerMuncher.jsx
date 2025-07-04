@@ -51,10 +51,12 @@ function BcvNotesViewerMuncher({metadata}) {
         }
     }
 
+
     const filteredIngredient = ingredient.filter(l => cvInRange(`${systemBcv.chapterNum}:${systemBcv.verseNum}`, l[0]));
     const verseNotes = filteredIngredient.map(l => l[6] || l[5]);
     const verseIds = filteredIngredient.map(l => l[1]);
     const verseSupReferences = filteredIngredient.map(l => l[3]);
+
 
     return (
         <Box sx={{ flexGrow: 1 }}>
