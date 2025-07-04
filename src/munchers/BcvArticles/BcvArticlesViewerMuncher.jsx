@@ -1,5 +1,6 @@
 import {useEffect, useState, useContext} from "react";
-import {Box} from "@mui/material";
+import {Box, Grid2, Typography, Accordion, AccordionSummary, AccordionDetails} from "@mui/material";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Markdown from 'react-markdown';
 
 import {
@@ -57,15 +58,44 @@ function BcvArticlesViewerMuncher({metadata}) {
         [ingredient]
     );
     return (
-        <Box>
-            <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
-            <h6>{doI18n("munchers:bcv_notes_viewer:title", i18nRef.current)}</h6>
-            <div>
-                {ingredient &&
-                    <Markdown>{
-                        verseNotes.length > 0 ? verseNotes.join("\n***\n") : "No notes found for this verse"
-                    }</Markdown>}
-            </div>
+        <Box sx={{ flexGrow: 1 }}>
+            <Grid2 
+                container
+                direction="row"
+                sx={{
+                    display:"flex",
+                    justifyContent: "center",
+                    alignItems: "center"
+                }}
+            >   
+                <Grid2
+                    item 
+                    size={3} 
+                    sx={{
+                        display:"flex",
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}
+                >
+                    <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</Typography>
+                </Grid2>
+                <Grid2 item size={12}>
+                    {verseNotes.length > 0 && [...new Set(verseNotes)].map((v, n) => {
+                        return <Accordion>
+                            <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls="panel1-content"
+                            id={`tword-${n}`}
+                            >
+                            <Typography component="span" sx={{fontWeight: "bold"}}>{v.split("##")[0].slice(2)}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                {ingredient && <Markdown className='markdown'>{v}</Markdown>}
+                            </AccordionDetails>
+                        </Accordion>
+                    })}
+                </Grid2>
+            </Grid2>
         </Box>
     );
 }

@@ -1,5 +1,6 @@
 import {useEffect, useState, useContext} from "react";
-import {Box} from "@mui/material";
+import {Box, Grid2, Typography, Accordion, AccordionSummary, AccordionDetails, Card, CardContent} from "@mui/material";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Markdown from 'react-markdown';
 
 import {
@@ -37,19 +38,61 @@ function BcvQuestionsViewerMuncher({metadata}) {
         [systemBcv]
     );
 
-    const verseNotes = ingredient
-        .filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)
-        .map(l => `${l[5]}\n***\n${l[6]}`);
+    const filteredIngredient = ingredient.filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`);
+    const verseQuestions = filteredIngredient.map(l => l[5]);
+    const verseAnswers = filteredIngredient.map(l => l[6]);
+    console.log(ingredient);
+
     return (
-        <Box>
-            <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
-            <h6>{doI18n("munchers:bcv_notes_viewer:title", i18nRef.current)}</h6>
-            <div>
-                {ingredient &&
-                    <Markdown>{
-                        verseNotes.length > 0 ? verseNotes.join("\n***\n***\n") : "No notes found for this verse"
-                    }</Markdown>}
-            </div>
+        <Box sx={{ flexGrow: 1 }}>
+            <Grid2
+                container
+                direction="row"
+                sx={{
+                    display:"flex",
+                    justifyContent: "center",
+                    alignItems: "center"
+                }}
+            >
+                <Grid2 
+                    item 
+                    size={3}
+                    sx={{
+                        display:"flex",
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}
+                >
+                    <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</Typography>
+                </Grid2>
+                <Grid2 item size={12}>
+                    {ingredient && verseQuestions.length > 0 ?
+                        verseQuestions
+                            .map((v, n) => {
+                                return (ingredient[1][5].includes("Study Questions")) ? 
+                                    <Card variant="outlined">
+                                        <CardContent>
+                                            <Typography component="span" sx={{fontWeight: "bold"}}>{v}</Typography>
+                                        </CardContent>
+                                    </Card> :
+                                    <Accordion>
+                                        <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon />}
+                                        aria-controls="panel1-content"
+                                        id={`tword-${n}`}
+                                        >
+                                        <Typography component="span" sx={{fontWeight: "bold"}}>{v}</Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            {ingredient && <Markdown className='markdown'>{`${verseAnswers[n]}`}</Markdown>}
+                                        </AccordionDetails>
+                                    </Accordion>
+                            })
+                        :
+                        "No questions found for this verse"
+                    }
+                </Grid2>
+            </Grid2>
         </Box>
     );
 }
