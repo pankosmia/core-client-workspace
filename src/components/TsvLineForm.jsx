@@ -8,7 +8,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuidv4 } from 'uuid';
 import DeleteNote from "./DeleteNote";
-import ModalCLoseLineDialog from "./ModalCloseLineDialog";
+//import ModalCLoseLineDialog from "./ModalCloseLineDialog";
 
 function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, setSaveIngredientTsv, setIngredientValueChanged }) {
     const { i18nRef } = useContext(I18nContext);
@@ -157,7 +157,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                 setSaveIngredientTsv={setSaveIngredientTsv}
                 currentRowN={currentRowN}
             />
-            <ModalCLoseLineDialog setCellValueChanged={setCellValueChanged} cellValueChanged={cellValueChanged} />
+            {/* <ModalCLoseLineDialog setCellValueChanged={setCellValueChanged} cellValueChanged={cellValueChanged} /> */}
         </Box>
 
     )

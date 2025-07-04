@@ -10,7 +10,7 @@ import {
 } from "pithekos-lib";
 import ModalCLoseLineDialog from "./ModalCloseLineDialog";
 
-function AddLineDialog({ open, ingredient, setIngredient, currentRowN, setIngredientValueChanged, setSaveIngredientTsv }) {
+function AddLineDialog({ open,closeModal, ingredient, setIngredient, currentRowN, setIngredientValueChanged, setSaveIngredientTsv }) {
     const { i18nRef } = useContext(I18nContext);
     const [newCurrentRow, setNewCurrentRow] = useState((ingredient[0] || []).map(c => ""));
     const [openedModalCloseLineDialog, setOpenedModalCloseLineDialog] = useState(false)

@@ -57,10 +57,8 @@ function BcvNotesViewerMuncher({ metadata }) {
     // changer de page +1 
     const nextRow = () => {
         const newRow = currentRowN + 1;
-        // const currentChapterNum = parseInt(ingredient[newRow][0].split(":")[0])
         if (
             ingredient[newRow]
-            // && currentChapterNum <= systemBcv.chapterNum
         ) {
             setCurrentRowN(currentRowN + 1);
         }
