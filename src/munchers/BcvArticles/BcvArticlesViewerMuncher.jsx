@@ -80,7 +80,7 @@ function BcvArticlesViewerMuncher({metadata}) {
                     <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</Typography>
                 </Grid2>
                 <Grid2 item size={12}>
-                    {verseNotes.length > 0 && verseNotes.map((v, n) => {
+                    {verseNotes.length > 0 && [...new Set(verseNotes)].map((v, n) => {
                         return <Accordion>
                             <AccordionSummary
                             expandIcon={<ExpandMoreIcon />}
