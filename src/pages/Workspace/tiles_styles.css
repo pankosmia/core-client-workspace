@@ -1,10 +1,11 @@
 .react-tile-pane-tabTitle {
   height: 100%;
   flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block;
   background-color: #EEEEEE;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .react-tile-pane-tabBar {
