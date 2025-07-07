@@ -80,14 +80,17 @@ function BcvImagesViewerMuncher({metadata}) {
         () => {
             if (verseNotes.length > 0){
             const doVerseCaptions = async () => {
-                    let response = await getText(`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.txt`, debugRef.current)
+                let captions = [];
+                for (const v of verseNotes){
+                    let response = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${v.slice(2)}.txt`, debugRef.current);
                     if (response.ok){
-                        console.log(response.txt);
-                        /* setVerseCaptions([...verseCaptions, ...]) */
+                        captions = captions.push(response.text);
                     } else {
-                        console.log("failed to fetch");
+                        return "";
                     }
                 }
+                setVerseCaptions(captions);
+            }
                 doVerseCaptions().then();
             }
         },
@@ -105,11 +108,7 @@ function BcvImagesViewerMuncher({metadata}) {
             );
         }
     };
-
-    console.log(metadata.local_path);
-
-
-
+    
     return (
         <Box className="h-full w-full flex flex-col overflow-hidden">
             <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
@@ -118,6 +117,8 @@ function BcvImagesViewerMuncher({metadata}) {
                 {ingredient &&
                 verseNotes.length > 0 ? 
                     <div className="relative w-full h-full overflow-hidden">
+                        
+                        {/* Slider images */}
                         <div
                             className="flex transition-transform duration-300 ease-out h-full"
                             style={{
@@ -125,17 +126,18 @@ function BcvImagesViewerMuncher({metadata}) {
                                 width: `${verseNotes.length * 100}%`,
                             }}
                         >
-                                                {verseNotes.map((v, n) => (
-                            <div key={n} className="w-full h-full flex-shrink-0 flex items-center justify-center" style={{ width: `${100 / verseNotes.length}%` }}>
-                                <img
-                                    src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.jpg`}
-                                    alt="resource image"
-                                    className="w-full h-full object-contain"
-                                />
-                            </div>
-                        ))}
+                            {verseNotes.map((v, n) => (
+                                <div key={n} className="w-full h-full flex-shrink-0 flex items-center justify-center" style={{ width: `${100 / verseNotes.length}%` }}>
+                                    <img
+                                        src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.jpg`}
+                                        alt="resource image"
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
+                            ))}
                         </div>
 
+                        {/* Navigation buttons for the slider */}
                         <div className="absolute inset-0 flex items-center justify-between pointer-events-none px-4">
                             <button
                                 className="cursor-pointer pointer-events-auto bg-blue-300 hover:bg-blue-400 rounded-full p-1 text-white"
@@ -150,6 +152,8 @@ function BcvImagesViewerMuncher({metadata}) {
                                 <ArrowCircleRightIcon />
                             </button>
                         </div>
+
+                        {/* Circle buttons bottom of the image */}
                         <div className="absolute inset-0 flex items-end justify-center pointer-events-none pb-16">
                             <div className="flex justify-center gap-3 pointer-events-none">
                                 {verseNotes.map((v, n) => {
@@ -170,7 +174,7 @@ function BcvImagesViewerMuncher({metadata}) {
                         
                         {/* Caption below the slider */}
                         <div className="absolute bottom-0 left-0 right-0 text-center py-4 px-4 text-base font-medium text-gray-800 bg-white bg-opacity-95 shadow-lg">
-                            Image {current + 1} of {verseNotes.length}
+                            {`${verseCaptions[current]} (${current + 1} of ${verseNotes.length})`}
                         </div>
                     </div> :
                     "No notes found for this verse"
