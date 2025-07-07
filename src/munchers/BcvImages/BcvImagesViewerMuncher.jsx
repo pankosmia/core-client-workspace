@@ -84,7 +84,7 @@ function BcvImagesViewerMuncher({metadata}) {
                 for (const v of verseNotes){
                     let response = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${v.slice(2)}.txt`, debugRef.current);
                     if (response.ok){
-                        captions = captions.push(response.text);
+                        captions = [...captions, response.text];
                     } else {
                         return "";
                     }
@@ -117,7 +117,7 @@ function BcvImagesViewerMuncher({metadata}) {
                 {ingredient &&
                 verseNotes.length > 0 ? 
                     <div className="relative w-full h-full overflow-hidden">
-                        
+
                         {/* Slider images */}
                         <div
                             className="flex transition-transform duration-300 ease-out h-full"
