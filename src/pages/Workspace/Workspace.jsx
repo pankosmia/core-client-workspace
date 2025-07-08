@@ -11,6 +11,7 @@ import {
 } from 'react-tile-pane'
 import {Header} from "pithekos-lib";
 import {typographyContext} from "pithekos-lib";
+import OBSContext from '../../contexts/obsContext';
 
 const paneStyle = {
     width: '100%',
@@ -57,6 +58,8 @@ const Workspace = () => {
     /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
     const adjSelectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
 
+    const [obs, setObs] = useState([1, 1]);
+
     return <>
         <Header
             titleKey="pages:core-local-workspace:title"
@@ -65,14 +68,16 @@ const Workspace = () => {
             widget={<BcvPicker/>}
         />
         <div className={adjSelectedFontClass}>
-          <TileProvider
-              tilePanes={paneList}
-              rootNode={rootPane}
-          >
-              <Box style={{position: 'fixed', top: '48px', bottom: 0, right: 0, overflow: 'scroll', width: '100vw'}}>
-                  <TileContainer/>
-              </Box>
-          </TileProvider>
+          <OBSContext.Provider value={{obs, setObs}}  >
+            <TileProvider
+                tilePanes={paneList}
+                rootNode={rootPane}
+            >
+            <Box style={{position: 'fixed', top: '48px', bottom: 0, right: 0, overflow: 'scroll', width: '100vw'}}>
+                <TileContainer/>
+            </Box>
+            </TileProvider>
+          </OBSContext.Provider>
         </div>
     </>
 }
