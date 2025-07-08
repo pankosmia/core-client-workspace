@@ -37,11 +37,34 @@ function BcvQuestionsViewerMuncher({metadata}) {
         },
         [systemBcv]
     );
+    
+    const chapterRegex = new RegExp("/\b([01]?[0-9][0-9]?|2[0-4][0-9]|25[0-5])");
 
-    const filteredIngredient = ingredient.filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`);
-    const verseQuestions = filteredIngredient.map(l => l[5]);
-    const verseAnswers = filteredIngredient.map(l => l[6]);
+    const filteredIngredient = ingredient.filter(l => {
+        const firstVerseCheck = l[0] === `${systemBcv.chapterNum}:`;
+        const secondVerseCheck = l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`;
+        const splittedVerse = l[0].split(":");
+        /* const thirdVerseCheck = l[0] ? (l[0].includes(",") ? true : false) : false;
+        const fourthVerseCheck = (l[0].split(",")[0].includes(`${systemBcv.verseNum}`)) || (l[0].split(",")[1].includes(`${systemBcv.verseNum}`)); */
+        /* const fourthVerseCheck = l[5] ? (l[5].includes(`${systemBcv.verseNum}`)) : false; */
+        console.log(l[0].includes(","));
+        if (l[0].split(":")[0] === `${systemBcv.chapterNum}` && l[0].split(":")[1].includes(`${systemBcv.verseNum}`)/*  && thirdVerseCheck */ /* && fourthVerseCheck */) {
+            console.log("chaooooooooooooooooooooooooooooooooooo");
+            return l[0].split(":")[1].includes(`${systemBcv.verseNum}`);
+        }
+    });
+
+    const filteredIngredient2 = ingredient.filter(l => {
+        return l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`;
+    });
+
+    const newArray =[...new Set([...filteredIngredient2,...filteredIngredient])];
+
+    const verseQuestions = newArray.map(l => l[5]);
+    const verseAnswers = filteredIngredient2.map(l => l[6]);
     console.log(ingredient);
+    console.log(filteredIngredient);
+    console.log(filteredIngredient);
 
     return (
         <Box sx={{ flexGrow: 1 }}>
