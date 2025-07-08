@@ -66,7 +66,7 @@ function OBSEditorMuncher({metadata}) {
         <Box>
             <OBSNavigator />
             <Box>
-                <SaveOBSButton obs={obs} ingredientList={ingredientList} metadata={metadata} />
+                <SaveOBSButton obs={obs} ingredientList={ingredientList} metadata={metadata} debugRef={debugRef}/>
                 <TextareaAutosize  value={ingredientList[obs[1]-1]} id="standard-basic" variant="standard" metadata={metadata} onChange={handleChange}/>
             </Box>
         </Box>

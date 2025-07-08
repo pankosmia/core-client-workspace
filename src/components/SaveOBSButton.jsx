@@ -4,10 +4,10 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { Button, IconButton } from "@mui/material";
 import SaveIcon from '@mui/icons-material/Save';
-import { postJson, doI18n } from "pithekos-lib";
+import { postText, doI18n, getText } from "pithekos-lib";
 
 
-function SaveOBSButton({ obs, ingredientList, metadata}) {
+function SaveOBSButton({ obs, ingredientList, metadata, debugRef}) {
 
     const handleSaveOBS = () => {
         if (ingredientList.length == 0) return;
@@ -16,13 +16,16 @@ function SaveOBSButton({ obs, ingredientList, metadata}) {
         uploadOBSIngredient(ingredientList);
     }
     
-    const uploadOBSIngredient = async (obsData) => {
-        const obsString = obsData
-        const payload = JSON.stringify({ payload: obsString });
+    const uploadOBSIngredient = async (ingredientList) => {
         let fileName = obs[0] <= 9 ? `0${obs[0]}` : obs[0];
-        const response = await postJson(
+        const obsString = await getStringifyIngredient(ingredientList, fileName);
+        const payload = JSON.stringify({ payload: obsString });
+        console.log(payload)
+        const response = await postText(
             `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
             payload,
+            debugRef,
+            "application/json"
         );
         if (response.ok) {
             console.log("Saved");
@@ -32,11 +35,30 @@ function SaveOBSButton({ obs, ingredientList, metadata}) {
         }
     }
 
+    const getStringifyIngredient = async ( ingredientList, fileName) => {
+        const response = await getText(
+            `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
+            debugRef
+        );
+        if (response.ok) {
+            return response.text.split("\n\n").map((line, index) => {
+                if (index % 2 === 1) {
+                    return line;
+                } else {
+                    return ingredientList[index / 2];
+                }
+            }).join("\n\n");
+        } else {
+            return "";
+        }
+    }
+
     return (
         <IconButton onClick={handleSaveOBS}>
             <SaveIcon />
         </IconButton>
     )
+
 
 }
 export default SaveOBSButton;
