@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, List, ListItemButton, ListItemText, Collapse, Typography } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 
-function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChanged, ingredientValueChanged, currentRowN }) {
+function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChanged, ingredientValueChanged, currentRowN, updateBcv }) {
 
     const [currentChapter, setCurrentChapter] = useState('');
     const [openChapter, setOpenChapter] = useState(false)
@@ -23,6 +23,7 @@ function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChange
         const index = ingredient.findIndex(l => l[1] === id);
         if (index !== -1) {
             setCurrentRowN(index);
+            updateBcv(index);
         }
     };
 

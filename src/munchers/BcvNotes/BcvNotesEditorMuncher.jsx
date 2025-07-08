@@ -5,6 +5,7 @@ import {
     debugContext as DebugContext,
     bcvContext as BcvContext,
     getText,
+    postEmptyJson,
     doI18n,
 } from "pithekos-lib";
 
@@ -18,7 +19,7 @@ import SaveTsvButton from "../../components/SaveTsvButton";
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
     const { i18nRef } = useContext(I18nContext);
-    const { systemBcv } = useContext(BcvContext);
+    const { systemBcv, setSystemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
     const [ingredientValueChanged, setIngredientValueChanged] = useState(true);
@@ -45,12 +46,22 @@ function BcvNotesViewerMuncher({ metadata }) {
         [systemBcv]
     );
 
+    const updateBcv = rowN => {
+        const newCurrentRowCV = ingredient[rowN][0].split(":")
+        postEmptyJson(
+            `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
+            debugRef.current
+        );
+
+    }
+
     // changer de page -1 
     const previousRow = () => {
         const newRow = currentRowN - 1;
         if (newRow >= 1 && ingredient.length > 1 && ingredient[newRow]) {
             setCurrentRowN(currentRowN - 1);
-        }
+            updateBcv(currentRowN - 1);
+         }
     };
 
 
@@ -61,6 +72,7 @@ function BcvNotesViewerMuncher({ metadata }) {
             ingredient[newRow]
         ) {
             setCurrentRowN(currentRowN + 1);
+            updateBcv(currentRowN + 1);
         }
     };
 
@@ -97,7 +109,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                     ingredient={ingredient}
                     currentRowN={currentRowN}
                     setCurrentRowN={setCurrentRowN}
-
+                    updateBcv={updateBcv}
                     ingredientValueChanged={ingredientValueChanged}
                     setIngredientValueChanged={setIngredientValueChanged}
                 />
