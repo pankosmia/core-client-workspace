@@ -48,9 +48,25 @@ function BcvQuestionsViewerMuncher({metadata}) {
         const fourthVerseCheck = (l[0].split(",")[0].includes(`${systemBcv.verseNum}`)) || (l[0].split(",")[1].includes(`${systemBcv.verseNum}`)); */
         /* const fourthVerseCheck = l[5] ? (l[5].includes(`${systemBcv.verseNum}`)) : false; */
         console.log(l[0].includes(","));
-        if (l[0].split(":")[0] === `${systemBcv.chapterNum}` && l[0].split(":")[1].includes(`${systemBcv.verseNum}`)/*  && thirdVerseCheck */ /* && fourthVerseCheck */) {
+        if (l[0].split(":")[0] === `${systemBcv.chapterNum}`) {
             console.log("chaooooooooooooooooooooooooooooooooooo");
-            return l[0].split(":")[1].includes(`${systemBcv.verseNum}`);
+            if (l[0].split(":")[1].includes(",")) {
+                if (l[0].split(":")[1].split(",")[0] === `${systemBcv.verseNum}`){
+                    return l[0].split(":")[1].split(",")[0] === `${systemBcv.verseNum}`;
+                }
+                if (l[0].split(":")[1].split(",")[1] === `${systemBcv.verseNum}`){
+                    return l[0].split(":")[1].split(",")[1] === `${systemBcv.verseNum}`;
+                }
+            }
+            if (l[0].split(":")[1].includes("-")) {
+                if (l[0].split(":")[1].split("-")[0] === `${systemBcv.verseNum}`){
+                    return l[0].split(":")[1].split("-")[0] === `${systemBcv.verseNum}`;
+                }
+                if (l[0].split(":")[1].split("-")[1] === `${systemBcv.verseNum}`){
+                    return l[0].split(":")[1].split("-")[1] === `${systemBcv.verseNum}`;
+                }
+            }
+            
         }
     });
 
