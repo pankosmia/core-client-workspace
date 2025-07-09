@@ -13,6 +13,8 @@ import VideoLinksViewerMuncher from "../../munchers/VideoLinks/VideoLinksViewerM
 import BNotesViewerMuncher from "../../munchers/BNotes/BNotesViewerMuncher";
 import OBSViewerMuncher from '../../munchers/OBS/OBSViewerMuncher';
 import OBSEditorMuncher from '../../munchers/OBS/OBSEditorMuncher';
+import OBSNotesViewerMuncher from '../../munchers/OBSNotes/OBSNotesViewerMuncher';
+import OBSQuestionsViewerMuncher from '../../munchers/OBSQuestions/OBSQuestionsViewerMuncher';
 
 function WorkspaceCard({metadata, style}) {
     const scriptDirectionString =  metadata.script_direction === 'rtl' ? 'rtl' : 'ltr';
@@ -107,6 +109,21 @@ function WorkspaceCard({metadata, style}) {
           />
         </div>
     } 
+    if (metadata.flavor.toLowerCase() === "x-obsquestions") {
+        return <div style={style} dir={scriptDirectionString}>
+            <OBSQuestionsViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
+    if (metadata.flavor.toLowerCase() === "x-obsnotes") {
+        return <div style={style} dir={scriptDirectionString}>
+            <OBSNotesViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
+
     // DO NOT REMOVE! Fallback so that an element is always returned
     return <div style={style} dir={scriptDirectionString}>
       <TastelessMuncher

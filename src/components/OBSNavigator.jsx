@@ -37,10 +37,10 @@ function OBSNavigator() {
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <ButtonGroup>
-                <IconButton disabled={obs[0] <= 1} onClick={() => setObs([obs[0] - 1 > 0 ? obs[0] - 1 : obs[0], 1])}>
+                <IconButton disabled={obs[0] <= 1} onClick={() => setObs([obs[0] - 1 > 0 ? obs[0] - 1 : obs[0], 0])}>
                     <FastRewindIcon fontSize="large" />
                 </IconButton>
-                <IconButton disabled={obs[1] <= 1} onClick={() => setObs([obs[0], obs[1] - 1 > 0 ? obs[1] - 1 : obs[1]])}>
+                <IconButton disabled={obs[1] <= 0} onClick={() => setObs([obs[0], obs[1] - 1 >= 0 ? obs[1] - 1 : obs[1]])}>
                     <ArrowLeft fontSize="large" />
                 </IconButton>
             </ButtonGroup>
@@ -65,7 +65,7 @@ function OBSNavigator() {
                 />
                 :
                 <NumberInput
-                    min={1}
+                    min={0}
                     max={50}
                     value={obs[1]}
                     onChange={(event, val) => {
@@ -79,7 +79,7 @@ function OBSNavigator() {
                 <IconButton disabled={obs[1] >= 50} onClick={() => setObs([obs[0], obs[1] + 1 <= 50 ? obs[1] + 1 : obs[1]])}>
                     <ArrowRight fontSize="large" />
                 </IconButton>
-                <IconButton disabled={obs[0] >= 50} onClick={() => setObs([obs[0] + 1 <= 50 ? obs[0] + 1 : obs[0], 1])}>
+                <IconButton disabled={obs[0] >= 50} onClick={() => setObs([obs[0] + 1 <= 50 ? obs[0] + 1 : obs[0], 0])}>
                     <FastForwardIcon fontSize="large" />
                 </IconButton>
             </ButtonGroup>

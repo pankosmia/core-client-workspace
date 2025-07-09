@@ -25,25 +25,25 @@ function OBSEditorMuncher({metadata}) {
 
 
     const getData = async () => {
-        if(obs[0] < 1) obs[0] = 1;
+        if(obs[0] < 0) obs[0] = 0;
         if(obs[0] > 50) obs[0] = 50;
     };
 
     const initIngredientList = async () => {
         // if (ingredientList.length !== 0) return;
-        if(obs[0] < 1) obs[0] = 1;
+        if(obs[0] < 0) obs[0] = 0;
         if(obs[0] > 50) obs[0] = 50;
         let fileName = obs[0] <= 9 ? `0${obs[0]}` : obs[0];
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`;
         let response = await getText(ingredientLink, debugRef.current);
         if (response.ok) {
-            setIngredientList(response.text.split("\n\n").filter((_, index) => index % 2 === 0)); // Lignes impaires
+            setIngredientList(response.text.split("\n\n").filter((_, index) => index % 2 === 0)); // Lignes paires
         }
     }
 
     const handleChange = (event) => {
         let newIngredientList = [...ingredientList];
-        newIngredientList[obs[1]-1] = event.target.value;
+        newIngredientList[obs[1]] = event.target.value;
         setIngredientList(newIngredientList);
         console.log(event.target.value);
     }
@@ -67,7 +67,7 @@ function OBSEditorMuncher({metadata}) {
             <OBSNavigator />
             <Box>
                 <SaveOBSButton obs={obs} ingredientList={ingredientList} metadata={metadata} debugRef={debugRef}/>
-                <TextareaAutosize  value={ingredientList[obs[1]-1]} id="standard-basic" variant="standard" metadata={metadata} onChange={handleChange}/>
+                <TextareaAutosize  value={ingredientList[obs[1]]} id="standard-basic" variant="standard" metadata={metadata} onChange={handleChange}/>
             </Box>
         </Box>
     );

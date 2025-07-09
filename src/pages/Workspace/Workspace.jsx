@@ -58,7 +58,7 @@ const Workspace = () => {
     /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
     const adjSelectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
 
-    const [obs, setObs] = useState([1, 1]);
+    const [obs, setObs] = useState([1, 0]);
 
     return <>
         <Header
