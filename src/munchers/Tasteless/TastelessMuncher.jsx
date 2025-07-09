@@ -1,5 +1,5 @@
 import {useEffect, useState, useContext} from "react";
-import {Box, Button, Grid} from "@mui/material";
+import {Box, Button, Grid2} from "@mui/material";
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import {i18nContext as I18nContext, debugContext as DebugContext, getJson, doI18n} from "pithekos-lib";
@@ -26,19 +26,34 @@ function TastelessMuncher({metadata}) {
     );
 
     return (
-        <Box>
-            <Grid container spacing={2}>
-                <Grid size={12}>
+        <Box sx={{ flexGrow: 1 }}>
+            <Grid2 container
+                direction="row"
+                sx={{
+                    display:"flex",
+                    justifyContent: "center",
+                    alignItems: "center"
+                }} 
+                spacing={2}
+            >
+                <Grid2 item 
+                    size={12} 
+                    sx={{
+                        display:"flex",
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}
+                >
                     <h5>{metadata.name}</h5>
                     <p><b>{doI18n("munchers:tasteless:title", i18nRef.current)}</b></p>
                     {metadata.description.length > 0 &&
                         <p>Description: {metadata.description}</p>}
                     <p>Flavor: {doI18n(`flavors:names:${metadata.flavor_type}/${metadata.flavor}`, i18nRef.current)}</p>
                     <p>Source: {metadata.local_path}</p>
-                </Grid>
+                </Grid2>
                 {sbMetadata &&
                     <>
-                        <Grid size={12}>
+                        <Grid2 item size={12}>
                             <Button
                                 variant="outlined"
                                 size="small"
@@ -47,15 +62,15 @@ function TastelessMuncher({metadata}) {
                             >
                                 {doI18n("munchers:tasteless:show_metadata", i18nRef.current)}
                             </Button>
-                        </Grid>
+                        </Grid2>
                         {showMetadata &&
-                            <Grid size={12}>
+                            <Grid2 item size={12}>
                                 {JSON.stringify(sbMetadata, null, 2)}
-                            </Grid>
+                            </Grid2>
                         }
                     </>
                 }
-            </Grid>
+            </Grid2>
         </Box>
     );
 }
