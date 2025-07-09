@@ -41,13 +41,12 @@ function BcvQuestionsViewerMuncher({metadata}) {
     const chapterRegex = new RegExp("/\b([01]?[0-9][0-9]?|2[0-4][0-9]|25[0-5])");
 
     const filteredIngredient = ingredient.filter(l => {
-        const firstVerseCheck = l[0] === `${systemBcv.chapterNum}:`;
+        /* const firstVerseCheck = l[0] === `${systemBcv.chapterNum}:`;
         const secondVerseCheck = l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`;
-        const splittedVerse = l[0].split(":");
+        const splittedVerse = l[0].split(":"); */
         /* const thirdVerseCheck = l[0] ? (l[0].includes(",") ? true : false) : false;
         const fourthVerseCheck = (l[0].split(",")[0].includes(`${systemBcv.verseNum}`)) || (l[0].split(",")[1].includes(`${systemBcv.verseNum}`)); */
         /* const fourthVerseCheck = l[5] ? (l[5].includes(`${systemBcv.verseNum}`)) : false; */
-        console.log(l[0].includes(","));
         if (l[0].split(":")[0] === `${systemBcv.chapterNum}`) {
             console.log("chaooooooooooooooooooooooooooooooooooo");
             if (l[0].split(":")[1].includes(",")) {
@@ -58,15 +57,34 @@ function BcvQuestionsViewerMuncher({metadata}) {
                     return l[0].split(":")[1].split(",")[1] === `${systemBcv.verseNum}`;
                 }
             }
-            if (l[0].split(":")[1].includes("-")) {
-                if (l[0].split(":")[1].split("-")[0] === `${systemBcv.verseNum}`){
+            /* if (l[0].split(":")[1].includes("-"))  */
+                const startValue = l[0].split(":")[1].includes("-") ? Number(l[0].split(":")[1].split("-")[0]) : null;
+                const endValue = l[0].split(":")[1].includes("-") ? Number(l[0].split(":")[1].split("-")[1]) : null;
+                const rangeArray = Array.from({ length: endValue - startValue + 1 }, (_, i) => startValue + i);
+                console.log(rangeArray);
+
+                if (rangeArray.includes(systemBcv.verseNum)){
+                    return l[0].split(":")[1].split("-")[0] === `${rangeArray[0]}`;
+                }
+
+                /* const search = rangeArray.find((l) => l === systemBcv.verseNum); */
+                
+                console.log(rangeArray);
+
+                /* rangeArray.forEach((r, n) => {
+                    return l[0].split(":")[1].split("-").includes(`${r}`);
+                }) */
+                
+                /* /* for (let i = 0; i < rangeArray.length; i++){
+                    return l[0] === `${systemBcv.chapterNum}:${rangeArray[i]}`
+                } */
+                /* if (l[0].split(":")[1].split("-")[0] === `${systemBcv.verseNum}`){
                     return l[0].split(":")[1].split("-")[0] === `${systemBcv.verseNum}`;
                 }
                 if (l[0].split(":")[1].split("-")[1] === `${systemBcv.verseNum}`){
                     return l[0].split(":")[1].split("-")[1] === `${systemBcv.verseNum}`;
-                }
-            }
-            
+                } */
+            /* }  */
         }
     });
 
@@ -128,7 +146,7 @@ function BcvQuestionsViewerMuncher({metadata}) {
                                     </Accordion>
                             })
                         :
-                        "No questions found for this verse"
+                        <Typography sx={{paddingLeft:"5%"}}>No questions found for this verse</Typography>
                     }
                 </Grid2>
             </Grid2>
