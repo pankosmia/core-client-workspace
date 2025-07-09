@@ -15,6 +15,7 @@ import OBSViewerMuncher from '../../munchers/OBS/OBSViewerMuncher';
 import OBSEditorMuncher from '../../munchers/OBS/OBSEditorMuncher';
 import OBSNotesViewerMuncher from '../../munchers/OBSNotes/OBSNotesViewerMuncher';
 import OBSQuestionsViewerMuncher from '../../munchers/OBSQuestions/OBSQuestionsViewerMuncher';
+import OBSArticlesViewerMuncher from '../../munchers/OBSArticles/OBSArticlesViewerMuncher';
 
 function WorkspaceCard({metadata, style}) {
     const scriptDirectionString =  metadata.script_direction === 'rtl' ? 'rtl' : 'ltr';
@@ -119,6 +120,13 @@ function WorkspaceCard({metadata, style}) {
     if (metadata.flavor.toLowerCase() === "x-obsnotes") {
         return <div style={style} dir={scriptDirectionString}>
             <OBSNotesViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
+    if (metadata.flavor.toLowerCase() === "x-obsarticles") {
+        return <div style={style} dir={scriptDirectionString}>
+            <OBSArticlesViewerMuncher
                 metadata={metadata}
             />
         </div>

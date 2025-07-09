@@ -63,13 +63,13 @@ function OBSEditorMuncher({metadata}) {
     );
 
     return (
-        <Box>
+        <Stack sx={{ p:2}}>
             <OBSNavigator />
-            <Box>
-                <SaveOBSButton obs={obs} ingredientList={ingredientList} metadata={metadata} debugRef={debugRef}/>
+            <Stack>
                 <TextareaAutosize  value={ingredientList[obs[1]]} id="standard-basic" variant="standard" metadata={metadata} onChange={handleChange}/>
-            </Box>
-        </Box>
+                <SaveOBSButton obs={obs} ingredientList={ingredientList} metadata={metadata} debugRef={debugRef}/>
+            </Stack>
+        </Stack>
     );
 }
 
