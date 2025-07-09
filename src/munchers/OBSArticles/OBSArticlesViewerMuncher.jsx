@@ -89,7 +89,7 @@ function OBSArticlesViewerMuncher({metadata}) {
                             aria-controls="panel1-content"
                             id={`tword-${n}`}
                             >
-                            <Typography component="span" sx={{fontWeight: "bold"}}>{v.split("##")[0].slice(2)}</Typography>
+                            <Typography component="span">{v.split("##")[0].slice(2)}</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
                                 {ingredient && <Markdown className='markdown'>{v}</Markdown>}
