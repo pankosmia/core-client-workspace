@@ -1,5 +1,5 @@
 import {useEffect, useState, useContext} from "react";
-import {Box, Grid2, Typography, Accordion, AccordionSummary, AccordionDetails, Card, CardContent} from "@mui/material";
+import {Box, Grid2, Typography, Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemText, Divider} from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Markdown from 'react-markdown';
 
@@ -90,11 +90,12 @@ function BcvQuestionsViewerMuncher({metadata}) {
                         verseQuestions
                             .map((v, n) => {
                                 return (verseAnswers[n].trim().length === 0) ? 
-                                    <Card variant="outlined">
-                                        <CardContent>
-                                            <Typography component="span" sx={{fontWeight: "bold"}}>{v}</Typography>
-                                        </CardContent>
-                                    </Card> :
+                                    <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+                                        <ListItem alignItems="flex-start">
+                                            <ListItemText primary={<Typography component="span" sx={{fontWeight: "bold"}}>{v}</Typography>}/>
+                                        </ListItem>
+                                        <Divider variant="middle" component="li" />
+                                    </List> :
                                     <Accordion>
                                         <AccordionSummary
                                         expandIcon={<ExpandMoreIcon />}
