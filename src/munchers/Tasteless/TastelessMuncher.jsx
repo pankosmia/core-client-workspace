@@ -36,23 +36,18 @@ function TastelessMuncher({metadata}) {
                 }} 
                 spacing={2}
             >
-                <Grid2 item 
-                    size={12} 
-                    sx={{
-                        display:"flex",
-                        justifyContent: "center",
-                        alignItems: "center"
-                    }}
-                >
-                    <h5>{metadata.name}</h5>
-                    <p><b>{doI18n("munchers:tasteless:title", i18nRef.current)}</b></p>
-                    {metadata.description.length > 0 &&
-                        <p>Description: {metadata.description}</p>}
-                    <p>Flavor: {doI18n(`flavors:names:${metadata.flavor_type}/${metadata.flavor}`, i18nRef.current)}</p>
-                    <p>Source: {metadata.local_path}</p>
+                <Grid2 item size={12}>
+                    <Box sx={{p:2}}>
+                        <h5>{metadata.name}</h5>
+                        <p><b>{doI18n("munchers:tasteless:title", i18nRef.current)}</b></p>
+                        {metadata.description.length > 0 &&
+                            <p>Description: {metadata.description}</p>}
+                        <p>Flavor: {doI18n(`flavors:names:${metadata.flavor_type}/${metadata.flavor}`, i18nRef.current)}</p>
+                        <p>Source: {metadata.local_path}</p>
+                    </Box>
                 </Grid2>
                 {sbMetadata &&
-                    <>
+                    <Box sx={{p:2}}>
                         <Grid2 item size={12}>
                             <Button
                                 variant="outlined"
@@ -68,7 +63,7 @@ function TastelessMuncher({metadata}) {
                                 {JSON.stringify(sbMetadata, null, 2)}
                             </Grid2>
                         }
-                    </>
+                    </Box>
                 }
             </Grid2>
         </Box>
