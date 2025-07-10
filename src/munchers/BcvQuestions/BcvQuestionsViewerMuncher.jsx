@@ -185,7 +185,7 @@ function BcvQuestionsViewerMuncher({metadata}) {
                                     </Accordion>
                             })
                         :
-                        <Typography sx={{paddingLeft:"5%"}}>No questions found for this verse</Typography>
+                        <Typography sx={{pl:2}}>No questions found for this verse</Typography>
                     }
                 </Grid2>
             </Grid2>
