@@ -40,15 +40,51 @@ function BcvQuestionsViewerMuncher({metadata}) {
     
     const chapterRegex = new RegExp("/\b([01]?[0-9][0-9]?|2[0-4][0-9]|25[0-5])");
 
+    
+
     const filteredIngredient = ingredient.filter(l => {
-        /* const firstVerseCheck = l[0] === `${systemBcv.chapterNum}:`;
-        const secondVerseCheck = l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`;
-        const splittedVerse = l[0].split(":"); */
-        /* const thirdVerseCheck = l[0] ? (l[0].includes(",") ? true : false) : false;
-        const fourthVerseCheck = (l[0].split(",")[0].includes(`${systemBcv.verseNum}`)) || (l[0].split(",")[1].includes(`${systemBcv.verseNum}`)); */
-        /* const fourthVerseCheck = l[5] ? (l[5].includes(`${systemBcv.verseNum}`)) : false; */
-        if (l[0].split(":")[0] === `${systemBcv.chapterNum}`) {
-            console.log("chaooooooooooooooooooooooooooooooooooo");
+
+        const expandedVerseNumbers = (evn) => {
+            const current = evn?.includes(",") ? env?.split(",") : evn;
+            const numbersArray = current?.map((num) => {
+                if (num.includes("-")){
+                    const startValue = Number(num.split("-")[0]);
+                    const endValue = Number(num.split("-")[1]);
+                    const rangeArray = Array.from({ length: endValue - startValue + 1 }, (_, i) => startValue + i);
+                    return rangeArray
+                } else {
+                    return [Number(num)];
+                }
+              })
+            return [...new Set([].concat(...numbersArray))]
+          }
+        
+        console.log(expandedVerseNumbers(l[0].split(":")[1]));
+
+          return l[0].split(":")[0] === `${systemBcv.chapterNum}` && expandedVerseNumbers(l[0].split(":")[1]).includes(systemBcv.verseNum)
+
+       /* const expandedVerseNumbers = (arr) => {
+            /* const map1 = arr.map((l) => {
+                if (l[0].split(":")[1].includes("-")){
+                    const startValue = Number(l[0].split(":")[1].split("-")[0]);
+                    const endValue = Number(l[0].split(":")[1].split("-")[1]);
+                    const rangeArray = Array.from({ length: endValue - startValue + 1 }, (_, i) => startValue + i);
+                    return rangeArray;
+                } else {
+                    return [l];
+                }
+            })
+        
+            
+        }; */
+        
+       
+
+       /*  if (l[0].split(":")[0] === `${systemBcv.chapterNum}`) { */
+
+
+
+/*             console.log("chaooooooooooooooooooooooooooooooooooo");
             if (l[0].split(":")[1].includes(",")) {
                 if (l[0].split(":")[1].split(",")[0] === `${systemBcv.verseNum}`){
                     return l[0].split(":")[1].split(",")[0] === `${systemBcv.verseNum}`;
@@ -56,20 +92,20 @@ function BcvQuestionsViewerMuncher({metadata}) {
                 if (l[0].split(":")[1].split(",")[1] === `${systemBcv.verseNum}`){
                     return l[0].split(":")[1].split(",")[1] === `${systemBcv.verseNum}`;
                 }
-            }
+            } */
             /* if (l[0].split(":")[1].includes("-"))  */
-                const startValue = l[0].split(":")[1].includes("-") ? Number(l[0].split(":")[1].split("-")[0]) : null;
+/*                 const startValue = l[0].split(":")[1].includes("-") ? Number(l[0].split(":")[1].split("-")[0]) : null;
                 const endValue = l[0].split(":")[1].includes("-") ? Number(l[0].split(":")[1].split("-")[1]) : null;
                 const rangeArray = Array.from({ length: endValue - startValue + 1 }, (_, i) => startValue + i);
                 console.log(rangeArray);
 
                 if (rangeArray.includes(systemBcv.verseNum)){
                     return l[0].split(":")[1].split("-")[0] === `${rangeArray[0]}`;
-                }
+                } */
 
                 /* const search = rangeArray.find((l) => l === systemBcv.verseNum); */
                 
-                console.log(rangeArray);
+                
 
                 /* rangeArray.forEach((r, n) => {
                     return l[0].split(":")[1].split("-").includes(`${r}`);
@@ -85,20 +121,20 @@ function BcvQuestionsViewerMuncher({metadata}) {
                     return l[0].split(":")[1].split("-")[1] === `${systemBcv.verseNum}`;
                 } */
             /* }  */
-        }
+        /* } */
     });
 
     const filteredIngredient2 = ingredient.filter(l => {
         return l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`;
     });
 
-    const newArray =[...new Set([...filteredIngredient2,...filteredIngredient])];
+    const newArray = [...new Set([...filteredIngredient2,...filteredIngredient])];
 
     const verseQuestions = newArray.map(l => l[5]);
     const verseAnswers = filteredIngredient2.map(l => l[6]);
     console.log(ingredient);
-    console.log(filteredIngredient);
-    console.log(filteredIngredient);
+    /* console.log(filteredIngredient);
+    console.log(filteredIngredient); */
 
     return (
         <Box sx={{ flexGrow: 1 }}>
