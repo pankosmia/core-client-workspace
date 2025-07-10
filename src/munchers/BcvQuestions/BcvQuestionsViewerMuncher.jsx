@@ -23,7 +23,9 @@ function BcvQuestionsViewerMuncher({metadata}) {
         if (response.ok) {
             setIngredient(
                 response.text
-                    .split("\n")
+                    .split(/[\r\n]+/)
+                    .slice(1)
+                    .filter((l) => l.trim().length > 0)
                     .map(l => l.split("\t").map(f => f.replace(/\\n/g, "\n\n")))
             );
         } else {
@@ -45,8 +47,9 @@ function BcvQuestionsViewerMuncher({metadata}) {
     const filteredIngredient = ingredient.filter(l => {
 
         const expandedVerseNumbers = (evn) => {
-            const current = evn?.includes(",") ? env?.split(",") : evn;
-            const numbersArray = current?.map((num) => {
+            console.log("evn", evn);
+            const current = evn.split(",");
+            const numbersArray = current.map((num) => {
                 if (num.includes("-")){
                     const startValue = Number(num.split("-")[0]);
                     const endValue = Number(num.split("-")[1]);
@@ -59,9 +62,9 @@ function BcvQuestionsViewerMuncher({metadata}) {
             return [...new Set([].concat(...numbersArray))]
           }
         
-        console.log(expandedVerseNumbers(l[0].split(":")[1]));
+        console.log("expanded",expandedVerseNumbers(l[0].split(":")[1]));
 
-          return l[0].split(":")[0] === `${systemBcv.chapterNum}` && expandedVerseNumbers(l[0].split(":")[1]).includes(systemBcv.verseNum)
+        return l[0].split(":")[0] === `${systemBcv.chapterNum}` && expandedVerseNumbers(l[0].split(":")[1]).includes(systemBcv.verseNum)
 
        /* const expandedVerseNumbers = (arr) => {
             /* const map1 = arr.map((l) => {
@@ -131,7 +134,7 @@ function BcvQuestionsViewerMuncher({metadata}) {
     const newArray = [...new Set([...filteredIngredient2,...filteredIngredient])];
 
     const verseQuestions = newArray.map(l => l[5]);
-    const verseAnswers = filteredIngredient2.map(l => l[6]);
+    const verseAnswers = newArray.map(l => l[6]);
     console.log(ingredient);
     /* console.log(filteredIngredient);
     console.log(filteredIngredient); */
@@ -162,7 +165,7 @@ function BcvQuestionsViewerMuncher({metadata}) {
                     {ingredient && verseQuestions.length > 0 ?
                         verseQuestions
                             .map((v, n) => {
-                                return (ingredient[1][5].includes("Study Questions")) ? 
+                                return (verseAnswers[n].trim().length === 0) ? 
                                     <Card variant="outlined">
                                         <CardContent>
                                             <Typography component="span" sx={{fontWeight: "bold"}}>{v}</Typography>
