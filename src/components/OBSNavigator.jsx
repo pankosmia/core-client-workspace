@@ -8,7 +8,7 @@ import { useContext } from "react";
 import OBSContext from "../contexts/obsContext";
 import { ButtonGroup } from '@mui/material';
 
-function OBSNavigator() {
+function OBSNavigator({max}) {
 
     const { obs, setObs } = useContext(OBSContext);
 
@@ -66,7 +66,7 @@ function OBSNavigator() {
                 :
                 <NumberInput
                     min={0}
-                    max={50}
+                    max={max}
                     value={obs[1]}
                     onChange={(event, val) => {
                         setObs([obs[0], val]);
@@ -76,7 +76,7 @@ function OBSNavigator() {
             </Box>
 
             <ButtonGroup>
-                <IconButton disabled={obs[1] >= 50} onClick={() => setObs([obs[0], obs[1] + 1 <= 50 ? obs[1] + 1 : obs[1]])}>
+                <IconButton disabled={obs[1] >= max} onClick={() => setObs([obs[0], obs[1] + 1 <= max ? obs[1] + 1 : obs[1]])}>
                     <ArrowRight fontSize="large" />
                 </IconButton>
                 <IconButton disabled={obs[0] >= 50} onClick={() => setObs([obs[0] + 1 <= 50 ? obs[0] + 1 : obs[0], 0])}>

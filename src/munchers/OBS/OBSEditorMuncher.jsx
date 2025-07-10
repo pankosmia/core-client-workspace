@@ -43,7 +43,7 @@ function OBSEditorMuncher({metadata}) {
 
     const handleChange = (event) => {
         let newIngredientList = [...ingredientList];
-        newIngredientList[obs[1]] = event.target.value;
+        newIngredientList[obs[1]] = event.target.value.replaceAll(/\s/g, " ");
         setIngredientList(newIngredientList);
         console.log(event.target.value);
     }
@@ -64,9 +64,9 @@ function OBSEditorMuncher({metadata}) {
 
     return (
         <Stack sx={{ p:2}}>
-            <OBSNavigator />
+            <OBSNavigator max={ingredientList.length - 1}/>
             <Stack>
-                <TextareaAutosize  value={ingredientList[obs[1]]} id="standard-basic" variant="standard" metadata={metadata} onChange={handleChange}/>
+                <TextareaAutosize value={ingredientList[obs[1]]} id="standard-basic" variant="standard" metadata={metadata} onChange={handleChange}/>
                 <SaveOBSButton obs={obs} ingredientList={ingredientList} metadata={metadata} debugRef={debugRef}/>
             </Stack>
         </Stack>

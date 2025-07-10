@@ -43,7 +43,7 @@ function SaveOBSButton({ obs, ingredientList, metadata, debugRef}) {
         if (response.ok) {
             return response.text.split("\n\n").map((line, index) => {
                 if (index % 2 === 1) {
-                    return line;
+                    return line.replaceAll(/\n/g, " ");
                 } else {
                     return ingredientList[index / 2];
                 }

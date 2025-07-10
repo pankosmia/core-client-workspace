@@ -61,13 +61,13 @@ function OBSViewerMuncher({metadata}) {
     );
 
     return (
-        <Box>
+        <Stack sx={{ p:2}}>
             <div>
                 <Markdown>
                     {ingredient}
                 </Markdown>
             </div>
-        </Box>
+        </Stack>
     );
 }
 

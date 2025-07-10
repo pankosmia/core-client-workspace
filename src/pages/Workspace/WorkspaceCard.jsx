@@ -16,6 +16,7 @@ import OBSEditorMuncher from '../../munchers/OBS/OBSEditorMuncher';
 import OBSNotesViewerMuncher from '../../munchers/OBSNotes/OBSNotesViewerMuncher';
 import OBSQuestionsViewerMuncher from '../../munchers/OBSQuestions/OBSQuestionsViewerMuncher';
 import OBSArticlesViewerMuncher from '../../munchers/OBSArticles/OBSArticlesViewerMuncher';
+import JuxtalinearViewerMuncher from "../../munchers/Juxtalinear/JuxtalinearViewer";
 
 function WorkspaceCard({metadata, style}) {
     const scriptDirectionString =  metadata.script_direction === 'rtl' ? 'rtl' : 'ltr';
@@ -57,6 +58,13 @@ function WorkspaceCard({metadata, style}) {
     if (metadata.flavor.toLowerCase() === "x-bnotes") {
         return <div style={style} dir={scriptDirectionString}>
             <BNotesViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
+    if (metadata.flavor.toLowerCase() === "x-juxtalinear") {
+        return <div style={style} dir={scriptDirectionString}>
+            <JuxtalinearViewerMuncher
                 metadata={metadata}
             />
         </div>
