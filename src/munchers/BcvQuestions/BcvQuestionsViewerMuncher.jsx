@@ -1,5 +1,5 @@
 import {useEffect, useState, useContext} from "react";
-import {Box, Grid2, Typography, Accordion, AccordionSummary, AccordionDetails, Card, CardContent} from "@mui/material";
+import {Box, Grid2, Typography, Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemText, Divider} from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Markdown from 'react-markdown';
 
@@ -23,7 +23,9 @@ function BcvQuestionsViewerMuncher({metadata}) {
         if (response.ok) {
             setIngredient(
                 response.text
-                    .split("\n")
+                    .split(/[\r\n]+/)
+                    .slice(1)
+                    .filter((l) => l.trim().length > 0)
                     .map(l => l.split("\t").map(f => f.replace(/\\n/g, "\n\n")))
             );
         } else {
@@ -38,10 +40,28 @@ function BcvQuestionsViewerMuncher({metadata}) {
         [systemBcv]
     );
 
-    const filteredIngredient = ingredient.filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`);
+    const filteredIngredient = ingredient.filter(l => {
+
+        const expandedVerseNumbers = (evn) => {
+            const current = evn.split(",");
+            const numbersArray = current.map((num) => {
+                if (num.includes("-")){
+                    const startValue = Number(num.split("-")[0]);
+                    const endValue = Number(num.split("-")[1]);
+                    const rangeArray = Array.from({ length: endValue - startValue + 1 }, (_, i) => startValue + i);
+                    return rangeArray
+                } else {
+                    return [Number(num)];
+                }
+              })
+            return [...new Set([].concat(...numbersArray))]
+          }
+
+        return l[0].split(":")[0] === `${systemBcv.chapterNum}` && expandedVerseNumbers(l[0].split(":")[1]).includes(systemBcv.verseNum)
+    });
+
     const verseQuestions = filteredIngredient.map(l => l[5]);
     const verseAnswers = filteredIngredient.map(l => l[6]);
-    console.log(ingredient);
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -69,12 +89,13 @@ function BcvQuestionsViewerMuncher({metadata}) {
                     {ingredient && verseQuestions.length > 0 ?
                         verseQuestions
                             .map((v, n) => {
-                                return (ingredient[1][5].includes("Study Questions")) ? 
-                                    <Card variant="outlined">
-                                        <CardContent>
-                                            <Typography component="span" sx={{fontWeight: "bold"}}>{v}</Typography>
-                                        </CardContent>
-                                    </Card> :
+                                return (verseAnswers[n].trim().length === 0) ? 
+                                    <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+                                        <ListItem alignItems="flex-start">
+                                            <ListItemText primary={<Typography component="span" sx={{fontWeight: "bold"}}>{v}</Typography>}/>
+                                        </ListItem>
+                                        <Divider variant="middle" component="li" />
+                                    </List> :
                                     <Accordion>
                                         <AccordionSummary
                                         expandIcon={<ExpandMoreIcon />}
@@ -89,7 +110,7 @@ function BcvQuestionsViewerMuncher({metadata}) {
                                     </Accordion>
                             })
                         :
-                        "No questions found for this verse"
+                        <Typography sx={{pl:2}}>No questions found for this verse</Typography>
                     }
                 </Grid2>
             </Grid2>
