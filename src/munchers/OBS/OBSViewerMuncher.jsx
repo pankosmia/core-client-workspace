@@ -2,7 +2,7 @@ import {useState, useContext, useEffect} from "react";
 import {Box, Stack} from "@mui/material";
 import OBSContext from "../../contexts/obsContext";
 import Markdown from 'react-markdown';
-import RequireResources from "../../components/RequireRessources";
+import RequireResources from "../../components/RequireResources";
 
 import {
     i18nContext as I18nContext,
