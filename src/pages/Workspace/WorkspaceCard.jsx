@@ -11,6 +11,12 @@ import TastelessMuncher from "../../munchers/Tasteless/TastelessMuncher";
 import './tiles_styles.css'
 import VideoLinksViewerMuncher from "../../munchers/VideoLinks/VideoLinksViewerMuncher";
 import BNotesViewerMuncher from "../../munchers/BNotes/BNotesViewerMuncher";
+import OBSViewerMuncher from '../../munchers/OBS/OBSViewerMuncher';
+import OBSEditorMuncher from '../../munchers/OBS/OBSEditorMuncher';
+import OBSNotesViewerMuncher from '../../munchers/OBSNotes/OBSNotesViewerMuncher';
+import OBSQuestionsViewerMuncher from '../../munchers/OBSQuestions/OBSQuestionsViewerMuncher';
+import OBSArticlesViewerMuncher from '../../munchers/OBSArticles/OBSArticlesViewerMuncher';
+import JuxtalinearViewerMuncher from "../../munchers/Juxtalinear/JuxtalinearViewer";
 
 function WorkspaceCard({metadata, style}) {
     const scriptDirectionString =  metadata.script_direction === 'rtl' ? 'rtl' : 'ltr';
@@ -56,6 +62,13 @@ function WorkspaceCard({metadata, style}) {
             />
         </div>
     }
+    if (metadata.flavor.toLowerCase() === "x-juxtalinear") {
+        return <div style={style} dir={scriptDirectionString}>
+            <JuxtalinearViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
     if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvquestions") {
         return <div style={style} dir={scriptDirectionString}>
            <BcvNotesEditorMuncher
@@ -90,7 +103,43 @@ function WorkspaceCard({metadata, style}) {
               metadata={metadata}
           />
         </div>
+    } 
+    if (metadata.primary && metadata.flavor === "textStories") {
+        return <div style={style} dir={scriptDirectionString}>
+          <OBSEditorMuncher
+              metadata={metadata}
+          />
+        </div>
+    } 
+    if (metadata.flavor === "textStories") {
+        return <div style={style} dir={scriptDirectionString}>
+          <OBSViewerMuncher
+              metadata={metadata}
+          />
+        </div>
+    } 
+    if (metadata.flavor.toLowerCase() === "x-obsquestions") {
+        return <div style={style} dir={scriptDirectionString}>
+            <OBSQuestionsViewerMuncher
+                metadata={metadata}
+            />
+        </div>
     }
+    if (metadata.flavor.toLowerCase() === "x-obsnotes") {
+        return <div style={style} dir={scriptDirectionString}>
+            <OBSNotesViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
+    if (metadata.flavor.toLowerCase() === "x-obsarticles") {
+        return <div style={style} dir={scriptDirectionString}>
+            <OBSArticlesViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
+
     // DO NOT REMOVE! Fallback so that an element is always returned
     return <div style={style} dir={scriptDirectionString}>
       <TastelessMuncher
