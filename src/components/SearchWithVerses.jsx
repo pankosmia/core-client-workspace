@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Box, List, ListItemButton, ListItemText, Collapse, Typography } from "@mui/material";
-import { ExpandLess, ExpandMore } from "@mui/icons-material"
+import { List, ListItemButton, ListItemText, Collapse, Typography } from "@mui/material";
+import ExpandLess from "@mui/icons-material/ExpandLess"
+import ExpandMore from "@mui/icons-material/ExpandMore"
 
 function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChanged, ingredientValueChanged, currentRowN, updateBcv }) {
 

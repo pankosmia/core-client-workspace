@@ -1,12 +1,11 @@
 import { useState, useContext } from "react";
 import { AppBar, Dialog, IconButton, Toolbar, Typography } from "@mui/material";
-import { Close as CloseIcon } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
 import TsvLineForm from "./TsvLineForm";
 import {
     i18nContext as I18nContext,
     doI18n,
 } from "pithekos-lib";
-//import ModalCLoseLineDialog from "./ModalCloseLineDialog";
 
 function AddLineDialog({ open,closeModal, ingredient, setIngredient, currentRowN, setIngredientValueChanged, setSaveIngredientTsv }) {
     const { i18nRef } = useContext(I18nContext);
