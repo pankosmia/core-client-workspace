@@ -87,9 +87,11 @@
       "fr": "Enregistrez votre nouvelle note"
     },
     "save_tsv": {
+      "en":"Save to file",
       "fr": "Sauvegarder dans le fichier "
     },
     "new_bcv_note": {
+      "en":"New note",
       "fr": "Nouvelle note"
     },
     "delete_note_bcv":{

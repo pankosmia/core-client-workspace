@@ -1,4 +1,4 @@
-import {useEffect, useState, useContext} from "react";
+import { useEffect, useState, useContext } from "react";
 import "./TextTranslationEditorMuncher.css";
 import {
     bcvContext as BcvContext,
@@ -9,17 +9,20 @@ import {
     doI18n
 } from "pithekos-lib";
 import md5sum from 'md5';
-import {enqueueSnackbar} from "notistack";
+import { enqueueSnackbar } from "notistack";
 
 import Editor from "./Editor";
-import {useAppReferenceHandler} from "./useAppReferenceHandler";
+import { useAppReferenceHandler } from "./useAppReferenceHandler";
+import DraftingEditor from "./DraftingEditor";
+import { Box, Button } from "@mui/material";
 
-function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
-    const {bcvRef} = useContext(BcvContext);
-    const {debugRef} = useContext(DebugContext);
-    const {i18nRef} = useContext(I18nContext);
+function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
+    const { bcvRef } = useContext(BcvContext);
+    const { debugRef } = useContext(DebugContext);
+    const { i18nRef } = useContext(I18nContext);
     const [usj, setUsj] = useState(null);
     const [contentChanged, _setContentChanged] = useState(false);
+    const [viewEditor, setViewEditor] = useState("Editor")
     const [bookCode, setBookCode] = useState(
         (bcvRef.current && bcvRef.current.bookCode) ||
         "TIT"
@@ -28,7 +31,11 @@ function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
         console.log("setContentChanged", nv);
         _setContentChanged(nv);
     }
-
+    const handleSwitchPage = () => {
+        setViewEditor((prev) =>
+            prev === 'Editor' ? 'TestInterface' : 'Editor'
+        );
+    };
     // Fetch new USFM as USJ, put in incoming
     useEffect(
         () => {
@@ -43,7 +50,7 @@ function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
                             } else {
                                 enqueueSnackbar(
                                     `${doI18n("pages:core-local-workspace:load_error", i18nRef.current)}: ${res.status}`,
-                                    {variant: "error"}
+                                    { variant: "error" }
                                 );
 
                             }
@@ -61,19 +68,19 @@ function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
             jsonString,
             debugBool
         );
-        console.log("response",response)
+        console.log("response", response)
 
         if (response.ok) {
             enqueueSnackbar(
                 `${doI18n("pages:core-local-workspace:saved", i18nRef.current)}`,
-                {variant: "success"}
+                { variant: "success" }
             );
             setContentChanged(false);
             return response.json;
         } else {
             enqueueSnackbar(
                 `${doI18n("pages:core-local-workspace:save_error", i18nRef.current)}: ${response.status}`,
-                {variant: "error"}
+                { variant: "error" }
             );
             throw new Error(`Failed to save: ${response.status}, ${response.error}`);
         }
@@ -85,7 +92,7 @@ function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
         }
     }
 
-    const onHistoryChange = ({editorState}) => {
+    const onHistoryChange = ({ editorState }) => {
 
         /**
          * editorState is a LexicalEditorState object.
@@ -106,18 +113,47 @@ function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
     }, []);
 
 
-    const {referenceHandler} = useAppReferenceHandler();
+    const { referenceHandler } = useAppReferenceHandler();
 
-    return usj ? <Editor
-            key={md5sum(JSON.stringify(usj))}
-            usj={usj}
-            editable={true}
-            bookCode={bcvRef.current && bcvRef.current.bookCode}
-            onSave={onSave}
-            onHistoryChange={onHistoryChange}
-            scriptureReferenceHandler={referenceHandler}
-            referenceHandlerSource="text-translation-editor"
-        />
-        : <div>Loading data...</div>;
+    // return usj ? <Editor
+    //         key={md5sum(JSON.stringify(usj))}
+    //         usj={usj}
+    //         editable={true}
+    //         bookCode={bcvRef.current && bcvRef.current.bookCode}
+    //         onSave={onSave}
+    //         onHistoryChange={onHistoryChange}
+    //         scriptureReferenceHandler={referenceHandler}
+    //         referenceHandlerSource="text-translation-editor"
+    //     />
+    //     : <div>Loading data...</div>;
+
+    return (
+        <Box sx={{ p: 2 }}>
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSwitchPage}
+            >
+                Aller à {viewEditor === 'Editor' ? 'TestInterface' : 'Editor'}
+            </Button>
+
+            <Box mt={4}>
+                {viewEditor === 'Editor' ? (
+                    usj ? <Editor
+                        key={md5sum(JSON.stringify(usj))}
+                        usj={usj}
+                        editable={true}
+                        bookCode={bcvRef.current && bcvRef.current.bookCode}
+                        onSave={onSave}
+                        onHistoryChange={onHistoryChange}
+                        scriptureReferenceHandler={referenceHandler}
+                        referenceHandlerSource="text-translation-editor" mode="Editor" />
+                        : <p>Loading data</p>
+                ) : (
+                    <DraftingEditor mode="TestInterface" metadata={metadata} />
+                )}
+            </Box>
+        </Box>
+    );
 }
 export default TextTranslationEditorMuncher;
