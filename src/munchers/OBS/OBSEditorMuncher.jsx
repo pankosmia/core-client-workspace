@@ -1,9 +1,11 @@
 import { useState, useContext, useEffect } from "react";
-import { Box, Button, Grid2, Stack, TextareaAutosize } from "@mui/material";
+import { Box, Button, Grid2, Stack, TextareaAutosize, Tabs, Tab } from "@mui/material";
 import OBSContext from "../../contexts/obsContext";
-import Markdown from 'react-markdown';
 import OBSNavigator from "../../components/OBSNavigator";
 import SaveOBSButton from "../../components/SaveOBSButton";
+import AudioRecorder from "../../components/AudioRecorder";
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 
 import {
     i18nContext as I18nContext,
@@ -22,6 +24,9 @@ function OBSEditorMuncher({ metadata }) {
     const { i18nRef } = useContext(I18nContext);
     const [ingredient, setIngredient] = useState("");
     const [ingredientList, setIngredientList] = useState([]);
+    const [audioFile, setAudioFile] = useState("");
+    const [tab, setTab] = useState("text");
+    const [isThereAnAudioFile, setIsThereAnAudioFile] = useState(false);
 
 
     const getData = async () => {
@@ -48,6 +53,20 @@ function OBSEditorMuncher({ metadata }) {
         console.log(event.target.value);
     }
 
+    function AudioViewer({chapter, paragraph}) {
+        let chapterString = chapter < 10 ? `0${chapter}` : chapter;
+        let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
+
+        // A faire: Faire en sorte d'afficher un message si le fichier n'existe pas
+
+        if (!paragraph) {
+            return <audio controls src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=content/${chapterString}.mp3`}></audio>
+        }
+        return <Stack>
+                <audio controls src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=content/${chapterString}_${paragraphString}.mp3`}></audio>
+        </Stack>
+    }
+
 
     useEffect(
         () => {
@@ -65,7 +84,12 @@ function OBSEditorMuncher({ metadata }) {
     return (
         <Stack sx={{ p: 2 }}>
             <OBSNavigator max={ingredientList.length - 1} />
+            <Tabs value={tab} onChange={(event, newValue) => setTab(newValue)}>
+                <Tab label="Text" value="text" iconPosition="end" icon={ ingredientList[obs[1]] != "" ? <CheckBoxOutlinedIcon /> : <CheckBoxOutlineBlankIcon />}/>
+                <Tab label="Audio" value="audio" iconPosition="end" icon={isThereAnAudioFile ? <CheckBoxOutlinedIcon /> : <CheckBoxOutlineBlankIcon />}/>
+            </Tabs>
             <Stack>
+                {tab === "text" && (
                 <TextareaAutosize
                     value={ingredientList[obs[1]]}
                     id="standard-basic"
@@ -83,7 +107,14 @@ function OBSEditorMuncher({ metadata }) {
                         boxShadow: "0 2px 2px #F3F6F9",
                     }}
                 />
-                <SaveOBSButton obs={obs} ingredientList={ingredientList} metadata={metadata} debugRef={debugRef} />
+                )}
+                {tab === "audio" && (
+                    <>
+                        <AudioViewer chapter={obs[0]} paragraph={obs[1]} />
+                        <AudioRecorder setAudioFile={setAudioFile} metadata={metadata} />
+                    </>
+                )}
+                <SaveOBSButton obs={obs} ingredientList={ingredientList} metadata={metadata} debugRef={debugRef} audioFile={audioFile}/>
             </Stack>
         </Stack>
     );
