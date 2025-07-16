@@ -54,13 +54,12 @@ function BcvNotesViewerMuncher({ metadata }) {
         );
 
     }
-
     // changer de page -1 
     const previousRow = () => {
         const newRow = currentRowN - 1;
         if (newRow >= 1 && ingredient.length > 1 && ingredient[newRow]) {
-            setCurrentRowN(currentRowN - 1);
             updateBcv(currentRowN - 1);
+            setCurrentRowN(currentRowN - 1);
          }
     };
 
@@ -68,11 +67,9 @@ function BcvNotesViewerMuncher({ metadata }) {
     // changer de page +1 
     const nextRow = () => {
         const newRow = currentRowN + 1;
-        if (
-            ingredient[newRow]
-        ) {
+        if (ingredient[newRow]) {
+            //updateBcv(currentRowN + 1);
             setCurrentRowN(currentRowN + 1);
-            updateBcv(currentRowN + 1);
         }
     };
 
@@ -118,7 +115,7 @@ function BcvNotesViewerMuncher({ metadata }) {
 
                     ingredient={ingredient}
                     setIngredient={setIngredient}
-
+                    
                     setIngredientValueChanged={setIngredientValueChanged}
                     setSaveIngredientTsv={setSaveIngredientTsv}
                 />

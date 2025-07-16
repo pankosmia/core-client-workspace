@@ -10,12 +10,6 @@ import {
 function AddLineDialog({ open,closeModal, ingredient, setIngredient, currentRowN, setIngredientValueChanged, setSaveIngredientTsv }) {
     const { i18nRef } = useContext(I18nContext);
     const [newCurrentRow, setNewCurrentRow] = useState((ingredient[0] || []).map(c => ""));
-    //const [openedModalCloseLineDialog, setOpenedModalCloseLineDialog] = useState(false)
-
-     // Permet d'ouvrir la modal de verfication d'enregistrement de la note
-    // const handleOpenModalCloseLineDialog = () => {
-    //     setOpenedModalCloseLineDialog("closeModalLineDialog");
-    // };
 
     // Permet de fermer la modal principale 
     const handleCloseModalMain = () => {
@@ -62,7 +56,7 @@ function AddLineDialog({ open,closeModal, ingredient, setIngredient, currentRowN
                 setIngredientValueChanged={setIngredientValueChanged}
 
             />
-        {/* <ModalCLoseLineDialog mode="closeModalLineDialog" open={openedModalCloseLineDialog === "closeModalLineDialog"}  closeModal={() => setOpenedModalCloseLineDialog(null)} handleCloseModalMain={handleCloseModalMain}/> */}
+
         </Dialog>
 
     )

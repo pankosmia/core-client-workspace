@@ -7,7 +7,8 @@ import {
     postJson
 } from "pithekos-lib";
 import { enqueueSnackbar } from "notistack";
-import { Button } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
+import SaveIcon from '@mui/icons-material/Save';
 
 function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredientTsv }) {
 
@@ -15,7 +16,7 @@ function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredi
     const { i18nRef } = useContext(I18nContext);
     const [contentChanged, _setContentChanged] = useState(false);
 
-
+    console.log("saveInregeitn", saveIngredientTsv)
     // Met à jour le fichier TSV
     const uploadTsvIngredient = async (tsvData, debugBool) => {
         const tsvString = tsvData
@@ -50,7 +51,6 @@ function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredi
 
     // Montre le changement d'état du contenu 
     const setContentChanged = nv => {
-        console.log("setContentChanged", nv);
         _setContentChanged(nv);
     }
     // Permet de sauvegarder dans le fichier TSV 
@@ -58,16 +58,21 @@ function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredi
         uploadTsvIngredient([...ingredient])
     }
     return (
-        <Button
+        <IconButton
             disabled={!saveIngredientTsv}
-            variant="contained"
             sx={{
                 mt: 2,
                 "&.Mui-disabled": {
-                    background: "#eaeaea",
-                    color: "#424242"
-                }
-            }} onClick={() => { handleSaveTsv(); setSaveIngredientTsv(false) }} > {doI18n("pages:core-local-workspace:save_tsv", i18nRef.current)} </Button>
+                    backgroundColor: '#eaeaea',
+                    color: '#424242',
+                },
+            }}
+            variant="contained"
+            onClick={() => { handleSaveTsv(); setSaveIngredientTsv(false) }} >
+            <SaveIcon
+                size="large" color={!saveIngredientTsv ? "#eaeaea":"primary"}
+            />
+        </IconButton>
     )
 }
 export default SaveTsvButton;

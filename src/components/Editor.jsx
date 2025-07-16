@@ -17,13 +17,12 @@ function Editor({ingredient, setIngredient, currentRowN, setIngredientValueChang
     const handleSaveRow = (rowN, newRow) => {
         const newIngredient = [...ingredient]
         newIngredient[rowN] = [...newRow]
+        setIngredient(newIngredient);
         setIngredientValueChanged(true)
         setSaveIngredientTsv(true)
-        setIngredient(newIngredient);
-        console.log("rown edit",rowN)
     };
 
-    
+
     return <Box sx={{ display: 'flex', flexDirection:"column", gap: 2, padding: 2 }}>
             <TsvLineForm
                 mode="edit"
@@ -31,7 +30,7 @@ function Editor({ingredient, setIngredient, currentRowN, setIngredientValueChang
                 currentRowN={currentRowN}
                 ingredient={ingredient}
                 setIngredient={setIngredient}
-                saveFunction={handleSaveRow}
+                handleSaveRow={handleSaveRow}
                 setIngredientValueChanged={setIngredientValueChanged}
                 setSaveIngredientTsv={setSaveIngredientTsv}
             />

@@ -8,9 +8,8 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuidv4 } from 'uuid';
 import DeleteNote from "./DeleteNote";
-//import ModalCLoseLineDialog from "./ModalCloseLineDialog";
 
-function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, setSaveIngredientTsv, setIngredientValueChanged }) {
+function TsvLineForm({ mode, currentRow, ingredient,handleSaveRow, saveFunction, currentRowN, setIngredient, setSaveIngredientTsv, setIngredientValueChanged }) {
     const { i18nRef } = useContext(I18nContext);
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const [cellValueChanged, setCellValueChanged] = useState(false);
@@ -33,7 +32,6 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
     const handleOpenModalDelete = () => {
         setOpenedModalDelete("delete");
     };
-
     // Permet la modification d'une note
     const changeCell = (event, n) => {
         const newCellValue = event.target.value;
@@ -46,15 +44,16 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
         }
         setIngredientValueChanged(false)
         setRowData(newRowData);
+        handleSaveRow(currentRowN, newRowData)
 
     };
 
     // Permet d'annuler les modications faites sur la note 
-    const handleCancel = () => {
-        const newRowData = (mode === "edit" ? [...currentRow] : Array(7).fill("", 0, 7))
-        setRowData(newRowData);
+    // const handleCancel = () => {
+    //     const newRowData = (mode === "edit" ? [...currentRow] : Array(7).fill("", 0, 7))
+    //     setRowData(newRowData);
 
-    };
+    // };
 
     const generateId = () => {
         let existingId = ingredient.map(l => l[1]);
@@ -86,6 +85,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                         <TextField
                             label={column}
                             value={rowData[n]}
+                            placeholder={n === 0 ? "1:1" : ""}
                             required={n === 0}
                             disabled={n === 1}
                             variant="outlined"
@@ -99,7 +99,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
 
             ))}
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-                <Button
+                {mode === "add" && (<Button
                     onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
                     variant="contained"
                     disabled={!cellValueChanged}
@@ -111,10 +111,10 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                         }
                     }}
                 >
-                    {mode === "edit" ? `${doI18n("pages:core-local-workspace:editing", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
-                </Button>
+                    {`${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
+                </Button>)}
 
-                {mode === "edit" && (
+                {/* {mode === "edit" && (
                     <Button
                         onClick={() => {
                             handleCancel();
@@ -133,7 +133,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                     >
                         {doI18n("pages:core-local-workspace:cancel", i18nRef.current)}
                     </Button>
-                )}
+                )} */}
 
                 {mode === "edit" && (
                     <IconButton
@@ -157,7 +157,6 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                 setSaveIngredientTsv={setSaveIngredientTsv}
                 currentRowN={currentRowN}
             />
-            {/* <ModalCLoseLineDialog setCellValueChanged={setCellValueChanged} cellValueChanged={cellValueChanged} /> */}
         </Box>
 
     )
