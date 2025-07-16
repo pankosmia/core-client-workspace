@@ -7,7 +7,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import { postText, doI18n, getText } from "pithekos-lib";
 
 
-function SaveOBSButton({ obs, ingredient, metadata, debugRef}) {
+function SaveOBSButton({ obs, ingredient, metadata, debugRef, updateChecksums, isDocumentModified}) {
 
     const handleSaveOBS = async () => {
         console.log("ingredient", ingredient);
@@ -34,6 +34,7 @@ function SaveOBSButton({ obs, ingredient, metadata, debugRef}) {
         );
         if (response.ok) {
             console.log(`Saved file ${fileName}`);
+            updateChecksums(i);
         } else {
             console.log(`Failed to save file ${fileName}`);
             throw new Error(`Failed to save file ${fileName}: ${response.status}, ${response.error}`);
@@ -59,7 +60,7 @@ function SaveOBSButton({ obs, ingredient, metadata, debugRef}) {
     }
 
     return (
-        <IconButton onClick={handleSaveOBS}>
+        <IconButton onClick={handleSaveOBS} disabled={!isDocumentModified}>
             <SaveIcon />
         </IconButton>
     )
