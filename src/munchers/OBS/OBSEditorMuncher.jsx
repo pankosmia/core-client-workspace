@@ -60,9 +60,7 @@ function OBSEditorMuncher({ metadata }) {
             return newIngredient;
         });
         const isDocModified = isModified(obs[0], obs[1], event.target.value);
-        console.log("isDocModified", isDocModified);
         if (isDocModified) { setIsDocumentModified(true); }
-        console.log(event.target.value);
     }
 
     /* Vérification des sauvegardes */
@@ -81,15 +79,12 @@ function OBSEditorMuncher({ metadata }) {
         setChecksums(prev => ({ ...prev, [key]: checksum }));
     };
     const isModified = (chapterIndex, paragraphIndex, currentContent) => {
-        console.log("isModified", chapterIndex, paragraphIndex, currentContent);
         const key = `${chapterIndex}-${paragraphIndex}`;
         const originalChecksum = checksums[key];
         if (!originalChecksum) {
             return false;
         }
         const currentChecksum = calculateChecksum(currentContent);
-        console.log("isModified", originalChecksum, currentChecksum, originalChecksum !== currentChecksum);
-        console.log("Content", currentContent, "Original", checksums[key]);
         return originalChecksum !== currentChecksum;
     };
     const updateChecksums = (chapterIndex) => {
@@ -129,6 +124,15 @@ function OBSEditorMuncher({ metadata }) {
             initIngredient().then();
         }, [obs[0]]
     );
+    
+    useEffect(() => {
+        const onBeforeUnload = ev => {
+            if (isDocumentModified) {
+                ev.preventDefault();
+            }
+        };
+        window.addEventListener('beforeunload', onBeforeUnload);
+    }, [isDocumentModified]);
 
     return (
         <Stack sx={{ p: 2 }}>
