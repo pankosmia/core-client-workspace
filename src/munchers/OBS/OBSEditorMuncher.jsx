@@ -26,14 +26,9 @@ function OBSEditorMuncher({ metadata }) {
     const [audioFile, setAudioFile] = useState("");
     const [tab, setTab] = useState("text");
     const [isThereAnAudioFile, setIsThereAnAudioFile] = useState(false);
+    const [ checksums, setChecksums] = useState({});
 
-
-    const getData = async () => {
-        if (obs[0] < 0) obs[0] = 0;
-        if (obs[0] > 50) obs[0] = 50;
-    };
-
-    const initingredient = async () => {
+    const initIngredient = async () => {
         if (obs[0] < 0) obs[0] = 0;
         if (obs[0] > 50) obs[0] = 50;
     
@@ -86,15 +81,8 @@ function OBSEditorMuncher({ metadata }) {
 
     useEffect(
         () => {
-            initingredient().then();
+            initIngredient().then();
         }, [obs[0]]
-    );
-
-    useEffect(
-        () => {
-            getData().then();
-        },
-        [obs[1]]
     );
 
     return (
@@ -114,7 +102,7 @@ function OBSEditorMuncher({ metadata }) {
                         <AudioRecorder setAudioFile={setAudioFile} metadata={metadata} />
                     </>
                 )}
-                <SaveOBSButton obs={obs} ingredient={currentChapter} metadata={metadata} debugRef={debugRef} audioFile={audioFile}/>
+                <SaveOBSButton obs={obs} ingredient={ingredient} metadata={metadata} debugRef={debugRef} audioFile={audioFile}/>
             </Stack>
         </Stack>
     );
