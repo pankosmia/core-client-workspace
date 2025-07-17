@@ -49,7 +49,7 @@ function OBSEditorMuncher({ metadata }) {
             newChapterChecksums[obs[0]] = calculateChapterChecksum(chapterContent);
             setChapterChecksums(newChapterChecksums);
         }
-        console.log(`Chapter Checksums: ${chapterChecksums}`);
+        // console.log(`Chapter Checksums: ${chapterChecksums}`);
     }
     const handleChange = (event) => {
         setIngredient(prevIngredient => {
@@ -70,24 +70,27 @@ function OBSEditorMuncher({ metadata }) {
         for (let i = 0; i < chapter.length; i++) {
             checksum += md5(chapter[i]);
         }
-        console.log(`Chapter Checksum: ${checksum} for ${chapter} `);
+        // console.log(`Chapter Checksum: ${checksum} for ${chapter} `);
         return checksum;
     }
 
     const initChecksums = (chapterIndex, paragraphIndex, content) => {
         const key = `${chapterIndex}-${paragraphIndex}`;
         const checksum = md5(content);
-        console.log(`Key: ${key}, Checksum: ${checksum}`);
+        // console.log(`Key: ${key}, Checksum: ${checksum}`);
         setChecksums(prev => ({ ...prev, [key]: checksum }));
     };
 
-    const isModified = (chapterIndex) => {
+    const isModified = () => {
+        const chapterIndex = obs[0];
         const originalChecksum = chapterChecksums[chapterIndex];
         if (!originalChecksum) {
             return false;
         }
         const currentChecksum = calculateChapterChecksum(ingredient[chapterIndex]);
         console.log(`Comparaison: ${originalChecksum} !== ${currentChecksum} ${originalChecksum !== currentChecksum}`);
+        console.log(`Content: ${ingredient[chapterIndex]}`);
+        
         return originalChecksum !== currentChecksum;
     };
     const updateChecksums = (chapterIndex) => {
@@ -112,13 +115,10 @@ function OBSEditorMuncher({ metadata }) {
 
     /* Systeme de sauvegarde */
     const handleSaveOBS = async () => {
-        console.log("ingredient", ingredient);
         if (!ingredient || ingredient.length == 0) return;
         
         for (let i = 0; i < ingredient.length; i++) {
             if (!ingredient[i] || ingredient[i].length == 0) continue;
-            console.log("ingredient[i]", ingredient[i]);
-            console.log("Index: ", i);
             await uploadOBSIngredient(ingredient[i], i);
         }
     }
@@ -187,12 +187,17 @@ function OBSEditorMuncher({ metadata }) {
     
     useEffect(() => {
         const onBeforeUnload = ev => {
-            if (isModified(obs[0])) {
+            console.log("isDocModified", isModified());
+
+            if (isModified()) {
                 ev.preventDefault();
             }
         };
         window.addEventListener('beforeunload', onBeforeUnload);
-    }, []);
+        return () =>{
+            window.removeEventListener('beforeunload', onBeforeUnload);
+        }
+    }, [isModified()]);
 
     return (
         <Stack sx={{ p: 2 }}>
