@@ -8,26 +8,22 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import MarkdownField from "../../components/MarkdownField";
 import {
-    i18nContext as I18nContext,
     debugContext as DebugContext,
-    bcvContext as BcvContext,
-    doI18n,
-    getText
+    getText,
+    postText
 } from "pithekos-lib";
-
-
+import md5 from "md5";
 
 
 function OBSEditorMuncher({ metadata }) {
     const { obs, setObs } = useContext(OBSContext);
     const { debugRef } = useContext(DebugContext);
-    const { i18nRef } = useContext(I18nContext);
     const [ingredient, setIngredient] = useState([]); 
     const [audioFile, setAudioFile] = useState("");
     const [tab, setTab] = useState("text");
     const [isThereAnAudioFile, setIsThereAnAudioFile] = useState(false);
     const [ checksums, setChecksums] = useState({});
-    const [isDocumentModified, setIsDocumentModified] = useState(false);
+    const [chapterChecksums, setChapterChecksums] = useState([]);
 
     /* Données de l'ingredient */
     const initIngredient = async () => {
@@ -46,8 +42,14 @@ function OBSEditorMuncher({ metadata }) {
                 newIngredient[obs[0]] = chapterContent;
                 return newIngredient;
             });
-            initChecksums(obs[0], obs[1], chapterContent[obs[1]]);
+            for (let i = 0; i < chapterContent.length; i++) {
+                initChecksums(obs[0], i, chapterContent[i]);
+            }
+            const newChapterChecksums = [...chapterChecksums];
+            newChapterChecksums[obs[0]] = calculateChapterChecksum(chapterContent);
+            setChapterChecksums(newChapterChecksums);
         }
+        console.log(`Chapter Checksums: ${chapterChecksums}`);
     }
     const handleChange = (event) => {
         setIngredient(prevIngredient => {
@@ -59,32 +61,33 @@ function OBSEditorMuncher({ metadata }) {
             newIngredient[obs[0]][obs[1]] = event.target.value.replaceAll(/\s/g, " ");
             return newIngredient;
         });
-        const isDocModified = isModified(obs[0], obs[1], event.target.value);
-        if (isDocModified) { setIsDocumentModified(true); }
     }
 
     /* Vérification des sauvegardes */
-    const calculateChecksum = (content) => {
-        let hash = 0;
-        if (!content) return hash;
-        for (let i = 0; i < content.length; i++) {
-            hash = ((hash << 5) - hash) + content.charCodeAt(i);
-            hash |= 0; // Constrain to 32-bit integer
+    const calculateChapterChecksum = (chapter) => {
+        if (!chapter) return 0;
+        let checksum = 0;
+        for (let i = 0; i < chapter.length; i++) {
+            checksum += md5(chapter[i]);
         }
-        return hash;
-    };
+        console.log(`Chapter Checksum: ${checksum} for ${chapter} `);
+        return checksum;
+    }
+
     const initChecksums = (chapterIndex, paragraphIndex, content) => {
         const key = `${chapterIndex}-${paragraphIndex}`;
-        const checksum = calculateChecksum(content);
+        const checksum = md5(content);
+        console.log(`Key: ${key}, Checksum: ${checksum}`);
         setChecksums(prev => ({ ...prev, [key]: checksum }));
     };
-    const isModified = (chapterIndex, paragraphIndex, currentContent) => {
-        const key = `${chapterIndex}-${paragraphIndex}`;
-        const originalChecksum = checksums[key];
+
+    const isModified = (chapterIndex) => {
+        const originalChecksum = chapterChecksums[chapterIndex];
         if (!originalChecksum) {
             return false;
         }
-        const currentChecksum = calculateChecksum(currentContent);
+        const currentChecksum = calculateChapterChecksum(ingredient[chapterIndex]);
+        console.log(`Comparaison: ${originalChecksum} !== ${currentChecksum} ${originalChecksum !== currentChecksum}`);
         return originalChecksum !== currentChecksum;
     };
     const updateChecksums = (chapterIndex) => {
@@ -95,12 +98,68 @@ function OBSEditorMuncher({ metadata }) {
             const newChecksums = { ...prev };
             chapter.forEach((content, paragraphIndex) => {
                 const key = `${chapterIndex}-${paragraphIndex}`;
-                newChecksums[key] = calculateChecksum(content);
+                newChecksums[key] = md5(content);
             });
             return newChecksums;
         });
-        setIsDocumentModified(false);
+
+        setChapterChecksums(prev => {
+            const newChapterChecksums = [...prev];
+            newChapterChecksums[chapterIndex] = calculateChapterChecksum(chapter);
+            return newChapterChecksums;
+        });
     };
+
+    /* Systeme de sauvegarde */
+    const handleSaveOBS = async () => {
+        console.log("ingredient", ingredient);
+        if (!ingredient || ingredient.length == 0) return;
+        
+        for (let i = 0; i < ingredient.length; i++) {
+            if (!ingredient[i] || ingredient[i].length == 0) continue;
+            console.log("ingredient[i]", ingredient[i]);
+            console.log("Index: ", i);
+            await uploadOBSIngredient(ingredient[i], i);
+        }
+    }
+    
+    const uploadOBSIngredient = async (ingredientItem, i) => {
+        let fileName = (i) <= 9 ? `0${i}` : (i);
+        const obsString = await getStringifyIngredient(ingredientItem, fileName);
+        const payload = JSON.stringify({ payload: obsString });
+        console.log(payload)
+        const response = await postText(
+            `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
+            payload,
+            debugRef,
+            "application/json"
+        );
+        if (response.ok) {
+            console.log(`Saved file ${fileName}`);
+            updateChecksums(i);
+        } else {
+            console.log(`Failed to save file ${fileName}`);
+            throw new Error(`Failed to save file ${fileName}: ${response.status}, ${response.error}`);
+        }
+    }
+    const getStringifyIngredient = async (ingredientItem, fileName) => {
+        const response = await getText(
+            `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
+            debugRef
+        );
+        if (response.ok) {
+            return response.text.split("\n\n").map((line, index) => {
+                if (index % 2 === 1) {
+                    return line.replaceAll(/\n/g, " ");
+                } else {
+                    return ingredientItem[index / 2];
+                }
+            }).join("\n\n");
+        } else {
+            return "";
+        }
+    }
+    
 
     /* Gestion de l'audio */
     function AudioViewer({chapter, paragraph}) {
@@ -121,18 +180,19 @@ function OBSEditorMuncher({ metadata }) {
 
     useEffect(
         () => {
+            handleSaveOBS();
             initIngredient().then();
         }, [obs[0]]
     );
     
     useEffect(() => {
         const onBeforeUnload = ev => {
-            if (isDocumentModified) {
+            if (isModified(obs[0])) {
                 ev.preventDefault();
             }
         };
         window.addEventListener('beforeunload', onBeforeUnload);
-    }, [isDocumentModified]);
+    }, []);
 
     return (
         <Stack sx={{ p: 2 }}>
@@ -151,7 +211,7 @@ function OBSEditorMuncher({ metadata }) {
                         <AudioRecorder setAudioFile={setAudioFile} metadata={metadata} />
                     </>
                 )}
-                <SaveOBSButton obs={obs} ingredient={ingredient} metadata={metadata} debugRef={debugRef} audioFile={audioFile} updateChecksums={updateChecksums} isDocumentModified={isDocumentModified}/>
+                <SaveOBSButton obs={obs} isModified={isModified} handleSave={handleSaveOBS} />
             </Stack>
         </Stack>
     );
