@@ -5,7 +5,7 @@ import {
     debugContext as DebugContext,
     getText,
 } from "pithekos-lib";
-import { Box, FormControl, TextField } from "@mui/material";
+import { Box, FormControl, TextareaAutosize,FormLabel } from "@mui/material";
 
 
 function DraftingEditor({ metadata, adjSelectedFontClass }) {
@@ -65,15 +65,23 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
 
     return (
         <Box>
+            <FormLabel> Chap {systemBcv.chapterNum}</FormLabel>
             {verseText.map((column, index) => (
-                <FormControl fullWidth margin="normal" key={index}>
-                    <TextField
-                        label={`Verset ${column.verseRange}`}
-                        defaultValue={column.text}
-                        variant="outlined"
-                        size="small"
-                    />
-                </FormControl>
+                <Box >
+                    <FormControl fullWidth margin="normal" key={index}>
+                        <FormLabel>{`Verset ${column.verseRange}`}</FormLabel>
+                        <TextareaAutosize
+                            value={column.text}
+                            //onChange={onChangeNote}
+                            minRows={4}
+                           style={{
+                                border: '1px solid',
+                                outline: 'none',
+                            }}
+                            onChange={onChangeNote}
+                        />
+                    </FormControl>
+                </Box>
             ))}
         </Box>
     );

@@ -9,6 +9,7 @@ function ButtonsNavigation({ ingredient, setIngredient, currentRowN, setCurrentR
 
     const { i18nRef } = useContext(I18nContext);
 
+
     // Permet d'enregistrer les changements effectués dans les nots
     const handleSaveRow = (rowN, newRow) => {
         const newIngredient = [...ingredient]
@@ -21,8 +22,8 @@ function ButtonsNavigation({ ingredient, setIngredient, currentRowN, setCurrentR
     const previousRow = () => {
         const newRowN = currentRowN - 1;
         if (newRowN >= 1 && ingredient.length > 1 && ingredient[newRowN]) {
-            setCurrentRowN(newRowN);
             //updateBcv(newRowN);
+            setCurrentRowN(newRowN);
         }
     };
 
@@ -30,14 +31,14 @@ function ButtonsNavigation({ ingredient, setIngredient, currentRowN, setCurrentR
     const nextRow = () => {
         const newRowN = currentRowN + 1;
         if (ingredient[newRowN]) {
-            setCurrentRowN(newRowN);
             //updateBcv(newRowN);
+            setCurrentRowN(newRowN);
 
         }
     };
 
     return (
-        <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
+        <Box sx={{ display: 'flex', gap: 2, justifyContent: "center" }}>
             <Button
                 variant="contained"
                 onClick={() => { previousRow(); handleSaveRow(currentRowN, rowData) }}

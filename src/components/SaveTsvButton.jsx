@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState,useEffect } from "react";
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
@@ -7,15 +7,17 @@ import {
     postJson
 } from "pithekos-lib";
 import { enqueueSnackbar } from "notistack";
-import { Button, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import SaveIcon from '@mui/icons-material/Save';
+
 
 function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredientTsv }) {
 
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
     const [contentChanged, _setContentChanged] = useState(false);
-    
+
+
     // Met à jour le fichier TSV
     const uploadTsvIngredient = async (tsvData, debugBool) => {
         const tsvString = tsvData
@@ -69,7 +71,7 @@ function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredi
             variant="contained"
             onClick={() => { handleSaveTsv(); setSaveIngredientTsv(false) }} >
             <SaveIcon
-                size="large" color={!saveIngredientTsv ? "#eaeaea":"primary"}
+                size="large" color={!saveIngredientTsv ? "#eaeaea" : "primary"}
             />
         </IconButton>
     )

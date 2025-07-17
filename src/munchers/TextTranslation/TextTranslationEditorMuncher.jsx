@@ -22,7 +22,8 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
     const { i18nRef } = useContext(I18nContext);
     const [usj, setUsj] = useState(null);
     const [contentChanged, _setContentChanged] = useState(false);
-    const [viewEditor, setViewEditor] = useState("Editor")
+    const [viewEditor, setViewEditor] = useState("Editor");
+    const { referenceHandler } = useAppReferenceHandler();
     const [bookCode, setBookCode] = useState(
         (bcvRef.current && bcvRef.current.bookCode) ||
         "TIT"
@@ -113,19 +114,7 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
     }, []);
 
 
-    const { referenceHandler } = useAppReferenceHandler();
 
-    // return usj ? <Editor
-    //         key={md5sum(JSON.stringify(usj))}
-    //         usj={usj}
-    //         editable={true}
-    //         bookCode={bcvRef.current && bcvRef.current.bookCode}
-    //         onSave={onSave}
-    //         onHistoryChange={onHistoryChange}
-    //         scriptureReferenceHandler={referenceHandler}
-    //         referenceHandlerSource="text-translation-editor"
-    //     />
-    //     : <div>Loading data...</div>;
 
     return (
         <Box sx={{ p: 2 }}>

@@ -16,8 +16,8 @@ function TsvLineForm({ mode, currentRow, ingredient, setIngredient, saveFunction
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const [cellValueChanged, setCellValueChanged] = useState(false);
     const [openedModalDelete, setOpenedModalDelete] = useState(false);
-    const [md5Ingredient, setMd5Ingredient] = useState("");
     const columnNames = ingredient[0] || [];
+    const [md5Ingredient, setMd5Ingredient] = useState("");
 
     useEffect(
         () => {
@@ -31,10 +31,19 @@ function TsvLineForm({ mode, currentRow, ingredient, setIngredient, saveFunction
         },
         [ingredient, currentRow, mode]
     );
+
+    // Vérification, des changements effectués sur le fichier 
+    useEffect(() => {
+        const hash = md5(JSON.stringify(ingredient, null, 2));
+        setMd5Ingredient(hash);
+        console.log("Hash initial :", hash);
+    }, []);
+
     // Permet d'ouvrir la modal Delete
     const handleOpenModalDelete = () => {
         setOpenedModalDelete("delete");
     };
+
     // Permet la modification d'une note
     const changeCell = (event, n) => {
         const newCellValue = event.target.value;
@@ -53,12 +62,6 @@ function TsvLineForm({ mode, currentRow, ingredient, setIngredient, saveFunction
         const newRowData = (mode === "edit" ? [...currentRow] : Array(7).fill("", 0, 7))
         setRowData(newRowData);
     };
-
-    // useEffect(() => {
-    //     const hash = md5(JSON.stringify(ingredient, null, 2));
-    //     setMd5Ingredient(hash);
-    //     console.log("Hash initial :", hash);
-    // }, []);
 
     const generateId = () => {
         let existingId = ingredient.map(l => l[1]);
@@ -102,7 +105,7 @@ function TsvLineForm({ mode, currentRow, ingredient, setIngredient, saveFunction
                 </FormControl>
 
             ))}
-            <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: "center" }}>
                 {mode === "add" && (<Button
                     onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
                     variant="contained"
