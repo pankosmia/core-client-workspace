@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
@@ -22,8 +22,8 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { systemBcv, setSystemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
-    const [ingredientValueChanged, setIngredientValueChanged] = useState(true);
     const [saveIngredientTsv, setSaveIngredientTsv] = useState(false)
+
 
     // Récupération des données du tsv
     const getAllData = async () => {
@@ -54,25 +54,7 @@ function BcvNotesViewerMuncher({ metadata }) {
         );
 
     }
-    // changer de page -1 
-    const previousRow = () => {
-        const newRow = currentRowN - 1;
-        if (newRow >= 1 && ingredient.length > 1 && ingredient[newRow]) {
-            updateBcv(currentRowN - 1);
-            setCurrentRowN(currentRowN - 1);
-         }
-    };
-
-
-    // changer de page +1 
-    const nextRow = () => {
-        const newRow = currentRowN + 1;
-        if (ingredient[newRow]) {
-            //updateBcv(currentRowN + 1);
-            setCurrentRowN(currentRowN + 1);
-        }
-    };
-
+ 
     useEffect(() => {
         const onBeforeUnload = ev => {
             ev.preventDefault();
@@ -94,9 +76,6 @@ function BcvNotesViewerMuncher({ metadata }) {
                 ingredient={ingredient}
                 setIngredient={setIngredient}
 
-                ingredientValueChanged={ingredientValueChanged}
-                setIngredientValueChanged={setIngredientValueChanged}
-
                 saveIngredientTsv={saveIngredientTsv}
                 setSaveIngredientTsv={setSaveIngredientTsv}
             />
@@ -107,17 +86,16 @@ function BcvNotesViewerMuncher({ metadata }) {
                     currentRowN={currentRowN}
                     setCurrentRowN={setCurrentRowN}
                     updateBcv={updateBcv}
-                    ingredientValueChanged={ingredientValueChanged}
-                    setIngredientValueChanged={setIngredientValueChanged}
                 />
                 <Editor
                     currentRowN={currentRowN}
-
+                    setCurrentRowN={setCurrentRowN}
+                    
                     ingredient={ingredient}
                     setIngredient={setIngredient}
-                    
-                    setIngredientValueChanged={setIngredientValueChanged}
+
                     setSaveIngredientTsv={setSaveIngredientTsv}
+                    updateBcv={updateBcv}
                 />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
@@ -131,33 +109,6 @@ function BcvNotesViewerMuncher({ metadata }) {
                     setSaveIngredientTsv={setSaveIngredientTsv}
 
                 />
-                <Button
-                    disabled={!ingredientValueChanged}
-                    variant="contained"
-                    onClick={() => { previousRow(); setIngredientValueChanged(true) }}
-                    sx={{
-                        mt: 2,
-                         "&.Mui-disabled": {
-                            background: "#eaeaea",
-                            color: "#424242"
-                        }
-                    }}
-                >
-                    {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
-                </Button>
-                <Button
-                    disabled={!ingredientValueChanged}
-                    onClick={() => { nextRow(); setIngredientValueChanged(true) }} variant="contained"
-                    sx={{
-                        mt: 2,
-                        "&.Mui-disabled": {
-                            background: "#eaeaea",
-                            color: "#424242"
-                        }
-                    }}
-                >
-                    {doI18n("pages:core-local-workspace:next", i18nRef.current)}
-                </Button>
             </Box>
         </Stack >
     );

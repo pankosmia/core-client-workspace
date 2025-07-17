@@ -15,8 +15,7 @@ function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredi
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
     const [contentChanged, _setContentChanged] = useState(false);
-
-    console.log("saveInregeitn", saveIngredientTsv)
+    
     // Met à jour le fichier TSV
     const uploadTsvIngredient = async (tsvData, debugBool) => {
         const tsvString = tsvData

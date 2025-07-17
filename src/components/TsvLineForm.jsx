@@ -8,12 +8,15 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuidv4 } from 'uuid';
 import DeleteNote from "./DeleteNote";
+import ButtonsNavigation from "./ButtonsNavigation";
+import md5 from "md5";
 
-function TsvLineForm({ mode, currentRow, ingredient,handleSaveRow, saveFunction, currentRowN, setIngredient, setSaveIngredientTsv, setIngredientValueChanged }) {
+function TsvLineForm({ mode, currentRow, ingredient, setIngredient, saveFunction, currentRowN, setCurrentRowN, setSaveIngredientTsv, updateBcv }) {
     const { i18nRef } = useContext(I18nContext);
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const [cellValueChanged, setCellValueChanged] = useState(false);
     const [openedModalDelete, setOpenedModalDelete] = useState(false);
+    const [md5Ingredient, setMd5Ingredient] = useState("");
     const columnNames = ingredient[0] || [];
 
     useEffect(
@@ -42,18 +45,20 @@ function TsvLineForm({ mode, currentRow, ingredient,handleSaveRow, saveFunction,
         } else {
             setCellValueChanged(false)
         }
-        setIngredientValueChanged(false)
         setRowData(newRowData);
-        handleSaveRow(currentRowN, newRowData)
-
     };
 
     // Permet d'annuler les modications faites sur la note 
-    // const handleCancel = () => {
-    //     const newRowData = (mode === "edit" ? [...currentRow] : Array(7).fill("", 0, 7))
-    //     setRowData(newRowData);
+    const handleCancel = () => {
+        const newRowData = (mode === "edit" ? [...currentRow] : Array(7).fill("", 0, 7))
+        setRowData(newRowData);
+    };
 
-    // };
+    // useEffect(() => {
+    //     const hash = md5(JSON.stringify(ingredient, null, 2));
+    //     setMd5Ingredient(hash);
+    //     console.log("Hash initial :", hash);
+    // }, []);
 
     const generateId = () => {
         let existingId = ingredient.map(l => l[1]);
@@ -92,7 +97,6 @@ function TsvLineForm({ mode, currentRow, ingredient,handleSaveRow, saveFunction,
                             fullWidth
                             size="small"
                             onChange={(e) => changeCell(e, n)}
-
                         />
                     )}
                 </FormControl>
@@ -114,36 +118,50 @@ function TsvLineForm({ mode, currentRow, ingredient,handleSaveRow, saveFunction,
                     {`${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
                 </Button>)}
 
-                {/* {mode === "edit" && (
-                    <Button
-                        onClick={() => {
-                            handleCancel();
-                            setCellValueChanged(false);
-                            setIngredientValueChanged(true)
-                        }}
-                        variant="contained"
-                        disabled={!cellValueChanged}
-                        sx={{
-                            mt: 2,
-                            "&.Mui-disabled": {
-                                background: "#eaeaea",
-                                color: "#424242"
-                            }
-                        }}
-                    >
-                        {doI18n("pages:core-local-workspace:cancel", i18nRef.current)}
-                    </Button>
-                )} */}
-
                 {mode === "edit" && (
-                    <IconButton
-                        onClick={() => handleOpenModalDelete()}
-                        sx={{
-                            mt: 2
-                        }}
-                    >
-                        <DeleteIcon size="large" color="primary" />
-                    </IconButton>
+                    <>
+
+                        <Button
+                            onClick={() => {
+                                handleCancel();
+                                setCellValueChanged(false);
+                              
+                            }}
+                            variant="contained"
+                            disabled={!cellValueChanged}
+                            sx={{
+                                mt: 2,
+                                "&.Mui-disabled": {
+                                    background: "#eaeaea",
+                                    color: "#424242"
+                                }
+                            }}
+                        >
+                            {doI18n("pages:core-local-workspace:cancel", i18nRef.current)}
+                        </Button>
+
+                        <ButtonsNavigation
+                            updateBcv={updateBcv}
+                            rowData={rowData}
+
+                            setSaveIngredientTsv={setSaveIngredientTsv}
+
+                            ingredient={ingredient}
+                            setIngredient={setIngredient}
+
+                            currentRowN={currentRowN}
+                            setCurrentRowN={setCurrentRowN}
+                        />
+
+                        <IconButton
+                            onClick={() => handleOpenModalDelete()}
+                            sx={{
+                                mt: 2
+                            }}
+                        >
+                            <DeleteIcon size="large" color="primary" />
+                        </IconButton>
+                    </>
                 )}
 
             </Box>
@@ -156,7 +174,9 @@ function TsvLineForm({ mode, currentRow, ingredient,handleSaveRow, saveFunction,
                 rowData={rowData}
                 setSaveIngredientTsv={setSaveIngredientTsv}
                 currentRowN={currentRowN}
+               
             />
+
         </Box>
 
     )
