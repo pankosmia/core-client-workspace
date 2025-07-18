@@ -2,10 +2,9 @@ import { useState } from "react";
 import Markdown from 'react-markdown';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
-import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl, FormLabel, TextField } from "@mui/material";
+import { Box, ToggleButton, ToggleButtonGroup, FormControl, TextField } from "@mui/material";
 
-function MarkdownField({ currentRow, columnNames, onChangeNote, value, mode, fieldN }) {
-
+function MarkdownField({columnNames, onChangeNote, value, fieldN }) {
     const [displayMode, setdisplayMode] = useState('write');
 
     return (
@@ -44,8 +43,6 @@ function MarkdownField({ currentRow, columnNames, onChangeNote, value, mode, fie
                         {value}
                     </Markdown>
                 </Box>
-
-
             )}
         </Box>
     )

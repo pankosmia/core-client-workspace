@@ -1,21 +1,14 @@
 import { Box, FormControl, TextField } from "@mui/material";
 import MarkdownField from "./MarkdownField";
 import { useState, useContext, useEffect } from "react";
-import {
-    i18nContext as I18nContext,
-    doI18n,
-} from "pithekos-lib";
 import { v4 as uuidv4 } from 'uuid';
 import ActionsButtons from "./ActionsButtons";
 
-
 function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, saveFunction,  }) {
-    const { i18nRef } = useContext(I18nContext);
     const [cellValueChanged, setCellValueChanged] = useState(false);
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const columnNames = ingredient[0] || [];
    
-
     useEffect(
         () => {
             if (mode === "edit" && ingredient.length > 0) {
@@ -28,9 +21,6 @@ function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, up
         },
         [ingredient, currentRow, mode]
     );
-
-
-
 
     // Permet la modification d'une note
     const changeCell = (event, n) => {
@@ -73,7 +63,6 @@ function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, up
                             value={rowData[n]}
                             columnNames={columnNames}
                             onChangeNote={(e) => changeCell(e, n)}
-                            mode={mode}
                             fieldN={n}
 
                         />
@@ -110,7 +99,6 @@ function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, up
                 setCellValueChanged={setCellValueChanged}
             />
         </Box>
-
     )
 }
 

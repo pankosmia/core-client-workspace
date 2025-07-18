@@ -95,7 +95,7 @@ return (
 
                 ingredient={ingredient}
                 setIngredient={setIngredient}
-                
+
                 updateBcv={updateBcv}
             />
         </Box>
@@ -107,6 +107,7 @@ return (
                 setIngredient={setIngredient}
 
                 md5Ingredient={md5Ingredient}
+                setMd5Ingredient={setMd5Ingredient}
             />
         </Box>
     </Stack >

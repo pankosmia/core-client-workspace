@@ -30,7 +30,7 @@ function SearchWithVerses({ ingredient, setCurrentRowN, currentRowN, updateBcv }
 
     return (
         <List sx={{ maxHeight: "70vh", overflowY: "auto" }}>
-            {bookCode.map(chap => (
+            {bookCode.splice(1) .filter(chap => chap && chap.trim() !== "").map(chap => (
                 <>
                     <ListItemButton
                         key={chap}
@@ -40,7 +40,7 @@ function SearchWithVerses({ ingredient, setCurrentRowN, currentRowN, updateBcv }
                             handleClick();
                         }}
                     >
-                        <ListItemText primary={<Typography sx={{ fontWeight: currentChapter === chap ? "bold" : "normal" }}>{`${/^\d+$/.test(chap) ? `Chap ${chap}` : chap}`}</Typography>} />
+                        <ListItemText primary={<Typography sx={{ fontWeight: currentChapter === chap ? "bold" : "normal" }}>{`${/^\d+$/.test(chap) ? `Ch ${chap}` : chap}`}</Typography>} />
                         {openChapter && currentChapter === chap ? <ExpandLess /> : <ExpandMore />}
                     </ListItemButton>
 

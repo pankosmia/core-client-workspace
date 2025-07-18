@@ -33,7 +33,6 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
             //updateBcv(newRowN);
             setCurrentRowN(newRowN);
             setCellValueChanged(false)
-
         }
     };
 
@@ -41,40 +40,41 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
         <Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
                 {mode === "edit" && (
-                    <>
-                        <Button
-                            variant="contained"
-                            onClick={() => { previousRow(); saveFunction(currentRowN, rowData) }}
-                            sx={{
-                                mt: 2,
-                                "&.Mui-disabled": {
-                                    background: "#eaeaea",
-                                    color: "#424242"
-                                }
-                            }}
-                        >
-                            {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
-                        </Button>
-                        <Button
-                            onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
-                            variant="contained"
-                            disabled={!cellValueChanged}
-                            sx={{
-                                mt: 2,
-                                "&.Mui-disabled": {
-                                    background: "#eaeaea",
-                                    color: "#424242"
-                                }
-                            }}
-                        >
-                            {mode === "edit" ? `${doI18n("pages:core-local-workspace:ok", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
-                        </Button>
 
+                    <Button
+                        variant="contained"
+                        onClick={() => { previousRow(); saveFunction(currentRowN, rowData) }}
+                        sx={{
+                            mt: 2,
+                            "&.Mui-disabled": {
+                                background: "#eaeaea",
+                                color: "#424242"
+                            }
+                        }}
+                    >
+                        {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
+                    </Button>
+                )}
+                <Button
+                    onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
+                    variant="contained"
+                    disabled={!cellValueChanged}
+                    sx={{
+                        mt: 2,
+                        "&.Mui-disabled": {
+                            background: "#eaeaea",
+                            color: "#424242"
+                        }
+                    }}
+                >
+                    {mode === "edit" ? `${doI18n("pages:core-local-workspace:ok", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
+                </Button>
+                {mode === "edit" && (
+                    <>
                         <Button
                             onClick={() => {
                                 handleCancel();
                                 setCellValueChanged(false);
-
                             }}
                             variant="contained"
                             disabled={!cellValueChanged}
@@ -97,20 +97,21 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                         >
                             <DeleteIcon size="large" color="primary" />
                         </IconButton>
+
+                        <Button
+                            onClick={() => { nextRow(); saveFunction(currentRowN, rowData) }} variant="contained"
+                            sx={{
+                                mt: 2,
+                                "&.Mui-disabled": {
+                                    background: "#eaeaea",
+                                    color: "#424242"
+                                }
+                            }}
+                        >
+                            {doI18n("pages:core-local-workspace:next", i18nRef.current)}
+                        </Button>
                     </>
                 )}
-                <Button
-                    onClick={() => { nextRow(); saveFunction(currentRowN, rowData) }} variant="contained"
-                    sx={{
-                        mt: 2,
-                        "&.Mui-disabled": {
-                            background: "#eaeaea",
-                            color: "#424242"
-                        }
-                    }}
-                >
-                    {doI18n("pages:core-local-workspace:next", i18nRef.current)}
-                </Button>
             </Box>
             <DeleteNote
                 mode="delete"

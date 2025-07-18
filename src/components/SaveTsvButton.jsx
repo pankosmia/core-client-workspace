@@ -11,7 +11,7 @@ import { IconButton } from "@mui/material";
 import SaveIcon from '@mui/icons-material/Save';
 import md5 from "md5";
 
-function SaveTsvButton({ ingredient, metadata ,md5Ingredient }) {
+function SaveTsvButton({ ingredient, metadata ,md5Ingredient,setMd5Ingredient }) {
 
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
@@ -56,6 +56,7 @@ function SaveTsvButton({ ingredient, metadata ,md5Ingredient }) {
     }
     // Permet de sauvegarder dans le fichier TSV 
     const handleSaveTsv = () => {
+        setMd5Ingredient(ingredient)
         uploadTsvIngredient([...ingredient])
     }
     return (
