@@ -56,7 +56,7 @@ function SaveTsvButton({ ingredient, metadata ,md5Ingredient,setMd5Ingredient })
     }
     // Permet de sauvegarder dans le fichier TSV 
     const handleSaveTsv = () => {
-        setMd5Ingredient(ingredient)
+        setMd5Ingredient(md5(JSON.stringify(ingredient)))
         uploadTsvIngredient([...ingredient])
     }
     return (
