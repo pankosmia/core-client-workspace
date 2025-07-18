@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Box, Button, MenuItem, Menu, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Typography } from "@mui/material";
+import { Box, Button, MenuItem, Menu, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Typography, Stack } from "@mui/material";
 import {
     bcvContext as BcvContext,
     i18nContext as I18nContext,
@@ -71,7 +71,7 @@ function BcvPicker() {
     };
 
     return <Box sx={{ display: 'flex', flexDirection: 'column', width:"200px" }}>
-
+      <Stack direction="row">
         <Box sx={{ m: 0 , display:"inline-block"}}>
             <Button
                 id="book-button"
@@ -133,8 +133,14 @@ function BcvPicker() {
                 </DialogActions>
             </Dialog>
         </Box>
-         <Button sx={}> hello  </Button>
-
+        <Button
+          variant="contained"
+          size="small"
+          sx={{ backgroundColor: "#E0E0E0", color: "#000", ml: 1 }}
+        >
+          hello
+        </Button>
+      </Stack>
     </Box>
 }
 
