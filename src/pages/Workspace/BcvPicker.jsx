@@ -1,5 +1,5 @@
-import React, {useState, useContext, useEffect} from "react";
-import {Box, Button, MenuItem, Menu, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Typography} from "@mui/material";
+import React, { useState, useContext, useEffect } from "react";
+import { Box, Button, MenuItem, Menu, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Typography } from "@mui/material";
 import {
     bcvContext as BcvContext,
     i18nContext as I18nContext,
@@ -13,10 +13,10 @@ import {
 } from "pithekos-lib";
 
 function BcvPicker() {
-    const {bcvRef} = useContext(BcvContext);
-    const {debugRef} = useContext(DebugContext);
-    const {i18nRef} = useContext(I18nContext);
-    const {currentProjectRef} = useContext(CurrentProjectContext);
+    const { bcvRef } = useContext(BcvContext);
+    const { debugRef } = useContext(DebugContext);
+    const { i18nRef } = useContext(I18nContext);
+    const { currentProjectRef } = useContext(CurrentProjectContext);
     const [contentBooks, setContentBooks] = useState([]);
 
     useEffect(
@@ -70,43 +70,45 @@ function BcvPicker() {
         handleDialogClose();
     };
 
-    return <Box sx={{m: 0}}>
-        <Button
-            id="book-button"
-            variant="contained"
-            size="small"
-            aria-controls={menuIsOpen ? 'book-button-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={menuIsOpen ? 'true' : undefined}
-            onClick={event => handleMenuOpen(event.currentTarget)}
-            sx={{backgroundColor: "#E0E0E0", color: "#000", ml: 4}}
-        >
-            {doI18n(`scripture:books:${bcvRef.current.bookCode}`, i18nRef.current)}
-        </Button>
-        <Menu
-            id="basic-menu"
-            anchorEl={menuAnchorEl}
-            open={menuIsOpen}
-            onClose={() => handleMenuClose()}
-            MenuListProps={{
-                'aria-labelledby': 'basic-button',
-            }}
-        >
-            {
-                contentBooks.map((b, n) =>
-                    <MenuItem
-                        key={n}
-                        disabled={b === (bcvRef.current && bcvRef.current.bookCode)}
-                        onClick={
-                            () => handleDialogOpen(b)
-                        }
-                    >
-                        {doI18n(`scripture:books:${b}`, i18nRef.current)}
-                    </MenuItem>
-                )
-            }
-        </Menu>
-        <Dialog
+    return <Box sx={{ display: 'flex', flexDirection: 'column', width:"200px" }}>
+
+        <Box sx={{ m: 0 , display:"inline-block"}}>
+            <Button
+                id="book-button"
+                variant="contained"
+                size="small"
+                aria-controls={menuIsOpen ? 'book-button-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={menuIsOpen ? 'true' : undefined}
+                onClick={event => handleMenuOpen(event.currentTarget)}
+                sx={{ backgroundColor: "#E0E0E0", color: "#000", ml: 4 }}
+            >
+                {doI18n(`scripture:books:${bcvRef.current.bookCode}`, i18nRef.current)}
+            </Button>
+            <Menu
+                id="basic-menu"
+                anchorEl={menuAnchorEl}
+                open={menuIsOpen}
+                onClose={() => handleMenuClose()}
+                MenuListProps={{
+                    'aria-labelledby': 'basic-button',
+                }}
+            >
+                {
+                    contentBooks.map((b, n) =>
+                        <MenuItem
+                            key={n}
+                            disabled={b === (bcvRef.current && bcvRef.current.bookCode)}
+                            onClick={
+                                () => handleDialogOpen(b)
+                            }
+                        >
+                            {doI18n(`scripture:books:${b}`, i18nRef.current)}
+                        </MenuItem>
+                    )
+                }
+            </Menu>
+            <Dialog
                 open={dialogIsOpen}
                 onClose={handleDialogClose}
                 slotProps={{
@@ -130,6 +132,9 @@ function BcvPicker() {
                     }}>{doI18n("pages:core-local-workspace:accept", i18nRef.current)}</Button>
                 </DialogActions>
             </Dialog>
+        </Box>
+         <Button sx={}> hello  </Button>
+
     </Box>
 }
 
