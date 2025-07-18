@@ -1,103 +1,99 @@
-import React, { useEffect, useRef, useState } from 'react';
-// import { useMicrophonePermission } from './getMIcPermission';
+import { useRef, useState, useCallback, useMemo, useEffect } from 'react';
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Box, IconButton, Typography } from '@mui/material';
-import { postJson, getText } from 'pithekos-lib';
+import SaveIcon from '@mui/icons-material/Save';
+import RestoreIcon from '@mui/icons-material/Restore';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
+import { useWavesurfer } from '@wavesurfer/react'
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js'
+import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js'
+import ButtonGroup from '@mui/material/ButtonGroup';
+import Button from '@mui/material/Button';
+import {
+    postJson
+} from "pithekos-lib";
 
-const AudioRecorder = ({ metadata, setAudioFile }) => {
-    const [recordedUrl, setRecordedUrl] = useState('');
+const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     const mediaStream = useRef(null);
     const mediaRecorder = useRef(null);
-    const [saveRecording, setSaveRecording] = useState(true);
     const [isRecording, setIsRecording] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
-    const [timer, setTimer] = useState(0);
     const chunks = useRef([]);
-    // const { permissionState, requestMicrophone } = useMicrophonePermission();
+    const waveformRef = useRef(null);
+    const regionsPlugin = useMemo(() => RegionsPlugin.create(), []);
+    const recordPlugin = useMemo(() => RecordPlugin.create(), []);
+    const plugins = useMemo(() => [regionsPlugin, recordPlugin], [regionsPlugin, recordPlugin]);
+    const [prise, setPrise] = useState("a");
+    const [bakExists, setBakExists] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
+    const getUrl = (segment = "bytes") => {
+        let chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
+        let paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
+        return `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}-${prise}.mp3`
+    }
 
-    const getSupportedMimeType = () => {
-        const types = [
-            "audio/webm",
-            "audio/mp4",
-            "audio/ogg; codecs=opus"
-        ];
+    const fileExists = async (newAudioUrl) => {
+        const url = `/burrito/paths/${metadata.local_path}`
+        const ipath = newAudioUrl.split("?ipath=")[1];
 
-        for (let type of types) {
-            if (MediaRecorder.isTypeSupported(type)) {
-                return type;
+        const response = await fetch(url, {
+            method: "GET",
+        })
+        if (response.ok) {
+            const data = await response.json();
+            // console.log(data);
+            // console.log(`Data: ${data}, ipath: ${ipath} : ${data.includes(ipath)}`);
+            if (data.includes(ipath)) {
+                return true;
+            } else {
+                return false;
             }
+        } else {
+            return false;
         }
-        console.log("No supported mime type found");
-        return "";
-    };
+    }
 
     const startRecording = async () => {
-        // if (permissionState === "denied") {
-        //     console.log("Permission denied");
-        //     // requestMicrophone();
-        //     return;
-        // }
         try {
-            // console.log("Starting recording, maybe");
-
             const stream = await navigator.mediaDevices.getUserMedia(
                 { audio: true }
             );
-            console.log("We have a stream");
             mediaStream.current = stream;
             mediaRecorder.current = new MediaRecorder(stream);
+
             mediaRecorder.current.ondataavailable = (e) => {
-                // console.log("data available")
                 if (e.data.size > 0) {
                     chunks.current.push(e.data);
                 }
             };
             mediaRecorder.current.onstart = async () => {
-                // console.log("Event: Recording started");
                 setTimeout(() => {
                     setIsRecording(true);
-                    setIsPaused(false);
                 }, 250);
             };
-            mediaRecorder.current.onstop = async () => {
-                console.log("Recording stopped");
+            mediaRecorder.current.onstop = () => {
                 setIsRecording(false);
-                setIsPaused(false);
-                setTimer(0);
-                // if (saveRecording) {
-                console.log("Saving recording ...");
                 const recordedBlob = new Blob(
                     chunks.current, { type: "audio/mp3" }
                 );
                 const url = URL.createObjectURL(recordedBlob);
-                setRecordedUrl(url);
-
-                // const content = '<q id="a"><span id="b">hey!</span></q>';
-                // const blob = new Blob([content], { type: "text/xml" });
+                setAudioUrl(url);
+                chunks.current = [];
 
                 const formData = new FormData();
                 formData.append("file", recordedBlob);
-
-                const postUrl = "http://localhost:19119/burrito/ingredient/bytes/a/b/c?ipath=banana.mp3";
-
-                console.log("Form data: ", formData);
-
+                const postUrl = getUrl();
                 fetch(postUrl, {
                     method: "POST",
-                    body: formData,
-                }).then((response) => {
-                    console.log("Response: ", response);
+                    body: formData
                 });
-
-
-
-                // }
-                chunks.current = [];
             };
             mediaRecorder.current.start(250);
         } catch (error) {
@@ -106,9 +102,7 @@ const AudioRecorder = ({ metadata, setAudioFile }) => {
     };
 
     const stopRecording = () => {
-        setSaveRecording(true);
         if (mediaRecorder.current && mediaRecorder.current.state === 'recording') {
-            console.log("Stopping recording ...");
             mediaRecorder.current.stop();
 
         }
@@ -119,94 +113,138 @@ const AudioRecorder = ({ metadata, setAudioFile }) => {
         }
     };
 
-    const pauseRecording = () => {
-        if (mediaRecorder.current && mediaRecorder.current.state === 'recording') {
-            mediaRecorder.current.pause();
-            setIsPaused(true);
-        }
-    }
-
-    const resumeRecording = () => {
-        if (mediaRecorder.current && mediaRecorder.current.state === 'paused') {
-            mediaRecorder.current.resume();
-            setIsPaused(false);
-        }
-    }
-
-    const deleteRecording = () => {
-        setSaveRecording(false);
-        if (mediaRecorder.current && mediaRecorder.current.state === 'recording') {
-            mediaRecorder.current.stop();
-        }
-        if (mediaStream.current) {
-            mediaStream.current.getTracks().forEach((track) => {
-                track.stop();
-            });
-        }
-    }
-
-    useEffect(() => {
-        if (isRecording && !isPaused) {
-            const interval = setInterval(() => {
-                setTimer(prev => prev + 0.1);
-            }, 100);
-            return () => clearInterval(interval);
-        }
-    }, [isRecording, isPaused]);
-
     const formatTime = (time) => {
         const seconds = Math.floor(time % 60);
         const minutes = Math.floor(time / 60);
         return minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
     }
 
-    const toggleRecording = () => {
-        if (isRecording) {
-            stopRecording();
-        } else {
-            startRecording();
-        }
+    const { wavesurfer, currentTime, isPlaying } = useWavesurfer({
+        container: waveformRef,
+        height: 100,
+        waveColor: 'rgb(102, 102, 102)',
+        progressColor: 'rgb(27, 27, 27)',
+        url: audioUrl,
+        plugins: plugins,
+        barWidth: 2,
+        barGap: 1,
+        barRadius: 2,
+    })
+
+    const onPlayPause = () => {
+        if (!audioUrl) return;
+        wavesurfer && wavesurfer.playPause()
     }
 
+    const onDelete = () => {
+        // A faire: Peut etre delete le fichier audio
+        setAudioUrl('')
+
+        const deleteUrl = getUrl("delete");
+        fetch(deleteUrl, {
+            method: "POST",
+        });
+    }
+
+    const onSave = () => {
+        // A faire: Save le fichier audio
+    }
+
+    const addRegion = (start, end, content = "") => {
+        regionsPlugin.addRegion({
+            content: content,
+            start: start,
+            end: end,
+        });
+    }
+
+    const onRestore = () => {
+        const bakUrl = getUrl("revert");
+        fetch(bakUrl, {
+            method: "POST",
+        }).then(async () => {
+            setBakExists(await fileExists(getUrl() + ".bak"))
+            setAudioUrl("")
+        })
+    }
+
+    useEffect(() => {
+        regionsPlugin.getRegions().forEach((region) => {
+            console.log(`${region.start} - ${region.end}`);
+        });
+    });
+
+    wavesurfer?.on("ready", () => {
+        setIsLoading(false);
+    });
+    wavesurfer?.on("loading", () => {
+        setIsLoading(true);
+    });
+
+    useEffect(() => {
+        const updateAudioUrl = async () => {
+            setIsLoading(true);
+            if (await fileExists(getUrl())) {
+                setTimeout(() => {
+                    setAudioUrl(getUrl())
+                }, audioUrl != "" ? 200 : 0);
+            } else {
+                setTimeout(() => {
+                    setAudioUrl("")
+                }, audioUrl != "" ? 200 : 0);
+            }
+        }
+        updateAudioUrl();
+    }, [obs, prise, bakExists])
+
+    useEffect(() => {
+        const updateBakExists = async () => {
+            setBakExists(await fileExists(getUrl() + ".bak"))
+        }
+        updateBakExists();
+    }, [obs, prise, audioUrl])
+
+
     return (
-        <Box>
-            <audio controls src={recordedUrl} />
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', backgroundColor: "lightgray", borderRadius: 4, boxShadow: 1, gap: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', backgroundColor: "lightgray", borderRadius: 4, boxShadow: 0 }}>
-                    <IconButton onClick={isRecording ? stopRecording : startRecording} style={{ backgroundColor: "lightgray", paddingRight: 0 }}>
-                        {isRecording ? <StopIcon /> : <MicIcon />}
-                    </IconButton>
-                    {isRecording && (
-                        <IconButton onClick={isPaused ? resumeRecording : pauseRecording} style={{ backgroundColor: "lightgray", paddingLeft: 0 }}>
-                            {isPaused ? <PlayArrowIcon /> : <PauseIcon />}
-                        </IconButton>
-                    )}
+        <Stack sx={{ mt: 5, backgroundColor: "rgb(224, 224, 224)", borderRadius: 1, boxShadow: 1, width: '100%', height: '150px' }}>
+
+            {/* Barre du haut */}
+            <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgb(206, 204, 204)', justifyContent: 'space-between' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', marginLeft: 2 }}>
+                    {/*Timer*/}
+                    <Box sx={{ fontSize: 16, fontWeight: 600, minWidth: '60px', textAlign: 'center' }}> {formatTime(currentTime)} </Box>
+                    {/*Play/Pause Button*/}
+                    <IconButton onClick={onPlayPause}> {isPlaying ? <PauseIcon /> : <PlayArrowIcon />} </IconButton>
+                    {/*Record Button*/}
+                    <IconButton onClick={isRecording ? stopRecording : startRecording}> {isRecording ? <StopIcon sx={{ color: 'red' }} /> : <MicIcon />} </IconButton>
+                    {/*Save Button*/}
+                    {/* <IconButton onClick={onSave}> <SaveIcon /> </IconButton> */}
+                    {/*Delete Button*/}
+                    <IconButton onClick={onDelete}> <DeleteIcon /> </IconButton>
+                    {/*Add Region Button*/}
+                    {/* <IconButton onClick={() => addRegion(currentTime, currentTime + 2)}> <EditIcon /> </IconButton> */}
+                    {/* Restore Button */}
+                    {bakExists && <IconButton onClick={onRestore}> <RestoreIcon /> </IconButton>}
                 </Box>
-                {(isRecording) ?
-                    <div>
-                        {formatTime(timer)}
-                    </div>
-                    : null
-                }
-                {isRecording ? <div style={{ margin: 2 }}>
-                    {isPaused ? "Paused" : "Recording"}
-                </div> : null}
-                {isRecording && !isPaused ?
-                    <span style={{
-                        display: "inline-block",
-                        width: 10,
-                        height: 10,
-                        borderRadius: "50%",
-                        backgroundColor: "red",
-                        margin: 8
-                    }}></span>
-                    : null
-                }
-                {isRecording ? <IconButton onClick={() => deleteRecording()} style={{ backgroundColor: "lightgray" }}>
-                    <DeleteIcon />
-                </IconButton> : null}
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'flex-end', marginRight: 2 }}>
+                    <ButtonGroup size="small" aria-label="Small button group">
+                        <Button key="a" variant={prise === "a" ? "contained" : "outlined"} onClick={() => setPrise("a")}>A</Button>
+                        <Button key="b" variant={prise === "b" ? "contained" : "outlined"} onClick={() => setPrise("b")}>B</Button>
+                        <Button key="c" variant={prise === "c" ? "contained" : "outlined"} onClick={() => setPrise("c")}>C</Button>
+                    </ButtonGroup>
+                </Box>
             </Box>
-        </Box>
+            <Divider />
+            {/* Progress Bar */}
+            <Box sx={{ display: '', alignItems: '' }}>
+                <div
+                    ref={waveformRef}
+                    className={`audio-waveform ${isLoading ? 'loading' : 'loaded'}`}
+                    style={{ width: '100%', height: '70px', marginBottom: '' }}
+                />
+            </Box>
+        </Stack>
+
     );
 };
 export default AudioRecorder;

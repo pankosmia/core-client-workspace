@@ -1,5 +1,6 @@
 import { useState, useContext, useEffect } from "react";
-import { Box, Button, Grid2, Stack, TextareaAutosize, Tabs, Tab } from "@mui/material";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 import OBSContext from "../../contexts/obsContext";
 import OBSNavigator from "../../components/OBSNavigator";
 import SaveOBSButton from "../../components/SaveOBSButton";
@@ -7,22 +8,25 @@ import AudioRecorder from "../../components/AudioRecorder";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import MarkdownField from "../../components/MarkdownField";
+
+import "./OBSMuncher.css";
+
 import {
     debugContext as DebugContext,
     getText,
     postText
 } from "pithekos-lib";
 import md5 from "md5";
+import Switch from "@mui/material/Switch";
 
 
 function OBSEditorMuncher({ metadata }) {
     const { obs, setObs } = useContext(OBSContext);
     const { debugRef } = useContext(DebugContext);
     const [ingredient, setIngredient] = useState([]); 
-    const [audioFile, setAudioFile] = useState("");
-    const [tab, setTab] = useState("text");
-    const [isThereAnAudioFile, setIsThereAnAudioFile] = useState(false);
+    const [audioUrl, setAudioUrl] = useState("");
     const [ checksums, setChecksums] = useState({});
+    const [audioEnabled, setAudioEnabled] = useState(false);
     const [chapterChecksums, setChapterChecksums] = useState([]);
 
     /* Données de l'ingredient */
@@ -88,8 +92,8 @@ function OBSEditorMuncher({ metadata }) {
             return false;
         }
         const currentChecksum = calculateChapterChecksum(ingredient[chapterIndex]);
-        console.log(`Comparaison: ${originalChecksum} !== ${currentChecksum} ${originalChecksum !== currentChecksum}`);
-        console.log(`Content: ${ingredient[chapterIndex]}`);
+        // console.log(`Comparaison: ${originalChecksum} !== ${currentChecksum} ${originalChecksum !== currentChecksum}`);
+        // console.log(`Content: ${ingredient[chapterIndex]}`);
         
         return originalChecksum !== currentChecksum;
     };
@@ -168,12 +172,12 @@ function OBSEditorMuncher({ metadata }) {
 
         // A faire: Faire en sorte d'afficher un message si le fichier n'existe pas
 
-        if (!paragraph) {
-            return <audio controls src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=content/${chapterString}.mp3`}></audio>
-        }
-        return <Stack>
-                <audio controls src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=content/${chapterString}_${paragraphString}.mp3`}></audio>
-        </Stack>
+        // if (!paragraph) {
+        //     return <audio controls src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=content/${chapterString}.mp3`}></audio>
+        // }
+        // return <Stack>
+        //         <audio controls src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=content/${chapterString}_${paragraphString}.mp3`}></audio>
+        // </Stack>
     }
 
     const currentChapter = ingredient[obs[0]] || [];
@@ -202,20 +206,12 @@ function OBSEditorMuncher({ metadata }) {
     return (
         <Stack sx={{ p: 2 }}>
             <OBSNavigator max={currentChapter.length - 1} />
-            <Tabs value={tab} onChange={(event, newValue) => setTab(newValue)}>
-                <Tab label="Text" value="text" iconPosition="end" icon={ currentChapter[obs[1]] && currentChapter[obs[1]] !== "" ? <CheckBoxOutlinedIcon /> : <CheckBoxOutlineBlankIcon />}/>
-                <Tab label="Audio" value="audio" iconPosition="end" icon={isThereAnAudioFile ? <CheckBoxOutlinedIcon /> : <CheckBoxOutlineBlankIcon />}/>
-            </Tabs>
+            <Box>
+                Audio: <Switch checked={audioEnabled} onChange={() => setAudioEnabled(!audioEnabled)} />
+            </Box>
             <Stack>
-                {tab === "text" && (
-                    <MarkdownField currentRow={obs[1]} columnNames={currentChapter} onChangeNote={handleChange} value={currentChapter[obs[1]] || ""} mode="write"/>
-                )}
-                {tab === "audio" && (
-                    <>
-                        <AudioViewer chapter={obs[0]} paragraph={obs[1]} />
-                        <AudioRecorder setAudioFile={setAudioFile} metadata={metadata} />
-                    </>
-                )}
+                <MarkdownField currentRow={obs[1]} columnNames={currentChapter} onChangeNote={handleChange} value={currentChapter[obs[1]] || ""} mode="write"/>
+                {audioEnabled && <AudioRecorder audioUrl={audioUrl} setAudioUrl={setAudioUrl} metadata={metadata} obs={obs}/>}
                 <SaveOBSButton obs={obs} isModified={isModified} handleSave={handleSaveOBS} />
             </Stack>
         </Stack>
