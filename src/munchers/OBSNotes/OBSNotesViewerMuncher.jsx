@@ -4,9 +4,7 @@ import Markdown from 'react-markdown';
 import OBSContext from "../../contexts/obsContext";
 
 import {
-    i18nContext as I18nContext,
     debugContext as DebugContext,
-    doI18n,
     getText
 } from "pithekos-lib";
 
@@ -14,7 +12,6 @@ function OBSNotesViewerMuncher({metadata}) {
     const [ingredient, setIngredient] = useState([]);
     const {obs} = useContext(OBSContext);
     const {debugRef} = useContext(DebugContext);
-    const {i18nRef} = useContext(I18nContext);
 
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=OBS.tsv`;
