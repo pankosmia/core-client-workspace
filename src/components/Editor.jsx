@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import TsvLineForm from "./TsvLineForm";
-function Editor({ingredient, setIngredient, currentRowN,setCurrentRowN,updateBcv }) {
+import { enqueueSnackbar } from "notistack";
+function Editor({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv }) {
     const [currentRow, setCurrentRow] = useState([]);
 
     useEffect(
@@ -21,21 +22,21 @@ function Editor({ingredient, setIngredient, currentRowN,setCurrentRowN,updateBcv
     };
 
 
-    return <Box sx={{ display: 'flex', flexDirection:"column", gap: 2, padding: 2 }}>
-            <TsvLineForm
-                mode="edit"
-                currentRow={currentRow}
-                saveFunction={handleSaveRow}
-                updateBcv={updateBcv}
+    return <Box sx={{ display: 'flex', flexDirection: "column", gap: 2, padding: 2 }}>
+        <TsvLineForm
+            mode="edit"
+            currentRow={currentRow}
+            saveFunction={handleSaveRow}
+            updateBcv={updateBcv}
 
-                currentRowN={currentRowN}
-                setCurrentRowN={setCurrentRowN}
+            currentRowN={currentRowN}
+            setCurrentRowN={setCurrentRowN}
 
-                ingredient={ingredient}
-                setIngredient={setIngredient}
+            ingredient={ingredient}
+            setIngredient={setIngredient}
 
-            />
-            </Box>
+        />
+    </Box>
 }
 
 export default Editor;

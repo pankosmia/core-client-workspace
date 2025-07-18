@@ -6,6 +6,10 @@ import {
     i18nContext as I18nContext,
     doI18n,
 } from "pithekos-lib";
+import RestoreIcon from '@mui/icons-material/Restore';
+import CheckIcon from '@mui/icons-material/Check';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
 function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN, cellValueChanged, setCellValueChanged, updateBcv, rowData, handleCancel, mode, saveFunction }) {
     const { i18nRef } = useContext(I18nContext);
@@ -41,7 +45,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
                 {mode === "edit" && (
 
-                    <Button
+                    <IconButton
                         variant="contained"
                         onClick={() => { previousRow(); saveFunction(currentRowN, rowData) }}
                         sx={{
@@ -52,10 +56,10 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                             }
                         }}
                     >
-                        {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
-                    </Button>
+                       <ArrowBackIosNewIcon/>
+                    </IconButton>
                 )}
-                <Button
+                <IconButton
                     onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
                     variant="contained"
                     disabled={!cellValueChanged}
@@ -63,15 +67,15 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                         mt: 2,
                         "&.Mui-disabled": {
                             background: "#eaeaea",
-                            color: "#424242"
+                           color: '#bebbbbff'
                         }
                     }}
                 >
-                    {mode === "edit" ? `${doI18n("pages:core-local-workspace:ok", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
-                </Button>
+                  <CheckIcon size="large"color={!cellValueChanged ? "#eaeaea" : "primary"}/>
+                </IconButton>
                 {mode === "edit" && (
                     <>
-                        <Button
+                        <IconButton
                             onClick={() => {
                                 handleCancel();
                                 setCellValueChanged(false);
@@ -82,12 +86,12 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                                 mt: 2,
                                 "&.Mui-disabled": {
                                     background: "#eaeaea",
-                                    color: "#424242"
+                                   color: '#bebbbbff'
                                 }
                             }}
                         >
-                            {doI18n("pages:core-local-workspace:reset", i18nRef.current)}
-                        </Button>
+                           <RestoreIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"}/>
+                        </IconButton>
 
                         <IconButton
                             onClick={() => handleOpenModalDelete()}
@@ -98,7 +102,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                             <DeleteIcon size="large" color="primary" />
                         </IconButton>
 
-                        <Button
+                        <IconButton
                             onClick={() => { nextRow(); saveFunction(currentRowN, rowData) }} variant="contained"
                             sx={{
                                 mt: 2,
@@ -108,8 +112,8 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                                 }
                             }}
                         >
-                            {doI18n("pages:core-local-workspace:next", i18nRef.current)}
-                        </Button>
+                           <ArrowForwardIosIcon/>
+                        </IconButton>
                     </>
                 )}
             </Box>
