@@ -10,6 +10,7 @@
     "@mui/icons-material": "^6.1.5",
     "@mui/lab": "^6.0.1-beta.35",
     "@mui/material": "^6.1.5",
+    "@mui/x-data-grid": "^8.8.0",
     "@scriptural/react": "^0.0.21",
     "@tailwindcss/postcss": "^4.1.4",
     "@use-gesture/react": "^10.3.1",
