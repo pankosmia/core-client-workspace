@@ -7,7 +7,7 @@ import {
     doI18n,
 } from "pithekos-lib";
 
-function ButtonsNavigation({ ingredient, setIngredient, currentRowN, setCurrentRowN, cellValueChanged, setCellValueChanged, updateBcv, rowData, handleCancel, mode, setSaveIngredientTsv, saveFunction }) {
+function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN, cellValueChanged, setCellValueChanged, updateBcv, rowData, handleCancel, mode, saveFunction }) {
     const { i18nRef } = useContext(I18nContext);
     const [openedModalDelete, setOpenedModalDelete] = useState(false);
 
@@ -26,7 +26,7 @@ function ButtonsNavigation({ ingredient, setIngredient, currentRowN, setCurrentR
         }
     };
 
-    // changer de page +1 
+    // changer de page +1
     const nextRow = () => {
         const newRowN = currentRowN + 1;
         if (ingredient[newRowN]) {
@@ -40,36 +40,35 @@ function ButtonsNavigation({ ingredient, setIngredient, currentRowN, setCurrentR
     return (
         <Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-                <Button
-                    variant="contained"
-                    onClick={() => { previousRow(); saveFunction(currentRowN, rowData) }}
-                    sx={{
-                        mt: 2,
-                        "&.Mui-disabled": {
-                            background: "#eaeaea",
-                            color: "#424242"
-                        }
-                    }}
-                >
-                    {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
-                </Button>
-                <Button
-                    onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
-                    variant="contained"
-                    disabled={!cellValueChanged}
-                    sx={{
-                        mt: 2,
-                        "&.Mui-disabled": {
-                            background: "#eaeaea",
-                            color: "#424242"
-                        }
-                    }}
-                >
-                    {mode === "edit" ? `${doI18n("pages:core-local-workspace:ok", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
-                </Button>
-
                 {mode === "edit" && (
                     <>
+                        <Button
+                            variant="contained"
+                            onClick={() => { previousRow(); saveFunction(currentRowN, rowData) }}
+                            sx={{
+                                mt: 2,
+                                "&.Mui-disabled": {
+                                    background: "#eaeaea",
+                                    color: "#424242"
+                                }
+                            }}
+                        >
+                            {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
+                        </Button>
+                        <Button
+                            onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
+                            variant="contained"
+                            disabled={!cellValueChanged}
+                            sx={{
+                                mt: 2,
+                                "&.Mui-disabled": {
+                                    background: "#eaeaea",
+                                    color: "#424242"
+                                }
+                            }}
+                        >
+                            {mode === "edit" ? `${doI18n("pages:core-local-workspace:ok", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
+                        </Button>
 
                         <Button
                             onClick={() => {
@@ -89,8 +88,6 @@ function ButtonsNavigation({ ingredient, setIngredient, currentRowN, setCurrentR
                         >
                             {doI18n("pages:core-local-workspace:reset", i18nRef.current)}
                         </Button>
-
-
 
                         <IconButton
                             onClick={() => handleOpenModalDelete()}
@@ -122,13 +119,10 @@ function ButtonsNavigation({ ingredient, setIngredient, currentRowN, setCurrentR
                 ingredient={ingredient}
                 setIngredient={setIngredient}
                 rowData={rowData}
-                setSaveIngredientTsv={setSaveIngredientTsv}
                 currentRowN={currentRowN}
             />
         </Box>
     )
 }
 
-export default ButtonsNavigation;
-
-
+export default ActionsButtons;

@@ -9,7 +9,7 @@ function MarkdownField({ currentRow, columnNames, onChangeNote, value, mode, fie
     const [displayMode, setdisplayMode] = useState('write');
 
     return (
-        <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
+        <Box>
             <ToggleButtonGroup
                 exclusive
                 size="small"
@@ -39,9 +39,12 @@ function MarkdownField({ currentRow, columnNames, onChangeNote, value, mode, fie
                     />
                 </FormControl>
             ) : (
-                <Markdown fullWidth>
-                    {value}
-                </Markdown>
+                <Box sx={{border:"1px solid", marginTop:2}}>
+                    <Markdown fullWidth>
+                        {value}
+                    </Markdown>
+                </Box>
+
 
             )}
         </Box>

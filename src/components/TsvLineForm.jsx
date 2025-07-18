@@ -6,15 +6,15 @@ import {
     doI18n,
 } from "pithekos-lib";
 import { v4 as uuidv4 } from 'uuid';
-import ButtonsNavigation from "./ButtonsNavigation";
-import md5 from "md5";
+import ActionsButtons from "./ActionsButtons";
 
-function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, setSaveIngredientTsv, updateBcv, mode, currentRow, saveFunction,  }) {
+
+function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, saveFunction,  }) {
     const { i18nRef } = useContext(I18nContext);
     const [cellValueChanged, setCellValueChanged] = useState(false);
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const columnNames = ingredient[0] || [];
-    const [md5Ingredient, setMd5Ingredient] = useState("");
+   
 
     useEffect(
         () => {
@@ -29,12 +29,7 @@ function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, se
         [ingredient, currentRow, mode]
     );
 
-    // Vérification, des changements effectués sur le fichier 
-    useEffect(() => {
-        const hash = md5(JSON.stringify(ingredient, null, 2));
-        setMd5Ingredient(hash);
-        console.log("Hash initial :", hash);
-    }, []);
+
 
 
     // Permet la modification d'une note
@@ -98,13 +93,12 @@ function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, se
                 </FormControl>
 
             ))}
-            <ButtonsNavigation
+            <ActionsButtons
                 updateBcv={updateBcv}
                 rowData={rowData}
                 saveFunction={saveFunction}
                 handleCancel={handleCancel}
                 mode={mode}
-                setSaveIngredientTsv={setSaveIngredientTsv}
 
                 ingredient={ingredient}
                 setIngredient={setIngredient}

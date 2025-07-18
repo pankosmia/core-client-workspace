@@ -9,9 +9,9 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { IconButton } from "@mui/material";
 import SaveIcon from '@mui/icons-material/Save';
+import md5 from "md5";
 
-
-function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredientTsv }) {
+function SaveTsvButton({ ingredient, metadata ,md5Ingredient }) {
 
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
@@ -60,18 +60,18 @@ function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredi
     }
     return (
         <IconButton
-            disabled={!saveIngredientTsv}
+            disabled={md5(JSON.stringify(ingredient))=== md5Ingredient}
             sx={{
                 mt: 2,
                 "&.Mui-disabled": {
                     backgroundColor: '#eaeaea',
-                    color: '#424242',
+                    color: '#bebbbbff',
                 },
             }}
             variant="contained"
-            onClick={() => { handleSaveTsv(); setSaveIngredientTsv(false) }} >
+            onClick={() => { handleSaveTsv()}} >
             <SaveIcon
-                size="large" color={!saveIngredientTsv ? "#eaeaea" : "primary"}
+                size="large" color={md5(JSON.stringify(ingredient))=== md5Ingredient ? "#eaeaea":"primary"}
             />
         </IconButton>
     )
