@@ -5,7 +5,7 @@ import {
     debugContext as DebugContext,
     getText,
 } from "pithekos-lib";
-import { Box, FormControl, TextareaAutosize,FormLabel } from "@mui/material";
+import { Box, FormControl, TextareaAutosize, FormLabel, TextField } from "@mui/material";
 
 
 function DraftingEditor({ metadata, adjSelectedFontClass }) {
@@ -70,15 +70,12 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                 <Box >
                     <FormControl fullWidth margin="normal" key={index}>
                         <FormLabel>{`Verset ${column.verseRange}`}</FormLabel>
-                        <TextareaAutosize
+                        <TextField
+                            label={column.text}
                             value={column.text}
-                            //onChange={onChangeNote}
-                            minRows={4}
-                           style={{
-                                border: '1px solid',
-                                outline: 'none',
-                            }}
-                            onChange={onChangeNote}
+                            multiline
+                            minRows={5}
+                            maxRows={5}
                         />
                     </FormControl>
                 </Box>
