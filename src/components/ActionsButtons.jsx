@@ -29,7 +29,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
     // changer de page +1
     const nextRow = () => {
         const newRowN = currentRowN + 1;
-        if (ingredient[newRowN]) {
+        if (ingredient.length > 1 && ingredient[newRowN]) {
             //updateBcv(newRowN);
             setCurrentRowN(newRowN);
             setCellValueChanged(false)
