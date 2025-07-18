@@ -101,6 +101,14 @@
     "do_delete_button": {
       "en": "Delete",
       "fr": "Supprimer"
+    },
+    "ok":{
+      "en":"Ok",
+      "fr":"Ok"
+    },
+    "reset":{
+      "en":"Reset",
+      "fr":"Annuler"
     }
 
   }

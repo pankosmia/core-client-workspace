@@ -25,7 +25,6 @@ function Editor({ingredient, setIngredient, currentRowN,setCurrentRowN, setSaveI
     return <Box sx={{ display: 'flex', flexDirection:"column", gap: 2, padding: 2 }}>
             <TsvLineForm
                 mode="edit"
-
                 currentRow={currentRow}
                 saveFunction={handleSaveRow}
                 updateBcv={updateBcv}
