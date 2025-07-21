@@ -154,29 +154,6 @@ function ConfigureWorkspace() {
                 width: '100%'
             }}>
                 <Box sx={{ml: 2}}>
-                    <Box sx={{mb: 3}}>
-                        <ButtonGroup>
-                            <Button
-                                onClick={() => setLanguage("")}
-                                variant={language === "" ? "contained" : "outlined"}
-                                color="secondary"
-                            >
-                                {`* (${selectedResources.length}/${repos.length})`}
-                            </Button>
-                            {
-                                languages
-                                    .map(
-                                        ce => <Button
-                                            onClick={() => setLanguage(ce)}
-                                            variant={language === ce ? "contained" : "outlined"}
-                                            color="secondary"
-                                        >
-                                            {ce}
-                                        </Button>
-                                    )
-                            }
-                        </ButtonGroup>
-                    </Box>
                     <DataGrid
                         initialState={{
                             columns: {
