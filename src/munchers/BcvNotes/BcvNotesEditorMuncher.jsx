@@ -90,19 +90,31 @@ function BcvNotesViewerMuncher({ metadata }) {
         }}
         >
             {/* <SearchNavBar getAllData={getAllData} /> */}
-            <AddFab
-                currentRowN={currentRowN}
-                setCurrentRowN={setCurrentRowN}
+            <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2, justifyContent:"space-between" }}>
+                <AddFab
+                    currentRowN={currentRowN}
+                    setCurrentRowN={setCurrentRowN}
 
-                ingredient={ingredient}
-                setIngredient={setIngredient}
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
 
-                ingredientValueChanged={ingredientValueChanged}
-                setIngredientValueChanged={setIngredientValueChanged}
+                    ingredientValueChanged={ingredientValueChanged}
+                    setIngredientValueChanged={setIngredientValueChanged}
 
-                saveIngredientTsv={saveIngredientTsv}
-                setSaveIngredientTsv={setSaveIngredientTsv}
-            />
+                    saveIngredientTsv={saveIngredientTsv}
+                    setSaveIngredientTsv={setSaveIngredientTsv}
+                />
+                 <SaveTsvButton
+                    metadata={metadata}
+
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
+
+                    saveIngredientTsv={saveIngredientTsv}
+                    setSaveIngredientTsv={setSaveIngredientTsv}
+
+                />
+            </Box>
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
 
                 <SearchWithVerses
@@ -124,16 +136,7 @@ function BcvNotesViewerMuncher({ metadata }) {
                 />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-                <SaveTsvButton
-                    metadata={metadata}
-
-                    ingredient={ingredient}
-                    setIngredient={setIngredient}
-
-                    saveIngredientTsv={saveIngredientTsv}
-                    setSaveIngredientTsv={setSaveIngredientTsv}
-
-                />
+               
                 <Button
                     disabled={!ingredientValueChanged}
                     variant="contained"
