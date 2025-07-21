@@ -4,7 +4,7 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
 import { Box, ToggleButton, ToggleButtonGroup, TextareaAutosize, FormControl, FormLabel } from "@mui/material";
 
-function MarkdownField({ currentRow, columnNames, onChangeNote, value, mode, fieldN }) {
+function MarkdownField({ currentRow, columnNames, onChangeNote, value, mode, fieldN, ingredient, currentRowN }) {
 
     const [displayMode, setdisplayMode] = useState('write');
 
@@ -38,6 +38,8 @@ function MarkdownField({ currentRow, columnNames, onChangeNote, value, mode, fie
                                 border: 'none',
                                 outline: 'none',
                             }}
+                            disabled={mode === "edit" && ingredient[currentRowN] && ingredient[currentRowN].length === 1}
+                            
                         />
                     </FormControl>
                 ) : (

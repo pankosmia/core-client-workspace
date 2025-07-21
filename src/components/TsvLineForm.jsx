@@ -80,6 +80,8 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                             onChangeNote={(e) => changeCell(e, n)}
                             mode={mode}
                             fieldN={n}
+                            ingredient={ingredient}
+                           currentRowN={currentRowN}
 
                         />
                     ) : (
@@ -87,7 +89,7 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                             label={column}
                             value={rowData[n]}
                             required={n === 0}
-                            disabled={n === 1}
+                            disabled={n === 1|| (mode === "edit" && ingredient[currentRowN] && ingredient[currentRowN].length === 1)}
                             variant="outlined"
                             fullWidth
                             size="small"
