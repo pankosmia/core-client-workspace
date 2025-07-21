@@ -159,8 +159,11 @@ function ConfigureWorkspace() {
                             columns: {
                                 columnVisibilityModel: {
                                     description: false
-                                },
+                                }
                             },
+                            sorting: {
+                                sortModel: [{ field: 'name', sort: 'asc' }],
+                            }
                         }}
                         checkboxSelection
                         onRowSelectionModelChange={(selected) => {
