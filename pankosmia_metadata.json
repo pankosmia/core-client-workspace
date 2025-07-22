@@ -109,7 +109,26 @@
     "reset":{
       "en":"Reset",
       "fr":"Annuler"
+    },
+    "row_name": {
+      "en": "Name",
+      "fr": "Nom",
+      "es": "Nombre"
+    },
+    "row_description": {
+      "en": "Description",
+      "fr": "Description",
+      "es": "Descripción"
+    },
+    "row_type": {
+      "en": "Type",
+      "fr": "Type",
+      "es": "Tipo"
+    },
+    "row_language": {
+      "en": "Language",
+      "fr": "Langue",
+      "es": "Idioma"
     }
-
   }
 }
