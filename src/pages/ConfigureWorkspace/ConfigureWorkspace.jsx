@@ -4,46 +4,21 @@ import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18
 import {
     Box,
     Typography,
-    Fab,
-    ButtonGroup,
-    Button
+    Fab
 } from "@mui/material";
 import {DataGrid} from '@mui/x-data-grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 function ConfigureWorkspace() {
-    const [repos, setRepos] = useState([]);
+
     const {debugRef} = useContext(debugContext);
     const {i18nRef} = useContext(i18nContext);
     const {currentProjectRef} = useContext(currentProjectContext);
 
     const [selectedResources, setSelectedResources] = useState([]);
-    const [language, setLanguage] = useState("");
-
     const navigate = useNavigate();
 
-    const getRepoList = async () => {
-        const listResponse = await getJson("/git/list-local-repos", debugRef.current);
-        if (listResponse.ok) {
-            let responses = [];
-            for (const repoPath of listResponse.json) {
-                const metadataResponse = await getJson(`/burrito/metadata/summary/${repoPath}`);
-                if (metadataResponse.ok) {
-                    responses.push({path: repoPath, ...metadataResponse.json})
-                }
-            }
-            setRepos(responses);
-        }
-    }
-
-    useEffect(
-        () => {
-            getRepoList().then();
-        },
-        []
-    );
-
-    const [ projectSummaries, setProjectSummaries ] = useState();
+    const [ projectSummaries, setProjectSummaries ] = useState({});
 
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
@@ -91,8 +66,6 @@ function ConfigureWorkspace() {
         "x-parallel": "parascriptural"
     };
 
-    const languages = Array.from(new Set(repos.map(r => r.language_code))).sort();
-
     const columns = [
         {
             field: 'name',
@@ -117,9 +90,11 @@ function ConfigureWorkspace() {
         }
     ]
 
-    const rows = repos
+    const rows = Object.entries(projectSummaries)
+                    .map(e => {
+                        return {...e[1], path: e[0]}
+                    })
                     .filter((r) => currentProjectRef.current && projectFlavors[projectSummaries[r.path].flavor] === projectFlavors[projectSummaries[`_local_/_local_/${currentProjectRef.current.project}`].flavor])
-                    .filter(r => ["", r.language_code].includes(language))
                     .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
                     .map((rep, n) => {
                         return {
@@ -131,15 +106,6 @@ function ConfigureWorkspace() {
                             language: rep.language_code
                         }
                     });
-
-    /* console.log(projectSummaries[currentProjectRef.current?.project]) */
-
-    //console.log(projectSummaries);
-    /* console.log(Object.entries(projectSummaries)); */
-    //console.log(Object.entries(projectFlavors)[currentProjectRef.current?.project]);
-    //currentProjectRef.current && console.log(projectSummaries[`_local_/_local_/${currentProjectRef.current?.project}`].flavor);
-    //console.log(projectFlavors[currentProjectRef.current?.project].value);
-    //console.log(rows);
 
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
@@ -168,7 +134,10 @@ function ConfigureWorkspace() {
                     }}
                     onClick={
                         (e) => {
-                            let stateEntries = repos
+                            let stateEntries = Object.entries(projectSummaries)
+                                .map(e => {
+                                    return {...e[1], path: e[0]}
+                                })
                                 .map(r => [r.path, r])
                                 .filter(re => selectedResources.includes(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
                                 .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
