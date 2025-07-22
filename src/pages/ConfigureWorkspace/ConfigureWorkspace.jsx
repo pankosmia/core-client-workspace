@@ -43,6 +43,42 @@ function ConfigureWorkspace() {
         []
     );
 
+    const [ projectSummaries, setProjectSummaries ] = useState();
+
+    const getProjectSummaries = async () => {
+        const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
+        if (summariesResponse.ok) {
+            setProjectSummaries(summariesResponse.json);
+        }
+    }
+
+    useEffect(
+        () => {
+            getProjectSummaries().then();
+        },
+        []
+    );
+
+    const projectFlavors = {
+        "textTranslation": "myBcvList",
+        "audioTranslation": "myBcvList",
+        "x-bcvnotes": "myBcvList",
+        "x-bnotes": "myBcvList",
+        "x-bcvarticles": "myBcvList",
+        "x-bcvquestions": "myBcvList",
+        "x-bcvQuestions": "myBcvList",
+        "x-bcvimages": "myBcvList",
+        "x-juxtalinear": "myBcvList",
+        "x-parallel": "myBcvList",
+        "x-bcvImages": "myBcvList",
+        "textStories": "myObsList",
+        "x-obsimages": "myObsList",
+        "x-obsarticles": "myObsList",
+        "x-obsquestions": "myObsList",
+        "x-obsnotes": "myObsList",
+        "x-obsquestions": "myObsList"
+    };
+
     const flavorTypes = {
         textTranslation: "scripture",
         audioTranslation: "scripture",
@@ -82,6 +118,7 @@ function ConfigureWorkspace() {
     ]
 
     const rows = repos
+                    .filter((r) => currentProjectRef.current && projectFlavors[projectSummaries[r.path].flavor] === projectFlavors[projectSummaries[`_local_/_local_/${currentProjectRef.current.project}`].flavor])
                     .filter(r => ["", r.language_code].includes(language))
                     .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
                     .map((rep, n) => {
@@ -94,6 +131,15 @@ function ConfigureWorkspace() {
                             language: rep.language_code
                         }
                     });
+
+    /* console.log(projectSummaries[currentProjectRef.current?.project]) */
+
+    //console.log(projectSummaries);
+    /* console.log(Object.entries(projectSummaries)); */
+    //console.log(Object.entries(projectFlavors)[currentProjectRef.current?.project]);
+    //currentProjectRef.current && console.log(projectSummaries[`_local_/_local_/${currentProjectRef.current?.project}`].flavor);
+    //console.log(projectFlavors[currentProjectRef.current?.project].value);
+    //console.log(rows);
 
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
