@@ -16,6 +16,9 @@
 
 .audio-waveform {
     transition: opacity 0.2s ease;
+    overflow: hidden !important;
+    position: relative;
+    max-width: 100%;
 }
 
 .audio-waveform.loading {
@@ -24,4 +27,14 @@
 
 .audio-waveform.loaded {
     opacity: 1;
+}
+
+/* Styles pour s'assurer que wavesurfer reste dans ses limites */
+.audio-waveform > div {
+    overflow: hidden !important;
+    max-width: 100% !important;
+}
+
+.audio-waveform canvas {
+    max-width: 100% !important;
 }

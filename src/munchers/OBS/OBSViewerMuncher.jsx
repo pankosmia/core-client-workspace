@@ -62,7 +62,7 @@ function OBSViewerMuncher({metadata}) {
 
     return (
         <RequireResources contentSpec={contentSpec}>
-            <Stack sx={{ p:2}}>
+            <Stack sx={{ p:1}}>
                 <div>
                     <Markdown className="markdown-content">
                         {ingredient}

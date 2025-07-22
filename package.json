@@ -32,7 +32,8 @@
     "react-router-dom": "^6.27.0",
     "react-tile-pane": "^0.5.1",
     "react-use-measure": "^2.1.1",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "wavesurfer-multitrack": "^0.4.12"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
