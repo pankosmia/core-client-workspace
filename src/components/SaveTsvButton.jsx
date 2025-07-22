@@ -7,14 +7,14 @@ import {
     postJson
 } from "pithekos-lib";
 import { enqueueSnackbar } from "notistack";
-import { Button } from "@mui/material";
+import { IconButton } from "@mui/material";
+import SaveIcon from '@mui/icons-material/Save';
+import md5 from "md5";
 
-function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredientTsv }) {
-
+function SaveTsvButton({ ingredient, metadata, md5Ingredient, setMd5Ingredient }) {
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
     const [contentChanged, _setContentChanged] = useState(false);
-
 
     // Met à jour le fichier TSV
     const uploadTsvIngredient = async (tsvData, debugBool) => {
@@ -50,24 +50,29 @@ function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredi
 
     // Montre le changement d'état du contenu 
     const setContentChanged = nv => {
-        console.log("setContentChanged", nv);
         _setContentChanged(nv);
     }
     // Permet de sauvegarder dans le fichier TSV 
     const handleSaveTsv = () => {
+        setMd5Ingredient(md5(JSON.stringify(ingredient)))
         uploadTsvIngredient([...ingredient])
     }
     return (
-        <Button
-            disabled={!saveIngredientTsv}
-            variant="contained"
+        <IconButton
+            disabled={md5(JSON.stringify(ingredient)) === md5Ingredient}
             sx={{
                 mt: 2,
                 "&.Mui-disabled": {
-                    background: "#eaeaea",
-                    color: "#424242"
-                }
-            }} onClick={() => { handleSaveTsv(); setSaveIngredientTsv(false) }} > {doI18n("pages:core-local-workspace:save_tsv", i18nRef.current)} </Button>
+                    backgroundColor: '#eaeaea',
+                    color: '#bebbbbff',
+                },
+            }}
+            variant="contained"
+            onClick={() => { handleSaveTsv() }} >
+            <SaveIcon
+                size="large" color={md5(JSON.stringify(ingredient)) === md5Ingredient ? "#eaeaea" : "primary"}
+            />
+        </IconButton>
     )
 }
 export default SaveTsvButton;
