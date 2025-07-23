@@ -1,22 +1,14 @@
-import { Box, FormControl, TextField, Button, IconButton } from "@mui/material";
+import { Box, FormControl, TextField } from "@mui/material";
 import MarkdownField from "./MarkdownField";
 import { useState, useContext, useEffect } from "react";
-import {
-    i18nContext as I18nContext,
-    doI18n,
-} from "pithekos-lib";
-import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuidv4 } from 'uuid';
-import DeleteNote from "./DeleteNote";
-//import ModalCLoseLineDialog from "./ModalCloseLineDialog";
+import ActionsButtons from "./ActionsButtons";
 
-function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, setIngredient, setSaveIngredientTsv, setIngredientValueChanged }) {
-    const { i18nRef } = useContext(I18nContext);
-    const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
+function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, saveFunction,  }) {
     const [cellValueChanged, setCellValueChanged] = useState(false);
-    const [openedModalDelete, setOpenedModalDelete] = useState(false);
+    const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const columnNames = ingredient[0] || [];
-
+   
     useEffect(
         () => {
             if (mode === "edit" && ingredient.length > 0) {
@@ -29,10 +21,6 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
         },
         [ingredient, currentRow, mode]
     );
-    // Permet d'ouvrir la modal Delete
-    const handleOpenModalDelete = () => {
-        setOpenedModalDelete("delete");
-    };
 
     // Permet la modification d'une note
     const changeCell = (event, n) => {
@@ -44,16 +32,13 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
         } else {
             setCellValueChanged(false)
         }
-        setIngredientValueChanged(false)
         setRowData(newRowData);
-
     };
 
     // Permet d'annuler les modications faites sur la note 
     const handleCancel = () => {
         const newRowData = (mode === "edit" ? [...currentRow] : Array(7).fill("", 0, 7))
         setRowData(newRowData);
-
     };
 
     const generateId = () => {
@@ -78,7 +63,6 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                             value={rowData[n]}
                             columnNames={columnNames}
                             onChangeNote={(e) => changeCell(e, n)}
-                            mode={mode}
                             fieldN={n}
 
                         />
@@ -86,80 +70,35 @@ function TsvLineForm({ mode, currentRow, ingredient, saveFunction, currentRowN, 
                         <TextField
                             label={column}
                             value={rowData[n]}
+                            placeholder={n === 0 ? "1:1" : ""}
                             required={n === 0}
                             disabled={n === 1}
                             variant="outlined"
                             fullWidth
                             size="small"
                             onChange={(e) => changeCell(e, n)}
-
                         />
                     )}
                 </FormControl>
 
             ))}
-            <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-                <Button
-                    onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
-                    variant="contained"
-                    disabled={!cellValueChanged}
-                    sx={{
-                        mt: 2,
-                        "&.Mui-disabled": {
-                            background: "#eaeaea",
-                            color: "#424242"
-                        }
-                    }}
-                >
-                    {mode === "edit" ? `${doI18n("pages:core-local-workspace:editing", i18nRef.current)}` : `${doI18n("pages:core-local-workspace:save_note", i18nRef.current)}`}
-                </Button>
+            <ActionsButtons
+                updateBcv={updateBcv}
+                rowData={rowData}
+                saveFunction={saveFunction}
+                handleCancel={handleCancel}
+                mode={mode}
 
-                {mode === "edit" && (
-                    <Button
-                        onClick={() => {
-                            handleCancel();
-                            setCellValueChanged(false);
-                            setIngredientValueChanged(true)
-                        }}
-                        variant="contained"
-                        disabled={!cellValueChanged}
-                        sx={{
-                            mt: 2,
-                            "&.Mui-disabled": {
-                                background: "#eaeaea",
-                                color: "#424242"
-                            }
-                        }}
-                    >
-                        {doI18n("pages:core-local-workspace:cancel", i18nRef.current)}
-                    </Button>
-                )}
-
-                {mode === "edit" && (
-                    <IconButton
-                        onClick={() => handleOpenModalDelete()}
-                        sx={{
-                            mt: 2
-                        }}
-                    >
-                        <DeleteIcon size="large" color="primary" />
-                    </IconButton>
-                )}
-
-            </Box>
-            <DeleteNote
-                mode="delete"
-                open={openedModalDelete === "delete"}
-                closeModal={() => setOpenedModalDelete(null)}
                 ingredient={ingredient}
                 setIngredient={setIngredient}
-                rowData={rowData}
-                setSaveIngredientTsv={setSaveIngredientTsv}
-                currentRowN={currentRowN}
-            />
-            {/* <ModalCLoseLineDialog setCellValueChanged={setCellValueChanged} cellValueChanged={cellValueChanged} /> */}
-        </Box>
 
+                currentRowN={currentRowN}
+                setCurrentRowN={setCurrentRowN}
+
+                cellValueChanged={cellValueChanged}
+                setCellValueChanged={setCellValueChanged}
+            />
+        </Box>
     )
 }
 

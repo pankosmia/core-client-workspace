@@ -5,7 +5,7 @@ import {
     doI18n,
 } from "pithekos-lib";
 
-function DeleteNote({open,closeModal, ingredient, setIngredient, rowData, setSaveIngredientTsv, currentRowN }) {
+function DeleteNote({open,closeModal, ingredient, setIngredient, rowData, currentRowN }) {
     const { i18nRef } = useContext(I18nContext);
 
     const handleClose = () => {
@@ -15,7 +15,6 @@ function DeleteNote({open,closeModal, ingredient, setIngredient, rowData, setSav
     const handleDeleteRow = (rowN) => {
         const newIngredient = [...ingredient]
         newIngredient.splice(rowN, 1)
-        setSaveIngredientTsv(true)
         setIngredient(newIngredient)
     };
 

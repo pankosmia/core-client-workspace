@@ -87,9 +87,11 @@
       "fr": "Enregistrez votre nouvelle note"
     },
     "save_tsv": {
+      "en":"Save to file",
       "fr": "Sauvegarder dans le fichier "
     },
     "new_bcv_note": {
+      "en":"New note",
       "fr": "Nouvelle note"
     },
     "delete_note_bcv":{
@@ -99,7 +101,34 @@
     "do_delete_button": {
       "en": "Delete",
       "fr": "Supprimer"
+    },
+    "ok":{
+      "en":"Ok",
+      "fr":"Ok"
+    },
+    "reset":{
+      "en":"Reset",
+      "fr":"Annuler"
+    },
+    "row_name": {
+      "en": "Name",
+      "fr": "Nom",
+      "es": "Nombre"
+    },
+    "row_description": {
+      "en": "Description",
+      "fr": "Description",
+      "es": "Descripción"
+    },
+    "row_type": {
+      "en": "Type",
+      "fr": "Type",
+      "es": "Tipo"
+    },
+    "row_language": {
+      "en": "Language",
+      "fr": "Langue",
+      "es": "Idioma"
     }
-
   }
 }

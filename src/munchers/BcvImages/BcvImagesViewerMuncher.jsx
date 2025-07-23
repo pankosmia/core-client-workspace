@@ -111,9 +111,11 @@ function BcvImagesViewerMuncher({metadata}) {
     
     return (
         <Box className="h-full w-full flex flex-col overflow-hidden">
-            <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
-            <h6>{doI18n("munchers:bcv_notes_viewer:title", i18nRef.current)}</h6>
-            <div className="flex-1 min-h-0 min-w-0 overflow-hidden">
+            <div className="flex flex-col items-center justify-center p-2">
+                <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
+                <h6>{doI18n("munchers:bcv_notes_viewer:title", i18nRef.current)}</h6>
+            </div>
+            <div className="flex-1 min-h-0 min-w-0 overflow-hidden p-2">
                 {ingredient &&
                 verseNotes.length > 0 ? 
                     <div className="relative w-full h-full overflow-hidden">
