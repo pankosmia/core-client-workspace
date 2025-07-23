@@ -1,18 +1,16 @@
-import { useRef, useState, useCallback, useMemo, useEffect } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
 import PauseIcon from '@mui/icons-material/Pause';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import EditIcon from '@mui/icons-material/Edit';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RestoreIcon from '@mui/icons-material/Restore';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import { useWavesurfer } from '@wavesurfer/react'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js'
 import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js'
@@ -28,7 +26,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     const regionsPlugin = useMemo(() => RegionsPlugin.create(), []);
     const recordPlugin = useMemo(() => RecordPlugin.create(), []);
     const plugins = useMemo(() => [regionsPlugin, recordPlugin], [regionsPlugin, recordPlugin]);
-    const [prise, setPrise] = useState("a");
+    const [prise, setPrise] = useState("1");
     const [bakExists, setBakExists] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [showOtherTracks, setShowOtherTracks] = useState(false);
@@ -36,8 +34,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     const [currentTrack, setCurrentTrack] = useState(0);
     const [trackDurations, setTrackDurations] = useState({});
     const [maxDuration, setMaxDuration] = useState(0);
-    const [selectedRegions, setSelectedRegions] = useState([]);
-    const [multiTrackMode, setMultiTrackMode] = useState(false); 
+    const [selectedRegion, setSelectedRegion] = useState([]);
+    const cursorRef = useRef(null);
 
     const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], newPrise = prise) => {
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
@@ -105,9 +103,10 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         return new Blob([arrayBuffer], { type: 'audio/wav' });
     };
 
-    const concatenateAudioFiles = async (startTimeA, endTimeA, startTimeB, endTimeB) => {
-        const urlA = getUrl().replace(`-${prise}.mp3`, '-a.mp3');
-        const urlB = getUrl().replace(`-${prise}.mp3`, '-b.mp3');
+    // ça insert l'audio B a un endroit dans l'audio A
+    const insertAudio = async (A, B, insertTime, startTimeB, endTimeB) => {
+        const urlA = getUrl().replace(`-${prise}.mp3`, `-${A}.mp3`);
+        const urlB = getUrl().replace(`-${prise}.mp3`, `-${B}.mp3`);    
 
         const audioContext = new AudioContext();
 
@@ -124,22 +123,36 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
                 const sampleRate = bufferA.sampleRate;
 
-                const segmentA = bufferA.getChannelData(0).slice(
-                    startTimeA * sampleRate, endTimeA * sampleRate
+                // Débyt del'audio A
+                const segmentA1 = bufferA.getChannelData(0).slice(
+                    0, insertTime * sampleRate                    
                 );
+                // Fin de l'audio A
+                const segmentA2 = bufferA.getChannelData(0).slice(
+                    insertTime * sampleRate, bufferA.getChannelData(0).length
+                );
+
+                // Début de l'audio B
                 const segmentB = bufferB.getChannelData(0).slice(
                     startTimeB * sampleRate, endTimeB * sampleRate
                 );
 
-                const totalSamples = segmentA.length + segmentB.length;
+                const totalSamples = segmentA1.length + segmentB.length + segmentA2.length;
                 const newBuffer = audioContext.createBuffer(1, totalSamples, sampleRate);
                 const channel = newBuffer.getChannelData(0);
 
-                channel.set(segmentA, 0);
-                channel.set(segmentB, segmentA.length);
+                channel.set(segmentA1, 0);
+                channel.set(segmentB, segmentA1.length);
+                channel.set(segmentA2, segmentA1.length + segmentB.length);
 
                 const wav = audioBufferToWav(newBuffer);
-                return URL.createObjectURL(wav);
+                const newUrl = URL.createObjectURL(wav);
+                const newMaxDuration = (endTimeB - startTimeB) + (bufferA.getChannelData(0).length / sampleRate);
+                if (newMaxDuration > maxDuration) {
+                    setMaxDuration(newMaxDuration);
+                }
+
+                return newUrl;
             }
         } catch (error) {
             console.error('Erreur:', error);
@@ -216,6 +229,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         barWidth: 2,
         barGap: 1,
         barRadius: 2,
+        cursorWidth: 0,
     })
 
     const onPlayPause = () => {
@@ -236,14 +250,6 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         // A faire: Save le fichier audio
     }
 
-    const addRegion = (start, end, content = "") => {
-        regionsPlugin.addRegion({
-            content: content,
-            start: start,
-            end: end,
-        });
-    }
-
     const onRestore = () => {
         const bakUrl = getUrl("revert");
         fetch(bakUrl, {
@@ -254,17 +260,14 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         })
     }
 
-    useEffect(() => {
-        regionsPlugin.getRegions().forEach((region) => {
-            console.log(`${region.start} - ${region.end}`);
-        });
-    });
-
     wavesurfer?.on("ready", () => {
         setIsLoading(false);
     });
     wavesurfer?.on("loading", () => {
         setIsLoading(true);
+    });
+    wavesurfer?.on("timeupdate", () => {
+        setCursorTime(wavesurfer.getCurrentTime());
     });
 
     useEffect(() => {
@@ -273,13 +276,6 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
             setIsLoading(true);
             if (await fileExists(getUrl())) {
                 setTimeout(async () => {
-                    // if (getUrl().includes("01-00-a")) {
-                    //     const concatenatedUrl = await concatenateAudioFiles(3, 8, 0, 3);
-                    //     if (concatenatedUrl) {
-                    //         setAudioUrl(concatenatedUrl);
-                    //         return;
-                    //     }
-                    // }
                     setAudioUrl(getUrl())
                 }, audioUrl != "" ? 200 : 0);
             } else {
@@ -311,19 +307,26 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
     const handleRegionSelect = (regionData) => {
         console.log('Région sélectionnée:', regionData);
-        setSelectedRegions(prev => {
-            const filtered = prev.filter(r => r.trackId !== regionData.trackId);
-            return [...filtered, regionData];
+        const oldRegion = selectedRegion[0];
+        oldRegion?.setOptions({
+            color: 'rgba(0, 0, 0, 0.1)',
         });
+        regionData[0].setOptions({
+            color: 'rgba(0, 0, 0, 0.3)',
+        });
+        setSelectedRegion(regionData);
     };
 
-    const applyRegionToMainTrack = async (regionData) => {
-        if (!regionData) return;
-        
-        console.log(`Application de la région ${regionData.startTime}-${regionData.endTime} de la track ${regionData.trackId} à la track principale`);
-        
-        alert(`Région appliquée: ${regionData.startTime.toFixed(2)}s - ${regionData.endTime.toFixed(2)}s depuis la track ${regionData.trackId}`);
-    };
+    const copyRegion = async (regionData) => {
+        console.log(regionData[0].start, regionData[0].end);
+        const concatenatedUrl = await insertAudio("1", regionData[1], cursorTime, regionData[0].start, regionData[0].end);
+        setAudioUrl(concatenatedUrl);
+    }
+
+    const deleteRegion = (regionData) => {
+        regionData[0].remove();
+        setSelectedRegion([]);
+    }
 
     useEffect(() => {
         const updateOtherPrises = async () => {
@@ -336,68 +339,36 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                 const priseNumbers = prises.map(prise => prise.split(`/${chapterString}-${paragraphString}-`)[1].replace(".mp3", ""));
                 console.log(priseNumbers);
                 setOtherPrises(priseNumbers);
-                
+
                 setTrackDurations({});
                 setMaxDuration(0);
-                setSelectedRegions([]);
+                setSelectedRegion([]);
             } else {
                 setOtherPrises([]);
                 setTrackDurations({});
                 setMaxDuration(0);
-                setSelectedRegions([]);
+                setSelectedRegion([]);
             }
         }
         updateOtherPrises();
+        wavesurfer?.setOptions({
+            cursorWidth: showOtherTracks ? 0 : 1,
+        })
+        setTimeout(() => {
+            cursorRef.current.style.backgroundColor = 'red';
+        }, 300)
     }, [showOtherTracks, obs])
 
-    const prepareTracksForEditor = () => {
-        return otherPrises.map(priseNumber => ({
-            id: priseNumber,
-            name: priseNumber.toUpperCase(),
-            url: getUrl("bytes", obs[0], obs[1], priseNumber)
-        }));
-    };
-
-    if (multiTrackMode && showOtherTracks) {
-        return (
-            <Stack sx={{ mt: 5 }}>
-                <Box sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    backgroundColor: 'rgb(255, 254, 246)', 
-                    p: 1, 
-                    borderRadius: '8px 8px 0 0' 
-                }}>
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                checked={multiTrackMode}
-                                onChange={(e) => setMultiTrackMode(e.target.checked)}
-                                color="primary"
-                            />
-                        }
-                        label="Mode MultiTrack Avancé"
-                        sx={{ mr: 2 }}
-                    />
-                    
-                    <Box sx={{ flex: 1 }} />
-                    
-                    <IconButton
-                        onClick={() => setShowOtherTracks(false)}
-                        title="Fermer l'éditeur"
-                    >
-                        <ArrowBackIosIcon />
-                    </IconButton>
-                </Box>
-            </Stack>
-        );
-    }
+    useEffect(() => {
+        // wavesurfer?.setTime(cursorTime);
+    }, [maxDuration, cursorTime ])
 
     return (
-        <Stack sx={{ mt: 5, backgroundColor: "rgb(224, 224, 224)", borderRadius: 1, boxShadow: 1, width: '100%', height: otherPrises?.length > 0 ? `${otherPrises?.length * 100 + 150}px` : '150px' }}>
+        <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+        <Stack sx={{ position: 'relative', mt: 5, backgroundColor: "rgb(224, 224, 224)", borderRadius: 1, boxShadow: 1, width: '100%', height: otherPrises?.length > 0 ? `${otherPrises?.length * 100 + 150}px` : '150px', overflow: 'hidden' }}>
 
             {/* Barre du haut */}
-            <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgb(19, 18, 15)', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgb(19, 18, 15)', justifyContent: 'space-between', zIndex: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', marginLeft: 2, color: 'white' }}>
                     {/*Timer*/}
                     <Box sx={{ fontSize: 16, fontWeight: 600, minWidth: '60px', textAlign: 'center' }}> {formatTime(currentTime)} </Box>
@@ -412,19 +383,19 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'flex-end', marginRight: 2 }}>
                     {/* Boutons d'édition pour les régions sélectionnées */}
-                    {selectedRegions.length > 0 && (
+                    {selectedRegion.length > 0 && (
                         <Box sx={{ display: 'flex', gap: 1, mr: 2 }}>
-                            <IconButton 
-                                size="small" 
-                                onClick={() => applyRegionToMainTrack(selectedRegions[selectedRegions.length - 1])}
+                            <IconButton
+                                size="small"
+                                onClick={() => copyRegion(selectedRegion)}
                                 sx={{ backgroundColor: 'rgb(76, 175, 80)', color: 'white', '&:hover': { backgroundColor: 'rgb(56, 142, 60)' } }}
                                 title="Appliquer la région sélectionnée à la track principale"
                             >
-                                <EditIcon fontSize="small" />
+                                <ContentCopyIcon fontSize="small" />
                             </IconButton>
-                            <IconButton 
-                                size="small" 
-                                onClick={() => setSelectedRegions([])}
+                            <IconButton
+                                size="small"
+                                onClick={() => deleteRegion(selectedRegion)}
                                 sx={{ backgroundColor: 'rgb(244, 67, 54)', color: 'white', '&:hover': { backgroundColor: 'rgb(198, 40, 40)' } }}
                                 title="Effacer les sélections"
                             >
@@ -432,22 +403,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                             </IconButton>
                         </Box>
                     )}
-                    
-                    {/* Bouton Mode MultiTrack */}
-                    {/* {showOtherTracks && otherPrises.length > 0 && (
-                        <IconButton
-                            onClick={() => setMultiTrackMode(true)}
-                            sx={{ 
-                                color: 'rgb(63, 81, 181)', 
-                                mr: 1,
-                                '&:hover': { backgroundColor: 'rgba(63, 81, 181, 0.1)' }
-                            }}
-                            title="Passer en mode éditeur multitrack avancé"
-                        >
-                            <QueueMusicIcon />
-                        </IconButton>
-                    )} */}
-                    
+
                     {/* Bouton d'affichage pour les autres pistes audio */}
                     <IconButton
                         onClick={() => setShowOtherTracks((prev) => !prev)}
@@ -463,7 +419,25 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                 </Box>
             </Box>
             <Divider />
-            
+
+            {/* Curseur multi track */}
+            {showOtherTracks && (
+                <span 
+                    ref={cursorRef} 
+                    style={{ 
+                        position: 'absolute', 
+                        height: '100%',
+                        width: '1px', 
+                        backgroundColor: 'transparent', 
+                        zIndex: 2,
+                        pointerEvents: 'none',
+                        left: 8,
+                        transform: `translateX(${ waveformRef.current ? waveformRef.current.clientWidth / maxDuration * cursorTime : 0}px)`,
+                        transition: 'transform 0.1s',
+                    }}
+                />
+            )}
+
             {/* Track principale */}
             <Box sx={{ p: 1, backgroundColor: 'rgb(255, 245, 245)', overflow: 'hidden' }}>
                 <Box sx={{ fontSize: 12, fontWeight: 600, mb: 1, color: 'rgb(255, 69, 0)' }}>
@@ -472,21 +446,18 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                 <div
                     ref={waveformRef}
                     className={`audio-waveform ${isLoading ? 'loading' : 'loaded'}`}
-                    style={{ width: '100%', height: '100px', marginBottom: '', overflow: 'hidden' }}  
+                    style={{ width: '100%', height: '100px', marginBottom: '', overflow: 'hidden' }}
                 />
             </Box>
-            
+
             {/* Liste des autres pistes audio */}
             {showOtherTracks && (
                 <Box sx={{ p: 1, backgroundColor: 'rgb(235, 235, 235)', maxHeight: '300px', overflowY: 'auto', overflowX: 'hidden' }}>
                     {otherPrises.map((priseNumber, index) => (
                         <Box key={`${obs[0]}-${obs[1]}-${priseNumber}-${index}`} sx={{ mb: 1 }}>
                             <Box sx={{ fontSize: 11, color: 'rgb(120, 120, 120)', mb: 0.5 }}>
-                                Track {priseNumber.toUpperCase()} 
+                                Track {priseNumber.toUpperCase()}
                                 {trackDurations[priseNumber] && ` - ${formatTime(trackDurations[priseNumber])}`}
-                                {selectedRegions.find(r => r.trackId === priseNumber) && 
-                                    ` - Région: ${selectedRegions.find(r => r.trackId === priseNumber).startTime.toFixed(1)}s-${selectedRegions.find(r => r.trackId === priseNumber).endTime.toFixed(1)}s`
-                                }
                             </Box>
                             <Waveform
                                 priseNumber={priseNumber}
@@ -501,6 +472,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                 onRegionSelect={handleRegionSelect}
                                 onDurationUpdate={updateTrackDuration}
                                 isMainTrack={false}
+                                mainTrackRef={waveformRef}
+                                setMaxDuration={setMaxDuration}
                             />
                         </Box>
                     ))}
@@ -511,8 +484,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                     )}
                 </Box>
             )}
-        </Stack>
-
+            </Stack>
+        </Box>
     );
 };
 export default AudioRecorder;
