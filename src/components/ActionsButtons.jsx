@@ -11,7 +11,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
-function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN, cellValueChanged, setCellValueChanged, updateBcv, rowData, handleCancel, mode, saveFunction }) {
+function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN, cellValueChanged, setCellValueChanged, updateBcv, rowData, handleCancel, mode, saveFunction, handleCloseModalNewNote }) {
     const { i18nRef } = useContext(I18nContext);
     const [openedModalDelete, setOpenedModalDelete] = useState(false);
 
@@ -71,7 +71,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                         }
                     }}
                 >
-                  <CheckIcon size="large"color={!cellValueChanged ? "#eaeaea" : "primary"}/>
+                  <CheckIcon onClick={()=>{mode === "add" && (handleCloseModalNewNote())}} size="large"color={!cellValueChanged ? "#eaeaea" : "primary"}/>
                 </IconButton>
                 {mode === "edit" && (
                     <>

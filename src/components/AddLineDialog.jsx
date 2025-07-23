@@ -12,7 +12,7 @@ function AddLineDialog({ open,closeModal, ingredient, setIngredient, currentRowN
     const [newCurrentRow, setNewCurrentRow] = useState((ingredient[0] || []).map(c => ""));
 
     // Permet de fermer la modal principale 
-    const handleCloseModalMain = () => {
+    const handleCloseModalNewNote = () => {
         closeModal();
     }
 
@@ -29,14 +29,14 @@ function AddLineDialog({ open,closeModal, ingredient, setIngredient, currentRowN
         <Dialog
             fullScreen
             open={open}
-            onClose={handleCloseModalMain}
+            onClose={handleCloseModalNewNote}
         >
             <AppBar sx={{ position: 'relative' }}>
                 <Toolbar>
                     <IconButton
                         edge="start"
                         color="inherit"
-                        onClick={handleCloseModalMain}
+                        onClick={handleCloseModalNewNote}
                     >
                         <CloseIcon />
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
@@ -53,7 +53,7 @@ function AddLineDialog({ open,closeModal, ingredient, setIngredient, currentRowN
                 ingredient={ingredient}
                 setIngredient={setIngredient}
                 saveFunction={handleSaveNewTsvRow}
-
+                handleCloseModalNewNote={handleCloseModalNewNote}
             />
 
         </Dialog>

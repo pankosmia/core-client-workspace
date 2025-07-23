@@ -4,7 +4,7 @@ import { useState, useContext, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import ActionsButtons from "./ActionsButtons";
 
-function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, saveFunction, }) {
+function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, saveFunction,handleCloseModalNewNote }) {
     const [cellValueChanged, setCellValueChanged] = useState(false);
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const columnNames = ingredient[0] || [];
@@ -91,6 +91,7 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
                 saveFunction={saveFunction}
                 handleCancel={handleCancel}
                 mode={mode}
+                handleCloseModalNewNote={handleCloseModalNewNote}
 
                 ingredient={ingredient}
                 setIngredient={setIngredient}
