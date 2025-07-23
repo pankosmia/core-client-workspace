@@ -42,20 +42,20 @@ function BcvNotesViewerMuncher({ metadata }) {
         () => {
             getAllData().then();
 
-},
+        },
 
-[systemBcv]
+        [systemBcv]
     );
 
-const updateBcv = rowN => {
-    const newCurrentRowCV = ingredient[rowN][0].split(":")
-    postEmptyJson(
-        `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
-        debugRef.current
-    );
+    const updateBcv = rowN => {
+        const newCurrentRowCV = ingredient[rowN][0].split(":")
+        postEmptyJson(
+            `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
+            debugRef.current
+        );
 
-}
-
+    }
+    
 useEffect(() => {
     const onBeforeUnload = ev => {
         ev.preventDefault();

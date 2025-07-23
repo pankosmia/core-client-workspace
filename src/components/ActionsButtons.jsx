@@ -20,7 +20,6 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
     const previousRow = () => {
         const newRowN = currentRowN - 1;
         if (newRowN >= 1 && ingredient.length > 1 && ingredient[newRowN]) {
-            //updateBcv(newRowN);
             setCurrentRowN(newRowN);
             setCellValueChanged(false)
         }
@@ -29,8 +28,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
     // changer de page +1
     const nextRow = () => {
         const newRowN = currentRowN + 1;
-        if (ingredient.length > 1 && ingredient[newRowN]) {
-            //updateBcv(newRowN);
+        if (ingredient.length > 1 && ingredient[newRowN] && ingredient[newRowN].length > 0) {
             setCurrentRowN(newRowN);
             setCellValueChanged(false)
         }
@@ -43,7 +41,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                     <>
                         <IconButton
                             variant="contained"
-                            onClick={() => { previousRow(); saveFunction(currentRowN, rowData) }}
+                            onClick={() => { previousRow(); saveFunction(currentRowN, rowData); updateBcv() }}
                             sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
@@ -54,7 +52,6 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                         >
                             <ArrowBackIosNewIcon />
                         </IconButton>
-
                         <IconButton
                             onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
                             variant="contained"
@@ -69,7 +66,6 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                         >
                             <CheckIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"} />
                         </IconButton>
-
                         <IconButton
                             onClick={() => {
                                 handleCancel();
@@ -87,7 +83,6 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                         >
                             <RestoreIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"} />
                         </IconButton>
-
                         <IconButton
                             onClick={() => handleOpenModalDelete()}
                             sx={{
@@ -101,9 +96,8 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                         >
                             <DeleteIcon size="large" color={ingredient[currentRowN] && ingredient[currentRowN].length === 1 ? "#eaeaea" : "primary"} />
                         </IconButton>
-
                         <IconButton
-                            onClick={() => { nextRow(); saveFunction(currentRowN, rowData) }} variant="contained"
+                            onClick={() => { nextRow(); saveFunction(currentRowN, rowData); updateBcv() }} variant="contained"
                             sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
