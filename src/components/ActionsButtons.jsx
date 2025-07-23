@@ -95,11 +95,16 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
 
                         <IconButton
                             onClick={() => handleOpenModalDelete()}
-                            sx={{
-                                mt: 2
+                             sx={{
+                                mt: 2,
+                                "&.Mui-disabled": {
+                                    background: "#eaeaea",
+                                   color: '#bebbbbff'
+                                }
                             }}
+                            disabled={ingredient[currentRowN] && ingredient[currentRowN].length === 1}
                         >
-                            <DeleteIcon size="large" color="primary" />
+                            <DeleteIcon size="large"color={ingredient[currentRowN] && ingredient[currentRowN].length === 1 ? "#eaeaea" : "primary"} />
                         </IconButton>
 
                         <IconButton

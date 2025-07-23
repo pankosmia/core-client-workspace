@@ -4,44 +4,55 @@ import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18
 import {
     Box,
     Typography,
-    Fab,
-    ButtonGroup,
-    Button
+    Fab
 } from "@mui/material";
 import {DataGrid} from '@mui/x-data-grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 function ConfigureWorkspace() {
-    const [repos, setRepos] = useState([]);
+
     const {debugRef} = useContext(debugContext);
     const {i18nRef} = useContext(i18nContext);
     const {currentProjectRef} = useContext(currentProjectContext);
 
     const [selectedResources, setSelectedResources] = useState([]);
-    const [language, setLanguage] = useState("");
-
     const navigate = useNavigate();
 
-    const getRepoList = async () => {
-        const listResponse = await getJson("/git/list-local-repos", debugRef.current);
-        if (listResponse.ok) {
-            let responses = [];
-            for (const repoPath of listResponse.json) {
-                const metadataResponse = await getJson(`/burrito/metadata/summary/${repoPath}`);
-                if (metadataResponse.ok) {
-                    responses.push({path: repoPath, ...metadataResponse.json})
-                }
-            }
-            setRepos(responses);
+    const [ projectSummaries, setProjectSummaries ] = useState({});
+
+    const getProjectSummaries = async () => {
+        const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
+        if (summariesResponse.ok) {
+            setProjectSummaries(summariesResponse.json);
         }
     }
 
     useEffect(
         () => {
-            getRepoList().then();
+            getProjectSummaries().then();
         },
         []
     );
+
+    const projectFlavors = {
+        "textTranslation": "myBcvList",
+        "audioTranslation": "myBcvList",
+        "x-bcvnotes": "myBcvList",
+        "x-bnotes": "myBcvList",
+        "x-bcvarticles": "myBcvList",
+        "x-bcvquestions": "myBcvList",
+        "x-bcvQuestions": "myBcvList",
+        "x-bcvimages": "myBcvList",
+        "x-juxtalinear": "myBcvList",
+        "x-parallel": "myBcvList",
+        "x-bcvImages": "myBcvList",
+        "textStories": "myObsList",
+        "x-obsimages": "myObsList",
+        "x-obsarticles": "myObsList",
+        "x-obsquestions": "myObsList",
+        "x-obsnotes": "myObsList",
+        "x-obsquestions": "myObsList"
+    };
 
     const flavorTypes = {
         textTranslation: "scripture",
@@ -54,8 +65,6 @@ function ConfigureWorkspace() {
         "x-juxtalinear": "scripture",
         "x-parallel": "parascriptural"
     };
-
-    const languages = Array.from(new Set(repos.map(r => r.language_code))).sort();
 
     const columns = [
         {
@@ -81,8 +90,11 @@ function ConfigureWorkspace() {
         }
     ]
 
-    const rows = repos
-                    .filter(r => ["", r.language_code].includes(language))
+    const rows = Object.entries(projectSummaries)
+                    .map(e => {
+                        return {...e[1], path: e[0]}
+                    })
+                    .filter((r) => currentProjectRef.current && projectFlavors[projectSummaries[r.path].flavor] === projectFlavors[projectSummaries[`_local_/_local_/${currentProjectRef.current.project}`].flavor])
                     .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
                     .map((rep, n) => {
                         return {
@@ -122,7 +134,10 @@ function ConfigureWorkspace() {
                     }}
                     onClick={
                         (e) => {
-                            let stateEntries = repos
+                            let stateEntries = Object.entries(projectSummaries)
+                                .map(e => {
+                                    return {...e[1], path: e[0]}
+                                })
                                 .map(r => [r.path, r])
                                 .filter(re => selectedResources.includes(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
                                 .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
