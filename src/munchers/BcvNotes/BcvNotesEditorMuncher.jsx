@@ -77,7 +77,8 @@ function BcvNotesViewerMuncher({ metadata }) {
 
                     ingredient={ingredient}
                     setIngredient={setIngredient}
-
+                    cellValueChanged={cellValueChanged}
+                    setCellValueChanged={setCellValueChanged}
                 />
                 <SaveTsvButton
                     metadata={metadata}
@@ -106,6 +107,9 @@ function BcvNotesViewerMuncher({ metadata }) {
                     setIngredient={setIngredient}
 
                     updateBcv={updateBcv}
+
+                    cellValueChanged={cellValueChanged}
+                    setCellValueChanged={setCellValueChanged}
                 />
             </Box>
 
