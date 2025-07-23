@@ -23,7 +23,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
     const [md5Ingredient, setMd5Ingredient] = useState([]);
-    console.log("md5ingredient",md5Ingredient)
+ 
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -37,7 +37,6 @@ function BcvNotesViewerMuncher({ metadata }) {
             setIngredient(newIngredient);
             const hash = md5(JSON.stringify(newIngredient));
             setMd5Ingredient(hash);
-            console.log("Hash initial :", hash);
         }
     };
     // utilisation de la fonction getAllData
