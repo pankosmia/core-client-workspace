@@ -55,65 +55,63 @@ function BcvNotesViewerMuncher({ metadata }) {
         );
 
     }
-    
-useEffect(() => {
-    const onBeforeUnload = ev => {
-        ev.preventDefault();
-    };
-    window.addEventListener('beforeunload', onBeforeUnload);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
 
-return (
-    <Stack sx={{
-        padding: 2,
-    }}
-    >
-        {/* <SearchNavBar getAllData={getAllData} /> */}
-        <AddFab
-            currentRowN={currentRowN}
-            setCurrentRowN={setCurrentRowN}
+    useEffect(() => {
+        const onBeforeUnload = ev => {
+            ev.preventDefault();
+        };
+        window.addEventListener('beforeunload', onBeforeUnload);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-            ingredient={ingredient}
-            setIngredient={setIngredient}
+    return (
+        <Stack sx={{
+            padding: 2,
+        }}
+        >
+            {/* <SearchNavBar getAllData={getAllData} /> */}
+            <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "space-between" }}>
+                <AddFab
+                    currentRowN={currentRowN}
+                    setCurrentRowN={setCurrentRowN}
 
-            cellValueChanged={cellValueChanged}
-            setCellValueChanged={setCellValueChanged}
-        />
-        <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
 
-            <SearchWithVerses
-                ingredient={ingredient}
-                currentRowN={currentRowN}
-                setCurrentRowN={setCurrentRowN}
-                updateBcv={updateBcv}
-            />
-            <Editor
-                currentRowN={currentRowN}
-                setCurrentRowN={setCurrentRowN}
+                />
+                <SaveTsvButton
+                    metadata={metadata}
 
-                ingredient={ingredient}
-                setIngredient={setIngredient}
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
 
-                cellValueChanged={cellValueChanged}
-                setCellValueChanged={setCellValueChanged}
+                    md5Ingredient={md5Ingredient}
+                    setMd5Ingredient={setMd5Ingredient}
+                />
+            </Box>
 
-                updateBcv={updateBcv}
-            />
-        </Box>
-        <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-            <SaveTsvButton
-                metadata={metadata}
+            <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
 
-                ingredient={ingredient}
-                setIngredient={setIngredient}
+                <SearchWithVerses
+                    ingredient={ingredient}
+                    currentRowN={currentRowN}
+                    setCurrentRowN={setCurrentRowN}
+                    updateBcv={updateBcv}
+                />
+                <Editor
+                    currentRowN={currentRowN}
+                    setCurrentRowN={setCurrentRowN}
 
-                md5Ingredient={md5Ingredient}
-                setMd5Ingredient={setMd5Ingredient}
-            />
-        </Box>
-    </Stack >
-);
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
+
+                    updateBcv={updateBcv}
+                />
+            </Box>
+
+        </Stack >
+    );
+
 }
 
 export default BcvNotesViewerMuncher;
