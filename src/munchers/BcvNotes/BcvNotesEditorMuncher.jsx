@@ -72,16 +72,27 @@ function BcvNotesViewerMuncher({ metadata }) {
         }}
         >
             {/* <SearchNavBar getAllData={getAllData} /> */}
-            <AddFab
-                currentRowN={currentRowN}
-                setCurrentRowN={setCurrentRowN}
+            <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "space-between" }}>
+                <AddFab
+                    currentRowN={currentRowN}
+                    setCurrentRowN={setCurrentRowN}
 
-                ingredient={ingredient}
-                setIngredient={setIngredient}
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
 
-            />
+                />
+                <SaveTsvButton
+                    metadata={metadata}
+
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
+
+                    md5Ingredient={md5Ingredient}
+                    setMd5Ingredient={setMd5Ingredient}
+                />
+            </Box>
+
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
-
 
                 <SearchWithVerses
                     ingredient={ingredient}
@@ -93,27 +104,13 @@ function BcvNotesViewerMuncher({ metadata }) {
                     currentRowN={currentRowN}
                     setCurrentRowN={setCurrentRowN}
 
-
                     ingredient={ingredient}
                     setIngredient={setIngredient}
-
 
                     updateBcv={updateBcv}
                 />
             </Box>
-            <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-                <SaveTsvButton
-                    metadata={metadata}
 
-
-                    ingredient={ingredient}
-                    setIngredient={setIngredient}
-
-
-                    md5Ingredient={md5Ingredient}
-                    setMd5Ingredient={setMd5Ingredient}
-                />
-            </Box>
         </Stack >
     );
 
