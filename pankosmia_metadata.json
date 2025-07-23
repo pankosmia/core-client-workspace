@@ -87,28 +87,28 @@
       "fr": "Enregistrez votre nouvelle note"
     },
     "save_tsv": {
-      "en":"Save to file",
+      "en": "Save to file",
       "fr": "Sauvegarder dans le fichier "
     },
     "new_bcv_note": {
-      "en":"New note",
+      "en": "New note",
       "fr": "Nouvelle note"
     },
-    "delete_note_bcv":{
+    "delete_note_bcv": {
       "en": "About to delete this content. This operation cannot be undone. Click \"cancel\" unless you are sure you want to delete this content permanently.",
-      "fr":"Vous êtes sur le point de supprimer ce contenu. Cette opération est permanent. Cliquez sur \"Annuler\", sauf si vous voulez vraiment effacer ce contenu de façon irréversible."
+      "fr": "Vous êtes sur le point de supprimer ce contenu. Cette opération est permanent. Cliquez sur \"Annuler\", sauf si vous voulez vraiment effacer ce contenu de façon irréversible."
     },
     "do_delete_button": {
       "en": "Delete",
       "fr": "Supprimer"
     },
-    "ok":{
-      "en":"Ok",
-      "fr":"Ok"
+    "ok": {
+      "en": "Ok",
+      "fr": "Ok"
     },
-    "reset":{
-      "en":"Reset",
-      "fr":"Annuler"
+    "reset": {
+      "en": "Reset",
+      "fr": "Annuler"
     },
     "row_name": {
       "en": "Name",
@@ -129,6 +129,16 @@
       "en": "Language",
       "fr": "Langue",
       "es": "Idioma"
+    },
+    "create": {
+      "en": "Create",
+      "es": "Crear",
+      "fr": "Créer"
+    },
+    "close": {
+      "en": "close",
+      "es": "cerrar",
+      "fr": "fermer"
     }
   }
 }

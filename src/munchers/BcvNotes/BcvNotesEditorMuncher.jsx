@@ -1,12 +1,10 @@
 import { useEffect, useState, useContext } from "react";
 import { Box, Stack } from "@mui/material";
 import {
-    i18nContext as I18nContext,
     debugContext as DebugContext,
     bcvContext as BcvContext,
     getText,
     postEmptyJson,
-    doI18n,
 } from "pithekos-lib";
 
 //import SearchNavBar from "../../components/SearchNavBar";
@@ -18,12 +16,12 @@ import md5 from "md5";
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
-    const { i18nRef } = useContext(I18nContext);
     const { systemBcv, setSystemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
     const [md5Ingredient, setMd5Ingredient] = useState([]);
- 
+    const [cellValueChanged, setCellValueChanged] = useState(false);
+
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -79,6 +77,8 @@ return (
             ingredient={ingredient}
             setIngredient={setIngredient}
 
+            cellValueChanged={cellValueChanged}
+            setCellValueChanged={setCellValueChanged}
         />
         <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
 
@@ -94,6 +94,9 @@ return (
 
                 ingredient={ingredient}
                 setIngredient={setIngredient}
+
+                cellValueChanged={cellValueChanged}
+                setCellValueChanged={setCellValueChanged}
 
                 updateBcv={updateBcv}
             />

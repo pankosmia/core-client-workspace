@@ -30,7 +30,7 @@ function SearchWithVerses({ ingredient, setCurrentRowN, currentRowN, updateBcv }
 
     return (
         <List sx={{ maxHeight: "70vh", overflowY: "auto" }}>
-            {bookCode.splice(1) .filter(chap => chap && chap.trim() !== "").map(chap => (
+            {bookCode.splice(1).filter(chap => chap && chap.trim() !== "").map(chap => (
                 <>
                     <ListItemButton
                         key={chap}
