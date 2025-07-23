@@ -55,7 +55,6 @@ function BcvNotesViewerMuncher({ metadata }) {
             `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
             debugRef.current
         );
-
     }
 
     useEffect(() => {

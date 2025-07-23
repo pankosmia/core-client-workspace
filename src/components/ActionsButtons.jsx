@@ -26,15 +26,21 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
         if (newRowN >= 1 && ingredient.length > 1 && ingredient[newRowN]) {
             setCurrentRowN(newRowN);
             setCellValueChanged(false)
+            saveFunction(currentRowN, rowData);
+            updateBcv(newRowN)
+
         }
     };
 
     // changer de page +1
     const nextRow = () => {
         const newRowN = currentRowN + 1;
-        if (ingredient.length > 1 && ingredient[newRowN] && ingredient[newRowN].length > 0) {
+        if (ingredient[newRowN] && ingredient[newRowN].length > 0) {
             setCurrentRowN(newRowN);
             setCellValueChanged(false)
+            saveFunction(currentRowN, rowData);
+            updateBcv(newRowN)
+           
         }
     };
 
@@ -45,7 +51,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
 
                     <IconButton
                         variant="contained"
-                        onClick={() => { previousRow(); saveFunction(currentRowN, rowData);updateBcv() }}
+                        onClick={() => { previousRow() }}
                         sx={{
                             mt: 2,
                             "&.Mui-disabled": {
@@ -54,7 +60,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                             }
                         }}
                     >
-                       <ArrowBackIosNewIcon/>
+                        <ArrowBackIosNewIcon />
                     </IconButton>
                 )}
                 <IconButton
@@ -65,11 +71,11 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                         mt: 2,
                         "&.Mui-disabled": {
                             background: "#eaeaea",
-                           color: '#bebbbbff'
+                            color: '#bebbbbff'
                         }
                     }}
                 >
-                  <CheckIcon size="large"color={!cellValueChanged ? "#eaeaea" : "primary"}/>
+                    <CheckIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"} />
                 </IconButton>
                 {mode === "edit" && (
                     <>
@@ -84,29 +90,29 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                                 mt: 2,
                                 "&.Mui-disabled": {
                                     background: "#eaeaea",
-                                   color: '#bebbbbff'
+                                    color: '#bebbbbff'
                                 }
                             }}
                         >
-                           <RestoreIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"}/>
+                            <RestoreIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"} />
                         </IconButton>
 
                         <IconButton
                             onClick={() => handleOpenModalDelete()}
-                             sx={{
+                            sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
                                     background: "#eaeaea",
-                                   color: '#bebbbbff'
+                                    color: '#bebbbbff'
                                 }
                             }}
                             disabled={ingredient[currentRowN] && ingredient[currentRowN].length === 1}
                         >
-                            <DeleteIcon size="large"color={ingredient[currentRowN] && ingredient[currentRowN].length === 1 ? "#eaeaea" : "primary"} />
+                            <DeleteIcon size="large" color={ingredient[currentRowN] && ingredient[currentRowN].length === 1 ? "#eaeaea" : "primary"} />
                         </IconButton>
 
                         <IconButton
-                            onClick={() => { nextRow(); saveFunction(currentRowN, rowData); updateBcv() }} variant="contained"
+                            onClick={() => { nextRow() }} variant="contained"
                             sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
@@ -115,7 +121,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                                 }
                             }}
                         >
-                           <ArrowForwardIosIcon/>
+                            <ArrowForwardIosIcon />
                         </IconButton>
                     </>
                 )}
