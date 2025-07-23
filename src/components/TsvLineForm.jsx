@@ -4,11 +4,11 @@ import { useState, useContext, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import ActionsButtons from "./ActionsButtons";
 
-function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, saveFunction,  }) {
+function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, saveFunction, }) {
     const [cellValueChanged, setCellValueChanged] = useState(false);
     const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
     const columnNames = ingredient[0] || [];
-   
+
     useEffect(
         () => {
             if (mode === "edit" && ingredient.length > 0) {
@@ -64,6 +64,9 @@ function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, up
                             columnNames={columnNames}
                             onChangeNote={(e) => changeCell(e, n)}
                             fieldN={n}
+                            ingredient={ingredient}
+                            currentRowN={currentRowN}
+                            mode={mode}
 
                         />
                     ) : (
@@ -72,7 +75,7 @@ function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, up
                             value={rowData[n]}
                             placeholder={n === 0 ? "1:1" : ""}
                             required={n === 0}
-                            disabled={n === 1}
+                            disabled={n === 1 || (mode === "edit" && ingredient[currentRowN] && ingredient[currentRowN].length === 1)}
                             variant="outlined"
                             fullWidth
                             size="small"
