@@ -1,12 +1,10 @@
 import { useEffect, useState, useContext } from "react";
 import { Box, Stack } from "@mui/material";
 import {
-    i18nContext as I18nContext,
     debugContext as DebugContext,
     bcvContext as BcvContext,
     getText,
     postEmptyJson,
-    doI18n,
 } from "pithekos-lib";
 
 //import SearchNavBar from "../../components/SearchNavBar";
@@ -18,11 +16,11 @@ import md5 from "md5";
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
-    const { i18nRef } = useContext(I18nContext);
     const { systemBcv, setSystemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
     const [md5Ingredient, setMd5Ingredient] = useState([]);
+    const [cellValueChanged, setCellValueChanged] = useState(false);
 
     // Récupération des données du tsv
     const getAllData = async () => {
@@ -78,7 +76,8 @@ function BcvNotesViewerMuncher({ metadata }) {
 
                     ingredient={ingredient}
                     setIngredient={setIngredient}
-
+                    cellValueChanged={cellValueChanged}
+                    setCellValueChanged={setCellValueChanged}
                 />
                 <SaveTsvButton
                     metadata={metadata}
@@ -107,6 +106,9 @@ function BcvNotesViewerMuncher({ metadata }) {
                     setIngredient={setIngredient}
 
                     updateBcv={updateBcv}
+
+                    cellValueChanged={cellValueChanged}
+                    setCellValueChanged={setCellValueChanged}
                 />
             </Box>
 

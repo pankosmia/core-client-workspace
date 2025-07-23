@@ -7,7 +7,7 @@ import {
     doI18n,
 } from "pithekos-lib";
 
-function AddFab({currentRowN, setCurrentRowN, ingredient, setIngredient}) {
+function AddFab({currentRowN, setCurrentRowN, ingredient, setIngredient, cellValueChanged, setCellValueChanged}) {
     const { i18nRef } = useContext(I18nContext);
     const [openedModal, setOpenedModal] = useState(null);
 
@@ -16,7 +16,6 @@ function AddFab({currentRowN, setCurrentRowN, ingredient, setIngredient}) {
     };
 
     return (
-
         <Box>
             <Fab
                 variant="extended"
@@ -39,6 +38,8 @@ function AddFab({currentRowN, setCurrentRowN, ingredient, setIngredient}) {
                 setCurrentRowN={setCurrentRowN}
                 ingredient={ingredient}
                 setIngredient={setIngredient}
+                cellValueChanged={cellValueChanged}
+                setCellValueChanged={setCellValueChanged}
             />
         </Box>
 
