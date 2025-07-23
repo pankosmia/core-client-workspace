@@ -3,7 +3,7 @@ import { List, ListItemButton, ListItemText, Collapse, Typography } from "@mui/m
 import ExpandLess from "@mui/icons-material/ExpandLess"
 import ExpandMore from "@mui/icons-material/ExpandMore"
 
-function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChanged, ingredientValueChanged, currentRowN, updateBcv }) {
+function SearchWithVerses({ ingredient, setCurrentRowN, currentRowN, updateBcv }) {
 
     const [currentChapter, setCurrentChapter] = useState('');
     const [openChapter, setOpenChapter] = useState(false)
@@ -30,19 +30,17 @@ function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChange
 
     return (
         <List sx={{ maxHeight: "70vh", overflowY: "auto" }}>
-            {bookCode.map(chap => (
+            {bookCode.splice(1) .filter(chap => chap && chap.trim() !== "").map(chap => (
                 <>
                     <ListItemButton
-                        disabled={!ingredientValueChanged}
                         key={chap}
                         onClick={() => {
 
                             setCurrentChapter(chap);
-                            setIngredientValueChanged(true);
                             handleClick();
                         }}
                     >
-                        <ListItemText primary={<Typography sx={{ fontWeight: currentChapter === chap ? "bold" : "normal" }}>{`${/^\d+$/.test(chap) ? `Chap ${chap}` : chap}`}</Typography>} />
+                        <ListItemText primary={<Typography sx={{ fontWeight: currentChapter === chap ? "bold" : "normal" }}>{`${/^\d+$/.test(chap) ? `Ch ${chap}` : chap}`}</Typography>} />
                         {openChapter && currentChapter === chap ? <ExpandLess /> : <ExpandMore />}
                     </ListItemButton>
 
@@ -52,9 +50,8 @@ function SearchWithVerses({ ingredient, setCurrentRowN, setIngredientValueChange
                                 {verses
                                     .map(v => (
                                         <ListItemButton
-                                            disabled={!ingredientValueChanged}
                                             key={v[1]}
-                                            onClick={() => { handleChangeId(v[1]); setIngredientValueChanged(true) }}
+                                            onClick={() => { handleChangeId(v[1]) }}
                                         >
                                             <ListItemText primary={<Typography sx={{ fontWeight: ingredient[currentRowN][1] === v[1] ? "bold" : "normal" }}>{/^\d+$/.test(v[0].split(':')[1])
                                                 ? `v${v[0].split(':')[1]} - ${v[1]}`

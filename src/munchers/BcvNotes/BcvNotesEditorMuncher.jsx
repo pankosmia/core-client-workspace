@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
@@ -14,7 +14,7 @@ import SearchWithVerses from "../../components/SearchWithVerses";
 import Editor from "../../components/Editor"
 import AddFab from "../../components/AddFab";
 import SaveTsvButton from "../../components/SaveTsvButton";
-
+import md5 from "md5";
 
 function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
@@ -22,9 +22,8 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { systemBcv, setSystemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
-    const [ingredientValueChanged, setIngredientValueChanged] = useState(true);
-    const [saveIngredientTsv, setSaveIngredientTsv] = useState(false)
-
+    const [md5Ingredient, setMd5Ingredient] = useState([]);
+    console.log("md5ingredient", md5Ingredient)
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -36,13 +35,18 @@ function BcvNotesViewerMuncher({ metadata }) {
                     .map(f => f.replace(/(\\n){2,}/g, "\n\n"))
                 )
             setIngredient(newIngredient);
+            const hash = md5(JSON.stringify(newIngredient));
+            setMd5Ingredient(hash);
+            console.log("Hash initial :", hash);
         }
     };
     // utilisation de la fonction getAllData
     useEffect(
         () => {
             getAllData().then();
+
         },
+
         [systemBcv]
     );
 
@@ -54,27 +58,6 @@ function BcvNotesViewerMuncher({ metadata }) {
         );
 
     }
-
-    // changer de page -1 
-    const previousRow = () => {
-        const newRow = currentRowN - 1;
-        if (newRow >= 1 && ingredient.length > 1 && ingredient[newRow]) {
-            setCurrentRowN(currentRowN - 1);
-            updateBcv(currentRowN - 1);
-         }
-    };
-
-
-    // changer de page +1 
-    const nextRow = () => {
-        const newRow = currentRowN + 1;
-        if (
-            ingredient[newRow]
-        ) {
-            setCurrentRowN(currentRowN + 1);
-            updateBcv(currentRowN + 1);
-        }
-    };
 
     useEffect(() => {
         const onBeforeUnload = ev => {
@@ -90,83 +73,51 @@ function BcvNotesViewerMuncher({ metadata }) {
         }}
         >
             {/* <SearchNavBar getAllData={getAllData} /> */}
-            <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2, justifyContent:"space-between" }}>
-                <AddFab
-                    currentRowN={currentRowN}
-                    setCurrentRowN={setCurrentRowN}
+            <AddFab
+                currentRowN={currentRowN}
+                setCurrentRowN={setCurrentRowN}
 
-                    ingredient={ingredient}
-                    setIngredient={setIngredient}
+                ingredient={ingredient}
+                setIngredient={setIngredient}
 
-                    ingredientValueChanged={ingredientValueChanged}
-                    setIngredientValueChanged={setIngredientValueChanged}
-
-                    saveIngredientTsv={saveIngredientTsv}
-                    setSaveIngredientTsv={setSaveIngredientTsv}
-                />
-                 <SaveTsvButton
-                    metadata={metadata}
-
-                    ingredient={ingredient}
-                    setIngredient={setIngredient}
-
-                    saveIngredientTsv={saveIngredientTsv}
-                    setSaveIngredientTsv={setSaveIngredientTsv}
-
-                />
-            </Box>
+            />
             <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
+
 
                 <SearchWithVerses
                     ingredient={ingredient}
                     currentRowN={currentRowN}
                     setCurrentRowN={setCurrentRowN}
                     updateBcv={updateBcv}
-                    ingredientValueChanged={ingredientValueChanged}
-                    setIngredientValueChanged={setIngredientValueChanged}
                 />
                 <Editor
                     currentRowN={currentRowN}
+                    setCurrentRowN={setCurrentRowN}
+
 
                     ingredient={ingredient}
                     setIngredient={setIngredient}
 
-                    setIngredientValueChanged={setIngredientValueChanged}
-                    setSaveIngredientTsv={setSaveIngredientTsv}
+
+                    updateBcv={updateBcv}
                 />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-               
-                <Button
-                    disabled={!ingredientValueChanged}
-                    variant="contained"
-                    onClick={() => { previousRow(); setIngredientValueChanged(true) }}
-                    sx={{
-                        mt: 2,
-                         "&.Mui-disabled": {
-                            background: "#eaeaea",
-                            color: "#424242"
-                        }
-                    }}
-                >
-                    {doI18n("pages:core-local-workspace:previous", i18nRef.current)}
-                </Button>
-                <Button
-                    disabled={!ingredientValueChanged}
-                    onClick={() => { nextRow(); setIngredientValueChanged(true) }} variant="contained"
-                    sx={{
-                        mt: 2,
-                        "&.Mui-disabled": {
-                            background: "#eaeaea",
-                            color: "#424242"
-                        }
-                    }}
-                >
-                    {doI18n("pages:core-local-workspace:next", i18nRef.current)}
-                </Button>
+                <SaveTsvButton
+                    metadata={metadata}
+
+
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
+
+
+                    md5Ingredient={md5Ingredient}
+                    setMd5Ingredient={setMd5Ingredient}
+                />
             </Box>
         </Stack >
     );
+
 }
 
 export default BcvNotesViewerMuncher;
