@@ -3,6 +3,7 @@ import {Box, Stack} from "@mui/material";
 import OBSContext from "../../contexts/obsContext";
 import Markdown from 'react-markdown';
 import RequireResources from "../../components/RequireResources";
+import "./OBSMuncher.css";
 
 import {
     i18nContext as I18nContext,
@@ -61,9 +62,9 @@ function OBSViewerMuncher({metadata}) {
 
     return (
         <RequireResources contentSpec={contentSpec}>
-            <Stack sx={{ p:2}}>
+            <Stack sx={{ p:1}}>
                 <div>
-                    <Markdown>
+                    <Markdown className="markdown-content">
                         {ingredient}
                     </Markdown>
                 </div>
