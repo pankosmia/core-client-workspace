@@ -66,6 +66,7 @@ function TsvLineForm({ingredient, setIngredient, currentRowN, setCurrentRowN, up
                             fieldN={n}
                             ingredient={ingredient}
                            currentRowN={currentRowN}
+                           mode={mode}
 
                         />
                     ) : (
