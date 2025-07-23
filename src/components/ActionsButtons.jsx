@@ -1,18 +1,14 @@
-import { useContext, useState } from "react";
-import { Box, Button, IconButton } from "@mui/material";
+import { useState } from "react";
+import { Box, IconButton } from "@mui/material";
 import DeleteNote from "./DeleteNote";
 import DeleteIcon from '@mui/icons-material/Delete';
-import {
-    i18nContext as I18nContext,
-    doI18n,
-} from "pithekos-lib";
+
 import RestoreIcon from '@mui/icons-material/Restore';
 import CheckIcon from '@mui/icons-material/Check';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
-function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN, cellValueChanged, setCellValueChanged, updateBcv, rowData, handleCancel, mode, saveFunction }) {
-    const { i18nRef } = useContext(I18nContext);
+function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN, cellValueChanged, setCellValueChanged, updateBcv, rowData, handleCancel, mode, saveFunction, handleCloseModalNewNote }) {
     const [openedModalDelete, setOpenedModalDelete] = useState(false);
 
     // Permet d'ouvrir la modal Delete
@@ -42,37 +38,34 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
         <Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
                 {mode === "edit" && (
-
-                    <IconButton
-                        variant="contained"
-                        onClick={() => { previousRow(); saveFunction(currentRowN, rowData);updateBcv() }}
-                        sx={{
-                            mt: 2,
-                            "&.Mui-disabled": {
-                                background: "#eaeaea",
-                                color: "#424242"
-                            }
-                        }}
-                    >
-                       <ArrowBackIosNewIcon/>
-                    </IconButton>
-                )}
-                <IconButton
-                    onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
-                    variant="contained"
-                    disabled={!cellValueChanged}
-                    sx={{
-                        mt: 2,
-                        "&.Mui-disabled": {
-                            background: "#eaeaea",
-                           color: '#bebbbbff'
-                        }
-                    }}
-                >
-                  <CheckIcon size="large"color={!cellValueChanged ? "#eaeaea" : "primary"}/>
-                </IconButton>
-                {mode === "edit" && (
                     <>
+                        <IconButton
+                            variant="contained"
+                            onClick={() => { previousRow(); saveFunction(currentRowN, rowData); updateBcv() }}
+                            sx={{
+                                mt: 2,
+                                "&.Mui-disabled": {
+                                    background: "#eaeaea",
+                                    color: "#424242"
+                                }
+                            }}
+                        >
+                            <ArrowBackIosNewIcon />
+                        </IconButton>
+                        <IconButton
+                            onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
+                            variant="contained"
+                            disabled={!cellValueChanged}
+                            sx={{
+                                mt: 2,
+                                "&.Mui-disabled": {
+                                    background: "#eaeaea",
+                                    color: '#bebbbbff'
+                                }
+                            }}
+                        >
+                            <CheckIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"} />
+                        </IconButton>
                         <IconButton
                             onClick={() => {
                                 handleCancel();
@@ -84,27 +77,25 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                                 mt: 2,
                                 "&.Mui-disabled": {
                                     background: "#eaeaea",
-                                   color: '#bebbbbff'
+                                    color: '#bebbbbff'
                                 }
                             }}
                         >
-                           <RestoreIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"}/>
+                            <RestoreIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"} />
                         </IconButton>
-
                         <IconButton
                             onClick={() => handleOpenModalDelete()}
-                             sx={{
+                            sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
                                     background: "#eaeaea",
-                                   color: '#bebbbbff'
+                                    color: '#bebbbbff'
                                 }
                             }}
                             disabled={ingredient[currentRowN] && ingredient[currentRowN].length === 1}
                         >
-                            <DeleteIcon size="large"color={ingredient[currentRowN] && ingredient[currentRowN].length === 1 ? "#eaeaea" : "primary"} />
+                            <DeleteIcon size="large" color={ingredient[currentRowN] && ingredient[currentRowN].length === 1 ? "#eaeaea" : "primary"} />
                         </IconButton>
-
                         <IconButton
                             onClick={() => { nextRow(); saveFunction(currentRowN, rowData); updateBcv() }} variant="contained"
                             sx={{
@@ -115,7 +106,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                                 }
                             }}
                         >
-                           <ArrowForwardIosIcon/>
+                            <ArrowForwardIosIcon />
                         </IconButton>
                     </>
                 )}
