@@ -23,7 +23,7 @@ function BcvNotesViewerMuncher({ metadata }) {
     const { debugRef } = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
     const [md5Ingredient, setMd5Ingredient] = useState([]);
- 
+
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -44,73 +44,76 @@ function BcvNotesViewerMuncher({ metadata }) {
         () => {
             getAllData().then();
 
-},
+        },
 
-[systemBcv]
+        [systemBcv]
     );
 
-const updateBcv = rowN => {
-    const newCurrentRowCV = ingredient[rowN][0].split(":")
-    postEmptyJson(
-        `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
-        debugRef.current
+    const updateBcv = rowN => {
+        const newCurrentRowCV = ingredient[rowN][0].split(":")
+        postEmptyJson(
+            `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
+            debugRef.current
+        );
+
+    }
+
+    useEffect(() => {
+        const onBeforeUnload = ev => {
+            ev.preventDefault();
+        };
+        window.addEventListener('beforeunload', onBeforeUnload);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    return (
+        <Stack sx={{
+            padding: 2,
+        }}
+        >
+            {/* <SearchNavBar getAllData={getAllData} /> */}
+            <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "space-between" }}>
+                <AddFab
+                    currentRowN={currentRowN}
+                    setCurrentRowN={setCurrentRowN}
+
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
+
+                />
+                <SaveTsvButton
+                    metadata={metadata}
+
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
+
+                    md5Ingredient={md5Ingredient}
+                    setMd5Ingredient={setMd5Ingredient}
+                />
+            </Box>
+
+            <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
+
+                <SearchWithVerses
+                    ingredient={ingredient}
+                    currentRowN={currentRowN}
+                    setCurrentRowN={setCurrentRowN}
+                    updateBcv={updateBcv}
+                />
+                <Editor
+                    currentRowN={currentRowN}
+                    setCurrentRowN={setCurrentRowN}
+
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
+
+                    updateBcv={updateBcv}
+                />
+            </Box>
+
+        </Stack >
     );
 
-}
-
-useEffect(() => {
-    const onBeforeUnload = ev => {
-        ev.preventDefault();
-    };
-    window.addEventListener('beforeunload', onBeforeUnload);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
-
-return (
-    <Stack sx={{
-        padding: 2,
-    }}
-    >
-        {/* <SearchNavBar getAllData={getAllData} /> */}
-        <AddFab
-            currentRowN={currentRowN}
-            setCurrentRowN={setCurrentRowN}
-
-            ingredient={ingredient}
-            setIngredient={setIngredient}
-
-        />
-        <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
-
-            <SearchWithVerses
-                ingredient={ingredient}
-                currentRowN={currentRowN}
-                setCurrentRowN={setCurrentRowN}
-                updateBcv={updateBcv}
-            />
-            <Editor
-                currentRowN={currentRowN}
-                setCurrentRowN={setCurrentRowN}
-
-                ingredient={ingredient}
-                setIngredient={setIngredient}
-
-                updateBcv={updateBcv}
-            />
-        </Box>
-        <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-            <SaveTsvButton
-                metadata={metadata}
-
-                ingredient={ingredient}
-                setIngredient={setIngredient}
-
-                md5Ingredient={md5Ingredient}
-                setMd5Ingredient={setMd5Ingredient}
-            />
-        </Box>
-    </Stack >
-);
 }
 
 export default BcvNotesViewerMuncher;
