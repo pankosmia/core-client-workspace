@@ -14,7 +14,7 @@ import AddFab from "../../components/AddFab";
 import SaveTsvButton from "../../components/SaveTsvButton";
 import md5 from "md5";
 
-function BcvNotesViewerMuncher({ metadata }) {
+function BcvNotesEditorMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
     const { systemBcv, setSystemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
@@ -44,7 +44,7 @@ function BcvNotesViewerMuncher({ metadata }) {
 
         },
 
-        [systemBcv]
+        [systemBcv.bookCode]
     );
 
     const updateBcv = rowN => {
@@ -117,4 +117,4 @@ function BcvNotesViewerMuncher({ metadata }) {
 
 }
 
-export default BcvNotesViewerMuncher;
+export default BcvNotesEditorMuncher;

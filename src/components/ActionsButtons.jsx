@@ -20,11 +20,10 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
     const previousRow = () => {
         const newRowN = currentRowN - 1;
         if (newRowN >= 1 && ingredient.length > 1 && ingredient[newRowN]) {
+            saveFunction(currentRowN, rowData);
             setCurrentRowN(newRowN);
             setCellValueChanged(false)
-            saveFunction(currentRowN, rowData);
             updateBcv(newRowN)
-
         }
     };
 
@@ -32,11 +31,10 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
     const nextRow = () => {
         const newRowN = currentRowN + 1;
         if (ingredient[newRowN] && ingredient[newRowN].length > 0) {
+            saveFunction(currentRowN, rowData);
             setCurrentRowN(newRowN);
             setCellValueChanged(false)
-            saveFunction(currentRowN, rowData);
             updateBcv(newRowN)
-
         }
     };
 
