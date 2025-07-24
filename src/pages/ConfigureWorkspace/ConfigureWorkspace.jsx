@@ -50,8 +50,7 @@ function ConfigureWorkspace() {
         "x-obsimages": "myObsList",
         "x-obsarticles": "myObsList",
         "x-obsquestions": "myObsList",
-        "x-obsnotes": "myObsList",
-        "x-obsquestions": "myObsList"
+        "x-obsnotes": "myObsList"
     };
 
     const flavorTypes = {

@@ -1,58 +1,28 @@
 import { Box, FormControl, TextField } from "@mui/material";
 import MarkdownField from "./MarkdownField";
-import { useState, useContext, useEffect } from "react";
-import { v4 as uuidv4 } from 'uuid';
 import ActionsButtons from "./ActionsButtons";
 
-function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, saveFunction, }) {
-    const [cellValueChanged, setCellValueChanged] = useState(false);
-    const [rowData, setRowData] = useState(Array(7).fill("", 0, 7))
+function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction,cellValueChanged,setCellValueChanged }) {
     const columnNames = ingredient[0] || [];
-
-    useEffect(
-        () => {
-            if (mode === "edit" && ingredient.length > 0) {
-                setRowData(currentRow);
-            } else {
-                const newRowData = [...rowData]
-                newRowData[1] = generateId()
-                setRowData(newRowData)
-            }
-        },
-        [ingredient, currentRow, mode]
-    );
 
     // Permet la modification d'une note
     const changeCell = (event, n) => {
         const newCellValue = event.target.value;
-        const newRowData = [...rowData];
+        const newRowData = [...currentRow];
         newRowData[n] = newCellValue;
         if (newRowData[0].length > 0 && /^[^:]+:[^:]+$/.test(newRowData[0])) {
             setCellValueChanged(true)
         } else {
             setCellValueChanged(false)
         }
-        setRowData(newRowData);
+        setCurrentRow(newRowData);
     };
 
     // Permet d'annuler les modications faites sur la note 
     const handleCancel = () => {
         const newRowData = (mode === "edit" ? [...currentRow] : Array(7).fill("", 0, 7))
-        setRowData(newRowData);
+        setCurrentRow(newRowData);
     };
-
-    const generateId = () => {
-        let existingId = ingredient.map(l => l[1]);
-        let myId = null;
-        let found = false;
-        while (!found) {
-            myId = uuidv4().substring(0, 4)
-            if (!existingId.includes(myId)) {
-                found = true
-            }
-        }
-        return myId
-    }
 
     return (
         <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
@@ -60,7 +30,7 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
                 <FormControl fullWidth margin="normal" key={n} >
                     {['Note', 'Question', 'Response'].includes(column) ? (
                         <MarkdownField
-                            value={rowData[n]}
+                            value={currentRow[n]}
                             columnNames={columnNames}
                             onChangeNote={(e) => changeCell(e, n)}
                             fieldN={n}
@@ -72,7 +42,7 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
                     ) : (
                         <TextField
                             label={column}
-                            value={rowData[n]}
+                            value={currentRow[n]}
                             placeholder={n === 0 ? "1:1" : ""}
                             required={n === 0}
                             disabled={n === 1 || (mode === "edit" && ingredient[currentRowN] && ingredient[currentRowN].length === 1)}
@@ -87,7 +57,7 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
             ))}
             <ActionsButtons
                 updateBcv={updateBcv}
-                rowData={rowData}
+                rowData={currentRow}
                 saveFunction={saveFunction}
                 handleCancel={handleCancel}
                 mode={mode}
