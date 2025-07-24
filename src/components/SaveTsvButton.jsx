@@ -1,4 +1,4 @@
-import { useContext, useState,useEffect } from "react";
+import { useContext, useState } from "react";
 import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
@@ -9,14 +9,12 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { IconButton } from "@mui/material";
 import SaveIcon from '@mui/icons-material/Save';
+import md5 from "md5";
 
-
-function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredientTsv }) {
-
+function SaveTsvButton({ ingredient, metadata, md5Ingredient, setMd5Ingredient }) {
     const { systemBcv } = useContext(BcvContext);
     const { i18nRef } = useContext(I18nContext);
     const [contentChanged, _setContentChanged] = useState(false);
-
 
     // Met à jour le fichier TSV
     const uploadTsvIngredient = async (tsvData, debugBool) => {
@@ -56,22 +54,23 @@ function SaveTsvButton({ ingredient, metadata, setSaveIngredientTsv, saveIngredi
     }
     // Permet de sauvegarder dans le fichier TSV 
     const handleSaveTsv = () => {
+        setMd5Ingredient(md5(JSON.stringify(ingredient)))
         uploadTsvIngredient([...ingredient])
     }
     return (
         <IconButton
-            disabled={!saveIngredientTsv}
+            disabled={md5(JSON.stringify(ingredient)) === md5Ingredient}
             sx={{
                 mt: 2,
                 "&.Mui-disabled": {
                     backgroundColor: '#eaeaea',
-                    color: '#424242',
+                    color: '#bebbbbff',
                 },
             }}
             variant="contained"
-            onClick={() => { handleSaveTsv(); setSaveIngredientTsv(false) }} >
+            onClick={() => { handleSaveTsv() }} >
             <SaveIcon
-                size="large" color={!saveIngredientTsv ? "#eaeaea" : "primary"}
+                size="large" color={md5(JSON.stringify(ingredient)) === md5Ingredient ? "#eaeaea" : "primary"}
             />
         </IconButton>
     )

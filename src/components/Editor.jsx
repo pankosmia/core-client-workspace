@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import TsvLineForm from "./TsvLineForm";
-function Editor({ingredient, setIngredient, currentRowN,setCurrentRowN, setSaveIngredientTsv,updateBcv }) {
-    const [currentRow, setCurrentRow] = useState([]);
+function Editor({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, cellValueChanged, setCellValueChanged}) {
+    const [currentRow, setCurrentRow] = useState( Array(7).fill("", 0, 7));
 
     useEffect(
         () => {
@@ -18,27 +18,28 @@ function Editor({ingredient, setIngredient, currentRowN,setCurrentRowN, setSaveI
         const newIngredient = [...ingredient]
         newIngredient[rowN] = [...newRow]
         setIngredient(newIngredient);
-        setSaveIngredientTsv(true)
     };
 
 
-    return <Box sx={{ display: 'flex', flexDirection:"column", gap: 2, padding: 2 }}>
-            <TsvLineForm
-                mode="edit"
+    return <Box sx={{ display: 'flex', flexDirection: "column", gap: 2, padding: 2 }}>
+        <TsvLineForm
+            mode="edit"
+            currentRow={currentRow}
+            setCurrentRow={setCurrentRow}
 
-                currentRow={currentRow}
-                saveFunction={handleSaveRow}
-                updateBcv={updateBcv}
-                setSaveIngredientTsv={setSaveIngredientTsv}
+            saveFunction={handleSaveRow}
+            updateBcv={updateBcv}
 
-                currentRowN={currentRowN}
-                setCurrentRowN={setCurrentRowN}
+            currentRowN={currentRowN}
+            setCurrentRowN={setCurrentRowN}
 
-                ingredient={ingredient}
-                setIngredient={setIngredient}
+            ingredient={ingredient}
+            setIngredient={setIngredient}
 
-            />
-            </Box>
+            cellValueChanged={cellValueChanged}
+            setCellValueChanged={setCellValueChanged}
+        />
+    </Box>
 }
 
 export default Editor;

@@ -4,49 +4,54 @@ import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18
 import {
     Box,
     Typography,
-    Fab,
-    Card,
-    CardContent,
-    CardActionArea,
-    ButtonGroup,
-    Button
+    Fab
 } from "@mui/material";
-import {Masonry} from '@mui/lab';
+import {DataGrid} from '@mui/x-data-grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import RadioButtonChecked from '@mui/icons-material/RadioButtonChecked';
-import RadioButtonUnchecked from '@mui/icons-material/RadioButtonUnchecked';
 
 function ConfigureWorkspace() {
-    const [repos, setRepos] = useState([]);
+
     const {debugRef} = useContext(debugContext);
     const {i18nRef} = useContext(i18nContext);
     const {currentProjectRef} = useContext(currentProjectContext);
 
     const [selectedResources, setSelectedResources] = useState([]);
-    const [language, setLanguage] = useState("");
-
     const navigate = useNavigate();
 
-    const getRepoList = async () => {
-        const listResponse = await getJson("/git/list-local-repos", debugRef.current);
-        if (listResponse.ok) {
-            let responses = [];
-            for (const repoPath of listResponse.json) {
-                const metadataResponse = await getJson(`/burrito/metadata/summary/${repoPath}`);
-                if (metadataResponse.ok) {
-                    responses.push({path: repoPath, ...metadataResponse.json})
-                }
-            }
-            setRepos(responses);
+    const [ projectSummaries, setProjectSummaries ] = useState({});
+
+    const getProjectSummaries = async () => {
+        const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
+        if (summariesResponse.ok) {
+            setProjectSummaries(summariesResponse.json);
         }
     }
 
     useEffect(
         () => {
-            getRepoList().then();
+            getProjectSummaries().then();
         },
         []
     );
+
+    const projectFlavors = {
+        "textTranslation": "myBcvList",
+        "audioTranslation": "myBcvList",
+        "x-bcvnotes": "myBcvList",
+        "x-bnotes": "myBcvList",
+        "x-bcvarticles": "myBcvList",
+        "x-bcvquestions": "myBcvList",
+        "x-bcvQuestions": "myBcvList",
+        "x-bcvimages": "myBcvList",
+        "x-juxtalinear": "myBcvList",
+        "x-parallel": "myBcvList",
+        "x-bcvImages": "myBcvList",
+        "textStories": "myObsList",
+        "x-obsimages": "myObsList",
+        "x-obsarticles": "myObsList",
+        "x-obsquestions": "myObsList",
+        "x-obsnotes": "myObsList"
+    };
 
     const flavorTypes = {
         textTranslation: "scripture",
@@ -60,7 +65,46 @@ function ConfigureWorkspace() {
         "x-parallel": "parascriptural"
     };
 
-    const languages = Array.from(new Set(repos.map(r => r.language_code))).sort();
+    const columns = [
+        {
+            field: 'name',
+            headerName: <Typography>{doI18n("pages:core-local-workspace:row_name", i18nRef.current)}</Typography>,
+            flex: 1
+        },
+        {
+            field: 'description',
+            headerName: <Typography>{doI18n("pages:core-local-workspace:row_description", i18nRef.current)}</Typography>,
+            flex: 1
+        },
+        {
+            field: 'type',
+            headerName: <Typography>{doI18n("pages:core-local-workspace:row_type", i18nRef.current)}</Typography>,
+            flex: 0.75
+            //valueGetter: v => doI18n(`flavors:names:${flavorTypes[v.toLowerCase()]}/${v}`, i18nRef.current)
+        },
+        {
+            field: 'language',
+            headerName: <Typography>{doI18n("pages:core-local-workspace:row_language", i18nRef.current)}</Typography>,
+            flex: 1
+        }
+    ]
+
+    const rows = Object.entries(projectSummaries)
+                    .map(e => {
+                        return {...e[1], path: e[0]}
+                    })
+                    .filter((r) => currentProjectRef.current && projectFlavors[projectSummaries[r.path].flavor] === projectFlavors[projectSummaries[`_local_/_local_/${currentProjectRef.current.project}`].flavor])
+                    .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
+                    .map((rep, n) => {
+                        return {
+                            ...rep,
+                            id: n.toString(),
+                            name: `${rep.name} (${rep.abbreviation})`,
+                            description: rep.description !== rep.name ? rep.description : "",
+                            type: rep.flavor,
+                            language: rep.language_code
+                        }
+                    });
 
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
@@ -89,7 +133,10 @@ function ConfigureWorkspace() {
                     }}
                     onClick={
                         (e) => {
-                            let stateEntries = repos
+                            let stateEntries = Object.entries(projectSummaries)
+                                .map(e => {
+                                    return {...e[1], path: e[0]}
+                                })
                                 .map(r => [r.path, r])
                                 .filter(re => selectedResources.includes(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
                                 .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
@@ -121,104 +168,27 @@ function ConfigureWorkspace() {
                 width: '100%'
             }}>
                 <Box sx={{ml: 2}}>
-                    <Box sx={{mb: 3}}>
-                        <ButtonGroup>
-                            <Button
-                                onClick={() => setLanguage("")}
-                                variant={language === "" ? "contained" : "outlined"}
-                                color="secondary"
-                            >
-                                {`* (${selectedResources.length}/${repos.length})`}
-                            </Button>
-                            {
-                                languages
-                                    .map(
-                                        ce => <Button
-                                            onClick={() => setLanguage(ce)}
-                                            variant={language === ce ? "contained" : "outlined"}
-                                            color="secondary"
-                                        >
-                                            {ce}
-                                        </Button>
-                                    )
+                    <DataGrid
+                        initialState={{
+                            columns: {
+                                columnVisibilityModel: {
+                                    description: false
+                                }
+                            },
+                            sorting: {
+                                sortModel: [{ field: 'name', sort: 'asc' }],
                             }
-                        </ButtonGroup>
-                    </Box>
-                    <Masonry
-                        container
-                        spacing={3}
-                        columns={{xs: 1, md: 2, xl: 3}}
-                    >
-                        {
-                            repos
-                                .filter(r => ["", r.language_code].includes(language))
-                                .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
-                                .map(
-                                    ((rep, n) => {
-                                            return <Card>
-                                                <CardActionArea
-                                                    sx={{
-                                                        color: selectedResources.includes(rep.path) ? "#000" : "#666"
-                                                    }}
-                                                    onClick={
-                                                        () => setSelectedResources(
-                                                            selectedResources.includes(rep.path) ?
-                                                                [...selectedResources].filter(s => s !== rep.path) :
-                                                                [...selectedResources, rep.path]
-                                                        )
-                                                    }
-                                                >
-                                                    <CardContent
-                                                        sx={{
-                                                            height: "100%",
-                                                            width: "100%",
-                                                            display: 'flex',
-                                                            alignItems: 'flex-start',
-                                                            flexDirection: 'column',
-                                                            justifyContent: 'space-between',
-                                                        }}
-                                                    >
-                                                        <Box
-                                                            sx={{
-                                                                color: selectedResources.includes(rep.path) ? "secondary.main" : "#666",
-                                                                display: "flex",
-                                                                flexDirection: "row-reverse",
-                                                                width: "100%"
-                                                        }}
-                                                        >
-                                                            {
-                                                                selectedResources.includes(rep.path) ?
-                                                                    <RadioButtonChecked sx={{justifyContent: "flex-end"}}/> :
-                                                                    <RadioButtonUnchecked/>
-                                                            }
-                                                        </Box>
-                                                        <Typography key={`${n}-name`} variant="h6"
-                                                                    sx={{color: selectedResources.includes(rep.path) ? "secondary.main" : "#666"}}>
-                                                            {`${rep.name} (${rep.abbreviation})`}
-                                                        </Typography>
-                                                        {rep.description !== rep.name &&
-                                                            <Typography variant="body">
-                                                                {rep.description}
-                                                            </Typography>
-                                                        }
-                                                        <Typography key={`${n}-language`} variant="body">
-                                                            {rep.language_code}
-                                                        </Typography>
-                                                        <Typography key={`${n}-flavor`} variant="body">
-                                                            {
-                                                                flavorTypes[rep.flavor] ?
-                                                                    doI18n(`flavors:names:${flavorTypes[rep.flavor]}/${rep.flavor}`, i18nRef.current) :
-                                                                    rep.flavor
-                                                            }
-                                                        </Typography>
-                                                    </CardContent>
-                                                </CardActionArea>
-                                            </Card>
-                                        }
-                                    )
-                                )
-                        }
-                    </Masonry>
+                        }}
+                        checkboxSelection
+                        onRowSelectionModelChange={(selected) => {
+                            const selectedRowData = rows.filter((row) => selected.ids.has(row.id));
+                            const selectedPaths = selectedRowData.map((data) => data["path"]);
+                            setSelectedResources(selectedPaths);
+                        }}
+                        rows={rows}
+                        columns={columns}
+                        sx={{fontSize: "1rem"}}
+                    />
                 </Box>
             </Box>
         </Box>
