@@ -13,6 +13,8 @@ import {enqueueSnackbar} from "notistack";
 
 import Editor from "./Editor";
 import {useAppReferenceHandler} from "./useAppReferenceHandler";
+import DraftingEditor from "./DraftingEditor";
+import { Box, Button } from "@mui/material";
 
 function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
     const {bcvRef} = useContext(BcvContext);
@@ -20,6 +22,7 @@ function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
     const {i18nRef} = useContext(I18nContext);
     const [usj, setUsj] = useState(null);
     const [contentChanged, _setContentChanged] = useState(false);
+    const [viewEditor, setViewEditor] = useState("Editor");
     const [bookCode, setBookCode] = useState(
         (bcvRef.current && bcvRef.current.bookCode) ||
         "TIT"
@@ -28,6 +31,12 @@ function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
         console.log("setContentChanged", nv);
         _setContentChanged(nv);
     }
+
+    const handleSwitchPage = () => {
+        setViewEditor((prev) =>
+            prev === 'Editor' ? 'TestInterface' : 'Editor'
+        );
+    };
 
     // Fetch new USFM as USJ, put in incoming
     useEffect(
@@ -108,16 +117,33 @@ function TextTranslationEditorMuncher({metadata, adjSelectedFontClass}) {
 
     const {referenceHandler} = useAppReferenceHandler();
 
-    return usj ? <Editor
-            key={md5sum(JSON.stringify(usj))}
-            usj={usj}
-            editable={true}
-            bookCode={bcvRef.current && bcvRef.current.bookCode}
-            onSave={onSave}
-            onHistoryChange={onHistoryChange}
-            scriptureReferenceHandler={referenceHandler}
-            referenceHandlerSource="text-translation-editor"
-        />
-        : <div>Loading data...</div>;
+    return (
+        <Box sx={{ p: 2 }}>
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSwitchPage}
+            >
+                Aller à {viewEditor === 'Editor' ? 'TestInterface' : 'Editor'}
+            </Button>
+
+            <Box mt={4}>
+                {viewEditor === 'Editor' ? (
+                    usj ? <Editor
+                        key={md5sum(JSON.stringify(usj))}
+                        usj={usj}
+                        editable={true}
+                        bookCode={bcvRef.current && bcvRef.current.bookCode}
+                        onSave={onSave}
+                        onHistoryChange={onHistoryChange}
+                        scriptureReferenceHandler={referenceHandler}
+                        referenceHandlerSource="text-translation-editor" mode="Editor" />
+                        : <p>Loading data</p>
+                ) : (
+                    <DraftingEditor mode="TestInterface" metadata={metadata} />
+                )}
+            </Box>
+        </Box>
+    );
 }
 export default TextTranslationEditorMuncher;

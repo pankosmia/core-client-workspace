@@ -3,84 +3,121 @@ import { Proskomma } from 'proskomma-core';
 import {
     bcvContext as BcvContext,
     debugContext as DebugContext,
+    getJson,
     getText,
+    postEmptyJson
 } from "pithekos-lib";
-import { Box, FormControl, TextareaAutosize, FormLabel, TextField } from "@mui/material";
-
+import { Box, FormControl, FormLabel, TextField } from "@mui/material";
+import RequireResources from "../../components/RequireResources";
+import juxta2Units from "../../components/juxta2Units";
+import NavBarDrafting from "../../components/NavBarDrafting";
 
 function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const { systemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
-    const [verseText, setVerseText] = useState([]);
+    const [newUnits, setNewUnits] = useState([]);
+    const [currentChapter, setCurrentChapter] = useState(1);
+    const [pk, setPk] = useState(null)
 
-    const updateBcv = rowN => {
-        const newCurrentRowCV = ingredient[rowN][0].split(":")
-        postEmptyJson(
-            `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
-            debugRef.current
-        );
+    // const updateBcv = rowN => {
+    //     const newCurrentRowCV = ingredient[rowN][0].split(":")
+    //     postEmptyJson(
+    //         `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
+    //         debugRef.current
+    //     );
 
-    }
+    // }
+    useEffect(() => {
+        const juxtaJson = async () => {
+            let jsonResponse = await getJson(`/burrito/ingredient/raw/git.door43.org/BurritoTruck/fr_juxta/?ipath=${systemBcv.bookCode}.json`, debugRef.current);
+            if (jsonResponse.ok) {
+                let units = juxta2Units(jsonResponse.json)
+                setNewUnits(units)
+            }
+        }
+        juxtaJson().then()
+    }, [debugRef, systemBcv.bookCode])
 
     useEffect(
         () => {
-            const getVerseText = async () => {
+            const getProskomma = async () => {
                 let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
                     debugRef.current
                 );
                 if (usfmResponse.ok) {
-                    const pk = new Proskomma();
-                    pk.importDocument({
+                    const newPk = new Proskomma();
+                    newPk.importDocument({
                         lang: "xxx",
                         abbr: "yyy"
                     },
                         "usfm",
                         usfmResponse.text
                     );
-                    const query = `{
-                        docSets { 
-                            documents {
-                                cvIndex(chapter : ${systemBcv.chapterNum}){  
-                                verses{
-                                        verse{
-                                                text 
-                                                verseRange
-                                                }
-                                        }
-                                }
-                            }
-                        }
-                    }`;
-                    const result = pk.gqlQuerySync(query);
-
-                    setVerseText(result.data.docSets[0].documents[0].cvIndex.verses.map(v => v.verse).filter(v => v.length > 0).map(v => v[0]));
-                } else {
-                    setVerseText([]);
+                   setPk(newPk)
                 }
             };
-            getVerseText().then();
+            getProskomma().then();
         },
         [debugRef, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum, metadata.local_path]
     );
+    const getUnitText = (cv)=> {
+        const query = `{
+            documents {
+                mainSequence {
+                    blocks(withScriptureCV:"${cv}"){
+                        items(withScriptureCV:"${cv}") {
+                            type subType payload
+                        }
+                    }
+                }
+               
+            }
+        }`
+        const result = pk.gqlQuerySync(query)
+        return result.data.documents[0].mainSequence.blocks
+            .map(b => b.items
+                .filter(i => i.type === "token")
+                    .map(i => i.payload)
+                        .join("")
+            ).join("\n\n")
+    }
+    const contentSpec = {
+        "general": {
+            "ntjxt": {
+                "_all": {
+                    "dcs": {
+                        "name": "Juxtalinéaire grec-français du Nouveau Testament, créée par Xenizo (NTJXT)",
+                        "repoPath": "git.door43.org/BurritoTruck/fr_juxta"
+                    }
+                }
+            }
+        }
+    }
 
     return (
-        <Box>
-            <FormLabel> Chap {systemBcv.chapterNum}</FormLabel>
-            {verseText.map((column, index) => (
-                <Box >
-                    <FormControl fullWidth margin="normal" key={index}>
-                        <FormLabel>{`Verset ${column.verseRange}`}</FormLabel>
-                        <TextField
-                            label={column.text}
-                            value={column.text}
-                            multiline
-                            minRows={5}
-                            maxRows={5}
-                        />
-                    </FormControl>
-                </Box>
-            ))}
-        </Box>
+        <RequireResources contentSpec={contentSpec}>
+            <NavBarDrafting currentChapter={currentChapter} newUnits={newUnits} setCurrentChapter={setCurrentChapter} />
+            <Box>
+                {newUnits
+                    .filter(ref => ref.startsWith(`${currentChapter}:`))
+                    .map((ref, index) => (
+                        <Box>
+                            <FormControl fullWidth margin="normal" key={index}>
+                                <TextField
+                                    label={ref}
+                                    value={getUnitText(ref)}
+                                    multiline
+                                    minRows={4}
+                                    maxRows={4}
+                                />
+                            </FormControl>
+                        </Box>
+                    ))
+                }
+            </Box>
+
+        </RequireResources>
+
     );
 }
 
