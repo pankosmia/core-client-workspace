@@ -21,7 +21,7 @@ const Waveform = ({
     isMainTrack = false,
     onDurationUpdate = null,
     mainTrackRef = null,
-    setMaxDuration = null,
+    selectedRegion = null,
 }) => {
     const waveformContainerRef = useRef(null);
     const waveformRef = useRef(null);
@@ -32,14 +32,14 @@ const Waveform = ({
     const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], prise = priseNumber) => {
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
         let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
-        return `http://localhost:19119/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}-${prise}.mp3`
+        return `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${prise}.mp3`
     }
 
     const waveformConfig = {
         container: waveformRef,
         height: isMainTrack ? 80 : 60,
-        waveColor: isMainTrack ? 'rgb(27, 27, 27)' : 'rgb(102, 102, 102)',
-        progressColor: isMainTrack ? 'rgb(255, 69, 0)' : 'rgb(27, 27, 27)',
+        waveColor: 'rgb(34, 173, 197)',
+        progressColor: 'rgb(64, 107, 114)',
         url: getUrl(),
         plugins: plugins,
         barWidth: 2,
@@ -64,9 +64,6 @@ const Waveform = ({
             if (onDurationUpdate) {
                 onDurationUpdate(priseNumber, duration);
             }
-            
-            
-
         };
 
         const handleClick = () => {
@@ -80,18 +77,18 @@ const Waveform = ({
         if (enableRegions) {
             const handleRegionCreate = (region) => {
                 if (onRegionSelect) {
-                    onRegionSelect([region, priseNumber]);
+                    onRegionSelect([region, priseNumber, regionsPlugin]);
                 }
             };
 
             const handleRegionUpdate = (region) => {
                 if (onRegionSelect) {
-                    onRegionSelect([region, priseNumber]);
+                    onRegionSelect([region, priseNumber, regionsPlugin]);
                 }
             };
 
             const handleRegionClick = (region) => {
-                    onRegionSelect([region, priseNumber]);
+                    onRegionSelect([region, priseNumber, regionsPlugin]);
             };
 
             regionsPlugin?.on('region-created', handleRegionCreate);
@@ -133,6 +130,14 @@ const Waveform = ({
     useEffect(() => {
         updateActualDuration();
     }, [maxDuration, mainTrackRef]);
+
+    useEffect(() => {
+        regionsPlugin.getRegions().forEach(region => { 
+            if(selectedRegion[0] != region) {
+            region.setOptions({ color: 'rgba(0, 0, 0, 0.1)' }) 
+            }
+        });
+    }, [selectedRegion])
 
     useEffect(() => {
         if (wavesurfer && cursorTime !== undefined) {
@@ -204,13 +209,13 @@ const Waveform = ({
             </Box>
 
             {/* Boutons de contrôle pour la track principale */}
-            {isMainTrack && (
+            {/* {isMainTrack && (
                 <Box sx={{ px: 1 }}>
                     <IconButton size="small" onClick={onPlayPause}>
                         {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
                     </IconButton>
                 </Box>
-            )}
+            )} */}
         </Box>
     );
 };
