@@ -6,63 +6,43 @@ import ArrowLeft from '@mui/icons-material/ArrowLeft';
 import { Box, IconButton } from "@mui/material";
 import { ButtonGroup } from '@mui/material';
 
-function NavBarDrafting({newUnits, currentChapter, setCurrentChapter }) {
-    const highestChapter = () => newUnits.length === 0 ? 0 : parseInt(newUnits[newUnits.length - 1].split(":")[0])
+function NavBarDrafting({units, currentChapter, setCurrentChapter, setSeletedRef }) {
+    const highestChapter = () => units.length === 0 ? 0 : parseInt(units[units.length - 1].split(":")[0])
     // changer de page -1 
-    const previousRow = () => {
-        const newRowN = currentChapter - 1;
-        if (newRowN >= 1 && newUnits.length > 1 && newUnits[newRowN]) {
-            setCurrentChapter(newRowN);
+    const previousChapter = () => {
+        const newChapterN = currentChapter - 1;
+        if (newChapterN >= 1 && units.length > 1 && units[newChapterN]) {
+            setCurrentChapter(newChapterN);
+            setSeletedRef({currentChapter : newChapterN, ref: 0 - 1 })
         }
     };
 
     // changer de page +1
     const nextChapter = () => {
-        const newRowN = currentChapter + 1;
+        const newChapterN = currentChapter + 1;
         if ( currentChapter < highestChapter() ) {
-            setCurrentChapter(newRowN);
+            setCurrentChapter(newChapterN);
+             setSeletedRef({currentChapter : newChapterN, ref: 0 + 1 })
         }
     };
-    console.log("changement currentCHapter",currentChapter)
-    // return (
-    //     <Box>
-    //         <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
-    //                 <>
-    //                     <IconButton
-    //                         variant="contained"
-    //                         onClick={() => { previousRow() }}
-    //                         sx={{
-    //                             mt: 2,
-    //                             "&.Mui-disabled": {
-    //                                 background: "#eaeaea",
-    //                                 color: "#424242"
-    //                             }
-    //                         }}
-    //                     >
-    //                         <ArrowBackIosNewIcon />
-    //                     </IconButton>
-                   
-    //                     <IconButton
-    //                         onClick={() => { nextRow() }} variant="contained"
-    //                         sx={{
-    //                             mt: 2,
-    //                             "&.Mui-disabled": {
-    //                                 background: "#eaeaea",
-    //                                 color: "#424242"
-    //                             }
-    //                         }}
-    //                     >
-    //                         <ArrowForwardIosIcon />
-    //                     </IconButton>
-    //                 </>
-    //         </Box>
-    //     </Box>
-    // )
+  
+    // const nextRow = () => {
+    //     const newRowN = currentRow + 1;
+    //     if(newRown > 0){
 
-     return (
+    //     }
+    // }
+       // const previousRow = () => {
+    //     const newRowN = currentRow + 1;
+    //     if(newRown > 0){
+
+    //     }
+    // }selectedRef.split(":")[1]
+   
+    return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <ButtonGroup>
-                <IconButton onClick={() => { previousRow() }}>
+                <IconButton onClick={() => { previousChapter() }}>
                     <FastRewindIcon fontSize="large" />
                 </IconButton>
                 <IconButton disabled >
@@ -87,13 +67,13 @@ function NavBarDrafting({newUnits, currentChapter, setCurrentChapter }) {
                     // slotProps={StyledNumberInput}
                 />
                 :
-                <NumberInput
-                    value={currentChapter}
+                {/* <NumberInput
+                    value={}
                     // onChange={(event, val) => {
                     //     setObs([obs[0], val]);
                     // }}
                     // slotProps={StyledNumberInput}
-                />
+                /> */}
             </Box>
 
             <ButtonGroup>

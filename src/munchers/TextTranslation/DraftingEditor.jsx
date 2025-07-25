@@ -5,9 +5,8 @@ import {
     debugContext as DebugContext,
     getJson,
     getText,
-    postEmptyJson
 } from "pithekos-lib";
-import { Box, FormControl, FormLabel, TextField } from "@mui/material";
+import { Box, FormControl, TextField } from "@mui/material";
 import RequireResources from "../../components/RequireResources";
 import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
@@ -15,10 +14,13 @@ import NavBarDrafting from "../../components/NavBarDrafting";
 function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const { systemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
-    const [newUnits, setNewUnits] = useState([]);
+    const [units, setUnits] = useState([]);
     const [currentChapter, setCurrentChapter] = useState(1);
-    const [pk, setPk] = useState(null)
-
+    const [pk, setPk] = useState(null);
+    const [unitData, setUnitData] = useState([]);
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [selectedRef, setSelectedRef] = useState({currentChapter:0 ,ref: 0})
+   
     // const updateBcv = rowN => {
     //     const newCurrentRowCV = ingredient[rowN][0].split(":")
     //     postEmptyJson(
@@ -31,12 +33,16 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
         const juxtaJson = async () => {
             let jsonResponse = await getJson(`/burrito/ingredient/raw/git.door43.org/BurritoTruck/fr_juxta/?ipath=${systemBcv.bookCode}.json`, debugRef.current);
             if (jsonResponse.ok) {
-                let units = juxta2Units(jsonResponse.json)
-                setNewUnits(units)
+                let newUnits = juxta2Units(jsonResponse.json)
+                setUnits(newUnits)
             }
         }
         juxtaJson().then()
     }, [debugRef, systemBcv.bookCode])
+
+    useEffect(()=>{
+        setSelectedRef()
+    },[currentChapter])
 
     useEffect(
         () => {
@@ -53,34 +59,48 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                         "usfm",
                         usfmResponse.text
                     );
-                   setPk(newPk)
+                    setPk(newPk)
                 }
             };
             getProskomma().then();
         },
         [debugRef, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum, metadata.local_path]
     );
-    const getUnitText = (cv)=> {
-        const query = `{
-            documents {
-                mainSequence {
-                    blocks(withScriptureCV:"${cv}"){
-                        items(withScriptureCV:"${cv}") {
-                            type subType payload
+    const getUnitTexts = async () => {
+
+        let newUnitData = []
+        setIsDownloading(true)
+        for (const cv of units) {
+            const query = `{
+                documents {
+                    mainSequence {
+                        blocks(withScriptureCV:"${cv}"){
+                            items(withScriptureCV:"${cv}") {
+                                type subType payload
+                            }
                         }
                     }
+
                 }
-               
-            }
-        }`
-        const result = pk.gqlQuerySync(query)
-        return result.data.documents[0].mainSequence.blocks
-            .map(b => b.items
-                .filter(i => i.type === "token")
+            }`
+            const result = await pk.gqlQuery(query)
+            const cvText = result.data.documents[0].mainSequence.blocks
+                .map(b => b.items
+                    .filter(i => i.type === "token")
                     .map(i => i.payload)
-                        .join("")
-            ).join("\n\n")
+                    .join("")
+                ).join("\n\n")
+            newUnitData.push({ reference: cv, text: cvText })
+        }
+        setUnitData(newUnitData)
+        setIsDownloading(false)
     }
+    
+    console.log("selectedRef", selectedRef)
+    useEffect(() => {
+        getUnitTexts().then()
+    }, [units]);
+
     const contentSpec = {
         "general": {
             "ntjxt": {
@@ -93,31 +113,36 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
             }
         }
     }
-
+    if (isDownloading) {
+        return <p>loading...</p>
+    }
     return (
         <RequireResources contentSpec={contentSpec}>
-            <NavBarDrafting currentChapter={currentChapter} newUnits={newUnits} setCurrentChapter={setCurrentChapter} />
+            <NavBarDrafting currentChapter={currentChapter} units={units} setCurrentChapter={setCurrentChapter} selectedRef={selectedRef} setSeletedRef={selectedRef} />
             <Box>
-                {newUnits
-                    .filter(ref => ref.startsWith(`${currentChapter}:`))
-                    .map((ref, index) => (
-                        <Box>
-                            <FormControl fullWidth margin="normal" key={index}>
-                                <TextField
-                                    label={ref}
-                                    value={getUnitText(ref)}
-                                    multiline
-                                    minRows={4}
-                                    maxRows={4}
-                                />
-                            </FormControl>
-                        </Box>
-                    ))
+                {unitData
+                    .filter(u => u.reference.startsWith(`${currentChapter}:`))
+                    .map((u, index) => {
+                        return (
+                            <Box key={index} >
+                                <FormControl fullWidth margin="normal">
+                                    <TextField
+                                        label={u.reference}
+                                        value={u.text}
+                                        multiline
+                                        minRows={9}
+                                        maxRows={9}
+                                        onFocus={()=> {console.log("focus", u.reference)}}
+                                        onBlur={()=> {console.log("blur",u.reference)}}
+                                        autoFocus={selectedRef === u.reference}
+                                    />
+                                </FormControl>
+                            </Box>
+                        );
+                    })
                 }
             </Box>
-
         </RequireResources>
-
     );
 }
 
