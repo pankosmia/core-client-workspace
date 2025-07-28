@@ -134,6 +134,7 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                 metadata={metadata}
                 systemBcv={systemBcv}
                 usfmHeader={usfmHeader}
+                unitData={unitData}
             />
             <NavBarDrafting currentChapter={currentChapter} setCurrentChapter={setCurrentChapter} units={units} />
             <Box>

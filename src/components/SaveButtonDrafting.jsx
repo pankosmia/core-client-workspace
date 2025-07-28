@@ -6,16 +6,27 @@ import { enqueueSnackbar } from "notistack";
 import I18nContext from "pithekos-lib/dist/contexts/i18nContext";
 import { useContext, useState } from "react";
 
-function SaveButtonDrafting({ metadata, systemBcv, usfmHeader }) {
+function SaveButtonDrafting({ metadata, systemBcv, usfmHeader, unitData }) {
     const { i18nRef } = useContext(I18nContext);
     const [contentChanged, _setContentChanged] = useState(false);
 
     // Permet de sauvegarder dans le fichier TSV 
     const handleSaveUsfm = async (debugBool) => {
         let contentBits = [usfmHeader]
-        const payload = JSON.stringify({ payload: contentBits.join("") });
+        let chapterN = "0";
+        for (const unit of unitData) {
+            const chapter = unit.reference.split(":")[0]
+            if (chapterN !== chapter) {
+                contentBits.push(`\\c ${chapter}`)
+                chapterN = chapter
+            }
+            contentBits.push("\\p")
+            contentBits.push(`\\v ${unit.reference.split(":")[1]}`)
+            contentBits.push(unit.text)
+        }
+        const payload = JSON.stringify({ payload: contentBits.join("\n") });
         const response = await postJson(
-            `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}1.usfm`,
+            `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
             payload,
             debugBool
         );
@@ -37,7 +48,7 @@ function SaveButtonDrafting({ metadata, systemBcv, usfmHeader }) {
         }
     }
 
-        // Montre le changement d'état du contenu 
+    // Montre le changement d'état du contenu 
     const setContentChanged = nv => {
         _setContentChanged(nv);
     }
