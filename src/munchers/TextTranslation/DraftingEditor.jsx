@@ -18,9 +18,11 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const [currentChapter, setCurrentChapter] = useState(1);
     const [pk, setPk] = useState(null);
     const [unitData, setUnitData] = useState([]);
+    console.log("unitData", unitData);
     const [isDownloading, setIsDownloading] = useState(false);
-    const [selectedRef, setSelectedRef] = useState({currentChapter:0 ,ref: 0})
-   
+    const [currentText, setCurrentText] = useState("");
+    const [selectedReference, setSelectedReference] = useState("");
+
     // const updateBcv = rowN => {
     //     const newCurrentRowCV = ingredient[rowN][0].split(":")
     //     postEmptyJson(
@@ -29,6 +31,7 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
     //     );
 
     // }
+
     useEffect(() => {
         const juxtaJson = async () => {
             let jsonResponse = await getJson(`/burrito/ingredient/raw/git.door43.org/BurritoTruck/fr_juxta/?ipath=${systemBcv.bookCode}.json`, debugRef.current);
@@ -39,10 +42,6 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
         }
         juxtaJson().then()
     }, [debugRef, systemBcv.bookCode])
-
-    useEffect(()=>{
-        setSelectedRef()
-    },[currentChapter])
 
     useEffect(
         () => {
@@ -95,11 +94,12 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
         setUnitData(newUnitData)
         setIsDownloading(false)
     }
-    
-    console.log("selectedRef", selectedRef)
+
     useEffect(() => {
-        getUnitTexts().then()
-    }, [units]);
+        if (pk) {
+            getUnitTexts().then()
+        }
+    }, [units, pk]);
 
     const contentSpec = {
         "general": {
@@ -113,12 +113,23 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
             }
         }
     }
+
     if (isDownloading) {
         return <p>loading...</p>
     }
+
+    const handleSaveUnit = (unitN, newText) => {
+        const newUnit = { ...unitData[unitN], text: newText }
+        let newUnitData = [...unitData]
+        newUnitData[unitN] = newUnit
+        setUnitData(newUnitData)
+    }
+
+    console.log("currentText", currentText)
+
     return (
         <RequireResources contentSpec={contentSpec}>
-            <NavBarDrafting currentChapter={currentChapter} units={units} setCurrentChapter={setCurrentChapter} selectedRef={selectedRef} setSeletedRef={selectedRef} />
+            <NavBarDrafting currentChapter={currentChapter} units={units} setCurrentChapter={setCurrentChapter} selectedReference={selectedReference} setSelectedReference={selectedReference} />
             <Box>
                 {unitData
                     .filter(u => u.reference.startsWith(`${currentChapter}:`))
@@ -128,13 +139,20 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                                 <FormControl fullWidth margin="normal">
                                     <TextField
                                         label={u.reference}
-                                        value={u.text}
+                                        value={u.reference === selectedReference ? currentText : u.text}
+
                                         multiline
                                         minRows={9}
                                         maxRows={9}
-                                        onFocus={()=> {console.log("focus", u.reference)}}
-                                        onBlur={()=> {console.log("blur",u.reference)}}
-                                        autoFocus={selectedRef === u.reference}
+                                        autoFocus={u.reference === selectedReference}
+                                        onFocus={() => {
+                                            setCurrentText(u.text);
+                                            setSelectedReference(u.reference)
+                                        }}
+                                        onChange={(e) => {
+                                            setCurrentText(e.target.value)
+                                        }}
+                                        onBlur={() => handleSaveUnit(index, currentText)}
                                     />
                                 </FormControl>
                             </Box>
