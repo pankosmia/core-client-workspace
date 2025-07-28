@@ -54,7 +54,8 @@ function BcvNotesEditorMuncher({ metadata }) {
             debugRef.current
         );
     }
-
+    console.log("updateBCV",updateBcv)
+    
     useEffect(() => {
         const onBeforeUnload = ev => {
             ev.preventDefault();

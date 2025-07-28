@@ -5,6 +5,7 @@ import {
     debugContext as DebugContext,
     getJson,
     getText,
+    postEmptyJson,
 } from "pithekos-lib";
 import { Box, FormControl, TextField } from "@mui/material";
 import RequireResources from "../../components/RequireResources";
@@ -18,19 +19,19 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const [currentChapter, setCurrentChapter] = useState(1);
     const [pk, setPk] = useState(null);
     const [unitData, setUnitData] = useState([]);
-    console.log("unitData", unitData);
     const [isDownloading, setIsDownloading] = useState(false);
     const [currentText, setCurrentText] = useState("");
     const [selectedReference, setSelectedReference] = useState("");
 
-    // const updateBcv = rowN => {
-    //     const newCurrentRowCV = ingredient[rowN][0].split(":")
-    //     postEmptyJson(
-    //         `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
-    //         debugRef.current
-    //     );
+    const updateBcv = unitN => {
+        const newCurrentRowCV = unitData[unitN][0].split(":")
+        postEmptyJson(
+            `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
+            debugRef.current
+        );
 
-    // }
+    }
+    
 
     useEffect(() => {
         const juxtaJson = async () => {
@@ -101,6 +102,13 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
         }
     }, [units, pk]);
 
+    const handleSaveUnit = (unitN, newText) => {
+        const newUnit = { ...unitData[unitN], text: newText }
+        let newUnitData = [...unitData]
+        newUnitData[unitN] = newUnit
+        setUnitData(newUnitData)
+    }
+
     const contentSpec = {
         "general": {
             "ntjxt": {
@@ -117,19 +125,9 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
     if (isDownloading) {
         return <p>loading...</p>
     }
-
-    const handleSaveUnit = (unitN, newText) => {
-        const newUnit = { ...unitData[unitN], text: newText }
-        let newUnitData = [...unitData]
-        newUnitData[unitN] = newUnit
-        setUnitData(newUnitData)
-    }
-
-    console.log("currentText", currentText)
-
     return (
         <RequireResources contentSpec={contentSpec}>
-            <NavBarDrafting currentChapter={currentChapter} units={units} setCurrentChapter={setCurrentChapter} selectedReference={selectedReference} setSelectedReference={selectedReference} />
+            <NavBarDrafting currentChapter={currentChapter} setCurrentChapter={setCurrentChapter} units={units} />
             <Box>
                 {unitData
                     .filter(u => u.reference.startsWith(`${currentChapter}:`))
@@ -140,7 +138,6 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                                     <TextField
                                         label={u.reference}
                                         value={u.reference === selectedReference ? currentText : u.text}
-
                                         multiline
                                         minRows={9}
                                         maxRows={9}
@@ -148,6 +145,7 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                                         onFocus={() => {
                                             setCurrentText(u.text);
                                             setSelectedReference(u.reference)
+                                            updateBcv(u.reference)
                                         }}
                                         onChange={(e) => {
                                             setCurrentText(e.target.value)
