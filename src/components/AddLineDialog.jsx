@@ -21,7 +21,6 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
         const newIngredient = [...ingredient];
         newIngredient.splice(rowN, 0, newRow);
         setIngredient(newIngredient);
-        console.log("newRow", newRow)
         closeModal();
     };
 

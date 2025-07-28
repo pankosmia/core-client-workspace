@@ -68,23 +68,27 @@ function ConfigureWorkspace() {
     const columns = [
         {
             field: 'name',
-            headerName: <Typography>{doI18n("pages:core-local-workspace:row_name", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-local-workspace:row_name", i18nRef.current),
+            minWidth: 110,
             flex: 1
         },
         {
             field: 'description',
-            headerName: <Typography>{doI18n("pages:core-local-workspace:row_description", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-local-workspace:row_description", i18nRef.current),
+            minWidth: 130,
             flex: 1
         },
         {
             field: 'type',
-            headerName: <Typography>{doI18n("pages:core-local-workspace:row_type", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-local-workspace:row_type", i18nRef.current),
+            minWidth: 80,
             flex: 0.75
             //valueGetter: v => doI18n(`flavors:names:${flavorTypes[v.toLowerCase()]}/${v}`, i18nRef.current)
         },
         {
             field: 'language',
-            headerName: <Typography>{doI18n("pages:core-local-workspace:row_language", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-local-workspace:row_language", i18nRef.current),
+            minWidth: 120,
             flex: 1
         }
     ]

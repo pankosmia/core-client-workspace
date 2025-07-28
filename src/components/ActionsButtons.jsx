@@ -20,17 +20,21 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
     const previousRow = () => {
         const newRowN = currentRowN - 1;
         if (newRowN >= 1 && ingredient.length > 1 && ingredient[newRowN]) {
+            saveFunction(currentRowN, rowData);
             setCurrentRowN(newRowN);
             setCellValueChanged(false)
+            updateBcv(newRowN)
         }
     };
 
     // changer de page +1
     const nextRow = () => {
         const newRowN = currentRowN + 1;
-        if (ingredient.length > 1 && ingredient[newRowN] && ingredient[newRowN].length > 0) {
+        if (ingredient[newRowN] && ingredient[newRowN].length > 0) {
+            saveFunction(currentRowN, rowData);
             setCurrentRowN(newRowN);
             setCellValueChanged(false)
+            updateBcv(newRowN)
         }
     };
 
@@ -41,7 +45,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                     <>
                         <IconButton
                             variant="contained"
-                            onClick={() => { previousRow(); saveFunction(currentRowN, rowData); updateBcv() }}
+                            onClick={() => { previousRow() }}
                             sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
@@ -52,6 +56,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                         >
                             <ArrowBackIosNewIcon />
                         </IconButton>
+
                         <IconButton
                             onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
                             variant="contained"
@@ -66,6 +71,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                         >
                             <CheckIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"} />
                         </IconButton>
+
                         <IconButton
                             onClick={() => {
                                 handleCancel();
@@ -97,7 +103,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                             <DeleteIcon size="large" color={ingredient[currentRowN] && ingredient[currentRowN].length === 1 ? "#eaeaea" : "primary"} />
                         </IconButton>
                         <IconButton
-                            onClick={() => { nextRow(); saveFunction(currentRowN, rowData); updateBcv() }} variant="contained"
+                            onClick={() => { nextRow() }} variant="contained"
                             sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {

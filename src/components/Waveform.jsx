@@ -7,49 +7,45 @@ import IconButton from '@mui/material/IconButton';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
-const Waveform = ({ 
-    priseNumber, 
-    obs, 
-    metadata, 
-    setCursorTime, 
-    cursorTime, 
-    currentTrack, 
+const Waveform = ({
+    priseNumber,
+    obs,
+    metadata,
+    setCursorTime,
+    cursorTime,
+    currentTrack,
     setCurrentTrack,
-    maxDuration = null,
+    maxDuration,
     enableRegions = false,
     onRegionSelect = null,
     isMainTrack = false,
-    onDurationUpdate = null
+    onDurationUpdate = null,
+    mainTrackRef = null,
+    selectedRegion = null,
 }) => {
+    const waveformContainerRef = useRef(null);
     const waveformRef = useRef(null);
     const regionsPlugin = useMemo(() => RegionsPlugin.create(), []);
-    const recordPlugin = useMemo(() => RecordPlugin.create(), []);
-    const plugins = useMemo(() => [regionsPlugin, recordPlugin], [regionsPlugin, recordPlugin]);
+    const plugins = useMemo(() => [regionsPlugin,], [regionsPlugin]);
     const [actualDuration, setActualDuration] = useState(0);
 
     const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], prise = priseNumber) => {
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
         let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
-        return `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}-${prise}.mp3`
+        return `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${prise}.mp3`
     }
 
     const waveformConfig = {
         container: waveformRef,
         height: isMainTrack ? 80 : 60,
-        waveColor: isMainTrack ? 'rgb(27, 27, 27)' : 'rgb(102, 102, 102)',
-        progressColor: isMainTrack ? 'rgb(255, 69, 0)' : 'rgb(27, 27, 27)',
+        waveColor: 'rgb(34, 173, 197)',
+        progressColor: 'rgb(64, 107, 114)',
         url: getUrl(),
         plugins: plugins,
         barWidth: 2,
         barGap: 1,
         barRadius: 2,
-        normalize: true,
-        fillParent: true,
-        responsive: true,
-        hideScrollbar: true,
-        ...(maxDuration && { 
-            minPxPerSec: 50 
-        })
+        cursorWidth: 0,
     };
 
     const { wavesurfer, currentTime, isPlaying } = useWavesurfer(waveformConfig);
@@ -59,15 +55,14 @@ const Waveform = ({
 
         const handleReady = () => {
             const duration = wavesurfer.getDuration();
-            setActualDuration(duration);
-            
-            if (onDurationUpdate) {
-                onDurationUpdate(priseNumber, duration);
-            }
-            
+
             if (maxDuration && duration < maxDuration) {
                 const ratio = duration / maxDuration;
                 console.log(`Track ${priseNumber}: ${duration}s/${maxDuration}s (${(ratio * 100).toFixed(1)}%)`);
+            }
+
+            if (onDurationUpdate) {
+                onDurationUpdate(priseNumber, duration);
             }
         };
 
@@ -82,33 +77,26 @@ const Waveform = ({
         if (enableRegions) {
             const handleRegionCreate = (region) => {
                 if (onRegionSelect) {
-                    onRegionSelect({
-                        trackId: priseNumber,
-                        startTime: region.start,
-                        endTime: region.end,
-                        region: region
-                    });
+                    onRegionSelect([region, priseNumber, regionsPlugin]);
                 }
             };
 
             const handleRegionUpdate = (region) => {
                 if (onRegionSelect) {
-                    onRegionSelect({
-                        trackId: priseNumber,
-                        startTime: region.start,
-                        endTime: region.end,
-                        region: region,
-                        action: 'update'
-                    });
+                    onRegionSelect([region, priseNumber, regionsPlugin]);
                 }
+            };
+
+            const handleRegionClick = (region) => {
+                    onRegionSelect([region, priseNumber, regionsPlugin]);
             };
 
             regionsPlugin?.on('region-created', handleRegionCreate);
             regionsPlugin?.on('region-updated', handleRegionUpdate);
-
+            regionsPlugin?.on('region-clicked', handleRegionClick);
             // return () => {
-            //     regionsPlugin?.off('region-created', handleRegionCreate);
-            //     regionsPlugin?.off('region-updated', handleRegionUpdate);
+                // regionsPlugin?.off('region-created', handleRegionCreate);
+                // regionsPlugin?.off('region-updated', handleRegionUpdate);
             // };
         }
 
@@ -117,11 +105,39 @@ const Waveform = ({
         wavesurfer?.on('interaction', handleInteraction);
 
         // return () => {
-        //     wavesurfer?.off('ready', handleReady);
+            // wavesurfer?.off('ready', handleReady);
         //     wavesurfer?.off('click', handleClick);
-        //     wavesurfer?.off('interaction', handleInteraction);
+            // wavesurfer?.off('interaction', handleInteraction);
         // };
     }, [wavesurfer, enableRegions, onRegionSelect, maxDuration, priseNumber, setCursorTime, setCurrentTrack, onDurationUpdate]);
+
+    useEffect(() => {
+        regionsPlugin?.enableDragSelection({
+            drag: true,
+            color: 'rgba(0, 0, 0, 0.3)',
+        }, 1);
+    }, []);
+
+    const updateActualDuration = () => {
+        const duration = wavesurfer?.getDuration();
+        if (maxDuration && maxDuration >= duration) {
+            let newDuration = mainTrackRef.current.clientWidth / maxDuration * duration;
+            console.log(`${mainTrackRef.current.clientWidth} / ${maxDuration} * ${duration} = ${newDuration}`)
+            setActualDuration(newDuration - 20);
+        }
+    }
+
+    useEffect(() => {
+        updateActualDuration();
+    }, [maxDuration, mainTrackRef]);
+
+    useEffect(() => {
+        regionsPlugin.getRegions().forEach(region => { 
+            if(selectedRegion[0] != region) {
+            region.setOptions({ color: 'rgba(0, 0, 0, 0.1)' }) 
+            }
+        });
+    }, [selectedRegion])
 
     useEffect(() => {
         if (wavesurfer && cursorTime !== undefined) {
@@ -141,8 +157,13 @@ const Waveform = ({
     };
 
     const getDurationIndicator = () => {
-        // if (!maxDuration || !actualDuration) return null;
-        
+        if (!maxDuration || !actualDuration) return null;
+        // return (
+        //     <Box sx={{ position: 'absolute', top: 0, right: 8, backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', px: 1, py: 0.5, borderRadius: 1, fontSize: '0.75rem', zIndex: 1 }}>
+        //         {formatTime(actualDuration)}
+        //     </Box>
+        // )
+
         // return (
         //     <Box 
         //         sx={{ 
@@ -164,35 +185,37 @@ const Waveform = ({
     };
 
     return (
-        <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            backgroundColor: currentTrack == priseNumber ? 'rgb(255, 239, 239)' : 'rgb(255, 255, 255)', 
-            mb: 1, 
-            borderRadius: 1,
-            position: 'relative',
-            border: isMainTrack ? '2px solid rgb(255, 69, 0)' : '1px solid rgb(200, 200, 200)'
-        }}>
+        <Box
+            ref={waveformContainerRef}
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: currentTrack == priseNumber ? 'rgb(255, 239, 239)' : 'rgb(255, 255, 255)',
+                mb: 1,
+                borderRadius: 1,
+                position: 'relative',
+                border: isMainTrack ? '2px solid rgb(255, 69, 0)' : '1px solid rgb(200, 200, 200)',
+            }}>
             <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
                 <div
                     ref={waveformRef}
-                    style={{ 
-                        width: actualDuration * 100, 
+                    style={{
+                        width: actualDuration,
                         height: isMainTrack ? '80px' : '60px',
                         overflow: 'hidden',
                     }}
                 />
                 {getDurationIndicator()}
             </Box>
-            
+
             {/* Boutons de contrôle pour la track principale */}
-            {isMainTrack && (
+            {/* {isMainTrack && (
                 <Box sx={{ px: 1 }}>
                     <IconButton size="small" onClick={onPlayPause}>
                         {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
                     </IconButton>
                 </Box>
-            )}
+            )} */}
         </Box>
     );
 };
