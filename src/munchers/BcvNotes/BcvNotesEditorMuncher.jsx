@@ -53,6 +53,7 @@ function BcvNotesEditorMuncher({ metadata }) {
             `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
             debugRef.current
         );
+       
     }
     console.log("updateBCV",updateBcv)
     

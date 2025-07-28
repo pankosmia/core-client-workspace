@@ -11,6 +11,7 @@ import { Box, FormControl, TextField } from "@mui/material";
 import RequireResources from "../../components/RequireResources";
 import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
+import SaveButtonDrafting from "../../components/SaveButtonDrafting";
 
 function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const { systemBcv } = useContext(BcvContext);
@@ -22,17 +23,16 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const [isDownloading, setIsDownloading] = useState(false);
     const [currentText, setCurrentText] = useState("");
     const [selectedReference, setSelectedReference] = useState("");
+    const [usfmHeader, setUsfmHeader] = useState("");
+    // const updateBcv = unitN => {
+    //     const newCurrentUnitCV = unitData[unitN] > 0 && unitData[unitN].reference.split(":")
+    //     postEmptyJson(
+    //         `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1]}`,
+    //         debugRef.current
+    //     );
+    // }
 
-    const updateBcv = unitN => {
-        const newCurrentRowCV = unitData[unitN][0].split(":")
-        postEmptyJson(
-            `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
-            debugRef.current
-        );
-
-    }
-    
-
+    //console.log("newCurrentUnit",  unitData.map(ref => ref.reference))
     useEffect(() => {
         const juxtaJson = async () => {
             let jsonResponse = await getJson(`/burrito/ingredient/raw/git.door43.org/BurritoTruck/fr_juxta/?ipath=${systemBcv.bookCode}.json`, debugRef.current);
@@ -51,13 +51,15 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                     debugRef.current
                 );
                 if (usfmResponse.ok) {
+                    const usfmText = usfmResponse.text
+                    setUsfmHeader(usfmText.split("\\c")[0])
                     const newPk = new Proskomma();
                     newPk.importDocument({
                         lang: "xxx",
                         abbr: "yyy"
                     },
                         "usfm",
-                        usfmResponse.text
+                        usfmText
                     );
                     setPk(newPk)
                 }
@@ -127,6 +129,12 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
     }
     return (
         <RequireResources contentSpec={contentSpec}>
+
+            <SaveButtonDrafting
+                metadata={metadata}
+                systemBcv={systemBcv}
+                usfmHeader={usfmHeader}
+            />
             <NavBarDrafting currentChapter={currentChapter} setCurrentChapter={setCurrentChapter} units={units} />
             <Box>
                 {unitData
@@ -145,7 +153,7 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                                         onFocus={() => {
                                             setCurrentText(u.text);
                                             setSelectedReference(u.reference)
-                                            updateBcv(u.reference)
+                                            //updateBcv(u.reference)
                                         }}
                                         onChange={(e) => {
                                             setCurrentText(e.target.value)
