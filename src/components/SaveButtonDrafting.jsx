@@ -22,7 +22,7 @@ function SaveButtonDrafting({ metadata, systemBcv, usfmHeader, unitData }) {
             }
             contentBits.push("\\p")
             contentBits.push(`\\v ${unit.reference.split(":")[1]}`)
-            contentBits.push(unit.text)
+            contentBits.push(unit.text.split(/\n{2,}/).join("\n\\p"))
         }
         const payload = JSON.stringify({ payload: contentBits.join("\n") });
         const response = await postJson(

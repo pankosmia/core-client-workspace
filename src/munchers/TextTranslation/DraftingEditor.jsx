@@ -24,15 +24,19 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const [currentText, setCurrentText] = useState("");
     const [selectedReference, setSelectedReference] = useState("");
     const [usfmHeader, setUsfmHeader] = useState("");
-    // const updateBcv = unitN => {
-    //     const newCurrentUnitCV = unitData[unitN] > 0 && unitData[unitN].reference.split(":")
-    //     postEmptyJson(
-    //         `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1]}`,
-    //         debugRef.current
-    //     );
-    // }
 
-    //console.log("newCurrentUnit",  unitData.map(ref => ref.reference))
+    const updateBcv = unitN => {
+        if (unitData[unitN]) {
+            const newCurrentUnitCV = unitData[unitN].reference.split(":")
+            postEmptyJson(
+                `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1]}`,
+                debugRef.current
+            );
+        }
+
+    }
+
+    console.log("newCurrentUnit", )
     useEffect(() => {
         const juxtaJson = async () => {
             let jsonResponse = await getJson(`/burrito/ingredient/raw/git.door43.org/BurritoTruck/fr_juxta/?ipath=${systemBcv.bookCode}.json`, debugRef.current);
@@ -148,13 +152,13 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                                         label={u.reference}
                                         value={u.reference === selectedReference ? currentText : u.text}
                                         multiline
-                                        minRows={9}
+                                        minRows={6}
                                         maxRows={9}
                                         autoFocus={u.reference === selectedReference}
                                         onFocus={() => {
                                             setCurrentText(u.text);
                                             setSelectedReference(u.reference)
-                                            //updateBcv(u.reference)
+                                            updateBcv(index)
                                         }}
                                         onChange={(e) => {
                                             setCurrentText(e.target.value)
