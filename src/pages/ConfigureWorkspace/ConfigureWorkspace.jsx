@@ -47,7 +47,7 @@ function ConfigureWorkspace() {
         "x-parallel": "myBcvList",
         "x-bcvImages": "myBcvList",
         "textStories": "myObsList",
-        "x-obsimages": "myObsList",
+        "x-obsimages": [],
         "x-obsarticles": "myObsList",
         "x-obsquestions": "myObsList",
         "x-obsnotes": "myObsList"
