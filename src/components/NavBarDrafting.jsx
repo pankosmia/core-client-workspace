@@ -3,16 +3,17 @@ import FastRewindIcon from '@mui/icons-material/FastRewind';
 import FastForwardIcon from '@mui/icons-material/FastForward';
 import { Box, IconButton } from "@mui/material";
 import { ButtonGroup } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 function NavBarDrafting({ units, currentChapter, setCurrentChapter }) {
     const highestChapter = () => units.length === 0 ? 0 : parseInt(units[units.length - 1].split(":")[0])
-    
+
     // changer de page -1 
     const previousChapter = () => {
         const newChapterN = currentChapter - 1;
         if (newChapterN >= 1 && units.length > 1 && units[newChapterN]) {
             setCurrentChapter(newChapterN);
-            
+
         }
     };
 
@@ -21,14 +22,15 @@ function NavBarDrafting({ units, currentChapter, setCurrentChapter }) {
         const newChapterN = currentChapter + 1;
         if (currentChapter < highestChapter()) {
             setCurrentChapter(newChapterN);
-            
+
         }
     };
+
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <ButtonGroup>
-                <IconButton onClick={() => { previousChapter() }}>
-                    <FastRewindIcon fontSize="large" />
+                <IconButton disabled={currentChapter === 1} onClick={() => { previousChapter() }}>
+                    <FastRewindIcon fontSize="large" color={currentChapter === 1 ? "#eaeaea" : "primary"} />
                 </IconButton>
             </ButtonGroup>
 
@@ -47,8 +49,10 @@ function NavBarDrafting({ units, currentChapter, setCurrentChapter }) {
             </Box>
 
             <ButtonGroup>
-                <IconButton onClick={() => { nextChapter() }}>
-                    <FastForwardIcon fontSize="large" />
+                <IconButton disabled={currentChapter === highestChapter()} onClick={() => { nextChapter() }}
+
+                >
+                    <FastForwardIcon fontSize="large" color={currentChapter === highestChapter() ? "#eaeaea" : "primary"} />
                 </IconButton>
             </ButtonGroup>
         </Box>
