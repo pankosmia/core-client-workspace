@@ -6,7 +6,7 @@ import { enqueueSnackbar } from "notistack";
 import I18nContext from "pithekos-lib/dist/contexts/i18nContext";
 import { useContext, useState } from "react";
 
-function SaveButtonDrafting({ metadata, systemBcv, usfmHeader, unitData }) {
+function SaveButtonDrafting({ metadata, systemBcv, usfmHeader, unitData, md5Usfm, setMd5Usfm }) {
     const { i18nRef } = useContext(I18nContext);
     const [contentChanged, _setContentChanged] = useState(false);
 
@@ -30,9 +30,8 @@ function SaveButtonDrafting({ metadata, systemBcv, usfmHeader, unitData }) {
             payload,
             debugBool
         );
+        setMd5Usfm(md5(JSON.stringify(unitData))) 
 
-        //setMd5Ingredient(md5(JSON.stringify()))
-        //uploadUsfmIngredient([...])
         if (response.ok) {
             enqueueSnackbar(
                 `${doI18n("pages:core-local-workspace:saved", i18nRef.current)}`,
@@ -54,11 +53,13 @@ function SaveButtonDrafting({ metadata, systemBcv, usfmHeader, unitData }) {
     }
     return (
         <IconButton
+          disabled={md5(JSON.stringify(unitData)) === md5Usfm}
             variant="contained"
             onClick={() => { handleSaveUsfm() }}
         >
             <SaveIcon
                 size="large"
+                color={md5(JSON.stringify(unitData)) === md5Usfm ? "#eaeaea" : "primary"}
             />
         </IconButton>
     )

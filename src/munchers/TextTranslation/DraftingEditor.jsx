@@ -1,6 +1,7 @@
 import { useEffect, useContext, useState } from "react";
 import { Proskomma } from 'proskomma-core';
 import {
+    bcvContext,
     bcvContext as BcvContext,
     debugContext as DebugContext,
     getJson,
@@ -12,6 +13,7 @@ import RequireResources from "../../components/RequireResources";
 import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
 import SaveButtonDrafting from "../../components/SaveButtonDrafting";
+import md5 from "md5";
 
 function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const { systemBcv } = useContext(BcvContext);
@@ -24,19 +26,9 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const [currentText, setCurrentText] = useState("");
     const [selectedReference, setSelectedReference] = useState("");
     const [usfmHeader, setUsfmHeader] = useState("");
-
-    const updateBcv = unitN => {
-        if (unitData[unitN]) {
-            const newCurrentUnitCV = unitData[unitN].reference.split(":")
-            postEmptyJson(
-                `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1]}`,
-                debugRef.current
-            );
-        }
-
-    }
-
-    console.log("newCurrentUnit", )
+    const [md5Usfm, setMd5Usfm] = useState([]);
+    const {bcvRef} = useContext(BcvContext);
+   
     useEffect(() => {
         const juxtaJson = async () => {
             let jsonResponse = await getJson(`/burrito/ingredient/raw/git.door43.org/BurritoTruck/fr_juxta/?ipath=${systemBcv.bookCode}.json`, debugRef.current);
@@ -99,6 +91,8 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
             newUnitData.push({ reference: cv, text: cvText })
         }
         setUnitData(newUnitData)
+        const hash = md5(JSON.stringify(newUnitData));
+        setMd5Usfm(hash);
         setIsDownloading(false)
     }
 
@@ -106,7 +100,18 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
         if (pk) {
             getUnitTexts().then()
         }
-    }, [units, pk]);
+    }, [units, pk,systemBcv.chapterNum]);
+
+     const updateBcv = unitN => {
+        if (unitData[unitN]) {
+            const newCurrentUnitCV = unitData[unitN].reference.split(":")
+            postEmptyJson(
+                `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1]}`,
+                debugRef.current
+            );
+        }
+
+    }
 
     const handleSaveUnit = (unitN, newText) => {
         const newUnit = { ...unitData[unitN], text: newText }
@@ -133,12 +138,13 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
     }
     return (
         <RequireResources contentSpec={contentSpec}>
-
             <SaveButtonDrafting
                 metadata={metadata}
                 systemBcv={systemBcv}
                 usfmHeader={usfmHeader}
                 unitData={unitData}
+                md5Usfm={md5Usfm}
+                setMd5Usfm={setMd5Usfm}
             />
             <NavBarDrafting currentChapter={currentChapter} setCurrentChapter={setCurrentChapter} units={units} />
             <Box>
@@ -152,13 +158,13 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                                         label={u.reference}
                                         value={u.reference === selectedReference ? currentText : u.text}
                                         multiline
-                                        minRows={6}
+                                        minRows={3}
                                         maxRows={9}
                                         autoFocus={u.reference === selectedReference}
                                         onFocus={() => {
                                             setCurrentText(u.text);
                                             setSelectedReference(u.reference)
-                                            updateBcv(index)
+                                            //updateBcv(index)
                                         }}
                                         onChange={(e) => {
                                             setCurrentText(e.target.value)
