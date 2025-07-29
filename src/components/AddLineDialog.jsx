@@ -60,11 +60,11 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                //maxHeight: 560,
-                // maxWidth:560,
+                maxHeight: "500vh",
+                maxWidth:"560vh",
                 bgcolor: 'background.paper',
                 boxShadow: 24,
-                borderRadius:2
+                borderRadius:2,
                 
             }}>
                 <AppBar sx={{ position: 'relative',borderTopLeftRadius:4, borderTopRightRadius:4 }}>
