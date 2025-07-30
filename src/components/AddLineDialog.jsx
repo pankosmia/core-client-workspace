@@ -7,7 +7,7 @@ import {
     doI18n,
 } from "pithekos-lib";
 import { v4 as uuidv4 } from 'uuid';
-import { Fullscreen } from "lucide-react";
+
 function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRowN, cellValueChanged, setCellValueChanged }) {
     const { i18nRef } = useContext(I18nContext);
     const [newCurrentRow, setNewCurrentRow] = useState(Array(7).fill("", 0, 7));
@@ -60,11 +60,12 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                maxHeight: "500vh",
-                maxWidth:"560vh",
+                maxHeight: "80vh",
+                maxWidth:"80vw",
                 bgcolor: 'background.paper',
                 boxShadow: 24,
                 borderRadius:2,
+                overflow:"auto"
                 
             }}>
                 <AppBar sx={{ position: 'relative',borderTopLeftRadius:4, borderTopRightRadius:4 }}>

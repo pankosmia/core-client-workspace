@@ -2,7 +2,7 @@ import { Box, FormControl, TextField } from "@mui/material";
 import MarkdownField from "./MarkdownField";
 import ActionsButtons from "./ActionsButtons";
 
-function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction,cellValueChanged,setCellValueChanged }) {
+function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction, cellValueChanged, setCellValueChanged }) {
     const columnNames = ingredient[0] || [];
 
     // Permet la modification d'une note
@@ -40,20 +40,19 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
 
                         />
                     ) : (
-                        <>
-                            <TextField
-                                label={column}
-                                value={currentRow[n]}
-                                placeholder={n === 0 ? "1:1" : ""}
-                                required={n === 0}
-                                disabled={n === 1 || (mode === "edit" && ingredient[currentRowN] && ingredient[currentRowN].length === 1)}
-                                variant="outlined"
-                                fullWidth
-                                size="small"
-                                onChange={(e) => changeCell(e, n)}
-                            />
-                        </>
-                        
+
+                        <TextField
+                            label={column}
+                            value={currentRow[n]}
+                            placeholder={n === 0 ? "1:1" : ""}
+                            required={n === 0}
+                            disabled={n === 1 || (mode === "edit" && ingredient[currentRowN] && ingredient[currentRowN].length === 1)}
+                            variant="outlined"
+                            fullWidth
+                            size="small"
+                            onChange={(e) => changeCell(e, n)}
+                        />
+
                     )}
                 </FormControl>
 
