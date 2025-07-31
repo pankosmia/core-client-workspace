@@ -71,7 +71,7 @@ function BcvNotesEditorMuncher({ metadata }) {
         }}
         >
             {/* <SearchNavBar getAllData={getAllData} /> */}
-            <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "space-between" }}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
                 <AddFab
                     currentRowN={currentRowN}
                     setCurrentRowN={setCurrentRowN}
