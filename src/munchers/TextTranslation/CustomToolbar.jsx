@@ -28,6 +28,13 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { ButtonExpandNotes } from "./plugins/ButtonExpandNotes";
 import CustomMarkersToolbar from "./plugins/CustomMarkersToolbar";
 import { TriggerKeyDialog } from "./TriggerKeyDialog";
+import SaveIcon from '@mui/icons-material/Save';
+import SearchIcon from '@mui/icons-material/Search';
+import KeyboardCommandKeyIcon from '@mui/icons-material/KeyboardCommandKey';
+import ViewStreamIcon from '@mui/icons-material/ViewStream';
+import FormatTextdirectionRToLIcon from '@mui/icons-material/FormatTextdirectionRToL';
+import UndoIcon from '@mui/icons-material/Undo';
+import RedoIcon from '@mui/icons-material/Redo';
 
 function SearchButton() {
   const { isVisible, setIsVisible } = useFindReplace();
@@ -38,7 +45,7 @@ function SearchButton() {
       title="find and replace"
       className="toolbar-button"
     >
-      <MdSearch size={18} />
+      <SearchIcon size={18} />
     </button>
   );
 }
@@ -54,7 +61,7 @@ function TriggerKeyButton({
       onClick={onClick}
       title="Set trigger key combination"
     >
-      <MdKeyboardCommandKey size={18} />
+      <KeyboardCommandKeyIcon size={18} />
       <span style={{ marginLeft: "4px", fontSize: "12px" }}>{triggerKeyCombo}</span>
     </button>
   );
@@ -66,7 +73,7 @@ export function CustomToolbar({ onSave }) {
   const editable = useMemo(() => editor.isEditable(), [editor]);
 
   const [triggerKeyCombo, setTriggerKeyCombo] = useState("\\");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDialogOpenTriggerKey, setIsDialogOpenTriggerKey] = useState(false);
 
   // Define the markers to show in the toolbar
   const markerGroups = {
@@ -77,17 +84,17 @@ export function CustomToolbar({ onSave }) {
   };
 
   const openDialog = () => {
-    setIsDialogOpen(true);
+    setIsDialogOpenTriggerKey(true);
   };
 
   const closeDialog = () => {
-    setIsDialogOpen(false);
+    setIsDialogOpenTriggerKey(false);
   };
 
   return (
     <>
       <TriggerKeyDialog
-        isOpen={isDialogOpen}
+        isOpen={isDialogOpenTriggerKey}
         onClose={closeDialog}
         currentTrigger={triggerKeyCombo}
         onTriggerChange={setTriggerKeyCombo}
@@ -99,21 +106,21 @@ export function CustomToolbar({ onSave }) {
             <ToolbarContainer>
               <ToolbarSection className="w-full">
                 <UndoButton title="undo">
-                  <MdOutlineUndo size={20} />
+                  <UndoIcon size={20} />
                 </UndoButton>
                 <RedoButton title="redo">
-                  <MdOutlineRedo size={20} />
+                  <RedoIcon size={20} />
                 </RedoButton>
                 <hr />
                 <SaveButton onSave={onSave} title="save">
-                  <MdSave size={20} />
+                  <SaveIcon size={20} />
                 </SaveButton>
                 <hr />
                 <ViewButton title="toggle block view">
-                  <MdViewAgenda size={16} />
+                  <ViewStreamIcon size={16} />
                 </ViewButton>
                 <FormatButton title="toggle markup">
-                  <ImPilcrow />
+                  <FormatTextdirectionRToLIcon />
                 </FormatButton>
 
                 <ButtonExpandNotes defaultState={false} />
