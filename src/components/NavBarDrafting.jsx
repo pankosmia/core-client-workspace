@@ -26,6 +26,29 @@ function NavBarDrafting({ units, currentChapter, setCurrentChapter }) {
         }
     };
 
+    const StyledNumberInput = {
+        root: {
+            style: {
+                display: 'inline-flex',
+                alignItems: 'center',
+            }
+        },
+        input: {
+            style: {
+                width: 'auto',
+                height: '1rem',
+                textAlign: 'center',
+                borderRadius: '0.5rem',
+                fontSize: '1rem',
+                outline: 'none',
+                '&:focus': {
+                    borderColor: '#1976d2',
+                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.2)',
+                }
+            }
+        }
+    }
+
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <ButtonGroup>
@@ -45,6 +68,7 @@ function NavBarDrafting({ units, currentChapter, setCurrentChapter }) {
             }}>
                 <NumberInput
                     value={`Chap ${currentChapter}`}
+                    slotProps={StyledNumberInput}
                 />
             </Box>
 
