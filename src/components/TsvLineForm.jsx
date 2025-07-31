@@ -40,18 +40,32 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
 
                         />
                     ) : (
+                        <>
+                            <TextField
+                                label={column}
+                                value={currentRow[n]}
+                                placeholder={n === 0 ? "1:1" : ""}
+                                required={n === 0}
+                                disabled={n === 1 || (mode === "edit" && ingredient[currentRowN] && ingredient[currentRowN].length === 1)}
+                                variant="outlined"
+                                fullWidth
+                                size="small"
+                                onChange={(e) => changeCell(e, n)}
+                            />
+                            {/* {mode === "add" && (
+                                <>
+                                    <TextField label={"name"} />
+                                    <TextField label={"name"} />
+                                    <TextField label={"name"} />
+                                    <TextField label={"name"} />
+                                    <TextField label={"name"} />
+                                </>
 
-                        <TextField
-                            label={column}
-                            value={currentRow[n]}
-                            placeholder={n === 0 ? "1:1" : ""}
-                            required={n === 0}
-                            disabled={n === 1 || (mode === "edit" && ingredient[currentRowN] && ingredient[currentRowN].length === 1)}
-                            variant="outlined"
-                            fullWidth
-                            size="small"
-                            onChange={(e) => changeCell(e, n)}
-                        />
+
+                            )} */}
+
+                        </>
+
 
                     )}
                 </FormControl>
