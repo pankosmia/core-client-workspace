@@ -29,7 +29,7 @@ export function CustomMarkersToolbar({ customMarkers }) {
               {items.map((marker) => (
                 <button
                   key={`marker-${marker.name}`}
-                  className="px-2 py-1 text-xs font-mono bg-white border border-gray-300 rounded hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100"
+                  //className="px-2 py-1 text-xs font-mono bg-white border border-gray-300 rounded hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100"
                   onClick={() => marker.action(editor)}
                   title={marker.description || marker.name}
                   data-marker={marker.name}

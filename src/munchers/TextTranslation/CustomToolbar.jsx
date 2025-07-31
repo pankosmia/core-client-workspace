@@ -38,7 +38,7 @@ import RedoIcon from '@mui/icons-material/Redo';
 import ToggleButtonGroup, {
   toggleButtonGroupClasses,
 } from '@mui/material/ToggleButtonGroup';
-import { Divider, IconButton, Paper, Stack,} from "@mui/material";
+import { Divider, IconButton, Paper, Stack, } from "@mui/material";
 function SearchButton() {
   const { isVisible, setIsVisible } = useFindReplace();
 
@@ -105,32 +105,53 @@ export function CustomToolbar({ onSave }) {
 
       {editable ? (
         <Stack>
-          <ToggleButtonGroup sx={{marginb:2}}>
+          <ToggleButtonGroup sx={{ marginb: 2 }}>
             <FindReplacePlugin>
-                  <UndoButton title="undo">
-                    <UndoIcon />
-                  </UndoButton>
-                  <RedoButton title="redo">
-                    <RedoIcon />
-                  </RedoButton>
+
+              <IconButton>
+                <UndoButton title="undo">
+                  <UndoIcon />
+                </UndoButton>
+              </IconButton>
+
+              <IconButton>
+                <RedoButton title="redo">
+                  <RedoIcon />
+                </RedoButton>
+              </IconButton>
               <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
+
+              <IconButton>
                 <SaveButton onSave={onSave} title="save">
                   <SaveIcon />
                 </SaveButton>
+              </IconButton>
               <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
-                <ViewButton title="toggle block view">
-                  <ViewStreamIcon />
-                </ViewButton>
-                <FormatButton title="toggle markup">
-                  <FormatTextdirectionRToLIcon />
-                </FormatButton>
-              <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
+
               {/* <ButtonExpandNotes defaultState={false} /> */}
+              <IconButton>
                 <TriggerKeyButton
                   triggerKeyCombo={triggerKeyCombo}
                   onClick={openDialog}
                 />
+              </IconButton>
+              <IconButton>
+
                 <SearchButton />
+              </IconButton>
+              <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
+
+              <IconButton>
+                <ViewButton title="toggle block view">
+                  <ViewStreamIcon />
+                </ViewButton>
+              </IconButton>
+
+              <IconButton>
+                <FormatButton title="toggle markup">
+                  <FormatTextdirectionRToLIcon />
+                </FormatButton>
+              </IconButton>
 
               <ToggleButtonGroup>
                 <CustomMarkersToolbar customMarkers={markerGroups} />
