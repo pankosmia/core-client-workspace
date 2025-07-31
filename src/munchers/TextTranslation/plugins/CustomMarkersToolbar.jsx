@@ -16,7 +16,7 @@ export function CustomMarkersToolbar({ customMarkers }) {
   }
 
   return (
-    <div className="w-full border-t border-gray-200 pt-1 mt-1">
+    //<div className="w-full border-t border-gray-200 pt-1 mt-1">
       <div className="flex flex-wrap gap-1 px-2">
         {Object.entries(categories).map(([categoryName, items]) => {
           if (items.length === 0) return null;
@@ -41,7 +41,7 @@ export function CustomMarkersToolbar({ customMarkers }) {
           );
         })}
       </div>
-    </div>
+    //</div>
   );
 }
 

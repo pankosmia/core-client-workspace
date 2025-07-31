@@ -35,7 +35,10 @@ import ViewStreamIcon from '@mui/icons-material/ViewStream';
 import FormatTextdirectionRToLIcon from '@mui/icons-material/FormatTextdirectionRToL';
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
-
+import ToggleButtonGroup, {
+  toggleButtonGroupClasses,
+} from '@mui/material/ToggleButtonGroup';
+import { Divider, IconButton, Paper, Stack,} from "@mui/material";
 function SearchButton() {
   const { isVisible, setIsVisible } = useFindReplace();
 
@@ -101,46 +104,47 @@ export function CustomToolbar({ onSave }) {
       />
 
       {editable ? (
-        <FindReplacePlugin>
-          <div className="flex flex-col">
-            <ToolbarContainer>
-              <ToolbarSection className="w-full">
-                <UndoButton title="undo">
-                  <UndoIcon size={20} />
-                </UndoButton>
-                <RedoButton title="redo">
-                  <RedoIcon size={20} />
-                </RedoButton>
-                <hr />
+        <Stack>
+          <ToggleButtonGroup sx={{marginb:2}}>
+            <FindReplacePlugin>
+                  <UndoButton title="undo">
+                    <UndoIcon />
+                  </UndoButton>
+                  <RedoButton title="redo">
+                    <RedoIcon />
+                  </RedoButton>
+              <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
                 <SaveButton onSave={onSave} title="save">
-                  <SaveIcon size={20} />
+                  <SaveIcon />
                 </SaveButton>
-                <hr />
+              <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
                 <ViewButton title="toggle block view">
-                  <ViewStreamIcon size={16} />
+                  <ViewStreamIcon />
                 </ViewButton>
                 <FormatButton title="toggle markup">
                   <FormatTextdirectionRToLIcon />
                 </FormatButton>
-
-                <ButtonExpandNotes defaultState={false} />
-                <hr />
+              <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
+              {/* <ButtonExpandNotes defaultState={false} /> */}
                 <TriggerKeyButton
                   triggerKeyCombo={triggerKeyCombo}
                   onClick={openDialog}
-                  className="ml-auto"
                 />
                 <SearchButton />
-              </ToolbarSection>
 
-              <CustomMarkersToolbar customMarkers={markerGroups} />
-            </ToolbarContainer>
-          </div>
-          {/* The FindReplaceDialog is also a child of FindReplacePlugin */}
-          <FindReplaceDialog />
-          <ScripturalNodesMenuPlugin trigger={triggerKeyCombo} />
-        </FindReplacePlugin>
-      ) : null}
+              <ToggleButtonGroup>
+                <CustomMarkersToolbar customMarkers={markerGroups} />
+              </ToggleButtonGroup>
+
+              {/* The FindReplaceDialog is also a child of FindReplacePlugin */}
+              <FindReplaceDialog />
+              <ScripturalNodesMenuPlugin trigger={triggerKeyCombo} />
+            </FindReplacePlugin>
+          </ToggleButtonGroup>
+        </Stack >
+
+      ) : null
+      }
     </>
   );
 }
