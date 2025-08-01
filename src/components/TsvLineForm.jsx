@@ -2,7 +2,7 @@ import { Box, FormControl, TextField } from "@mui/material";
 import MarkdownField from "./MarkdownField";
 import ActionsButtons from "./ActionsButtons";
 
-function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction,cellValueChanged,setCellValueChanged }) {
+function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction, cellValueChanged, setCellValueChanged }) {
     const columnNames = ingredient[0] || [];
 
     // Permet la modification d'une note

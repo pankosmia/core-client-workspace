@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { AppBar, Dialog, IconButton, Toolbar, Typography, Button } from "@mui/material";
+import { AppBar, Dialog, IconButton, Toolbar, Typography, Button, Modal, Box } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import TsvLineForm from "./TsvLineForm";
 import {
@@ -7,6 +7,7 @@ import {
     doI18n,
 } from "pithekos-lib";
 import { v4 as uuidv4 } from 'uuid';
+
 function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRowN, cellValueChanged, setCellValueChanged }) {
     const { i18nRef } = useContext(I18nContext);
     const [newCurrentRow, setNewCurrentRow] = useState(Array(7).fill("", 0, 7));
@@ -50,47 +51,63 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
 
 
     return (
-        <Dialog
-            fullScreen
+        <Modal
             open={open}
             onClose={handleCloseModalNewNote}
+            sx={{
+                backdropFilter: "blur(3px)",
+            }}
         >
-            <AppBar sx={{ position: 'relative' }}>
-                <Toolbar sx={{justifyContent:"space-between"}}>
-                    <IconButton
-                        edge="start"
-                        color="inherit"
-                        onClick={handleCloseModalNewNote}
-                        aria-label={doI18n("pages:core-local-workspace:close", i18nRef.current)}
-                    >
-                        <CloseIcon />
-                        <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                            {doI18n("pages:core-local-workspace:new_bcv_note", i18nRef.current)}
-                        </Typography>
-                    </IconButton>
-                    <Button
-                        autoFocus
-                        color="inherit"
-                        disabled={!cellValueChanged}
-                        onClick={() => { handleSaveNewTsvRow(currentRowN, newCurrentRow); setCellValueChanged(false) }}
-                    >
-                           {doI18n("pages:core-local-workspace:create", i18nRef.current)}
-                    </Button>
-                </Toolbar>
-            </AppBar>
-            <TsvLineForm
-                mode="add"
-                currentRow={newCurrentRow}
-                setCurrentRow={setNewCurrentRow}
-                currentRowN={currentRowN}
-                ingredient={ingredient}
-                setIngredient={setIngredient}
-                saveFunction={handleSaveNewTsvRow}
-                handleCloseModalNewNote={handleCloseModalNewNote}
-                cellValueChanged={cellValueChanged}
-                setCellValueChanged={setCellValueChanged}
-            />
-        </Dialog>
+            <Box sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                maxHeight: "80vh",
+                maxWidth: "80vw",
+                bgcolor: 'background.paper',
+                boxShadow: 24,
+                borderRadius: 2,
+                overflow: "auto",
+            }}>
+                <AppBar sx={{ position: 'relative', borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
+                    <Toolbar sx={{ justifyContent: "space-between" }}>
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            onClick={handleCloseModalNewNote}
+                            aria-label={doI18n("pages:core-local-workspace:close", i18nRef.current)}
+                        >
+                            <CloseIcon />
+                            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+                                {doI18n("pages:core-local-workspace:new_bcv_note", i18nRef.current)}
+                            </Typography>
+                        </IconButton>
+                        <Button
+                            autoFocus
+                            color="inherit"
+                            disabled={!cellValueChanged}
+                            onClick={() => { handleSaveNewTsvRow(currentRowN, newCurrentRow); setCellValueChanged(false) }}
+                        >
+                            {doI18n("pages:core-local-workspace:create", i18nRef.current)}
+                        </Button>
+                    </Toolbar>
+                </AppBar>
+                <TsvLineForm
+                    mode="add"
+                    currentRow={newCurrentRow}
+                    setCurrentRow={setNewCurrentRow}
+                    currentRowN={currentRowN}
+                    ingredient={ingredient}
+                    setIngredient={setIngredient}
+                    saveFunction={handleSaveNewTsvRow}
+                    handleCloseModalNewNote={handleCloseModalNewNote}
+                    cellValueChanged={cellValueChanged}
+                    setCellValueChanged={setCellValueChanged}
+                />
+            </Box>
+
+        </Modal>
 
     )
 }

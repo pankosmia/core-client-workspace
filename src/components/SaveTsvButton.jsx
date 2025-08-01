@@ -61,7 +61,6 @@ function SaveTsvButton({ ingredient, metadata, md5Ingredient, setMd5Ingredient }
         <IconButton
             disabled={md5(JSON.stringify(ingredient)) === md5Ingredient}
             sx={{
-                mt: 2,
                 "&.Mui-disabled": {
                     backgroundColor: '#eaeaea',
                     color: '#bebbbbff',
