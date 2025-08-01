@@ -7,25 +7,12 @@ import {
   RedoButton,
   SaveButton,
   ScripturalNodesMenuPlugin,
-  ToolbarContainer,
-  ToolbarSection,
   UndoButton,
   useFindReplace,
   ViewButton,
 } from "@scriptural/react";
 
-import { ImPilcrow } from "react-icons/im";
-import {
-  MdOutlineUndo,
-  MdOutlineRedo,
-  MdSave,
-  MdViewAgenda,
-  MdKeyboardCommandKey,
-  MdSearch,
-} from "react-icons/md";
-
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { ButtonExpandNotes } from "./plugins/ButtonExpandNotes";
 import CustomMarkersToolbar from "./plugins/CustomMarkersToolbar";
 import { TriggerKeyDialog } from "./TriggerKeyDialog";
 import SaveIcon from '@mui/icons-material/Save';
@@ -35,10 +22,9 @@ import ViewStreamIcon from '@mui/icons-material/ViewStream';
 import FormatTextdirectionRToLIcon from '@mui/icons-material/FormatTextdirectionRToL';
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
-import ToggleButtonGroup, {
-  toggleButtonGroupClasses,
-} from '@mui/material/ToggleButtonGroup';
-import { Divider, IconButton, Paper, Stack, } from "@mui/material";
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { Divider, ToggleButton, Stack, IconButton, } from "@mui/material";
+
 function SearchButton() {
   const { isVisible, setIsVisible } = useFindReplace();
 
@@ -70,13 +56,12 @@ function TriggerKeyButton({
   );
 }
 
-
 export function CustomToolbar({ onSave }) {
   const [editor] = useLexicalComposerContext();
   const editable = useMemo(() => editor.isEditable(), [editor]);
-
   const [triggerKeyCombo, setTriggerKeyCombo] = useState("\\");
   const [isDialogOpenTriggerKey, setIsDialogOpenTriggerKey] = useState(false);
+  const [formats, setFormats] = useState(() => [""])
 
   // Define the markers to show in the toolbar
   const markerGroups = {
@@ -93,6 +78,9 @@ export function CustomToolbar({ onSave }) {
   const closeDialog = () => {
     setIsDialogOpenTriggerKey(false);
   };
+  const handleFormat = (event, newFormats) => {
+    setFormats(newFormats);
+  };
 
   return (
     <>
@@ -105,7 +93,12 @@ export function CustomToolbar({ onSave }) {
 
       {editable ? (
         <Stack>
-          <ToggleButtonGroup sx={{ marginb: 2 }}>
+          <ToggleButtonGroup
+            value={formats}
+            onChange={handleFormat}
+            aria-label="text formatting"
+            sx={{ marginb: 2 }}
+          >
             <FindReplacePlugin>
 
               <IconButton>
@@ -114,7 +107,7 @@ export function CustomToolbar({ onSave }) {
                 </UndoButton>
               </IconButton>
 
-              <IconButton>
+              <IconButton >
                 <RedoButton title="redo">
                   <RedoIcon />
                 </RedoButton>
@@ -135,28 +128,25 @@ export function CustomToolbar({ onSave }) {
                   onClick={openDialog}
                 />
               </IconButton>
-              <IconButton>
 
+              <IconButton>
                 <SearchButton />
               </IconButton>
               <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
 
-              <IconButton>
+              <ToggleButton value={"block_view"} sx={{border:0}}>
                 <ViewButton title="toggle block view">
                   <ViewStreamIcon />
                 </ViewButton>
-              </IconButton>
+              </ToggleButton>
 
-              <IconButton>
+              <ToggleButton value={"toggle_markup"} sx={{border:0}}>
                 <FormatButton title="toggle markup">
                   <FormatTextdirectionRToLIcon />
                 </FormatButton>
-              </IconButton>
+              </ToggleButton>
 
-              <ToggleButtonGroup>
                 <CustomMarkersToolbar customMarkers={markerGroups} />
-              </ToggleButtonGroup>
-
               {/* The FindReplaceDialog is also a child of FindReplacePlugin */}
               <FindReplaceDialog />
               <ScripturalNodesMenuPlugin trigger={triggerKeyCombo} />

@@ -3,6 +3,7 @@ import {
 } from "@scriptural/react/plugins/ToolbarPlugin/MarkersToolbar";
 import { ToolbarSection } from "@scriptural/react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { Box, Button, ButtonGroup } from "@mui/material";
 
 /**
  * Implementation of markers toolbar directly in component
@@ -16,32 +17,28 @@ export function CustomMarkersToolbar({ customMarkers }) {
   }
 
   return (
-    //<div className="w-full border-t border-gray-200 pt-1 mt-1">
-      <div className="flex flex-wrap gap-1 px-2">
+    <Box sx={{display:"flex", alignItems:"center"}}>
         {Object.entries(categories).map(([categoryName, items]) => {
           if (items.length === 0) return null;
-
           return (
-            <ToolbarSection
-              key={`markers-section-${categoryName}`}
-              className="flex flex-wrap gap-1 mr-3"
-            >
+            <Box
+              key={`markers-section-${categoryName}`}>
               {items.map((marker) => (
-                <button
+                <Button
                   key={`marker-${marker.name}`}
-                  //className="px-2 py-1 text-xs font-mono bg-white border border-gray-300 rounded hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100"
                   onClick={() => marker.action(editor)}
                   title={marker.description || marker.name}
                   data-marker={marker.name}
+                  sx={{border:0}}
+                  size="small"
                 >
                   {marker.name}
-                </button>
+                </Button>
               ))}
-            </ToolbarSection>
+            </Box>
           );
         })}
-      </div>
-    //</div>
+    </Box>
   );
 }
 
