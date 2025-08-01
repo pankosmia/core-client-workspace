@@ -1,9 +1,9 @@
 import {
   useFilteredMarkers,
 } from "@scriptural/react/plugins/ToolbarPlugin/MarkersToolbar";
-import { ToolbarSection } from "@scriptural/react";
+
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { Box, Button, ButtonGroup } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 /**
  * Implementation of markers toolbar directly in component

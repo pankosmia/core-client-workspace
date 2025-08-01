@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { FindReplaceDialog } from "./FindReplaceDialog";
 
 import {
@@ -24,33 +24,37 @@ import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { Divider, ToggleButton, Stack, IconButton, } from "@mui/material";
+import {
+    i18nContext as I18nContext,
+    doI18n,
+} from "pithekos-lib";
 
 function SearchButton() {
   const { isVisible, setIsVisible } = useFindReplace();
+  const { i18nRef } = useContext(I18nContext);
 
   return (
     <button
       onClick={() => setIsVisible(!isVisible)}
-      title="find and replace"
+      title={doI18n("pages:core-local-workspace:search_tool", i18nRef.current)}
       className="toolbar-button"
     >
-      <SearchIcon size={18} />
+      <SearchIcon/>
     </button>
   );
 }
 
-function TriggerKeyButton({
-  triggerKeyCombo,
-  onClick,
-  className,
-}) {
+function TriggerKeyButton({triggerKeyCombo,onClick, className,}) {
+  const { i18nRef } = useContext(I18nContext); 
+  
   return (
     <button
       className={"toolbar-button " + (className ? className : "")}
       onClick={onClick}
-      title="Set trigger key combination"
+
+      title={doI18n("pages:core-local-workspace:key_combination", i18nRef.current)}
     >
-      <KeyboardCommandKeyIcon size={18} />
+      <KeyboardCommandKeyIcon/>
       <span style={{ marginLeft: "4px", fontSize: "12px" }}>{triggerKeyCombo}</span>
     </button>
   );
@@ -62,6 +66,7 @@ export function CustomToolbar({ onSave }) {
   const [triggerKeyCombo, setTriggerKeyCombo] = useState("\\");
   const [isDialogOpenTriggerKey, setIsDialogOpenTriggerKey] = useState(false);
   const [formats, setFormats] = useState(() => [""])
+ const { i18nRef } = useContext(I18nContext);
 
   // Define the markers to show in the toolbar
   const markerGroups = {
@@ -92,30 +97,29 @@ export function CustomToolbar({ onSave }) {
       />
 
       {editable ? (
-        <Stack>
+       
+            <FindReplacePlugin>
           <ToggleButtonGroup
             value={formats}
             onChange={handleFormat}
             aria-label="text formatting"
-            sx={{ marginb: 2 }}
+            sx={{border:"1px solid"}}
           >
-            <FindReplacePlugin>
-
               <IconButton>
-                <UndoButton title="undo">
+                <UndoButton title={doI18n("pages:core-local-workspace:undo", i18nRef.current)}>
                   <UndoIcon />
                 </UndoButton>
               </IconButton>
 
               <IconButton >
-                <RedoButton title="redo">
+                <RedoButton title={doI18n("pages:core-local-workspace:redo", i18nRef.current)}>
                   <RedoIcon />
                 </RedoButton>
               </IconButton>
               <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
 
               <IconButton>
-                <SaveButton onSave={onSave} title="save">
+                <SaveButton onSave={onSave} title={doI18n("pages:core-local-workspace:add", i18nRef.current)}>
                   <SaveIcon />
                 </SaveButton>
               </IconButton>
@@ -135,24 +139,25 @@ export function CustomToolbar({ onSave }) {
               <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
 
               <ToggleButton value={"block_view"} sx={{border:0}}>
-                <ViewButton title="toggle block view">
+                <ViewButton  title={doI18n("pages:core-local-workspace:toggle_block_view", i18nRef.current)}>
                   <ViewStreamIcon />
                 </ViewButton>
               </ToggleButton>
 
               <ToggleButton value={"toggle_markup"} sx={{border:0}}>
-                <FormatButton title="toggle markup">
+                <FormatButton title={doI18n("pages:core-local-workspace:toggle_markup", i18nRef.current)}>
                   <FormatTextdirectionRToLIcon />
                 </FormatButton>
               </ToggleButton>
 
+          </ToggleButtonGroup>
+
                 <CustomMarkersToolbar customMarkers={markerGroups} />
+
               {/* The FindReplaceDialog is also a child of FindReplacePlugin */}
               <FindReplaceDialog />
               <ScripturalNodesMenuPlugin trigger={triggerKeyCombo} />
             </FindReplacePlugin>
-          </ToggleButtonGroup>
-        </Stack >
 
       ) : null
       }

@@ -139,6 +139,30 @@
       "en": "close",
       "es": "cerrar",
       "fr": "fermer"
+    },
+     "undo": {
+      "en": "Undo",
+      "fr": "Annuler"
+    },
+     "redo": {
+      "en": "Redo",
+      "fr": "Refaire"
+    },
+    "toggle_block_view": {
+      "en": "Toggle block view",
+      "fr": "Changer les blocs "
+    },
+    "toggle_markup": {
+      "en": "Toggle markup",
+      "fr": "Activer/désactiver le balisage"
+    },
+     "search_tool": {
+      "en": "Find and replace",
+      "fr": "Trouve et remplace "
+    },
+     "key_combination": {
+      "en": "Set trigger key combination",
+      "fr": "Définir la combinaison de touches de déclenchement "
     }
   }
 }
