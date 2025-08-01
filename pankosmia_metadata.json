@@ -163,6 +163,10 @@
      "key_combination": {
       "en": "Set trigger key combination",
       "fr": "Définir la combinaison de touches de déclenchement "
+    },
+    "usfm_button_c":{
+      "en":"Testing button c",
+      "fr":"teste le bouton c"
     }
   }
 }

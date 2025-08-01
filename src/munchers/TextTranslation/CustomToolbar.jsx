@@ -152,7 +152,7 @@ export function CustomToolbar({ onSave }) {
 
           </ToggleButtonGroup>
 
-                <CustomMarkersToolbar customMarkers={markerGroups} />
+                <CustomMarkersToolbar customMarkers={markerGroups} doI18n={doI18n} i18nRef={i18nRef} />
 
               {/* The FindReplaceDialog is also a child of FindReplacePlugin */}
               <FindReplaceDialog />

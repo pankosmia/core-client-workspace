@@ -8,7 +8,7 @@ import { Box, Button } from "@mui/material";
 /**
  * Implementation of markers toolbar directly in component
  */
-export function CustomMarkersToolbar({ customMarkers }) {
+export function CustomMarkersToolbar({ customMarkers, doI18n, i18nRef }) {
   const [editor] = useLexicalComposerContext();
   const { categories, isLoading } = useFilteredMarkers({ customMarkers });
 
@@ -27,7 +27,7 @@ export function CustomMarkersToolbar({ customMarkers }) {
                 <Button
                   key={`marker-${marker.name}`}
                   onClick={() => marker.action(editor)}
-                  title={marker.description || marker.name}
+                  title={doI18n(`pages:core-local-workspace:usfm_button_${marker.name}`, i18nRef.current)}
                   data-marker={marker.name}
                   sx={{border:0}}
                   size="small"
