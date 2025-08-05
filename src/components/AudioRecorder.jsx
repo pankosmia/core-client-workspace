@@ -75,7 +75,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
             method: "GET",
         })
         const data = await response.json();
-        console.log("Response Path: ", data)
+        // console.log("Response Path: ", data)
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
         let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
         return data.filter(item => item.includes(`audio_content/${chapterString}-${paragraphString}`) && !item.includes(".bak"))
@@ -479,7 +479,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     const updateOtherPrises = async () => {
         if (showOtherTracks) {
             const prises = await listPrises(obs[0], obs[1]);
-            console.log('Prises', prises);
+            // console.log('Prises', prises);
 
             const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
             const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
