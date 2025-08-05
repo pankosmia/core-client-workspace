@@ -156,7 +156,7 @@ function OBSEditorMuncher({ metadata }) {
             debugRef
         );
         if (response.ok) {
-            returnedText = response.text.split(/\n\r?\n\r?/).map((line, index) => {
+            const returnedText = response.text.split(/\n\r?\n\r?/).map((line, index) => {
                 if (index % 2 === 1) {
                     return line.replaceAll(/\n/g, " ");
                 } else {
