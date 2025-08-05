@@ -1,24 +1,24 @@
-import {useState, useEffect, useContext} from "react";
-import {useNavigate} from "react-router-dom";
-import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n} from "pithekos-lib";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n } from "pithekos-lib";
 import {
     Box,
     Typography,
     Fab,
 } from "@mui/material";
-import {DataGrid} from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 function ConfigureWorkspace() {
 
-    const {debugRef} = useContext(debugContext);
-    const {i18nRef} = useContext(i18nContext);
-    const {currentProjectRef} = useContext(currentProjectContext);
+    const { debugRef } = useContext(debugContext);
+    const { i18nRef } = useContext(i18nContext);
+    const { currentProjectRef } = useContext(currentProjectContext);
 
     const [selectedResources, setSelectedResources] = useState([]);
     const navigate = useNavigate();
 
-    const [ projectSummaries, setProjectSummaries ] = useState({});
+    const [projectSummaries, setProjectSummaries] = useState({});
 
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
@@ -94,26 +94,26 @@ function ConfigureWorkspace() {
     ]
 
     const rows = Object.entries(projectSummaries)
-                    .map(e => {
-                        return {...e[1], path: e[0]}
-                    })
-                    .filter((r) => currentProjectRef.current && projectFlavors[projectSummaries[r.path].flavor] === projectFlavors[projectSummaries[`_local_/_local_/${currentProjectRef.current.project}`].flavor])
-                    .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
-                    .map((rep, n) => {
-                        return {
-                            ...rep,
-                            id: n.toString(),
-                            name: `${rep.name} (${rep.abbreviation})`,
-                            description: rep.description !== rep.name ? rep.description : "",
-                            type: rep.flavor,
-                            language: rep.language_code
-                        }
-                    });
+        .map(e => {
+            return { ...e[1], path: e[0] }
+        })
+        .filter((r) => currentProjectRef.current && projectFlavors[projectSummaries[r.path].flavor] === projectFlavors[projectSummaries[`_local_/_local_/${currentProjectRef.current.project}`].flavor])
+        .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
+        .map((rep, n) => {
+            return {
+                ...rep,
+                id: n.toString(),
+                name: `${rep.name} (${rep.abbreviation})`,
+                description: rep.description !== rep.name ? rep.description : "",
+                type: rep.flavor,
+                language: rep.language_code
+            }
+        });
 
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
         <Box>
-            <Box style={{position: 'fixed', width: '100%'}}>
+            <Box style={{ position: 'fixed', width: '100%' }}>
                 <Header
                     titleKey="pages:core-local-workspace:title"
                     requireNet={false}
@@ -121,8 +121,10 @@ function ConfigureWorkspace() {
                 />
             </Box>
             <Box
-                style={{mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%'}}>
-                <Typography> {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)} </Typography>
+                style={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
+                <Typography
+                    sx={{ ml: 2 }}
+                > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)} </Typography>
                 <Fab
                     variant="extended"
                     color="secondary"
@@ -140,7 +142,7 @@ function ConfigureWorkspace() {
                         (e) => {
                             let stateEntries = Object.entries(projectSummaries)
                                 .map(e => {
-                                    return {...e[1], path: e[0]}
+                                    return { ...e[1], path: e[0] }
                                 })
                                 .map(r => [r.path, r])
                                 .filter(re => selectedResources.includes(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
@@ -161,7 +163,7 @@ function ConfigureWorkspace() {
                     <Typography variant="body2">
                         {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
                     </Typography>
-                    <PlayArrowIcon/>
+                    <PlayArrowIcon />
                 </Fab>
             </Box>
             <Box style={{
@@ -172,7 +174,7 @@ function ConfigureWorkspace() {
                 marginBottom: "16px",
                 width: '100%'
             }}>
-                <Box sx={{ml: 2}}>
+                <Box sx={{ ml: 2 }}>
                     <DataGrid
                         initialState={{
                             columns: {
@@ -192,7 +194,7 @@ function ConfigureWorkspace() {
                         }}
                         rows={rows}
                         columns={columns}
-                        sx={{fontSize: "1rem"}}
+                        sx={{ fontSize: "1rem" }}
                     />
                 </Box>
             </Box>
