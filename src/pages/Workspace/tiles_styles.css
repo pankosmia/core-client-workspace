@@ -7,6 +7,9 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   text-align: center;
+  cursor: move; /* fallback: no `url()` support or images disabled */
+  cursor: url(images/grab.cur); /* fallback: Chrome 1-21, Firefox 1.5-26, Safari 4+, IE, Edge 12-14, Android 2.1-4.4.4 */
+  cursor: grab; /* W3C standards syntax, all modern browser */
 }
 
 .react-tile-pane-tabBar {
@@ -24,6 +27,11 @@
   padding: 0.3em 1em;
   border-radius: 4px;
   background: #f5ffd3;
+}
+
+.react-tile-pane-tabTitle:active {
+  cursor: url(images/grabbing.cur);
+  cursor: grabbing;
 }
 
 .react-tile-pane-tabInner {
@@ -46,11 +54,11 @@
   box-shadow: inset 0px 1px 5px 2px #cfcfcf9c;
 }
 
-.react-tile-pane-tabInner:hover .react-tile-pane-off {
+/* .react-tile-pane-tabInner .react-tile-pane-off {
   opacity: 1;
-}
+} */
 
-.react-tile-pane-tabInnerOff:hover .react-tile-pane-off {
+.react-tile-pane-tabInnerOff .react-tile-pane-off {
   opacity: 1;
 }
 .react-tile-pane-off {
@@ -64,7 +72,6 @@
   width: 14px;
   font-size: 1.2em;
   height: 14px;
-  margin-right: 10px;
   cursor: pointer;
 }
 
