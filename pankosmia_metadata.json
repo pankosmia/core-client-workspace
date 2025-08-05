@@ -8,7 +8,7 @@
   "i18n": {
     "title": {
       "ar": "مساحة العمل المحلية ",
-      "en": "Workspace",
+      "en": "Select Resources",
       "fr": "Espace de Travail",
       "id": "Ruang Kerja"
     },
@@ -139,6 +139,9 @@
       "en": "close",
       "es": "cerrar",
       "fr": "fermer"
+    },
+    "choose_resources_workspace":{
+      "en":"Choose what resources to open in the Workspace, alongside your editable Content."
     }
   }
 }

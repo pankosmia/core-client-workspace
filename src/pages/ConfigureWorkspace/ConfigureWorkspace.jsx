@@ -4,7 +4,8 @@ import {Header, debugContext, i18nContext, currentProjectContext, getJson, doI18
 import {
     Box,
     Typography,
-    Fab
+    Fab,
+    TextField
 } from "@mui/material";
 import {DataGrid} from '@mui/x-data-grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -122,6 +123,7 @@ function ConfigureWorkspace() {
             </Box>
             <Box
                 style={{mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%'}}>
+                <Typography> {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)} </Typography>
                 <Fab
                     variant="extended"
                     color="secondary"
