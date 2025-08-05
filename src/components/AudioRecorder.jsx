@@ -75,6 +75,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
             method: "GET",
         })
         const data = await response.json();
+        console.log("Response Path: ", data)
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
         let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
         return data.filter(item => item.includes(`audio_content/${chapterString}-${paragraphString}`) && !item.includes(".bak"))
@@ -165,8 +166,6 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                     body: formData,
                 });
                 const data = await response.json();
-                console.log(data);
-
                 return newUrl;
             }
         } catch (error) {
@@ -315,7 +314,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
     wavesurfer?.on("ready", () => {
         const duration = wavesurfer?.getDuration();
-        console.log(duration);
+        // console.log(duration);
         updateMainTrackWidth(duration);
         setTimeout(() => {
             setIsLoading(false);
@@ -400,19 +399,19 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     };
 
     const handleRegionSelect = (regionData) => {
-        console.log('Région sélectionnée:', regionData);
+        // console.log('Région sélectionnée:', regionData);
         const oldRegion = selectedRegion[0];
-        console.log(`oldRegion: ${selectedRegion}`);
+        // console.log(`oldRegion: ${selectedRegion}`);
         oldRegion?.setOptions({ color: 'rgba(0, 0, 0, 0.1)' });
         regionData[0].setOptions({
             color: 'rgba(0, 0, 0, 0.3)',
         });
-        console.log(`regionData: ${regionData}`);
+        // console.log(`regionData: ${regionData}`);
         setSelectedRegion(regionData);
     };
 
     const copyRegion = async (regionData) => {
-        console.log(regionData[0].start, regionData[0].end);
+        // console.log(regionData[0].start, regionData[0].end);
         const concatenatedUrl = await insertAudio(prise, regionData[1], cursorTime, regionData[0].start, regionData[0].end);
         setAudioUrl(concatenatedUrl);
     }
@@ -462,9 +461,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                     body: formData,
                 });
                 const data = await response.json();
-                console.log(data);
-
-                setAudioUrl(newUrl);
+                setAudioUrl("Audio URL", newUrl);
 
                 return newUrl;
             }
@@ -482,7 +479,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     const updateOtherPrises = async () => {
         if (showOtherTracks) {
             const prises = await listPrises(obs[0], obs[1]);
-            console.log(prises);
+            console.log('Prises', prises);
 
             const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
             const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
@@ -507,7 +504,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
             const url1 = getUrl("bytes", obs[0], obs[1], 1);
             const priseExists = await fileExists(url0);
             const prise1Exists = await fileExists(url1);
-            console.log(`Prise 0: ${priseExists}, Prise 1: ${prise1Exists}`);
+            // console.log(`Prise 0: ${priseExists}, Prise 1: ${prise1Exists}`);
             if (!prise1Exists) return;
             if (!priseExists) {
                 const newFile = await fetch(url1);

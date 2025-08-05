@@ -40,7 +40,7 @@ function OBSEditorMuncher({ metadata }) {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`;
         let response = await getText(ingredientLink, debugRef.current);
         if (response.ok) {
-            const chapterContent = response.text.split("\n\n").filter((_, index) => index % 2 === 0); // Lignes paires
+            const chapterContent = response.text.split(/\n\r?\n\r?/).filter((_, index) => index % 2 === 0); // Lignes paires
             setIngredient(prevIngredient => {
                 const newIngredient = [...prevIngredient];
                 newIngredient[obs[0]] = chapterContent;
@@ -152,7 +152,7 @@ function OBSEditorMuncher({ metadata }) {
             debugRef
         );
         if (response.ok) {
-            return response.text.split("\n\n").map((line, index) => {
+            return response.text.split(/\n\r?\n\r?/).map((line, index) => {
                 if (index % 2 === 1) {
                     return line.replaceAll(/\n/g, " ");
                 } else {
