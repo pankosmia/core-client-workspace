@@ -54,9 +54,9 @@
   box-shadow: inset 0px 1px 5px 2px #cfcfcf9c;
 }
 
-/* .react-tile-pane-tabInner .react-tile-pane-off {
+.react-tile-pane-tabInner .react-tile-pane-off {
   opacity: 1;
-} */
+}
 
 .react-tile-pane-tabInnerOff .react-tile-pane-off {
   opacity: 1;
