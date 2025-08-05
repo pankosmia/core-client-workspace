@@ -146,21 +146,29 @@ function OBSEditorMuncher({ metadata }) {
             throw new Error(`Failed to save file ${fileName}: ${response.status}, ${response.error}`);
         }
     }
+    const getOs = () => {
+        const os = ['Windows', 'Linux', 'Mac'];
+        return os.find(v => navigator.userAgent.indexOf(v) >= 0);
+    }
     const getStringifyIngredient = async (ingredientItem, fileName) => {
         const response = await getText(
             `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
             debugRef
         );
         if (response.ok) {
-            return response.text.split(/\n\r?\n\r?/).map((line, index) => {
+            returnedText = response.text.split(/\n\r?\n\r?/).map((line, index) => {
                 if (index % 2 === 1) {
                     return line.replaceAll(/\n/g, " ");
                 } else {
                     return ingredientItem[index / 2];
                 }
-            }).join("\n\n");
-        } else {
-            return "";
+            })
+            // Detecter l'os
+            if (getOs() == "Windows") {
+                return returnedText.join("\r\n\r\n");
+            } else {
+                return returnedText.join("\n\n");
+            }
         }
     }
     
