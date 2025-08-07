@@ -194,6 +194,7 @@ function OBSEditorMuncher({ metadata }) {
             console.log("isDocModified", isModified());
 
             if (isModified()) {
+                ev.returnValue = "You have unsaved changes. Are you sure you want to leave?";
                 ev.preventDefault();
             }
         };
