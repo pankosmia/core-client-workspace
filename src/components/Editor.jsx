@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import TsvLineForm from "./TsvLineForm";
-function Editor({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, cellValueChanged, setCellValueChanged}) {
-    const [currentRow, setCurrentRow] = useState( Array(7).fill("", 0, 7));
+function Editor({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, cellValueChanged, setCellValueChanged, currentRow,setCurrentRow}) {
 
     useEffect(
         () => {

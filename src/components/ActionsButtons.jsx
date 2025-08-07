@@ -1,25 +1,23 @@
-import { useState } from "react";
-import { Box, IconButton } from "@mui/material";
-import DeleteNote from "./DeleteNote";
-import DeleteIcon from '@mui/icons-material/Delete';
-
-import RestoreIcon from '@mui/icons-material/Restore';
-import CheckIcon from '@mui/icons-material/Check';
+import { useContext, useState } from "react";
+import { Box, IconButton, MenuItem, Select, TextField } from "@mui/material";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import {
+    bcvContext as BcvContext,
+} from "pithekos-lib";
 
-function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN, cellValueChanged, setCellValueChanged, updateBcv, rowData, handleCancel, mode, saveFunction, handleCloseModalNewNote }) {
-    const [openedModalDelete, setOpenedModalDelete] = useState(false);
+function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueChanged, updateBcv, rowData, mode, saveFunction }) {
+    const { systemBcv, setSystemBcv } = useContext(BcvContext);
+    const [book, setBook] = useState('');
 
-    // Permet d'ouvrir la modal Delete
-    const handleOpenModalDelete = () => {
-        setOpenedModalDelete("delete");
+
+    const handleChange = (event) => {
+        setBook(event.target.value);
     };
-
     // changer de chapitre -1
-     const previousChap = () => {
+    const previousChap = () => {
         const newChapN = currentRowN - 1;
         if (newChapN >= 1 && ingredient.length > 1 && ingredient[newChapN]) {
             saveFunction(currentRowN, rowData);
@@ -52,14 +50,33 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
 
     const nextChap = () => {
         const newChapN = currentRowN;
-          if (ingredient[newChapN] && ingredient[newChapN].length > 0) {
+        if (ingredient[newChapN] && ingredient[newChapN].length > 0) {
             saveFunction(currentRowN, rowData);
             setCurrentRowN(newChapN);
             setCellValueChanged(false)
             updateBcv(newChapN)
         }
     }
+    const verseNotes = {};
 
+    ingredient.slice(1).forEach(row => {
+        const verse = row[0];
+        const note = row[6];
+
+        const match = verse.match(/^(\d+):/);
+        if (match) {
+            const chapter = match[1];
+
+            if (!verseNotes[chapter]) {
+                verseNotes[chapter] = [];
+            }
+
+            verseNotes[chapter].push({
+                verse,
+                note: note.trim() || "(pas de note)"
+            });
+        }
+    });
     return (
         <Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
@@ -90,32 +107,40 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                         >
                             <KeyboardArrowLeftIcon />
                         </IconButton>
+                        <Box
+                            component="form"
+                            sx={{ '& .MuiTextField-root': { m: 1, width: '25ch' } }}
+                            noValidate
+                            autoComplete="off"
+                        >
 
-                        {/* <IconButton
-                            onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
-                            variant="contained"
-                            disabled={!cellValueChanged}
-                            sx={{
-                                mt: 2,
-                                "&.Mui-disabled": {
-                                    color: '#bebbbbff'
-                                }
-                            }}
-                        >
-                            <CheckIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"} />
-                        </IconButton> */}
-                        <IconButton
-                            onClick={() => handleOpenModalDelete()}
-                            sx={{
-                                mt: 2,
-                                "&.Mui-disabled": {
-                                    color: '#bebbbbff'
-                                }
-                            }}
-                            disabled={ingredient[currentRowN] && ingredient[currentRowN].length === 1}
-                        >
-                            <DeleteIcon size="large" color={ingredient[currentRowN] && ingredient[currentRowN].length === 1 ? "#eaeaea" : "primary"} />
-                        </IconButton>
+                            <Select
+                                select
+                                label={systemBcv.bookCode}
+                                defaultValue={systemBcv.bookCode}
+                            >
+                                {verseNotes[currentRowN]?.map((item, i) => (
+                                    <MenuItem key={i} >
+                                        <strong>{item.verse}</strong> : {item.note}
+                                    </MenuItem>
+                                ))}
+
+                            </Select>
+                            <Select
+                                select
+                                value={systemBcv.bookCode}
+                                defaultValue={systemBcv.bookCode}
+                                onChange={handleChange}
+                            >
+                                {verseNotes[currentRowN]?.map((item, i) => (
+                                    <MenuItem key={i} >
+                                        <strong>{item.verse}</strong> : {item.note}
+                                    </MenuItem>
+                                ))}
+
+                            </Select>
+                        </Box>
+
                         <IconButton
                             onClick={() => { nextRow() }} variant="contained"
                             sx={{
@@ -143,15 +168,6 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                     </>
                 )}
             </Box>
-            <DeleteNote
-                mode="delete"
-                open={openedModalDelete === "delete"}
-                closeModal={() => setOpenedModalDelete(null)}
-                ingredient={ingredient}
-                setIngredient={setIngredient}
-                rowData={rowData}
-                currentRowN={currentRowN}
-            />
         </Box>
     )
 }

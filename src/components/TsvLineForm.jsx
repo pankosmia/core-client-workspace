@@ -4,7 +4,7 @@ import ActionsButtons from "./ActionsButtons";
 
 function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction, cellValueChanged, setCellValueChanged }) {
     const columnNames = ingredient[0] || [];
-
+  
     // Permet la modification d'une note
     const changeCell = (event, n) => {
         const newCellValue = event.target.value;
@@ -70,9 +70,6 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
                 currentRowN={currentRowN}
                 setCurrentRowN={setCurrentRowN}
 
-                handleCancel={handleCancel}
-                cellValueChanged={cellValueChanged}
-                setCellValueChanged={setCellValueChanged}
             />
         </Box>
     )

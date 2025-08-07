@@ -21,7 +21,9 @@ function BcvNotesEditorMuncher({ metadata }) {
     const [currentRowN, setCurrentRowN] = useState(1);
     const [md5Ingredient, setMd5Ingredient] = useState([]);
     const [cellValueChanged, setCellValueChanged] = useState(false);
-    console.log("ingredient",ingredient)
+    const [currentRow, setCurrentRow] = useState(Array(7).fill("", 0, 7))
+
+    console.log("ingredient", ingredient)
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -53,10 +55,10 @@ function BcvNotesEditorMuncher({ metadata }) {
             `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
             debugRef.current
         );
-       
+
     }
 
-    
+
     useEffect(() => {
         const onBeforeUnload = ev => {
             ev.preventDefault();
@@ -96,9 +98,14 @@ function BcvNotesEditorMuncher({ metadata }) {
 
                 <SearchWithVerses
                     ingredient={ingredient}
+                    setIngredient={setIngredient}
+                    updateBcv={updateBcv}
+
                     currentRowN={currentRowN}
                     setCurrentRowN={setCurrentRowN}
-                    updateBcv={updateBcv}
+
+                    currentRow={currentRow}
+                    setCurrentRow={setCurrentRow}
                 />
                 <Editor
                     currentRowN={currentRowN}
@@ -111,6 +118,9 @@ function BcvNotesEditorMuncher({ metadata }) {
 
                     cellValueChanged={cellValueChanged}
                     setCellValueChanged={setCellValueChanged}
+
+                    currentRow={currentRow}
+                    setCurrentRow={setCurrentRow}
                 />
             </Box>
 

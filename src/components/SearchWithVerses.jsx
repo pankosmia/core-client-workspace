@@ -1,12 +1,19 @@
 import { useState } from "react";
-import { List, ListItemButton, ListItemText, Collapse, Typography } from "@mui/material";
+import { List, ListItemButton, ListItemText, Collapse, Typography, ListItem, IconButton } from "@mui/material";
 import ExpandLess from "@mui/icons-material/ExpandLess"
 import ExpandMore from "@mui/icons-material/ExpandMore"
-
-function SearchWithVerses({ ingredient, setCurrentRowN, currentRowN, updateBcv }) {
+import DeleteNote from "./DeleteNote";
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+function SearchWithVerses({ ingredient,setIngredient, setCurrentRowN, currentRowN, updateBcv,currentRow }) {
 
     const [currentChapter, setCurrentChapter] = useState('');
     const [openChapter, setOpenChapter] = useState(false)
+    const [openedModalDelete, setOpenedModalDelete] = useState(false);
+
+    // Permet d'ouvrir la modal Delete
+    const handleOpenModalDelete = () => {
+        setOpenedModalDelete(true);
+    };
 
     // Permet d'afficher tous les versets 
     const bookCode = [...new Set(ingredient.map(l => l[0].split(':')[0]))];
@@ -29,7 +36,7 @@ function SearchWithVerses({ ingredient, setCurrentRowN, currentRowN, updateBcv }
     };
 
     return (
-        <List sx={{ maxHeight: "70vh", overflowY: "auto", width:"15vh" }}>
+        <List sx={{ maxHeight: "70vh", overflowY: "auto", width: "50vh" }}>
             {bookCode.splice(1).filter(chap => chap && chap.trim() !== "").map(chap => (
                 <>
                     <ListItemButton
@@ -40,7 +47,7 @@ function SearchWithVerses({ ingredient, setCurrentRowN, currentRowN, updateBcv }
                             handleClick();
                         }}
                     >
-                        <ListItemText primary={<Typography sx={{fontWeight: currentChapter === chap ? "bold" : "normal" }}>{`${/^\d+$/.test(chap) ? `Ch ${chap}` : chap}`}</Typography>} />
+                        <ListItemText primary={<Typography sx={{ fontWeight: currentChapter === chap ? "bold" : "normal" }}>{`${/^\d+$/.test(chap) ? `Ch ${chap}` : chap}`}</Typography>} />
                         {openChapter && currentChapter === chap ? <ExpandLess /> : <ExpandMore />}
                     </ListItemButton>
 
@@ -49,21 +56,45 @@ function SearchWithVerses({ ingredient, setCurrentRowN, currentRowN, updateBcv }
                             <List component="div">
                                 {verses
                                     .map(v => (
-                                        <ListItemButton
+                                        <ListItem
                                             key={v[1]}
                                             onClick={() => { handleChangeId(v[1]) }}
+                                            secondaryAction={
+                                                <IconButton
+                                                    onClick={() => handleOpenModalDelete()}
+                                                    sx={{
+                                                        "&.Mui-disabled": {
+                                                            color: '#bebbbbff'
+                                                        }
+                                                    }}
+                                                    disabled={ingredient[currentRowN] && ingredient[currentRowN].length === 1}
+                                                >
+                                                    <DeleteOutlinedIcon size="large" color={ingredient[currentRowN] && ingredient[currentRowN].length === 1 ? "#eaeaea" : "primary"} />
+                                                </IconButton>
+                                            }
                                         >
                                             <ListItemText primary={<Typography sx={{ fontWeight: ingredient[currentRowN][1] === v[1] ? "bold" : "normal" }}>{/^\d+$/.test(v[0].split(':')[1])
                                                 ? `v${v[0].split(':')[1]} - ${v[1]}`
                                                 : `${v[0].split(':')[1]} - ${v[1]}`}</Typography>} sx={{ pl: 4 }} />
-                                        </ListItemButton>
+                                        </ListItem>
                                     ))}
+
                             </List>
                         )}
                     </Collapse>
                 </>
             ))}
+            <DeleteNote
+                mode="delete"
+                open={openedModalDelete}
+                closeModal={() => setOpenedModalDelete(false)}
+                ingredient={ingredient}
+                setIngredient={setIngredient}
+                rowData={currentRow}
+                currentRowN={currentRowN}
+            />
         </List>
+
     );
 }
 
