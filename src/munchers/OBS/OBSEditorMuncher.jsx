@@ -5,8 +5,6 @@ import OBSContext from "../../contexts/obsContext";
 import OBSNavigator from "../../components/OBSNavigator";
 import SaveOBSButton from "../../components/SaveOBSButton";
 import AudioRecorder from "../../components/AudioRecorder";
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import MarkdownField from "../../components/MarkdownField";
 
 import "./OBSMuncher.css";

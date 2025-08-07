@@ -41,6 +41,8 @@ const Waveform = ({
       , []);
     const plugins = useMemo(() => [regionsPlugin], [regionsPlugin]);
     const [actualDuration, setActualDuration] = useState(0);
+    const [audioUrl, setAudioUrl] = useState(null);
+    const [fileExists, setFileExists] = useState(false);
 
     const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], prise = priseNumber) => {
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
@@ -48,12 +50,47 @@ const Waveform = ({
         return `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${prise}.mp3`
     }
 
+    const checkFileExists = async (audioUrl) => {
+        const url = `/burrito/paths/${metadata.local_path}`
+        const ipath = audioUrl.split("?ipath=")[1];
+
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+            })
+            if (response.ok) {
+                const data = await response.json();
+                return data.includes(ipath);
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.warn(`Error checking file existence for ${audioUrl}:`, error);
+            return false;
+        }
+    }
+
+    // Vérifier l'existence du fichier avant de le charger
+    useEffect(() => {
+        const checkAndSetUrl = async () => {
+            const url = getUrl();
+            const exists = await checkFileExists(url);
+            setFileExists(exists);
+            if (exists) {
+                setAudioUrl(url);
+            } else {
+                setAudioUrl(null);
+            }
+        };
+        checkAndSetUrl();
+    }, [priseNumber, obs, metadata]);
+
     const waveformConfig = {
         container: waveformRef,
         height: 80,
         waveColor: 'rgb(34, 173, 197)',
         progressColor: 'rgb(64, 107, 114)',
-        url: getUrl(),
+        url: audioUrl, // Utiliser audioUrl au lieu de getUrl() directement
         plugins: plugins,
         barWidth: 2,
         barGap: 1,
@@ -203,14 +240,32 @@ const Waveform = ({
                 border: isMainTrack ? '2px solid rgb(255, 69, 0)' : '1px solid rgb(200, 200, 200)',
             }}>
             <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-                <div
-                    ref={waveformRef}
-                    style={{
-                        width: actualDuration,
+                {fileExists ? (
+                    <div
+                        ref={waveformRef}
+                        style={{
+                            width: actualDuration,
+                            height: isMainTrack ? '100px' : '80px',
+                            overflow: 'hidden',
+                        }}
+                    />
+                ) : (
+                    <Box sx={{
+                        width: '100%',
                         height: isMainTrack ? '100px' : '80px',
-                        overflow: 'hidden',
-                    }}
-                />
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgb(250, 250, 250)',
+                        border: '1px dashed rgb(200, 200, 200)',
+                        borderRadius: 1,
+                        color: 'rgb(150, 150, 150)',
+                        fontStyle: 'italic',
+                        fontSize: 12
+                    }}>
+                        Track {priseNumber} - No audio file
+                    </Box>
+                )}
                 {getDurationIndicator()}
             </Box>
 
