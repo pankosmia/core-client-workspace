@@ -5,8 +5,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import RestoreIcon from '@mui/icons-material/Restore';
 import CheckIcon from '@mui/icons-material/Check';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
 function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN, cellValueChanged, setCellValueChanged, updateBcv, rowData, handleCancel, mode, saveFunction, handleCloseModalNewNote }) {
     const [openedModalDelete, setOpenedModalDelete] = useState(false);
@@ -16,6 +18,16 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
         setOpenedModalDelete("delete");
     };
 
+    // changer de chapitre -1
+     const previousChap = () => {
+        const newChapN = currentRowN - 1;
+        if (newChapN >= 1 && ingredient.length > 1 && ingredient[newChapN]) {
+            saveFunction(currentRowN, rowData);
+            setCurrentRowN(newChapN);
+            setCellValueChanged(false)
+            updateBcv(newChapN)
+        }
+    };
     // changer de page -1 
     const previousRow = () => {
         const newRowN = currentRowN - 1;
@@ -38,11 +50,34 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
         }
     };
 
+    const nextChap = () => {
+        const newChapN = currentRowN;
+          if (ingredient[newChapN] && ingredient[newChapN].length > 0) {
+            saveFunction(currentRowN, rowData);
+            setCurrentRowN(newChapN);
+            setCellValueChanged(false)
+            updateBcv(newChapN)
+        }
+    }
+
     return (
         <Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
                 {mode === "edit" && (
                     <>
+                        <IconButton
+                            variant="contained"
+                            onClick={() => { previousChap() }}
+                            sx={{
+                                mt: 2,
+                                "&.Mui-disabled": {
+                                    color: "#424242"
+                                }
+                            }}
+                        >
+                            <KeyboardDoubleArrowLeftIcon />
+                        </IconButton>
+
                         <IconButton
                             variant="contained"
                             onClick={() => { previousRow() }}
@@ -53,7 +88,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                                 }
                             }}
                         >
-                            <ArrowBackIosNewIcon />
+                            <KeyboardArrowLeftIcon />
                         </IconButton>
 
                         <IconButton
@@ -107,7 +142,20 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                                 }
                             }}
                         >
-                            <ArrowForwardIosIcon />
+                            <KeyboardArrowRightIcon />
+                        </IconButton>
+
+                        <IconButton
+                            variant="contained"
+                            onClick={() => { nextChap() }}
+                            sx={{
+                                mt: 2,
+                                "&.Mui-disabled": {
+                                    color: "#424242"
+                                }
+                            }}
+                        >
+                            <KeyboardDoubleArrowRightIcon />
                         </IconButton>
                     </>
                 )}
