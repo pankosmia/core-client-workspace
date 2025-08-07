@@ -9,14 +9,12 @@
     "title": {
       "ar": "مساحة العمل المحلية ",
       "en": "Workspace",
-      "fr": "Sélectionner des ressources",
+      "fr": "Espace de travail",
       "id": "Ruang Kerja"
     },
     "Select_Resources": {
-      "ar": "مساحة العمل المحلية ",
       "en": "Select Resources",
-      "fr": "Sélectionner des ressources",
-      "id": "Ruang Kerja"
+      "fr": "Sélectionner des ressources"
     },
     "summary": {
       "ar": "تسييير و تغيير الموارد المحلية",
