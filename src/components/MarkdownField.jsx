@@ -2,11 +2,11 @@ import { useState } from "react";
 import Markdown from 'react-markdown';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
-import { Box, ToggleButton, ToggleButtonGroup, FormControl, TextField } from "@mui/material";
-
-function MarkdownField({ columnNames, onChangeNote, value, fieldN, ingredient, currentRowN,mode }) {
+import { Box, ToggleButton, ToggleButtonGroup, FormControl, TextField, IconButton } from "@mui/material";
+import RestoreIcon from '@mui/icons-material/Restore';
+function MarkdownField({ columnNames, onChangeNote, value, fieldN, ingredient, currentRowN, mode,handleCancel,cellValueChanged,setCellValueChanged }) {
     const [displayMode, setdisplayMode] = useState('write');
-
+    
     return (
         <Box>
             <ToggleButtonGroup
@@ -22,7 +22,21 @@ function MarkdownField({ columnNames, onChangeNote, value, fieldN, ingredient, c
                 <ToggleButton value="write"><CreateIcon /></ToggleButton>
                 <ToggleButton value="preview"><RemoveRedEyeIcon /></ToggleButton>
             </ToggleButtonGroup>
-
+            <IconButton
+                onClick={() => {
+                    handleCancel();
+                    setCellValueChanged(false);
+                }}
+                variant="contained"
+                disabled={!cellValueChanged}
+                sx={{
+                    "&.Mui-disabled": {
+                        color: '#bebbbbff'
+                    },
+                }}
+            >
+                <RestoreIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"} />
+            </IconButton>
             {displayMode === 'write' ? (
                 <FormControl fullWidth margin="normal" >
                     <TextField

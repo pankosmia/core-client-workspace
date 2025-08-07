@@ -91,7 +91,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                             <KeyboardArrowLeftIcon />
                         </IconButton>
 
-                        <IconButton
+                        {/* <IconButton
                             onClick={() => { saveFunction(currentRowN, rowData); setCellValueChanged(false) }}
                             variant="contained"
                             disabled={!cellValueChanged}
@@ -103,24 +103,7 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                             }}
                         >
                             <CheckIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"} />
-                        </IconButton>
-
-                        <IconButton
-                            onClick={() => {
-                                handleCancel();
-                                setCellValueChanged(false);
-                            }}
-                            variant="contained"
-                            disabled={!cellValueChanged}
-                            sx={{
-                                mt: 2,
-                                "&.Mui-disabled": {
-                                    color: '#bebbbbff'
-                                }
-                            }}
-                        >
-                            <RestoreIcon size="large" color={!cellValueChanged ? "#eaeaea" : "primary"} />
-                        </IconButton>
+                        </IconButton> */}
                         <IconButton
                             onClick={() => handleOpenModalDelete()}
                             sx={{

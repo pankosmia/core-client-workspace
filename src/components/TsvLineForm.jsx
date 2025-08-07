@@ -37,6 +37,9 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
                             ingredient={ingredient}
                             currentRowN={currentRowN}
                             mode={mode}
+                            handleCancel={handleCancel}
+                            cellValueChanged={cellValueChanged}
+                            setCellValueChanged={setCellValueChanged}
 
                         />
                     ) : (
@@ -59,7 +62,6 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
                 updateBcv={updateBcv}
                 rowData={currentRow}
                 saveFunction={saveFunction}
-                handleCancel={handleCancel}
                 mode={mode}
 
                 ingredient={ingredient}
@@ -68,6 +70,7 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
                 currentRowN={currentRowN}
                 setCurrentRowN={setCurrentRowN}
 
+                handleCancel={handleCancel}
                 cellValueChanged={cellValueChanged}
                 setCellValueChanged={setCellValueChanged}
             />
