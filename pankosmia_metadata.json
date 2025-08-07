@@ -8,9 +8,13 @@
   "i18n": {
     "title": {
       "ar": "مساحة العمل المحلية ",
-      "en": "Select Resources",
-      "fr": "Sélectionner des ressources",
+      "en": "Workspace",
+      "fr": "Espace de travail",
       "id": "Ruang Kerja"
+    },
+    "Select_Resources": {
+      "en": "Select Resources",
+      "fr": "Sélectionner des ressources"
     },
     "summary": {
       "ar": "تسييير و تغيير الموارد المحلية",

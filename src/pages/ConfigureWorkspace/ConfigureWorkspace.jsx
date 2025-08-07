@@ -115,7 +115,7 @@ function ConfigureWorkspace() {
         <Box>
             <Box style={{ position: 'fixed', width: '100%' }}>
                 <Header
-                    titleKey="pages:core-local-workspace:title"
+                    titleKey="pages:core-local-workspace:Select_Resources"
                     requireNet={false}
                     currentId="core-local-workspace"
                 />
