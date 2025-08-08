@@ -18,14 +18,19 @@ import {
 } from "pithekos-lib";
 import md5 from "md5";
 import Switch from "@mui/material/Switch";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
 
 
 function OBSEditorMuncher({ metadata }) {
     const { obs, setObs } = useContext(OBSContext);
     const { debugRef } = useContext(DebugContext);
-    const [ingredient, setIngredient] = useState([]); 
+    const [ingredient, setIngredient] = useState([]);
     const [audioUrl, setAudioUrl] = useState("");
-    const [ checksums, setChecksums] = useState({});
+    const [checksums, setChecksums] = useState({});
     const [audioEnabled, setAudioEnabled] = useState(false);
     const [chapterChecksums, setChapterChecksums] = useState([]);
 
@@ -34,7 +39,7 @@ function OBSEditorMuncher({ metadata }) {
         if (obs[0] < 0) obs[0] = 0;
         if (obs[0] > 50) obs[0] = 50;
         if (ingredient[obs[0]]) {
-            return; 
+            return;
         }
         let fileName = obs[0] <= 9 ? `0${obs[0]}` : obs[0];
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`;
@@ -94,13 +99,13 @@ function OBSEditorMuncher({ metadata }) {
         const currentChecksum = calculateChapterChecksum(ingredient[chapterIndex]);
         // console.log(`Comparaison: ${originalChecksum} !== ${currentChecksum} ${originalChecksum !== currentChecksum}`);
         // console.log(`Content: ${ingredient[chapterIndex]}`);
-        
+
         return originalChecksum !== currentChecksum;
     };
     const updateChecksums = (chapterIndex) => {
         const chapter = ingredient[chapterIndex];
         if (!chapter) return;
-        
+
         setChecksums(prev => {
             const newChecksums = { ...prev };
             chapter.forEach((content, paragraphIndex) => {
@@ -120,13 +125,13 @@ function OBSEditorMuncher({ metadata }) {
     /* Systeme de sauvegarde */
     const handleSaveOBS = async () => {
         if (!ingredient || ingredient.length == 0) return;
-        
+
         for (let i = 0; i < ingredient.length; i++) {
             if (!ingredient[i] || ingredient[i].length == 0) continue;
             await uploadOBSIngredient(ingredient[i], i);
         }
     }
-    
+
     const uploadOBSIngredient = async (ingredientItem, i) => {
         let fileName = (i) <= 9 ? `0${i}` : (i);
         const obsString = await getStringifyIngredient(ingredientItem, fileName);
@@ -163,10 +168,10 @@ function OBSEditorMuncher({ metadata }) {
             return "";
         }
     }
-    
+
 
     /* Gestion de l'audio */
-    function AudioViewer({chapter, paragraph}) {
+    function AudioViewer({ chapter, paragraph }) {
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
         let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
 
@@ -188,21 +193,35 @@ function OBSEditorMuncher({ metadata }) {
             initIngredient().then();
         }, [obs[0]]
     );
-    
-    useEffect(() => {
-        const onBeforeUnload = ev => {
-            console.log("isDocModified", isModified());
 
+    // useEffect(() => {
+    //     const onBeforeUnload = ev => {
+    //         console.log("isDocModified", isModified());
+
+    //         if (isModified()) {
+    //             ev.returnValue = "You have unsaved changes. Are you sure you want to leave?";
+    //             ev.preventDefault();
+    //         }
+    //     };
+    //     window.addEventListener('beforeunload', onBeforeUnload);
+    //     return () =>{
+    //         window.removeEventListener('beforeunload', onBeforeUnload);
+    //     }
+    // }, [isModified()]);
+
+    const [showExitDialog, setShowExitDialog] = useState(false);
+
+    // Intercepter les tentatives de navigation
+    useEffect(() => {
+        const isElectron = !!window.electronAPI;
+        if (isElectron) {
             if (isModified()) {
-                ev.returnValue = "You have unsaved changes. Are you sure you want to leave?";
-                ev.preventDefault();
+                window.electronAPI.setCanClose(false);
+            } else {
+                window.electronAPI.setCanClose(true);
             }
-        };
-        window.addEventListener('beforeunload', onBeforeUnload);
-        return () =>{
-            window.removeEventListener('beforeunload', onBeforeUnload);
         }
-    }, [isModified()]);
+    }, [isModified]);
 
     return (
         <Stack sx={{ p: 2 }}>
@@ -211,10 +230,22 @@ function OBSEditorMuncher({ metadata }) {
                 Audio: <Switch checked={audioEnabled} onChange={() => setAudioEnabled(!audioEnabled)} />
             </Box>
             <Stack>
-                <MarkdownField currentRow={obs[1]} columnNames={currentChapter} onChangeNote={handleChange} value={currentChapter[obs[1]] || ""} mode="write"/>
-                {audioEnabled && <AudioRecorder audioUrl={audioUrl} setAudioUrl={setAudioUrl} metadata={metadata} obs={obs}/>}
+                <MarkdownField currentRow={obs[1]} columnNames={currentChapter} onChangeNote={handleChange} value={currentChapter[obs[1]] || ""} mode="write" />
+                {audioEnabled && <AudioRecorder audioUrl={audioUrl} setAudioUrl={setAudioUrl} metadata={metadata} obs={obs} />}
                 <SaveOBSButton obs={obs} isModified={isModified} handleSave={handleSaveOBS} />
             </Stack>
+            {showExitDialog && (
+            <Dialog open={showExitDialog}>
+                <DialogTitle>Quitter sans sauvegarder ?</DialogTitle>
+                <DialogContent>
+                Des modifications non sauvegardées seront perdues.
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={() => setShowExitDialog(false)}>Annuler</Button>
+                <Button onClick={handleForceExit}>Quitter</Button>
+                </DialogActions>
+            </Dialog>
+            )}
         </Stack>
     );
 }
