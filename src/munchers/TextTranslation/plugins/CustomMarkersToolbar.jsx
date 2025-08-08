@@ -17,7 +17,7 @@ export function CustomMarkersToolbar({ customMarkers, doI18n, i18nRef }) {
   }
 
   return (
-    <Box sx={{display:"flex", alignItems:"center"}}>
+    <Box sx={{ padding:2, display:"flex", alignItems:"center"}}>
         {Object.entries(categories).map(([categoryName, items]) => {
           if (items.length === 0) return null;
           return (
@@ -27,7 +27,7 @@ export function CustomMarkersToolbar({ customMarkers, doI18n, i18nRef }) {
                 <Button
                   key={`marker-${marker.name}`}
                   onClick={() => marker.action(editor)}
-                  title={doI18n("pages:core-local-workspace:usfm_button", i18nRef.current)}
+                  title={doI18n(`pages:core-local-workspace:usfm_button_${marker.name}`, i18nRef.current)}
                   data-marker={marker.name}
                   sx={{border:0}}
                   size="small"

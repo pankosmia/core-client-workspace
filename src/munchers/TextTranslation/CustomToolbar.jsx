@@ -104,7 +104,7 @@ export function CustomToolbar({ onSave }) {
             onChange={handleFormat}
             aria-label="text formatting"
           >
-            <Box sx={{ border: "0.5px solid", display:"flex", flexDirection:'row', borderRadius:4}}>
+            <Box sx={{ display: "flex", flexDirection: 'row', borderRadius: 4 }}>
               <IconButton>
                 <UndoButton title={doI18n("pages:core-local-workspace:undo", i18nRef.current)}>
                   <UndoIcon />
@@ -150,9 +150,10 @@ export function CustomToolbar({ onSave }) {
                 </FormatButton>
               </ToggleButton>
             </Box>
+            <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 , color:"black", border:"1 px solid"}} />
+            <CustomMarkersToolbar customMarkers={markerGroups} doI18n={doI18n} i18nRef={i18nRef} />
           </ToggleButtonGroup>
 
-          <CustomMarkersToolbar customMarkers={markerGroups} doI18n={doI18n} i18nRef={i18nRef} />
 
           {/* The FindReplaceDialog is also a child of FindReplacePlugin */}
           <FindReplaceDialog />

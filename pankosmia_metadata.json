@@ -9,8 +9,12 @@
     "title": {
       "ar": "مساحة العمل المحلية ",
       "en": "Workspace",
-      "fr": "Espace de Travail",
+      "fr": "Espace de travail",
       "id": "Ruang Kerja"
+    },
+    "Select_Resources": {
+      "en": "Select Resources",
+      "fr": "Sélectionner des ressources"
     },
     "summary": {
       "ar": "تسييير و تغيير الموارد المحلية",
@@ -164,9 +168,50 @@
       "en": "Set trigger key combination",
       "fr": "Définir la combinaison de touches de déclenchement "
     },
-    "usfm_button":{
+    "usfm_button_c":{
       "en":"Chapter number",
       "fr":"Numéro du chapitre"
+    },
+     "usfm_button_q":{
+      "en":"Poetry text, level 1 indent",
+      "fr":""
+    },
+     "usfm_button_m":{
+      "en":"Paragraph text, with no first line indent",
+      "fr":""
+    },
+     "usfm_button_q1":{
+      "en":"Poetry text, level 1 indent",
+      "fr":""
+    },
+     "usfm_button_q2":{
+      "en":"Poetry text, level 2 indent",
+      "fr":""
+    },
+     "usfm_button_s2":{
+      "en":"A section heading, level 2",
+      "fr":""
+    },
+     "usfm_button_mt":{
+      "en":"The main title of the book",
+      "fr":"Le titre principal du livre"
+    },
+     "usfm_button_s3":{
+      "en":"A section heading, level 3"
+    },
+     "usfm_button_s":{
+      "en":"A section heading, level 1"
+    },
+    "usfm_button_v":{
+      "en":"A verse number",
+      "fr":"Le numéro de verset"
+    },
+    "usfm_button_p":{
+      "en":"A paragraph text, with first line indent",
+      "fr":""
+    },
+    "choose_resources_workspace":{
+      "en":"Choose what resources to open in the Workspace, alongside your editable Content."
     }
   }
 }
