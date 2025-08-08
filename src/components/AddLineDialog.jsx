@@ -51,25 +51,13 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
 
 
     return (
-        <Modal
+        <Dialog
             open={open}
             onClose={handleCloseModalNewNote}
             sx={{
                 backdropFilter: "blur(3px)",
             }}
         >
-            <Box sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                maxHeight: "80vh",
-                maxWidth: "80vw",
-                bgcolor: 'background.paper',
-                boxShadow: 24,
-                borderRadius: 2,
-                overflow: "auto",
-            }}>
                 <AppBar sx={{ position: 'relative', borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
                     <Toolbar sx={{ justifyContent: "space-between" }}>
                         <IconButton
@@ -105,9 +93,7 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                     cellValueChanged={cellValueChanged}
                     setCellValueChanged={setCellValueChanged}
                 />
-            </Box>
-
-        </Modal>
+        </Dialog>
 
     )
 }
