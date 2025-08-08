@@ -23,7 +23,6 @@ function BcvNotesEditorMuncher({ metadata }) {
     const [cellValueChanged, setCellValueChanged] = useState(false);
     const [currentRow, setCurrentRow] = useState(Array(7).fill("", 0, 7))
 
-    console.log("ingredient", ingredient)
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;

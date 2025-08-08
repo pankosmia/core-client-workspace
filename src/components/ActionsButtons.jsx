@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Box, IconButton, MenuItem, Select, TextField } from "@mui/material";
+import { Box, IconButton, MenuItem, TextField } from "@mui/material";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
@@ -10,12 +10,7 @@ import {
 
 function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueChanged, updateBcv, rowData, mode, saveFunction }) {
     const { systemBcv, setSystemBcv } = useContext(BcvContext);
-    const [book, setBook] = useState('');
 
-
-    const handleChange = (event) => {
-        setBook(event.target.value);
-    };
     // changer de chapitre -1
     const previousChap = () => {
         const newChapN = currentRowN - 1;
@@ -77,6 +72,7 @@ function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueC
             });
         }
     });
+
     return (
         <Box>
             <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "center" }}>
@@ -84,7 +80,7 @@ function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueC
                     <>
                         <IconButton
                             variant="contained"
-                            onClick={() => { previousChap() }}
+                            onClick={() => { previousChap(currentRowN,rowData) }}
                             sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
@@ -114,7 +110,7 @@ function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueC
                             autoComplete="off"
                         >
 
-                            <Select
+                            <TextField
                                 select
                                 label={systemBcv.bookCode}
                                 defaultValue={systemBcv.bookCode}
@@ -125,12 +121,11 @@ function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueC
                                     </MenuItem>
                                 ))}
 
-                            </Select>
-                            <Select
+                            </TextField>
+                            <TextField
                                 select
                                 value={systemBcv.bookCode}
                                 defaultValue={systemBcv.bookCode}
-                                onChange={handleChange}
                             >
                                 {verseNotes[currentRowN]?.map((item, i) => (
                                     <MenuItem key={i} >
@@ -138,7 +133,7 @@ function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueC
                                     </MenuItem>
                                 ))}
 
-                            </Select>
+                            </TextField>
                         </Box>
 
                         <IconButton
