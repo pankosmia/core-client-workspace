@@ -23,6 +23,7 @@ const Waveform = ({
     onDurationUpdate = null,
     mainTrackRef = null,
     selectedRegion = null,
+    onWavesurferReady = null,
 }) => {
     const waveformContainerRef = useRef(null);
     const waveformRef = useRef(null);
@@ -41,19 +42,12 @@ const Waveform = ({
       , []);
     const plugins = useMemo(() => [regionsPlugin], [regionsPlugin]);
     const [actualDuration, setActualDuration] = useState(0);
-    const [audioUrl, setAudioUrl] = useState(null);
     const [fileExists, setFileExists] = useState(false);
-
-    const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], prise = priseNumber) => {
-        let chapterString = chapter < 10 ? `0${chapter}` : chapter;
-        let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
-        return `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${prise}.mp3`
-    }
+    const [audioUrl, setAudioUrl] = useState(null);
 
     const checkFileExists = async (audioUrl) => {
         const url = `/burrito/paths/${metadata.local_path}`
         const ipath = audioUrl.split("?ipath=")[1];
-
         try {
             const response = await fetch(url, {
                 method: "GET",
@@ -70,8 +64,9 @@ const Waveform = ({
         }
     }
 
-    // Vérifier l'existence du fichier avant de le charger
     useEffect(() => {
+
+
         const checkAndSetUrl = async () => {
             const url = getUrl();
             const exists = await checkFileExists(url);
@@ -85,12 +80,19 @@ const Waveform = ({
         checkAndSetUrl();
     }, [priseNumber, obs, metadata]);
 
+    const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], prise = priseNumber) => {
+        let chapterString = chapter < 10 ? `0${chapter}` : chapter;
+        let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
+        let url = `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${prise}.mp3`
+        return url
+    }
+
     const waveformConfig = {
         container: waveformRef,
         height: 80,
         waveColor: 'rgb(34, 173, 197)',
         progressColor: 'rgb(64, 107, 114)',
-        url: audioUrl, // Utiliser audioUrl au lieu de getUrl() directement
+        url: audioUrl,
         plugins: plugins,
         barWidth: 2,
         barGap: 1,
@@ -106,13 +108,12 @@ const Waveform = ({
         const handleReady = () => {
             const duration = wavesurfer.getDuration();
 
-            // if (maxDuration && duration < maxDuration) {
-            //     const ratio = duration / maxDuration;
-            //     console.log(`Track ${priseNumber}: ${duration}s/${maxDuration}s (${(ratio * 100).toFixed(1)}%)`);
-            // }
-
             if (onDurationUpdate) {
                 onDurationUpdate(priseNumber, duration);
+            }
+
+            if (onWavesurferReady) {
+                onWavesurferReady(wavesurfer);
             }
         };
 
@@ -137,21 +138,12 @@ const Waveform = ({
 
             regionsPlugin?.on('region-created', handleRegionCreate);
             regionsPlugin?.on('region-clicked', handleRegionClick);
-            // return () => {
-                // regionsPlugin?.off('region-created', handleRegionCreate);
-                // regionsPlugin?.off('region-updated', handleRegionUpdate);
-            // };
         }
 
         wavesurfer?.on('ready', handleReady);
         wavesurfer?.on('click', handleClick);
         wavesurfer?.on('interaction', handleInteraction);
 
-        // return () => {
-            // wavesurfer?.off('ready', handleReady);
-        //     wavesurfer?.off('click', handleClick);
-            // wavesurfer?.off('interaction', handleInteraction);
-        // };
     }, [wavesurfer, enableRegions, onRegionSelect, maxDuration, priseNumber, setCursorTime, setCurrentTrack, onDurationUpdate]);
 
     useEffect(() => {
@@ -165,7 +157,6 @@ const Waveform = ({
         const duration = wavesurfer?.getDuration();
         if (maxDuration && maxDuration >= duration) {
             let newDuration = mainTrackRef.current.clientWidth / maxDuration * duration;
-            // console.log(`${mainTrackRef.current.clientWidth} / ${maxDuration} * ${duration} = ${newDuration}`)
             setActualDuration(newDuration);
         }
     }
@@ -199,34 +190,6 @@ const Waveform = ({
         return minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
     };
 
-    const getDurationIndicator = () => {
-        if (!maxDuration || !actualDuration) return null;
-        // return (
-        //     <Box sx={{ position: 'absolute', top: 0, right: 8, backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', px: 1, py: 0.5, borderRadius: 1, fontSize: '0.75rem', zIndex: 1 }}>
-        //         {formatTime(actualDuration)}
-        //     </Box>
-        // )
-
-        // return (
-        //     <Box 
-        //         sx={{ 
-        //             position: 'absolute', 
-        //             top: 0, 
-        //             right: 8, 
-        //             backgroundColor: 'rgba(0,0,0,0.6)', 
-        //             color: 'white', 
-        //             px: 1, 
-        //             py: 0.5, 
-        //             borderRadius: 1, 
-        //             fontSize: '0.75rem',
-        //             zIndex: 1
-        //         }}
-        //     >
-        //         {formatTime(actualDuration)} ({percentage.toFixed(0)}%)
-        //     </Box>
-        // );
-    };
-
     return (
         <Box
             ref={waveformContainerRef}
@@ -241,42 +204,19 @@ const Waveform = ({
             }}>
             <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
                 {fileExists ? (
-                    <div
-                        ref={waveformRef}
-                        style={{
-                            width: actualDuration,
-                            height: isMainTrack ? '100px' : '80px',
-                            overflow: 'hidden',
-                        }}
-                    />
-                ) : (
-                    <Box sx={{
-                        width: '100%',
+                <div
+                    ref={waveformRef}
+                    style={{
+                        width: actualDuration,
                         height: isMainTrack ? '100px' : '80px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: 'rgb(250, 250, 250)',
-                        border: '1px dashed rgb(200, 200, 200)',
-                        borderRadius: 1,
-                        color: 'rgb(150, 150, 150)',
-                        fontStyle: 'italic',
-                        fontSize: 12
-                    }}>
-                        Track {priseNumber} - No audio file
+                        overflow: 'hidden',
+                    }}
+                />) : (
+                    <Box sx={{ width: actualDuration, height: isMainTrack ? '100px' : '80px', overflow: 'hidden' }}>
+                        <p>File does not exist</p>
                     </Box>
                 )}
-                {getDurationIndicator()}
             </Box>
-
-            {/* Boutons de contrôle pour la track principale */}
-            {/* {isMainTrack && (
-                <Box sx={{ px: 1 }}>
-                    <IconButton size="small" onClick={onPlayPause}>
-                        {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
-                    </IconButton>
-                </Box>
-            )} */}
         </Box>
     );
 };
