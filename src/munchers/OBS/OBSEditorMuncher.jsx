@@ -203,16 +203,17 @@ function OBSEditorMuncher({ metadata }) {
 
     return (
         <Stack sx={{ p: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'left', alignItems: 'center', mb: 1 }}>
                 {/* <Box /> */}
                 <Box>
                     <SaveOBSButton obs={obs} isModified={isModified} handleSave={handleSaveOBS} />
                 </Box>
+                <Box sx={{ ml: 2 }}>
+                    Audio 
+                    <Switch checked={audioEnabled} onChange={() => setAudioEnabled(!audioEnabled)} />
+                </Box>
             </Box>
             <OBSNavigator max={currentChapter.length - 1} title={chapterTitle} />
-            <Box>
-                Audio: <Switch checked={audioEnabled} onChange={() => setAudioEnabled(!audioEnabled)} />
-            </Box>
             <Stack>
                 <MarkdownField currentRow={obs[1]} columnNames={currentChapter} onChangeNote={handleChange} value={currentChapter[obs[1]] || ""} mode="write" />
                 {audioEnabled && <AudioRecorder audioUrl={audioUrl} setAudioUrl={setAudioUrl} metadata={metadata} obs={obs} />}
