@@ -28,6 +28,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { ButtonExpandNotes } from "./plugins/ButtonExpandNotes";
 import CustomMarkersToolbar from "./plugins/CustomMarkersToolbar";
 import { TriggerKeyDialog } from "./TriggerKeyDialog";
+import { Divider } from "@mui/material";
 
 function SearchButton() {
   const { isVisible, setIsVisible } = useFindReplace();
@@ -105,9 +106,11 @@ export function CustomToolbar({ onSave }) {
                   <MdOutlineRedo size={20} />
                 </RedoButton>
                 <hr />
+                <Divider orientation="vertical" variant="middle" flexItem />
                 <SaveButton onSave={onSave} title="save">
                   <MdSave size={20} />
                 </SaveButton>
+                <Divider orientation="vertical" variant="middle" flexItem />
                 <hr />
                 <ViewButton title="toggle block view">
                   <MdViewAgenda size={16} />
@@ -115,7 +118,7 @@ export function CustomToolbar({ onSave }) {
                 <FormatButton title="toggle markup">
                   <ImPilcrow />
                 </FormatButton>
-
+                 <Divider orientation="vertical" variant="middle" flexItem />
                 <ButtonExpandNotes defaultState={false} />
                 <hr />
                 <TriggerKeyButton
