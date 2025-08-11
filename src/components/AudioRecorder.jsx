@@ -110,6 +110,21 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         return data.filter(item => item.includes(`audio_content/${chapterString}-${paragraphString}`) && !item.includes(".bak"))
     }
 
+    // Attend que le fichier soit présent côté serveur avant de l'utiliser
+    const waitForFileByUrl = useCallback(async (urlToCheck, { timeoutMs = 8000, intervalMs = 250 } = {}) => {
+        const start = Date.now();
+        while (Date.now() - start < timeoutMs) {
+            try {
+                const exists = await fileExists(urlToCheck);
+                if (exists) return true;
+            } catch (_) {
+                // noop
+            }
+            await new Promise((r) => setTimeout(r, intervalMs));
+        }
+        return false;
+    }, []);
+
     const audioBufferToWav = (buffer) => {
         const length = buffer.length;
         const arrayBuffer = new ArrayBuffer(44 + length * 2);
@@ -241,6 +256,12 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         return isNaN(newPrise) ? 0 : newPrise;
     }, [metadata.local_path, obs]);
 
+    const refreshEmptyTrackOnly = useCallback(async () => {
+        const next = (await getOldPriseNumber()) + 1;
+        setNextPriseNumber(next);
+
+    }, [getOldPriseNumber]);
+
     const startWaveformAnimation = useCallback(() => {
         if (!recordingCanvasRef.current || !analyserRef.current) return;
 
@@ -325,10 +346,13 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                 formData.append("file", recordedBlob);
 
                 const postUrl = getUrl("bytes", obs[0], obs[1], nextPrise);
-                fetch(postUrl, {
+                await fetch(postUrl, {
                     method: "POST",
                     body: formData
                 });
+                // S'assurer que le fichier est bien disponible avant d'ajouter la piste
+                const createdUrl = getUrl("bytes", obs[0], obs[1], nextPrise);
+                await waitForFileByUrl(createdUrl);
 
                 // Calculer la durée et mettre à jour l'interface
                 const audioContext = new AudioContext();
@@ -344,7 +368,14 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                 chunksRef.current = [];
 
                 checkIfPriseExists();
-                updateOtherPrises();
+                refreshEmptyTrackOnly();
+                setOtherPrises((prev) => {
+                    const nextKey = String(nextPrise);
+                    const exists = (prev || []).some((p) => (p.split("_")[0] === nextKey));
+                    if (exists) return prev;
+                    const updated = [...(prev || []), nextKey];
+                    return updated.sort((a, b) => parseInt(a.split("_")[0]) - parseInt(b.split("_")[0]));
+                });
             };
 
             // Démarrer l'enregistrement et la visualisation
@@ -416,6 +447,16 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         cursorWidth: 0,
     })
 
+    // Fonction pour adapter la largeur visuelle de la piste principale en fonction de la durée max
+    const updateMainTrackWidth = useCallback((duration, newMaxDuration = maxDuration) => {
+        if (!waveformRef.current || !wavesurfer) return;
+        if (!duration) duration = wavesurfer.getDuration();
+        if (!duration || !newMaxDuration) return;
+        wavesurfer.setOptions({
+            width: (waveformRef.current.clientWidth / newMaxDuration) * duration,
+        })
+    }, [wavesurfer, maxDuration]);
+
     useEffect(() => {
         if (!waveformRef.current) return;
         const observer = new ResizeObserver((entries) => {
@@ -428,6 +469,12 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         setWaveformWidth(waveformRef.current.clientWidth);
         return () => observer.disconnect();
     }, [waveformRef]);
+
+    // Adapter dynamiquement la largeur de la waveform principale lors d'un resize du conteneur
+    useEffect(() => {
+        if (!wavesurfer || !waveformRef.current) return;
+        updateMainTrackWidth(undefined, maxDuration);
+    }, [waveformWidth, maxDuration, wavesurfer, updateMainTrackWidth]);
 
     const effectiveDuration = useMemo(() => {
         const dur = wavesurfer?.getDuration?.();
@@ -453,6 +500,9 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         const deleteUrl = getUrl("delete");
         fetch(deleteUrl, {
             method: "POST",
+        }).then(() => {
+            // Ne rafraîchir que la piste vide après suppression
+            refreshEmptyTrackOnly();
         });
     }
 
@@ -466,14 +516,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         })
     }
 
-    const updateMainTrackWidth = useCallback((duration, newMaxDuration = maxDuration) => {
-        if (!waveformRef.current || !wavesurfer) return;
-        if (!duration) duration = wavesurfer.getDuration();
-        if (!duration || !newMaxDuration) return;
-        wavesurfer.setOptions({
-            width: waveformRef.current.clientWidth / newMaxDuration * duration,
-        })
-    }, [wavesurfer, maxDuration]);
+    
 
     // Créer les handlers avec useCallback pour éviter les re-créations
     const handleReady = useCallback(() => {
@@ -607,8 +650,16 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     };
 
     const handleRegionSelect = (regionData) => {
-        const oldRegion = selectedRegion[0];
-        oldRegion?.remove();
+        const newRegion = regionData?.[0];
+        const oldRegion = selectedRegion?.[0];
+        // Ne pas supprimer la région si c'est la même (cas d'update/resize sur piste secondaire)
+        if (oldRegion && oldRegion !== newRegion) {
+            try {
+                oldRegion.remove();
+            } catch (e) {
+                // noop
+            }
+        }
         setSelectedRegion(regionData);
     };
 
@@ -695,15 +746,39 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         const srcPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName}.mp3`;
         const targetPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName.split("_")[0]}_${newName}.mp3`;
         let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${srcPath}&target_path=${targetPath}&delete_src=true`;
-        fetch(url, {
+        await fetch(url, {
             method: "POST",
+        });
+        // Ne rafraîchir que la piste vide après renommage
+        refreshEmptyTrackOnly();
+        // Mettre à jour localement la liste pour n'impacter que la piste concernée
+        const newPriseKey = `${oldName.split("_")[0]}_${newName}`;
+        setOtherPrises((prev) => prev.map((p) => (p === oldName ? newPriseKey : p)));
+        // Rebasculer les refs si nécessaire
+        setWaveformRefs((prev) => {
+            const { [oldName]: oldWs, ...rest } = prev || {};
+            return oldWs ? { ...rest, [newPriseKey]: oldWs } : prev;
         });
     }
 
     const deleteAudio = async (priseNumber) => {
         const url = getUrl("delete", obs[0], obs[1], priseNumber);
-        fetch(url, {
+        await fetch(url, {
             method: "POST",
+        });
+        // Ne rafraîchir que la piste vide après suppression d'une piste secondaire
+        refreshEmptyTrackOnly();
+        // Retirer localement uniquement la piste supprimée
+        setOtherPrises((prev) => prev.filter((p) => p !== priseNumber));
+        setWaveformRefs((prev) => {
+            if (!prev) return prev;
+            const { [priseNumber]: _removed, ...rest } = prev;
+            return rest;
+        });
+        setSecondaryIsPlaying((prev) => {
+            if (!prev) return prev;
+            const { [priseNumber]: _removed, ...rest } = prev;
+            return rest;
         });
     }
 
@@ -809,7 +884,6 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
     useEffect(() => {
         if (!selectedRegion || selectedRegion.length === 0) return;
-        // Ne nettoyer que lorsque la région sélectionnée appartient à la piste principale
         const [, selectedPrise] = selectedRegion;
         if (selectedPrise !== "0") return;
         regionsPlugin.getRegions().forEach(region => {
@@ -1033,9 +1107,9 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                             borderRadius: 1,
                             color: 'rgb(120, 120, 120)',
                             fontStyle: 'italic',
-                            fontSize: 14
+                            fontSize: 14,
                         }}>
-                            Cliquez sur enregistrer pour commencer
+                            Click record to start
                         </Box>
                     )}
                     </Box>
@@ -1079,13 +1153,14 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                             ws.on('pause', () => setSecondaryIsPlaying(prev => ({ ...prev, [priseNumber]: false })));
                                             ws.on('finish', () => setSecondaryIsPlaying(prev => ({ ...prev, [priseNumber]: false })));
                                         }}
+                                        containerWidth={waveformWidth}
                                     />
                                 </Box>
                             )
                         ))}
                         {/* Piste vide / visualisateur en bas: visuel si des pistes existent, sinon message */}
                         {(!isRecording || hasAnyTrack) && (
-                            <Box sx={{ mb: -1.2 }} className={`audio-waveform ${isLoading ? 'loading' : 'loaded'}`}>
+                            <Box sx={{ mb: 1, mt:4 }} className={`audio-waveform ${isLoading ? 'loading' : 'loaded'}`}>
                                 <Box sx={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -1120,9 +1195,10 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 color: 'rgb(120, 120, 120)',
-                                                fontStyle: 'italic'
+                                                fontStyle: 'italic',
+                                                mb: 1,
                                             }}>
-                                                Cliquez sur enregistrer pour commencer
+                                                Click the record button to start
                                             </Box>
                                         )}
                                     </Box>
