@@ -127,7 +127,7 @@ function ConfigureWorkspace() {
                 > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)} </Typography>
                 <Fab
                     variant="extended"
-                    color="secondary"
+                    color="primary"
                     size="small"
                     aria-label={doI18n("pages:content:add", i18nRef.current)}
                     sx={{
