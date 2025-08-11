@@ -78,18 +78,18 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], newPrise = prise, ext = "mp3") => {
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
         let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
-        return `http://localhost:19119/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newPrise}.${ext}`
+        return `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newPrise}.${ext}`
     }
 
     const fileExists = async (newAudioUrl) => {
-        const response = await fetch(`http://localhost:19119/burrito/paths/${metadata.local_path}`)
+        const response = await fetch(`/burrito/paths/${metadata.local_path}`)
         const data = await response.json();
         const ipath = newAudioUrl.split("?ipath=")[1];
         return data.some(item => item.includes(ipath));
     }
 
     const listPrises = async (chapter, paragraph) => {
-        const url = `http://localhost:19119/burrito/paths/${metadata.local_path}`
+        const url = `/burrito/paths/${metadata.local_path}`
         const response = await fetch(url, {
             method: "GET",
         })
@@ -209,7 +209,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     };
 
     const getOldPriseNumber = useCallback(async () => {
-        const url = `http://localhost:19119/burrito/paths/${metadata.local_path}`
+        const url = `/burrito/paths/${metadata.local_path}`
         const response = await fetch(url, {
             method: "GET",
         })
@@ -784,7 +784,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         
         const srcPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName}.mp3`;
         const targetPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName.split("_")[0]}_${newName}.mp3`;
-        let url = `http://localhost:19119/burrito/ingredient/copy/${metadata.local_path}?src_path=${srcPath}&target_path=${targetPath}&delete_src=true`;
+        let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${srcPath}&target_path=${targetPath}&delete_src=true`;
         await fetch(url, {
             method: "POST",
         });
@@ -909,7 +909,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         const trackPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newTrackNumber}.mp3`;
         const mainTrack = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_0_${newTrackNumber.split("_")[0]}.mp3`;
 
-        let url = `http://localhost:19119/burrito/ingredient/copy/${metadata.local_path}?src_path=${trackPath}&target_path=${mainTrack}`;
+        let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${trackPath}&target_path=${mainTrack}`;
         await fetch(url, {  
             method: "POST",
         })
@@ -933,7 +933,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
             const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
             const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
             const savePath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${track}.mp3`;
-            let url = `http://localhost:19119/burrito/ingredient/copy/${metadata.local_path}?src_path=${mainTrack}&target_path=${savePath}&delete_src=true`;
+            let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${mainTrack}&target_path=${savePath}&delete_src=true`;
             await fetch(url, {  
                 method: "POST",
             })
@@ -941,7 +941,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     }
 
     const getMainTrack = async () => {
-        const url = `http://localhost:19119/burrito/paths/${metadata.local_path}`
+        const url = `/burrito/paths/${metadata.local_path}`
         const response = await fetch(url, {
             method: "GET",
         })
@@ -953,7 +953,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     }
 
     const getTrackByNumber = async (number) => {
-        const url = `http://localhost:19119/burrito/paths/${metadata.local_path}`
+        const url = `/burrito/paths/${metadata.local_path}`
         const response = await fetch(url, {
             method: "GET",
         })

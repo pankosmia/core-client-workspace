@@ -46,7 +46,7 @@ const Waveform = ({
     const disableDragSelectionRef = useRef(null);
 
   const checkFileExists = async (newAudioUrl) => {
-    const response = await fetch(`http://localhost:19119/burrito/paths/${metadata.local_path}`)
+    const response = await fetch(`/burrito/paths/${metadata.local_path}`)
     const data = await response.json();
     const ipath = newAudioUrl.split("?ipath=")[1].split("&")[0];
     return data.some(item => item.includes(ipath));
@@ -89,7 +89,7 @@ const Waveform = ({
     const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], prise = priseNumber) => {
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
         let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
-        let url = `http://localhost:19119/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${prise}.mp3&_v=${cacheBust}`
+        let url = `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${prise}.mp3&_v=${cacheBust}`
         return url
     }
 
