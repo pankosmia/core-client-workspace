@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { AppBar, Dialog, IconButton, Toolbar, Typography, Button } from "@mui/material";
+import { AppBar, Dialog, IconButton, Toolbar, Typography, Button, DialogActions, DialogTitle } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import TsvLineForm from "./TsvLineForm";
 import {
@@ -52,47 +52,50 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
 
     return (
         <Dialog
+            fullWidth={true}
             open={open}
             onClose={handleCloseModalNewNote}
             sx={{
                 backdropFilter: "blur(3px)",
             }}
         >
-                <AppBar sx={{ position: 'relative', borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
-                    <Toolbar sx={{ justifyContent: "space-between" }}>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            onClick={handleCloseModalNewNote}
-                            aria-label={doI18n("pages:core-local-workspace:close", i18nRef.current)}
-                        >
-                            <CloseIcon />
-                            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                                {doI18n("pages:core-local-workspace:new_bcv_note", i18nRef.current)}
-                            </Typography>
-                        </IconButton>
-                        <Button
-                            autoFocus
-                            color="inherit"
-                            disabled={!cellValueChanged}
-                            onClick={() => { handleSaveNewTsvRow(currentRowN, newCurrentRow); setCellValueChanged(false) }}
-                        >
-                            {doI18n("pages:core-local-workspace:create", i18nRef.current)}
-                        </Button>
-                    </Toolbar>
-                </AppBar>
-                <TsvLineForm
-                    mode="add"
-                    currentRow={newCurrentRow}
-                    setCurrentRow={setNewCurrentRow}
-                    currentRowN={currentRowN}
-                    ingredient={ingredient}
-                    setIngredient={setIngredient}
-                    saveFunction={handleSaveNewTsvRow}
-                    handleCloseModalNewNote={handleCloseModalNewNote}
-                    cellValueChanged={cellValueChanged}
-                    setCellValueChanged={setCellValueChanged}
-                />
+            <AppBar color="secondary" sx={{ position: 'relative', borderTopLeftRadius: 4, borderTopRightRadius: 4}}>
+                <Toolbar>
+                    <Typography variant="h6" component="div" sx={{color:"black" }}>
+                        {doI18n("pages:core-local-workspace:new_bcv_note", i18nRef.current)}
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <Typography variant='subtitile2' sx={{ ml: 1, p: 1 }}>{doI18n("pages:content:required_field", i18nRef.current)}</Typography>
+            <TsvLineForm
+                mode="add"
+                currentRow={newCurrentRow}
+                setCurrentRow={setNewCurrentRow}
+                currentRowN={currentRowN}
+                ingredient={ingredient}
+                setIngredient={setIngredient}
+                saveFunction={handleSaveNewTsvRow}
+                handleCloseModalNewNote={handleCloseModalNewNote}
+                cellValueChanged={cellValueChanged}
+                setCellValueChanged={setCellValueChanged}
+            />
+            <DialogActions>
+                <Button
+                    onClick={handleCloseModalNewNote}
+                    color="primary"
+                >
+                    {doI18n("pages:core-local-workspace:cancel", i18nRef.current)}
+                </Button>
+                <Button
+                    autoFocus
+                    variant="contained"
+                    color="primary"
+                    disabled={!cellValueChanged}
+                    onClick={() => { handleSaveNewTsvRow(currentRowN, newCurrentRow); setCellValueChanged(false) }}
+                >
+                    {doI18n("pages:core-local-workspace:create", i18nRef.current)}
+                </Button>
+            </DialogActions>
         </Dialog>
     )
 }

@@ -146,6 +146,10 @@
     },
     "choose_resources_workspace":{
       "en":"Choose what resources to open in the Workspace, alongside your editable Content."
+    },
+     "required_field":{
+      "en":"* Required fields",
+      "fr":"* Champ obligatoire"
     }
   }
 }
