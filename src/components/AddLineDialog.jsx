@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { AppBar, Dialog, IconButton, Toolbar, Typography, Button, Modal, Box } from "@mui/material";
+import { AppBar, Dialog, IconButton, Toolbar, Typography, Button } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import TsvLineForm from "./TsvLineForm";
 import {
@@ -94,7 +94,6 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                     setCellValueChanged={setCellValueChanged}
                 />
         </Dialog>
-
     )
 }
 
