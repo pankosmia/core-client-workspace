@@ -134,7 +134,7 @@ function OBSEditorMuncher({ metadata }) {
         let fileName = (i) <= 9 ? `0${i}` : (i);
         const obsString = await getStringifyIngredient(ingredientItem, fileName);
         const payload = JSON.stringify({ payload: obsString });
-        console.log(payload)
+        // console.log(payload)
         const response = await postText(
             `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
             payload,
@@ -142,10 +142,10 @@ function OBSEditorMuncher({ metadata }) {
             "application/json"
         );
         if (response.ok) {
-            console.log(`Saved file ${fileName}`);
+            // console.log(`Saved file ${fileName}`);
             updateChecksums(i);
         } else {
-            console.log(`Failed to save file ${fileName}`);
+            console.error(`Failed to save file ${fileName}`);
             throw new Error(`Failed to save file ${fileName}: ${response.status}, ${response.error}`);
         }
     }
@@ -229,9 +229,11 @@ function OBSEditorMuncher({ metadata }) {
         }
     }, [isModified]);
 
+    const chapterTitle = (currentChapter[0] || "").replace(/^#+\s*/, '').trim();
+
     return (
         <Stack sx={{ p: 2 }}>
-            <OBSNavigator max={currentChapter.length - 1} />
+            <OBSNavigator max={currentChapter.length - 1} title={chapterTitle} />
             <Box>
                 Audio: <Switch checked={audioEnabled} onChange={() => setAudioEnabled(!audioEnabled)} />
             </Box>

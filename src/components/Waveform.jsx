@@ -24,6 +24,8 @@ const Waveform = ({
     mainTrackRef = null,
     selectedRegion = null,
     onWavesurferReady = null,
+    gridPx,
+    majorGridPx,
 }) => {
     const waveformContainerRef = useRef(null);
     const waveformRef = useRef(null);
@@ -97,7 +99,7 @@ const Waveform = ({
         barWidth: 2,
         barGap: 1,
         barRadius: 2,
-        cursorWidth: 0,
+        cursorWidth: isMainTrack ? 0 : 1,
     };
 
     const { wavesurfer, currentTime, isPlaying } = useWavesurfer(waveformConfig);
@@ -118,7 +120,9 @@ const Waveform = ({
         };
 
         const handleClick = () => {
-            setCursorTime(wavesurfer.getCurrentTime());
+            if (isMainTrack) {
+                setCursorTime(wavesurfer.getCurrentTime());
+            }
         };
 
         const handleInteraction = () => {
@@ -133,11 +137,20 @@ const Waveform = ({
             };
 
             const handleRegionClick = (region) => {
+                if (onRegionSelect) {
                     onRegionSelect([region, priseNumber, regionsPlugin]);
+                }
+            };
+
+            const handleRegionUpdate = (region) => {
+                if (onRegionSelect) {
+                    onRegionSelect([region, priseNumber, regionsPlugin]);
+                }
             };
 
             regionsPlugin?.on('region-created', handleRegionCreate);
             regionsPlugin?.on('region-clicked', handleRegionClick);
+            regionsPlugin?.on('region-updated', handleRegionUpdate);
         }
 
         wavesurfer?.on('ready', handleReady);
@@ -147,11 +160,16 @@ const Waveform = ({
     }, [wavesurfer, enableRegions, onRegionSelect, maxDuration, priseNumber, setCursorTime, setCurrentTrack, onDurationUpdate]);
 
     useEffect(() => {
-        regionsPlugin?.enableDragSelection({
-            drag: true,
-            color: 'rgba(0, 0, 0, 0.2)',
-        }, 1);
-    }, []);
+        if (!enableRegions || !regionsPlugin || !wavesurfer) return;
+        try {
+            regionsPlugin.enableDragSelection({
+                drag: true,
+                color: 'rgba(0, 0, 0, 0.2)'
+            });
+        } catch (e) {
+            // noop
+        }
+    }, [enableRegions, regionsPlugin, wavesurfer]);
 
     const updateActualDuration = () => {
         const duration = wavesurfer?.getDuration();
@@ -166,19 +184,26 @@ const Waveform = ({
     }, [maxDuration, mainTrackRef]);
 
     useEffect(() => {
-        regionsPlugin.getRegions().forEach(region => { 
-            if(selectedRegion[0] != region) {
-                region.remove();
-            }
-        });
-    }, [selectedRegion])
-
-    useEffect(() => {
-        if (wavesurfer && cursorTime !== undefined) {
-            const clampedTime = Math.min(cursorTime, actualDuration);
-            wavesurfer?.setTime(clampedTime);
+        if (!selectedRegion || selectedRegion.length === 0) return;
+        const [, selectedPrise] = selectedRegion;
+        // Si la sélection vient de cette piste, on garde uniquement la région sélectionnée
+        if (selectedPrise === priseNumber) {
+            regionsPlugin.getRegions().forEach(region => {
+                if (selectedRegion[0] !== region) {
+                    region.remove();
+                }
+            });
+            return;
         }
-    }, [cursorTime, wavesurfer, actualDuration]);
+        // Si la sélection vient de la piste principale, on supprime toutes les régions de cette piste secondaire
+        if (selectedPrise === "0") {
+            regionsPlugin.getRegions().forEach(region => {
+                region.remove();
+            });
+        }
+    }, [selectedRegion, regionsPlugin, priseNumber])
+
+    // Décorrélation temporelle: on ne force plus le setTime des pistes secondaires depuis le curseur global
 
     const onPlayPause = () => {
         wavesurfer && wavesurfer?.playPause();
@@ -204,14 +229,36 @@ const Waveform = ({
             }}>
             <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
                 {fileExists ? (
-                <div
-                    ref={waveformRef}
-                    style={{
-                        width: actualDuration,
-                        height: isMainTrack ? '100px' : '80px',
-                        overflow: 'hidden',
-                    }}
-                />) : (
+                <Box sx={{ position: 'relative', width: actualDuration, height: isMainTrack ? '100px' : '80px', overflow: 'hidden' }}>
+                    {gridPx > 0 && (
+                        <Box
+                            aria-hidden
+                            sx={{
+                                position: 'absolute',
+                                inset: 0,
+                                zIndex: 0,
+                                pointerEvents: 'none',
+                                backgroundImage: majorGridPx
+                                    ? 'linear-gradient(to right, rgba(0,0,0,0.08) 1px, transparent 1px), linear-gradient(to right, rgba(0,0,0,0.15) 1px, transparent 1px)'
+                                    : 'linear-gradient(to right, rgba(0,0,0,0.08) 1px, transparent 1px)',
+                                backgroundSize: majorGridPx
+                                    ? `${gridPx}px 100%, ${majorGridPx}px 100%`
+                                    : `${gridPx}px 100%`,
+                                backgroundRepeat: 'repeat',
+                            }}
+                        />
+                    )}
+                    <div
+                        ref={waveformRef}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            overflow: 'hidden',
+                            position: 'relative',
+                            zIndex: 1,
+                        }}
+                    />
+                </Box>) : (
                     <Box sx={{ width: actualDuration, height: isMainTrack ? '100px' : '80px', overflow: 'hidden' }}>
                         <p>File does not exist</p>
                     </Box>
