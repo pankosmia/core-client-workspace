@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from "react";
 import { HiOutlineKey, HiOutlineInformationCircle } from "react-icons/hi";
 import { MdKeyboard } from "react-icons/md";
 import { Keyboard, KeySquare, Headphones, Check, X } from "lucide-react";
+import KeyIcon from '@mui/icons-material/Key';
 import { Box, Button, Typography } from "@mui/material";
 import {
   i18nContext as I18nContext,
@@ -114,7 +115,7 @@ export function TriggerKeyDialog({
           {/* Header */}
           <Box className="flex items-center justify-between mb-4">
             <Box className="flex items-center gap-2">
-              <KeySquare className="h-5 w-5 text-blue-600" />
+             <KeyIcon/>
               <Typography className="font-semibold text-lg text-gray-900">Set Trigger Key</Typography>
             </Box>
             <Button
