@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Box, IconButton, MenuItem, TextField } from "@mui/material";
+import { Box, Button, IconButton, Menu, MenuItem, TextField } from "@mui/material";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
@@ -10,7 +10,15 @@ import {
 
 function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueChanged, updateBcv, rowData, mode, saveFunction }) {
     const { systemBcv, setSystemBcv } = useContext(BcvContext);
-    
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
     // changer de chapitre -1
     const previousChap = () => {
         let newRowN = currentRowN - 1;
@@ -129,7 +137,7 @@ function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueC
                             autoComplete="off"
                         >
 
-                            <TextField
+                            <Button
                                 select
                                 label={systemBcv.bookCode}
                                 defaultValue={systemBcv.bookCode}
@@ -140,8 +148,8 @@ function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueC
                                     </MenuItem>
                                 ))}
 
-                            </TextField>
-                            <TextField
+                            </Button>
+                            <Button
                                 select
                                 value={systemBcv.bookCode}
                                 defaultValue={systemBcv.bookCode}
@@ -152,7 +160,33 @@ function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueC
                                     </MenuItem>
                                 ))}
 
-                            </TextField>
+                            </Button>
+                            <div>
+                                <Button
+                                    id="basic-button"
+                                    aria-controls={open ? 'basic-menu' : undefined}
+                                    aria-haspopup="true"
+                                    aria-expanded={open ? 'true' : undefined}
+                                    onClick={handleClick}
+                                >
+                                    Dashboard
+                                </Button>
+                                <Menu
+                                    id="basic-menu"
+                                    anchorEl={anchorEl}
+                                    open={open}
+                                    onClose={handleClose}
+                                    slotProps={{
+                                        list: {
+                                            'aria-labelledby': 'basic-button',
+                                        },
+                                    }}
+                                >
+                                    <MenuItem onClick={handleClose}>Profile</MenuItem>
+                                    <MenuItem onClick={handleClose}>My account</MenuItem>
+                                    <MenuItem onClick={handleClose}>Logout</MenuItem>
+                                </Menu>
+                            </div>
                         </Box>
 
                         <IconButton
