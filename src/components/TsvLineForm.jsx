@@ -20,8 +20,11 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
 
     // Permet d'annuler les modications faites sur la note 
     const handleCancel = () => {
-        const newRowData = (mode === "edit" ? [...currentRow] : Array(7).fill("", 0, 7))
+        console.log("1")
+        const newRowData = (mode === "edit" ? [...ingredient[currentRowN]] : Array(7).fill("", 0, 7))
+        console.log("2")
         setCurrentRow(newRowData);
+        console.log("3")
     };
 
     return (
