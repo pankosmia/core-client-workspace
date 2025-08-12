@@ -137,7 +137,7 @@ function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueC
                             autoComplete="off"
                         >
 
-                            <Button
+                            <TextField
                                 select
                                 label={systemBcv.bookCode}
                                 defaultValue={systemBcv.bookCode}
@@ -148,45 +148,35 @@ function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueC
                                     </MenuItem>
                                 ))}
 
-                            </Button>
+                            </TextField>
                             <Button
-                                select
-                                value={systemBcv.bookCode}
-                                defaultValue={systemBcv.bookCode}
+                                id="basic-button"
+                                aria-controls={open ? 'basic-menu' : undefined}
+                                aria-haspopup="true"
+                                aria-expanded={open ? 'true' : undefined}
+                                onClick={handleClick}
+                               sx={{justifyItems:"end"}}
+                            >
+                                10
+                            </Button>
+                            <Menu
+                                id="basic-menu"
+                                anchorEl={anchorEl}
+                                open={open}
+                                onClose={handleClose}
+                                slotProps={{
+                                    list: {
+                                        'aria-labelledby': 'basic-button',
+                                    },
+                                }}
                             >
                                 {verseNotes[currentRowN]?.map((item, i) => (
                                     <MenuItem key={i} >
-                                        <strong>{item.verse}</strong> : {item.note}
+                                        <strong>{item.verse.split(":")[1]}</strong>
                                     </MenuItem>
                                 ))}
+                            </Menu>
 
-                            </Button>
-                            <div>
-                                <Button
-                                    id="basic-button"
-                                    aria-controls={open ? 'basic-menu' : undefined}
-                                    aria-haspopup="true"
-                                    aria-expanded={open ? 'true' : undefined}
-                                    onClick={handleClick}
-                                >
-                                    Dashboard
-                                </Button>
-                                <Menu
-                                    id="basic-menu"
-                                    anchorEl={anchorEl}
-                                    open={open}
-                                    onClose={handleClose}
-                                    slotProps={{
-                                        list: {
-                                            'aria-labelledby': 'basic-button',
-                                        },
-                                    }}
-                                >
-                                    <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                    <MenuItem onClick={handleClose}>My account</MenuItem>
-                                    <MenuItem onClick={handleClose}>Logout</MenuItem>
-                                </Menu>
-                            </div>
                         </Box>
 
                         <IconButton
