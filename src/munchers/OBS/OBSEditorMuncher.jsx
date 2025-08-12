@@ -199,6 +199,8 @@ function OBSEditorMuncher({ metadata }) {
         }
     }, [isModified]);
 
+    const chapterTitle = (currentChapter[0] || "").replace(/^#+\s*/, '').trim();
+
     return (
         <Stack sx={{ p: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
