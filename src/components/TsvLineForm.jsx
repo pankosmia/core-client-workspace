@@ -63,13 +63,11 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
                 rowData={currentRow}
                 saveFunction={saveFunction}
                 mode={mode}
-
                 ingredient={ingredient}
                 setIngredient={setIngredient}
-
                 currentRowN={currentRowN}
                 setCurrentRowN={setCurrentRowN}
-
+                setCellValueChanged={setCellValueChanged}
             />
         </Box>
     )

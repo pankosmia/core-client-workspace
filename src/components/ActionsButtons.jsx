@@ -10,17 +10,27 @@ import {
 
 function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueChanged, updateBcv, rowData, mode, saveFunction }) {
     const { systemBcv, setSystemBcv } = useContext(BcvContext);
-
+    
     // changer de chapitre -1
     const previousChap = () => {
-        const newChapN = currentRowN - 1;
-        if (newChapN >= 1 && ingredient.length > 1 && ingredient[newChapN]) {
+        let newRowN = currentRowN - 1;
+        const currentChap = ingredient[currentRowN][0].split(":")[0];
+
+        while (newRowN >= 1) {
+            const newChap = ingredient[newRowN][0].split(":")[0];
+            if (newChap !== currentChap) break;
+            newRowN--;
+        }
+
+        if (newRowN >= 1 && ingredient[newRowN]) {
             saveFunction(currentRowN, rowData);
-            setCurrentRowN(newChapN);
-            setCellValueChanged(false)
-            updateBcv(newChapN)
+            setCurrentRowN(newRowN);
+            setCellValueChanged(false);
+            updateBcv(newRowN);
         }
     };
+
+
     // changer de page -1 
     const previousRow = () => {
         const newRowN = currentRowN - 1;
@@ -44,14 +54,23 @@ function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueC
     };
 
     const nextChap = () => {
-        const newChapN = currentRowN;
-        if (ingredient[newChapN] && ingredient[newChapN].length > 0) {
-            saveFunction(currentRowN, rowData);
-            setCurrentRowN(newChapN);
-            setCellValueChanged(false)
-            updateBcv(newChapN)
+        let newRowN = currentRowN + 1;
+        const currentChap = ingredient[currentRowN][0].split(":")[0];
+
+        while (newRowN < ingredient.length) {
+            const newChap = ingredient[newRowN][0].split(":")[0];
+            if (newChap !== currentChap) break;
+            newRowN++;
         }
-    }
+
+        if (newRowN < ingredient.length && ingredient[newRowN]) {
+            saveFunction(currentRowN, rowData);
+            setCurrentRowN(newRowN);
+            setCellValueChanged(false);
+            updateBcv(newRowN);
+        }
+    };
+
     const verseNotes = {};
 
     ingredient.slice(1).forEach(row => {
@@ -80,7 +99,7 @@ function ActionsButtons({ ingredient, currentRowN, setCurrentRowN, setCellValueC
                     <>
                         <IconButton
                             variant="contained"
-                            onClick={() => { previousChap(currentRowN,rowData) }}
+                            onClick={() => { previousChap(currentRowN, rowData) }}
                             sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
