@@ -70,7 +70,7 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                 borderRadius: 2,
                 overflow: "auto",
             }}>
-                <AppBar sx={{ position: 'relative', borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
+                <AppBar color="secondary" sx={{ position: 'relative', borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
                     <Toolbar sx={{ justifyContent: "space-between" }}>
                         <IconButton
                             edge="start"

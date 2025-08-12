@@ -212,6 +212,26 @@
     },
     "choose_resources_workspace":{
       "en":"Choose what resources to open in the Workspace, alongside your editable Content."
+    },
+
+    "type_to_search":{
+      "en":"Type to search",
+      "fr":"Taper pour rechercher"
+    },
+    "no_result":{
+      "en":"No results",
+      "fr":"Pas de résultat"
+    },
+    "current":{
+      "en":"Current",
+      "fr":"Actuel"
+    },
+    "apply":{
+      "en":"Apply",
+      "fr":"Appliquer"
+    },
+    "modification_key":{
+      "en":"Press modifier keys (Ctrl, Alt, Shift) together with another key."
     }
   }
 }

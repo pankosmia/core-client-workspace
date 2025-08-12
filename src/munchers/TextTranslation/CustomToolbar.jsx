@@ -18,16 +18,16 @@ import { TriggerKeyDialog } from "./TriggerKeyDialog";
 import SaveIcon from '@mui/icons-material/Save';
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardCommandKeyIcon from '@mui/icons-material/KeyboardCommandKey';
-import ViewStreamIcon from '@mui/icons-material/ViewStream';
-import FormatTextdirectionRToLIcon from '@mui/icons-material/FormatTextdirectionRToL';
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { Divider, ToggleButton, Stack, IconButton, Box, } from "@mui/material";
+import { Divider, ToggleButton, IconButton, Box, } from "@mui/material";
 import {
   i18nContext as I18nContext,
   doI18n,
 } from "pithekos-lib";
+import SvgParaph from "./plugins/Svg_paraph";
 
 function SearchButton() {
   const { isVisible, setIsVisible } = useFindReplace();
@@ -97,7 +97,6 @@ export function CustomToolbar({ onSave }) {
       />
 
       {editable ? (
-
         <FindReplacePlugin>
           <ToggleButtonGroup
             value={formats}
@@ -140,17 +139,17 @@ export function CustomToolbar({ onSave }) {
 
               <ToggleButton value={"block_view"} sx={{ border: 0 }}>
                 <ViewButton title={doI18n("pages:core-local-workspace:toggle_block_view", i18nRef.current)}>
-                  <ViewStreamIcon />
+                  <FormatListNumberedIcon/>
                 </ViewButton>
               </ToggleButton>
 
-              <ToggleButton value={"toggle_markup"} sx={{ border: 0 }}>
+              <ToggleButton value={"toggle_markup"} sx={{ border: 0, borderBottomRightRadius:1, borderTopRightRadius:1 }}>
                 <FormatButton title={doI18n("pages:core-local-workspace:toggle_markup", i18nRef.current)}>
-                  <FormatTextdirectionRToLIcon />
+                  <SvgParaph/>
                 </FormatButton>
               </ToggleButton>
             </Box>
-            <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 , color:"black", border:"1 px solid"}} />
+            <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
             <CustomMarkersToolbar customMarkers={markerGroups} doI18n={doI18n} i18nRef={i18nRef} />
           </ToggleButtonGroup>
 
