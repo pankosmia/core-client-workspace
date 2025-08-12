@@ -46,7 +46,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     })
         , []);
     const plugins = useMemo(() => [regionsPlugin, recordPlugin, timelinePlugin], [regionsPlugin, recordPlugin, timelinePlugin]);
-    const [prise, setPrise] = useState("1");
+    const [prise, setPrise] = useState("0");
     const [bakExists, setBakExists] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [showOtherTracks, setShowOtherTracks] = useState(true);
@@ -85,20 +85,10 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     }
 
     const fileExists = async (newAudioUrl) => {
-        const url = `/burrito/paths/${metadata.local_path}`
-        const ipath = newAudioUrl.split("?ipath=")[1];
-
-        const response = await fetch(url, {
-            method: "GET",
-        })
-        if (response.ok) {
-            const data = await response.json();
-            if (data.includes(ipath)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
+        try {
+            const resp = await fetch(newAudioUrl, { method: 'GET', cache: 'no-store' });
+            return resp.ok;
+        } catch (_) {
             return false;
         }
     }
@@ -476,6 +466,24 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         return () => observer.disconnect();
     }, [waveformRef]);
 
+    // Assure une largeur non nulle après (ré)activation/affichage du composant
+    useEffect(() => {
+        let cancelled = false;
+        const ensureWidth = () => {
+            if (cancelled) return;
+            const el = waveformRef.current;
+            if (!el) return;
+            const w = el.clientWidth || 0;
+            if (w > 0) {
+                setWaveformWidth(w);
+                return;
+            }
+            setTimeout(ensureWidth, 60);
+        };
+        ensureWidth();
+        return () => { cancelled = true; };
+    }, [audioUrl]);
+
     // Adapter dynamiquement la largeur de la waveform principale lors d'un resize du conteneur
     useEffect(() => {
         if (!wavesurfer || !waveformRef.current) return;
@@ -487,11 +495,26 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         return (maxDuration && maxDuration > 0) ? maxDuration : (dur || 0);
     }, [maxDuration, wavesurfer]);
 
-    const gridPx = useMemo(() => {
-        if (!waveformWidth || !gridSeconds) return 0;
+    const derivedGridSeconds = useMemo(() => {
+        if (!waveformWidth) return gridSeconds;
         const baseDuration = effectiveDuration || 1;
-        return (waveformWidth / baseDuration) * gridSeconds;
+        const desiredMinPx = 8;
+        const secondsPerPx = baseDuration / waveformWidth;
+        const minSeconds = desiredMinPx * secondsPerPx;
+        const niceSteps = [
+            0.05, 0.1, 0.2, 0.25, 0.5,
+            1, 2, 5, 10, 15, 20, 30,
+            60, 120, 300, 600, 900, 1200
+        ];
+        const nice = niceSteps.find((s) => s >= minSeconds) || minSeconds;
+        return Math.max(gridSeconds, nice);
     }, [waveformWidth, effectiveDuration, gridSeconds]);
+
+    const gridPx = useMemo(() => {
+        if (!waveformWidth || !derivedGridSeconds) return 0;
+        const baseDuration = effectiveDuration || 1;
+        return (waveformWidth / baseDuration) * derivedGridSeconds;
+    }, [waveformWidth, effectiveDuration, derivedGridSeconds]);
 
     const majorGridPx = useMemo(() => (gridPx ? gridPx * 5 : 0), [gridPx]);
 
@@ -539,9 +562,9 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     }, []);
 
     const snapToGrid = useCallback((time) => {
-        if (!gridSeconds || gridSeconds <= 0) return time;
-        return Math.round(time / gridSeconds) * gridSeconds;
-    }, [gridSeconds]);
+        if (!derivedGridSeconds || derivedGridSeconds <= 0) return time;
+        return Math.round(time / derivedGridSeconds) * derivedGridSeconds;
+    }, [derivedGridSeconds]);
 
     const updateCursorTime = useCallback((time, { force = false } = {}) => {
         const base = (snapEnabled && !force) ? snapToGrid(time) : time;
@@ -933,10 +956,10 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                 onPlayPause();
                 return;
             } else if (event.key === 'ArrowLeft') {
-                updateCursorTime((cursorTime ?? 0) - gridSeconds);
+                updateCursorTime((cursorTime ?? 0) - derivedGridSeconds);
                 return;
             } else if (event.key === 'ArrowRight') {
-                updateCursorTime((cursorTime ?? 0) + gridSeconds);
+                updateCursorTime((cursorTime ?? 0) + derivedGridSeconds);
                 return;
             } else if (event.key === 'r') {
                 return isRecording ? stopRecording() : startRecording();

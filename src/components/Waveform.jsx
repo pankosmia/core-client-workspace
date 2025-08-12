@@ -167,6 +167,25 @@ const Waveform = ({
 
     }, [wavesurfer, enableRegions, onRegionSelect, maxDuration, priseNumber, setCursorTime, setCurrentTrack, onDurationUpdate]);
 
+    // Si le composant a été monté caché (display:none), forcer une vérification
+    // de largeur et un recalcul lors de l'apparition.
+    useEffect(() => {
+        const el = waveformRef.current?.parentElement;
+        if (!el) return;
+        let cancelled = false;
+        const tick = () => {
+            if (cancelled) return;
+            const w = el.clientWidth || 0;
+            if (w > 0) {
+                try { wavesurfer?.setOptions({ width: undefined }); } catch (_) {}
+                return;
+            }
+            setTimeout(tick, 60);
+        };
+        tick();
+        return () => { cancelled = true };
+    }, [audioUrl, maxDuration]);
+
     useEffect(() => {
         if (!enableRegions || !regionsPlugin || !wavesurfer) return;
         try {
@@ -221,6 +240,30 @@ const Waveform = ({
     const swallow = (e) => {
         e.stopPropagation();
         e.preventDefault();
+    };
+
+    // Permettre de placer le curseur par simple clic sur les pistes secondaires
+    // même quand enableRegions est actif, sans gêner le drag de sélection
+    const handleContainerClick = (e) => {
+        if (!wavesurfer || isMainTrack) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width || 0));
+        const mainWidth = mainTrackRef?.current?.clientWidth || 0;
+        const globalDuration = (maxDuration && maxDuration > 0) ? maxDuration : (wavesurfer.getDuration?.() || 0);
+        const denom = (mainWidth && globalDuration) ? mainWidth : rect.width;
+        if (!denom || !globalDuration) return;
+        const time = (x / denom) * globalDuration;
+        const snapped = Math.round(time * 10) / 10;
+        const trackDuration = wavesurfer.getDuration?.() || 0;
+        const clamped = Math.max(0, Math.min(snapped, trackDuration || snapped));
+        if (typeof wavesurfer.seekTo === 'function' && (wavesurfer.getDuration?.() || 0) > 0) {
+            const frac = clamped / wavesurfer.getDuration();
+            wavesurfer.seekTo(Math.max(0, Math.min(1, frac)));
+        } else {
+            wavesurfer.setTime(clamped);
+        }
+        setCurrentTrack?.(priseNumber);
+        // Ne pas stopPropagation ici pour ne pas bloquer la logique des régions
     };
 
     useEffect(() => {
@@ -294,17 +337,17 @@ const Waveform = ({
                                 inset: 0,
                                 zIndex: 0,
                                 pointerEvents: 'none',
-                                backgroundImage: majorGridPx
+                                backgroundImage: majorGridPx && majorGridPx >= 1
                                     ? 'linear-gradient(to right, rgba(0,0,0,0.08) 1px, transparent 1px), linear-gradient(to right, rgba(0,0,0,0.15) 1px, transparent 1px)'
-                                    : 'linear-gradient(to right, rgba(0,0,0,0.08) 1px, transparent 1px)',
+                                    : 'linear-gradient(to right, rgba(0,0,0,0.12) 1px, transparent 1px)',
                                 backgroundSize: majorGridPx
-                                    ? `${gridPx}px 100%, ${majorGridPx}px 100%`
+                                    ? `${Math.max(1, gridPx)}px 100%, ${Math.max(1, majorGridPx)}px 100%`
                                     : `${gridPx}px 100%`,
                                 backgroundRepeat: 'repeat',
                             }}
                         />
                     )}
-                    {!isMainTrack && (
+                    {!isMainTrack && !enableRegions && (
                         <div
                             onMouseDown={handleOverlayClick}
                             onMouseUp={swallow}
@@ -319,6 +362,7 @@ const Waveform = ({
                     )}
                     <div
                         ref={waveformRef}
+                        onClick={(!isMainTrack && enableRegions) ? handleContainerClick : undefined}
                         style={{
                             width: '100%',
                             height: '100%',
