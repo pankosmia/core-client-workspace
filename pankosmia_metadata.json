@@ -232,6 +232,18 @@
     },
     "modification_key":{
       "en":"Press modifier keys (Ctrl, Alt, Shift) together with another key."
+    }, 
+    "replace_all":{
+      "en": "Replace all",
+      "fr": "Tout remplacer"
+    },
+    "searching":{
+      "en":"searching...",
+      "fr":"recherche..."
+    },
+    "replace_one":{
+      "en":"replace",
+      "fr":"remplacer"
     }
   }
 }

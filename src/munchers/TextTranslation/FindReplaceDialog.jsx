@@ -1,14 +1,16 @@
 import { useRef, useEffect, useContext } from "react";
 import { useFindReplace } from "@scriptural/react";
-import { X, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import CloseIcon from '@mui/icons-material/Close';
 import { VscReplace } from "react-icons/vsc";
 import { VscReplaceAll } from "react-icons/vsc";
-import { Button, Typography, Box, TextField } from "@mui/material";
+import { Button, Typography, Box, TextField, IconButton, Stack, Grid2, Toolbar } from "@mui/material";
 import {
   i18nContext as I18nContext,
   doI18n,
 } from "pithekos-lib";
-
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 export function FindReplaceDialog() {
   const {
     searchText,
@@ -27,7 +29,7 @@ export function FindReplaceDialog() {
   } = useFindReplace();
 
   const searchInputRef = useRef(null);
- const { i18nRef } = useContext(I18nContext);
+  const { i18nRef } = useContext(I18nContext);
 
   // Focus the search input when the component becomes visible
   useEffect(() => {
@@ -44,51 +46,53 @@ export function FindReplaceDialog() {
 
   return (
     <Box className="fixed top-4 right-4 w-80 bg-white rounded-md shadow-lg overflow-hidden border border-gray-200 z-50">
-      <Box className="flex items-center content-center justify-between px-4 bg-gray-50 border-b border-gray-200">
-        <Typography className="text-sm font-medium text-gray-700">Find & Replace</Typography>
-        <Button
+      <Toolbar sx={{justifyContent:"space-between"}}>
+        <Typography variant="subtitle1">Find & Replace</Typography>
+        <IconButton
           onClick={handleClose}
-          className="text-gray-400 hover:text-gray-600 focus:outline-none"
         >
-          <X size={18} />
-        </Button>
-      </Box>
+          <CloseIcon />
+        </IconButton>
+      </Toolbar>
 
-      <Box className="p-4 space-y-3">
-        <Box className="space-y-2">
-          <Box className="flex items-center space-x-2">
-            <TextField
-              ref={searchInputRef}
-              type="text"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              placeholder="Find"
-              className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <Box className="flex items-center space-x-1">
-              <Button
-                onClick={handlePrev}
-                disabled={results.length === 0 || isSearching}
-                className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
-                title="Previous"
-              >
-                <ChevronUp size={16} />
-              </Button>
-              <Button
-                onClick={handleNext}
-                disabled={results.length === 0 || isSearching}
-                className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
-                title="Next"
-              >
-                <ChevronDown size={16} />
-              </Button>
-            </Box>
-          </Box>
-          <Box className="text-xs text-gray-500 flex items-center h-5">
+      <Box sx={{ p: 2 }}>
+        <Box>
+          <Grid2 container spacing={2} justifyItems="flex-end" alignItems="stretch">
+            <Grid2 item size={8}>
+              <TextField
+                ref={searchInputRef}
+                type="text"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                placeholder="Find"
+
+              />
+            </Grid2>
+            <Grid2 item size={4}>
+              <Box className="flex items-center space-x-1">
+                <IconButton
+                  onClick={handlePrev}
+                  disabled={results.length === 0 || isSearching}
+
+                  title="Previous"
+                >
+                  <KeyboardArrowUpIcon />
+                </IconButton>
+                <IconButton
+                  onClick={handleNext}
+                  disabled={results.length === 0 || isSearching}
+                  title="Next"
+                >
+                  <KeyboardArrowDownIcon />
+                </IconButton>
+              </Box>
+            </Grid2>
+          </Grid2>
+          <Typography sx={{ p: 1 }}>
             {isSearching ? (
               <>
                 <Loader2 size={14} className="animate-spin mr-1" />
-                <span>Searching...</span>
+                <Typography>{doI18n("pages:core-local-workspace:searching", i18nRef.current)}</Typography>
               </>
             ) : results.length > 0 ? (
               `${currentResultIndex + 1} of ${results.length}`
@@ -97,36 +101,40 @@ export function FindReplaceDialog() {
             ) : (
               `${doI18n("pages:core-local-workspace:type_to_search", i18nRef.current)}`
             )}
-          </Box>
+          </Typography>
         </Box>
 
-        <Box className="space-y-2">
+        <Box>
           <TextField
             type="text"
             value={replaceText}
             onChange={(e) => setReplaceText(e.target.value)}
             placeholder="Replace with"
-            className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
-          <Box className="flex items-center space-x-2">
-            <Button
-              onClick={handleReplace}
-              disabled={results.length === 0 || currentResultIndex === -1 || isSearching}
-              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-              title="Replace"
-            >
-              <VscReplace size={14} className="mr-1.5" />
-              <span>Replace</span>
-            </Button>
-            <Button
-              onClick={handleReplaceAll}
-              disabled={results.length === 0 || isSearching}
-              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-              title="Replace All"
-            >
-              <VscReplaceAll size={14} className="mr-1.5" />
-              <span>Replace All</span>
-            </Button>
+          <Box>
+            <Grid2 container spacing={2} justifyItems="flex-end" alignItems="stretch">
+              <Grid2 item size={6}>
+                <Button
+                  onClick={handleReplace}
+                  disabled={results.length === 0 || currentResultIndex === -1 || isSearching}
+                  title="Replace"
+                >
+                  <VscReplace/>
+                  <Typography variant="caption">{doI18n("pages:core-local-workspace:replace_one", i18nRef.current)}</Typography>
+                </Button>
+              </Grid2>
+
+              <Grid2 item size={6}>
+                <Button
+                  onClick={handleReplaceAll}
+                  disabled={results.length === 0 || isSearching}
+                  title="Replace All"
+                >
+                  <VscReplaceAll/>
+                  <Typography variant="caption"> {doI18n("pages:core-local-workspace:replace_all", i18nRef.current)}</Typography>
+                </Button>
+              </Grid2>
+            </Grid2>
           </Box>
         </Box>
       </Box>

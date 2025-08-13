@@ -33,6 +33,7 @@ function SearchButton() {
   const { isVisible, setIsVisible } = useFindReplace();
   const { i18nRef } = useContext(I18nContext);
 
+
   return (
     <button
       onClick={() => setIsVisible(!isVisible)}
@@ -67,7 +68,8 @@ export function CustomToolbar({ onSave }) {
   const [isDialogOpenTriggerKey, setIsDialogOpenTriggerKey] = useState(false);
   const [formats, setFormats] = useState(() => [""])
   const { i18nRef } = useContext(I18nContext);
-
+  const [openedModal, setOpenedModal] = useState(null);
+  
   // Define the markers to show in the toolbar
   const markerGroups = {
     ChapterVerse: ["c", "v"],
@@ -139,13 +141,13 @@ export function CustomToolbar({ onSave }) {
 
               <ToggleButton value={"block_view"} sx={{ border: 0 }}>
                 <ViewButton title={doI18n("pages:core-local-workspace:toggle_block_view", i18nRef.current)}>
-                  <FormatListNumberedIcon/>
+                  <FormatListNumberedIcon />
                 </ViewButton>
               </ToggleButton>
 
-              <ToggleButton value={"toggle_markup"} sx={{ border: 0, borderBottomRightRadius:1, borderTopRightRadius:1 }}>
+              <ToggleButton value={"toggle_markup"} sx={{ border: 0, borderBottomRightRadius: 1, borderTopRightRadius: 1 }}>
                 <FormatButton title={doI18n("pages:core-local-workspace:toggle_markup", i18nRef.current)}>
-                  <SvgParaph/>
+                  <SvgParaph />
                 </FormatButton>
               </ToggleButton>
             </Box>
@@ -155,7 +157,9 @@ export function CustomToolbar({ onSave }) {
 
 
           {/* The FindReplaceDialog is also a child of FindReplacePlugin */}
-          <FindReplaceDialog />
+          <FindReplaceDialog
+            open={openedModal === true}
+          />
           <ScripturalNodesMenuPlugin trigger={triggerKeyCombo} />
         </FindReplacePlugin>
       ) : null
