@@ -244,6 +244,18 @@
     "replace_one":{
       "en":"replace",
       "fr":"remplacer"
+    },
+    "find_replace":{
+      "en":"Find & replace",
+      "fr":"Trouve et remplace"
+    },
+    "find":{
+      "en":"Find",
+      "fr":"Trouve"
+    },
+    "replace_with":{
+      "en":"Replace with ",
+      "fr":"Remplacer avec"
     }
   }
 }

@@ -47,7 +47,7 @@ export function FindReplaceDialog() {
   return (
     <Box className="fixed top-4 right-4 w-80 bg-white rounded-md shadow-lg overflow-hidden border border-gray-200 z-50">
       <Toolbar sx={{justifyContent:"space-between"}}>
-        <Typography variant="subtitle1">Find & Replace</Typography>
+        <Typography variant="subtitle1"> {doI18n("pages:core-local-workspace:find_replace", i18nRef.current)}</Typography>
         <IconButton
           onClick={handleClose}
         >
@@ -64,7 +64,7 @@ export function FindReplaceDialog() {
                 type="text"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
-                placeholder="Find"
+                placeholder={`${doI18n("pages:core-local-workspace:find", i18nRef.current)}`}
 
               />
             </Grid2>
@@ -106,10 +106,9 @@ export function FindReplaceDialog() {
 
         <Box>
           <TextField
-            type="text"
             value={replaceText}
             onChange={(e) => setReplaceText(e.target.value)}
-            placeholder="Replace with"
+            placeholder={`${doI18n("pages:core-local-workspace:replace_with", i18nRef.current)}`}
           />
           <Box>
             <Grid2 container spacing={2} justifyItems="flex-end" alignItems="stretch">
