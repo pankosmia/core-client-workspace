@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { HiOutlineKey, HiOutlineInformationCircle } from "react-icons/hi";
-import { MdKeyboard } from "react-icons/md";
-import { Keyboard, KeySquare, Headphones, Check, X } from "lucide-react";
+import { HiOutlineInformationCircle } from "react-icons/hi";
+import { Headphones} from "lucide-react";
 import KeyIcon from '@mui/icons-material/Key';
-import { Box, Button, IconButton, Typography } from "@mui/material";
-import CloseIcon from '@mui/icons-material/Close';
+import { Box, Button, Typography } from "@mui/material";
+import InfoIcon from '@mui/icons-material/Info';
+import KeyboardIcon from '@mui/icons-material/Keyboard';
+import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 import {
   i18nContext as I18nContext,
   doI18n,
@@ -19,6 +20,7 @@ export function TriggerKeyDialog({
   const [capturedKeys, setCapturedKeys] = useState([]);
   const dialogRef = useRef(null);
   const { i18nRef } = useContext(I18nContext);
+  
   // Reset state when dialog opens
   useEffect(() => {
     if (isOpen) {
@@ -119,23 +121,16 @@ export function TriggerKeyDialog({
              <KeyIcon/>
               <Typography className="font-semibold text-lg text-gray-900">{doI18n("pages:core-local-workspace:set_trigger_key", i18nRef.current)}</Typography>
             </Box>
-            <IconButton
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 focus:outline-none"
-              aria-label="Close"
-            >
-              <CloseIcon/>
-            </IconButton>
           </Box>
 
           {/* Current trigger */}
           <Box className="flex items-center mb-4 gap-2">
-            <MdKeyboard className="h-5 w-5 text-gray-500" />
+            <KeyboardIcon/>
             <Box className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">{doI18n("pages:core-local-workspace:current", i18nRef.current)}</span>
-              <span className="text-xs bg-gray-100 px-2 py-1 rounded font-mono">
+              <Typography>{doI18n("pages:core-local-workspace:current", i18nRef.current)}</Typography>
+              <Typography>
                 {currentTrigger}
-              </span>
+              </Typography>
             </Box>
           </Box>
 
@@ -173,7 +168,7 @@ export function TriggerKeyDialog({
                 </Box>
               ) : (
                 <Box className="flex items-center justify-center gap-2 text-gray-500">
-                  <HiOutlineKey className="h-5 w-5" />
+                  <VpnKeyOutlinedIcon/>
                   <span>Click 'Record' below</span>
                 </Box>
               )}
@@ -200,17 +195,17 @@ export function TriggerKeyDialog({
               </>
             ) : (
               <>
-                <Keyboard className="h-4 w-4" />
+                <KeyboardIcon/> 
                 Record Key Combination
               </>
             )}
           </Button>
 
           {/* Info tip */}
-          <Box className="mt-3 flex items-start gap-2 text-xs text-gray-500">
-            <HiOutlineInformationCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+          <Typography variant="caption">
+            <InfoIcon/>
               {doI18n("pages:core-local-workspace:modification_key", i18nRef.current)}
-          </Box>
+          </Typography>
 
           {/* Action buttons */}
           <Box className="mt-5 flex justify-end gap-3">
@@ -222,6 +217,8 @@ export function TriggerKeyDialog({
             </Button>
             <Button
               onClick={applyTrigger}
+              color="primary"
+              variant="contained"
               disabled={capturedKeys.length === 0}
               className={`
                 px-4 py-2 text-sm font-medium rounded-md shadow-sm transition-colors
@@ -232,7 +229,6 @@ export function TriggerKeyDialog({
                 }
               `}
             >
-              <Check className="h-4 w-4" />
               {doI18n("pages:core-local-workspace:apply", i18nRef.current)}
             </Button>
           </Box>

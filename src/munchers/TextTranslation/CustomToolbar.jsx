@@ -69,7 +69,7 @@ export function CustomToolbar({ onSave }) {
   const [formats, setFormats] = useState(() => [""])
   const { i18nRef } = useContext(I18nContext);
   const [openedModal, setOpenedModal] = useState(null);
-  
+
   // Define the markers to show in the toolbar
   const markerGroups = {
     ChapterVerse: ["c", "v"],
@@ -104,6 +104,7 @@ export function CustomToolbar({ onSave }) {
             value={formats}
             onChange={handleFormat}
             aria-label="text formatting"
+            size="small"
           >
             <Box sx={{ display: "flex", flexDirection: 'row', borderRadius: 4 }}>
               <IconButton>
@@ -140,9 +141,9 @@ export function CustomToolbar({ onSave }) {
               <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
 
               <ToggleButton value={"block_view"} sx={{ border: 0 }}>
-                <ViewButton title={doI18n("pages:core-local-workspace:toggle_block_view", i18nRef.current)}>
-                  <FormatListNumberedIcon />
-                </ViewButton>
+                  <ViewButton title={doI18n("pages:core-local-workspace:toggle_block_view", i18nRef.current)}>
+                    <FormatListNumberedIcon />
+                  </ViewButton>
               </ToggleButton>
 
               <ToggleButton value={"toggle_markup"} sx={{ border: 0, borderBottomRightRadius: 1, borderTopRightRadius: 1 }}>

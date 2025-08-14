@@ -73,7 +73,6 @@ export function FindReplaceDialog() {
                 <IconButton
                   onClick={handlePrev}
                   disabled={results.length === 0 || isSearching}
-
                   title="Previous"
                 >
                   <KeyboardArrowUpIcon />
@@ -122,7 +121,6 @@ export function FindReplaceDialog() {
                   <Typography variant="caption">{doI18n("pages:core-local-workspace:replace_one", i18nRef.current)}</Typography>
                 </Button>
               </Grid2>
-
               <Grid2 item size={6}>
                 <Button
                   onClick={handleReplaceAll}
