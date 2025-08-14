@@ -68,7 +68,6 @@ export function CustomToolbar({ onSave }) {
   const [isDialogOpenTriggerKey, setIsDialogOpenTriggerKey] = useState(false);
   const [formats, setFormats] = useState(() => [""])
   const { i18nRef } = useContext(I18nContext);
-  const [openedModal, setOpenedModal] = useState(null);
 
   // Define the markers to show in the toolbar
   const markerGroups = {
@@ -158,9 +157,7 @@ export function CustomToolbar({ onSave }) {
 
 
           {/* The FindReplaceDialog is also a child of FindReplacePlugin */}
-          <FindReplaceDialog
-            open={openedModal === true}
-          />
+          <FindReplaceDialog/>
           <ScripturalNodesMenuPlugin trigger={triggerKeyCombo} />
         </FindReplacePlugin>
       ) : null

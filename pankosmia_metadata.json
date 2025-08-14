@@ -253,6 +253,16 @@
     },
     "set_trigger_key":{
       "en":"Set trigger Key"
+    },
+    "record_key_combination":{
+      "en":"Record key combination"
+    },
+    "click_record_below":{
+      "en":"Click 'record' below"
+    },
+    "listening":{
+      "en":"Listening...",
+      "fr":"Ecoute..."
     }
   }
 }
