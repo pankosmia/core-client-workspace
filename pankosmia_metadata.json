@@ -150,6 +150,18 @@
      "required_field":{
       "en":"* Required fields",
       "fr":"* Champ obligatoire"
+    },
+    "main_track": {
+      "en": "Main track",
+      "fr": "Piste principale"
+    },
+    "recording_in_progress": {
+      "en": "Recording in progress",
+      "fr": "Enregistrement en cours"
+    },
+    "no_other_tracks": {
+      "en": "No other tracks found",
+      "fr": "Aucune autre piste trouvée"
     }
   }
 }
