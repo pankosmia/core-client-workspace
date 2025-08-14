@@ -1060,15 +1060,15 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                         {/*Timer*/}
                         <Box sx={{ fontSize: 16, fontWeight: 600, minWidth: '60px', textAlign: 'center' }}> {formatTime(currentTime)} </Box>
                         {/*Play/Pause Button*/}
-                        <Tooltip title={"Play/Pause (space)"}>
+                        <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_play_pause", i18nRef.current)} (space)`}>
                             <IconButton onClick={onPlayPause} sx={{ color: 'white' }}> {isPlaying ? <PauseIcon /> : <PlayArrowIcon />} </IconButton>
                         </Tooltip>
                         {/*Record Button*/}
-                        <Tooltip title={"Record (r)"}>
+                        <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_record", i18nRef.current)} (r)`}>
                             <IconButton onClick={isRecording ? stopRecording : startRecording} sx={{ color: 'white' }}> {isRecording ? <StopIcon sx={{ color: 'red' }} /> : <MicIcon />} </IconButton>
                         </Tooltip>
                         {/* Restore Button */}
-                        {bakExists && <Tooltip title={"Restore (ctrl+z)"}>
+                        {bakExists && <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_restore", i18nRef.current)} (ctrl+z)`}>
                             <IconButton onClick={onRestore} sx={{ color: 'white' }}> <RestoreIcon /> </IconButton>
                         </Tooltip>}
                     </Box>
@@ -1077,7 +1077,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                         {selectedRegion.length > 0 && (
                             <Box sx={{ display: 'flex', gap: 1, mr: 2 }}>
                                 {copiedRegion && (
-                                    <Tooltip title={"Paste (ctrl+v)"}>
+                                    <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_paste", i18nRef.current)} (ctrl+v)`}>
                                         <IconButton
                                             size="small"
                                             onClick={() => pasteRegion(selectedRegion)}
@@ -1088,7 +1088,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                     </Tooltip>
                                 )}
                                 {selectedRegion[1] != "0" && (
-                                    <Tooltip title={"Copy (ctrl+c)"}>
+                                    <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_copy", i18nRef.current)} (ctrl+c)`}>
                                         <IconButton
                                             size="small"
                                             onClick={() => copyRegion(selectedRegion)}
@@ -1099,7 +1099,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                     </Tooltip>
                                 )}
                                 {selectedRegion && selectedRegion[1] == "0" && (
-                                    <Tooltip title={"Delete (suppr)"}>
+                                    <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_delete", i18nRef.current)} (suppr)`}>
                                         <IconButton
                                             size="small"
                                             onClick={() => cutRegion(selectedRegion)}
@@ -1191,7 +1191,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                             borderRadius: 1,
                             color: 'rgb(76, 76, 76)',
                         }}>
-                            Click <MicIcon fontSize='small'/> or press R to record
+                            {doI18n("pages:core-local-workspace:click_record_to_start", i18nRef.current)} <MicIcon fontSize='small'/> {doI18n("pages:core-local-workspace:or_press_r_to_record", i18nRef.current)}
                         </Box>
                     )}
                     </Box>
@@ -1210,7 +1210,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                             <ChevronRightIcon />
                         </IconButton>
                         <Box sx={{ fontSize: 12, fontWeight: 600, color: 'rgb(76, 76, 76)' }}>
-                            SUPPLEMENTARY TRACKS
+                            {doI18n("pages:core-local-workspace:supplementary_tracks", i18nRef.current)}
                         </Box>
                     </Box>
 
@@ -1242,7 +1242,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                     sx={{ maxWidth: 240, backgroundColor: 'white' }}
                                                 />
 
-                                                <Tooltip title="Confirm renaming">
+                                                <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_confirm_renaming", i18nRef.current)}`}>
                                                     <IconButton
                                                         size="small"
                                                         onClick={() => editingName?.trim() && editAudio(priseNumber, editingName)}
@@ -1253,7 +1253,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                     </IconButton>
                                                 </Tooltip>
 
-                                                <Tooltip title="Cancel renaming">
+                                                <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_cancel_renaming", i18nRef.current)}`}>
                                                     <IconButton
                                                         size="small"
                                                         onClick={() => setEditingPrise(null)}
@@ -1269,7 +1269,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                     Track {priseNumber.split("_")[0]} {priseNumber.split("_")[1] ? `- ${priseNumber.split("_")[1]}` : ""}
                                                 </Box>
 
-                                                <Tooltip title="Switch with maintrack">
+                                                <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_switch_with_maintrack", i18nRef.current)}`}>
                                                     <IconButton
                                                         onClick={() => switchMainTrack(priseNumber)}
                                                         sx={{ color: 'rgb(120, 120, 120)' }}
@@ -1278,7 +1278,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                     </IconButton>
                                                 </Tooltip>
                                                 
-                                                <Tooltip title="Rename track">
+                                                <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_rename_track", i18nRef.current)}`}>
                                                     <IconButton
                                                         onClick={() => {
                                                             setEditingPrise(priseNumber);
@@ -1289,11 +1289,11 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                         <EditIcon />
                                                     </IconButton>
                                                 </Tooltip>
-                                                <Tooltip title="Delete track">
-                                                    <IconButton aria-label={`Supprimer la piste ${priseNumber}`} onClick={() => deleteAudio(priseNumber)} sx={{ color: 'rgb(120, 120, 120)' }}> <DeleteIcon /> </IconButton>
+                                                <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_delete_track", i18nRef.current)}`}>
+                                                    <IconButton aria-label={`${doI18n("pages:core-local-workspace:delete_track", i18nRef.current)} ${priseNumber}`} onClick={() => deleteAudio(priseNumber)} sx={{ color: 'rgb(120, 120, 120)' }}> <DeleteIcon /> </IconButton>
                                                 </Tooltip>
-                                                <Tooltip title="Play track">
-                                                    <IconButton aria-label={`Lire la piste ${priseNumber}`} onClick={() => playAudio(priseNumber)} sx={{ color: 'rgb(120, 120, 120)' }}> {secondaryIsPlaying[priseNumber] ? <PauseIcon /> : <PlayArrowIcon />} </IconButton>
+                                                <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_play_track", i18nRef.current)}`}>
+                                                    <IconButton aria-label={`${doI18n("pages:core-local-workspace:play_track", i18nRef.current)} ${priseNumber}`} onClick={() => playAudio(priseNumber)} sx={{ color: 'rgb(120, 120, 120)' }}> {secondaryIsPlaying[priseNumber] ? <PauseIcon /> : <PlayArrowIcon />} </IconButton>
                                                 </Tooltip>
                                             </>
                                         )}
@@ -1346,8 +1346,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                     <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden', p: 1 }}>
                                         <Box sx={{ fontSize: 11, color: isRecording && hasAnyTrack ? 'rgb(255, 107, 107)' : 'rgb(120, 120, 120)', mb: 0.5 }}>
                                             {isRecording && hasAnyTrack
-                                                ? `Enregistrement en cours - Prise ${nextPriseNumber}`
-                                                : `Piste vide - Prochaine prise ${nextPriseNumber || '...'}`}
+                                                ? `${doI18n("pages:core-local-workspace:recording_in_progress", i18nRef.current)} - ${nextPriseNumber}`
+                                                : `${doI18n("pages:core-local-workspace:empty_track", i18nRef.current)} - ${nextPriseNumber || '...'}`}
                                         </Box>
                                         {isRecording && hasAnyTrack ? (
                                             <canvas
@@ -1370,7 +1370,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                 mb: 1,
                                             }}>
                                                 
-                                                Click <MicIcon fontSize='small'/> or press R to record
+                                                {doI18n("pages:core-local-workspace:click_record_to_start", i18nRef.current)} <MicIcon fontSize='small'/> {doI18n("pages:core-local-workspace:or_press_r_to_record", i18nRef.current)}
                                             </Box>
                                         )}
                                     </Box>
