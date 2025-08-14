@@ -75,7 +75,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     const tracksContainerRef = useRef(null);
     const [waveformWidth, setWaveformWidth] = useState(0);
 
-    const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], newPrise = prise, ext = "mp3") => {
+    const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], newPrise = prise, ext = "wav") => {
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
         let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
         return `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newPrise}.${ext}`
@@ -143,8 +143,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
     // ça insert l'audio B a un endroit dans l'audio A
     const insertAudio = async (A, B, insertTime, startTimeB, endTimeB) => {
-        const urlA = getUrl().replace(`_${prise}.mp3`, `_${A}.mp3`);
-        const urlB = getUrl().replace(`_${prise}.mp3`, `_${B}.mp3`);
+        const urlA = getUrl().replace(`_${prise}.wav`, `_${A}.wav`);
+        const urlB = getUrl().replace(`_${prise}.wav`, `_${B}.wav`);
 
         const audioContext = new AudioContext();
 
@@ -217,7 +217,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
         const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
         const prises = data.filter(item => item.includes(`audio_content/${chapterString}-${paragraphString}`) && !item.includes(".bak"));
-        const priseNumbers = prises.map(prise => prise.split(`${chapterString}-${paragraphString}_`)[1].split("_")[0].replace(".mp3", ""));
+        const priseNumbers = prises.map(prise => prise.split(`${chapterString}-${paragraphString}_`)[1].split("_")[0].replace(".wav", ""));
         const newPrise = priseNumbers
             .map(prise => parseInt(prise))
             .filter(prise => !isNaN(prise))
@@ -307,11 +307,18 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
             };
 
             mediaRecorderRef.current.onstop = async () => {
-                const recordedBlob = new Blob(chunksRef.current, { type: 'audio/mp3' });
+                // Convertir l'enregistrement en WAV avant upload
+                const recordedBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+
+                // Décoder puis ré-encoder en WAV
+                const audioContext = new AudioContext();
+                const arrayBuffer = await recordedBlob.arrayBuffer();
+                const sourceBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                const wavBlob = audioBufferToWav(sourceBuffer);
 
                 // Sauvegarder l'enregistrement
                 const formData = new FormData();
-                formData.append("file", recordedBlob);
+                formData.append("file", wavBlob);
 
                 const postUrl = getUrl("bytes", obs[0], obs[1], nextPrise);
                 await fetch(postUrl, {
@@ -322,8 +329,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                 await waitForFileByUrl(createdUrl);
 
                 // Calculer la durée et mettre à jour l'interface
-                const audioContext = new AudioContext();
-                const audioBuffer = await audioContext.decodeAudioData(await recordedBlob.arrayBuffer());
+                const audioBuffer = sourceBuffer;
                 const duration = audioBuffer.getChannelData(0).length / audioBuffer.sampleRate;
                 if (duration > maxDuration) {
                     setMaxDuration(duration);
@@ -620,7 +626,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         const updateAudioUrl = async () => {
             setIsLoading(true);
             let url = getUrl("bytes", obs[0], obs[1], prise);
-            if (url.includes("_null.mp3")) {
+            if (url.includes("_null.wav")) {
                 const newPrise = await updatePrise();
                 url = getUrl("bytes", obs[0], obs[1], newPrise);
                 
@@ -648,7 +654,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     // Réinitialiser l'état lié aux fichiers lorsque l'OBS change pour éviter les 404 transitoires
     const updatePrise = async () => {
         const mainTrack = await getMainTrack()
-        const newPrise = mainTrack?.split("/")?.pop().split("_")[2]?.replace(".mp3", "");
+        const newPrise = mainTrack?.split("/")?.pop().split("_")[2]?.replace(".wav", "");
         setPrise(newPrise);
         return newPrise;
     }
@@ -782,8 +788,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
             return;
         }
         
-        const srcPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName}.mp3`;
-        const targetPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName.split("_")[0]}_${newName}.mp3`;
+        const srcPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName}.wav`;
+        const targetPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName.split("_")[0]}_${newName}.wav`;
         let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${srcPath}&target_path=${targetPath}&delete_src=true`;
         await fetch(url, {
             method: "POST",
@@ -834,7 +840,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
             const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
             const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-            const newPrises = prises.map(prise => prise.split(`/${chapterString}-${paragraphString}_`)[1].replace(".mp3", ""));
+            const newPrises = prises.map(prise => prise.split(`/${chapterString}-${paragraphString}_`)[1].replace(".wav", ""));
             const sortedPrises = newPrises.sort((a, b) => a.split("_")[0] - b.split("_")[0]);
             setOtherPrises(sortedPrises.filter(prise => !prise.includes(".json")));
 
@@ -858,7 +864,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
         if (existing0) {
             const fileName = existing0.split("/").pop() || "";
-            const suffix = fileName.split(`${chapterString}-${paragraphString}_`)[1]?.replace(".mp3", "");
+            const suffix = fileName.split(`${chapterString}-${paragraphString}_`)[1]?.replace(".wav", "");
             if (suffix) {
                 setPrise(suffix);
                 return;
@@ -868,7 +874,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         // Rechercher la première prise existante (avec son éventuel nom)
         const prises = await listPrises(obs[0], obs[1]);
         const newPrises = prises
-            .map(prise => prise.split(`/${chapterString}-${paragraphString}_`)[1].replace(".mp3", ""))
+            .map(prise => prise.split(`/${chapterString}-${paragraphString}_`)[1].replace(".wav", ""))
             .filter(prise => !prise.includes(".json"))
             // Ne pas utiliser une piste déjà 0_* comme source
             .filter(prise => !(prise || "").startsWith("0"));
@@ -906,8 +912,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         await saveMainTrack()        
         const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
         const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-        const trackPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newTrackNumber}.mp3`;
-        const mainTrack = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_0_${newTrackNumber.split("_")[0]}.mp3`;
+        const trackPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newTrackNumber}.wav`;
+        const mainTrack = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_0_${newTrackNumber.split("_")[0]}.wav`;
 
         let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${trackPath}&target_path=${mainTrack}`;
         await fetch(url, {  
@@ -923,16 +929,16 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
     const saveMainTrack = async () => {
         const mainTrack = await getMainTrack()
-        const saveTrackNumber = mainTrack.split("/").pop().split("_")[2]?.replace(".mp3", "")
+        const saveTrackNumber = mainTrack.split("/").pop().split("_")[2]?.replace(".wav", "")
         const saveTrack = await getTrackByNumber(saveTrackNumber)
-        const saveTrackName = saveTrack.split("/").pop().split("_")[2]?.replace(".mp3", "")
+        const saveTrackName = saveTrack.split("/").pop().split("_")[2]?.replace(".wav", "")
 
         const track = `${saveTrackNumber}${saveTrackName ? "_" + saveTrackName : ""}`;
        
         if (!saveTrackNumber.includes("0_")) {
             const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
             const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
-            const savePath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${track}.mp3`;
+            const savePath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${track}.wav`;
             let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${mainTrack}&target_path=${savePath}&delete_src=true`;
             await fetch(url, {  
                 method: "POST",
@@ -967,7 +973,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     const getTrackName = async (number) => {
         const track = await getTrackByNumber(number);
         if (!track) return null;
-        return track.split("/").pop().split("_")[2]?.replace(".mp3", "");
+        return track.split("/").pop().split("_")[2]?.replace(".wav", "");
     }
 
     useEffect(() => {
