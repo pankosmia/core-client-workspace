@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo, useEffect, useCallback } from 'react';
+import { useRef, useState, useMemo, useEffect, useCallback, useContext } from 'react';
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -25,7 +25,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import AutorenewIcon from '@mui/icons-material/Autorenew'
 import Typography from '@mui/material/Typography';
 
+import {
+    i18nContext as I18nContext,
+    doI18n,
+} from "pithekos-lib";
+
 const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
+    const {i18nRef} = useContext(I18nContext);
     const [isRecording, setIsRecording] = useState(false);
     const waveformRef = useRef(null);
     const regionsPlugin = useMemo(() => RegionsPlugin.create(), []);
@@ -361,7 +367,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
             }, 100);
 
         } catch (error) {
-            console.error('Erreur lors de l\'accès au microphone:', error);
+            console.error('Error in recording', error);
         }
     };
 
@@ -396,7 +402,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                 analyserRef.current = null;
             }
         } catch (error) {
-            console.error('Erreur lors de l\'arrêt de l\'enregistrement:', error);
+            console.error('Error in stopping recording', error);
         }
     };
 
@@ -1106,7 +1112,6 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
                             </Box>
                         )}
-                        
                     </Box>
                 </Box>
                 <Divider />
@@ -1116,9 +1121,9 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
                     {/* Track principale */}
                     <Box sx={{ p: 1, backgroundColor: 'rgb(245, 245, 245)', height: '100%', position: 'relative', zIndex: 1 }}>
-                    <Box sx={{ fontSize: 12, fontWeight: 600, mb: 1, color: 'rgb(0, 0, 0)' }}>
-                        MAIN TRACK {prise?.split("_")[1] ? `- ${prise?.split("_")[1]} ` : ""}
-                    </Box>
+                      <Box sx={{ fontSize: 12, fontWeight: 600, mb: 1, color: 'rgb(45, 188, 255)' }}>
+                          {doI18n("pages:core-local-workspace:main_track", i18nRef.current)} {prise?.split("_")[1] ? `- ${prise?.split("_")[1]} ` : ""}
+                      </Box>
                     {isRecording && !hasAnyTrack ? (
                         <Box sx={{
                             width: '100%',
@@ -1132,7 +1137,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                             p: 1,
                         }}>
                             <Box sx={{ fontSize: 11, color: 'rgb(255, 107, 107)', mb: 0.5 }}>
-                                {`Enregistrement en cours - Prise ${nextPriseNumber}`}
+                                {doI18n("pages:core-local-workspace:recording_in_progress", i18nRef.current)} {nextPriseNumber}
                             </Box>
                             <canvas
                                 ref={recordingCanvasRef}
@@ -1374,8 +1379,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                         )}
 
                         {otherPrises.length === 0 && !isRecording && (
-                            <Box sx={{ textAlign: 'center', py: 2, color: 'rgb(76, 76, 76)' }}>
-                                No other tracks found
+                            <Box sx={{ textAlign: 'center', py: 2, color: 'rgb(120, 120, 120)' }}>
+                                {doI18n("pages:core-local-workspace:no_other_tracks", i18nRef.current)}
                             </Box>
                         )}
                     </Box>
