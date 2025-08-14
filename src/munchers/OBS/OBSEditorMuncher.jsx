@@ -185,7 +185,6 @@ function OBSEditorMuncher({ metadata }) {
     );
 
 
-    const [showExitDialog, setShowExitDialog] = useState(false);
 
     // Intercepter les tentatives de navigation
     useEffect(() => {
@@ -218,18 +217,6 @@ function OBSEditorMuncher({ metadata }) {
                 <MarkdownField currentRow={obs[1]} columnNames={currentChapter} onChangeNote={handleChange} value={currentChapter[obs[1]] || ""} mode="write" />
                 {audioEnabled && <AudioRecorder audioUrl={audioUrl} setAudioUrl={setAudioUrl} metadata={metadata} obs={obs} />}
             </Stack>
-            {showExitDialog && (
-            <Dialog open={showExitDialog}>
-                <DialogTitle>Quitter sans sauvegarder ?</DialogTitle>
-                <DialogContent>
-                Des modifications non sauvegardées seront perdues.
-                </DialogContent>
-                <DialogActions>
-                <Button onClick={() => setShowExitDialog(false)}>Annuler</Button>
-                <Button onClick={handleForceExit}>Quitter</Button>
-                </DialogActions>
-            </Dialog>
-            )}
         </Stack>
     );
 }
