@@ -1,19 +1,14 @@
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { useWavesurfer } from '@wavesurfer/react'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js'
-import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js'
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import PauseIcon from '@mui/icons-material/Pause';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 const Waveform = ({
     priseNumber,
     obs,
     metadata,
     setCursorTime,
-    cursorTime,
     currentTrack,
     setCurrentTrack,
     maxDuration,
@@ -24,6 +19,9 @@ const Waveform = ({
     mainTrackRef = null,
     selectedRegion = null,
     onWavesurferReady = null,
+    gridPx,
+    majorGridPx,
+    containerWidth,
 }) => {
     const waveformContainerRef = useRef(null);
     const waveformRef = useRef(null);
@@ -41,49 +39,57 @@ const Waveform = ({
       })
       , []);
     const plugins = useMemo(() => [regionsPlugin], [regionsPlugin]);
+    const [cacheBust, setCacheBust] = useState(Date.now());
     const [actualDuration, setActualDuration] = useState(0);
     const [fileExists, setFileExists] = useState(false);
     const [audioUrl, setAudioUrl] = useState(null);
+    const disableDragSelectionRef = useRef(null);
 
-    const checkFileExists = async (audioUrl) => {
-        const url = `/burrito/paths/${metadata.local_path}`
-        const ipath = audioUrl.split("?ipath=")[1];
-        try {
-            const response = await fetch(url, {
-                method: "GET",
-            })
-            if (response.ok) {
-                const data = await response.json();
-                return data.includes(ipath);
-            } else {
-                return false;
-            }
-        } catch (error) {
-            console.warn(`Error checking file existence for ${audioUrl}:`, error);
-            return false;
-        }
-    }
+  const checkFileExists = async (newAudioUrl) => {
+    const response = await fetch(`/burrito/paths/${metadata.local_path}`)
+    const data = await response.json();
+    const ipath = newAudioUrl.split("?ipath=")[1].split("&")[0];
+    return data.some(item => item.includes(ipath));
+  }
 
     useEffect(() => {
-
-
         const checkAndSetUrl = async () => {
             const url = getUrl();
             const exists = await checkFileExists(url);
             setFileExists(exists);
             if (exists) {
                 setAudioUrl(url);
+                return true;
             } else {
                 setAudioUrl(null);
+                return false;
             }
         };
-        checkAndSetUrl();
+        let cancelled = false;
+        let attempts = 0;
+        const maxAttempts = 30;
+        const intervalMs = 300;
+        setAudioUrl(null);
+
+        const tryLoad = async () => {
+            const ok = await checkAndSetUrl();
+            if (cancelled) return;
+            if (ok) return;
+            attempts += 1;
+            if (attempts < maxAttempts) {
+                setCacheBust(Date.now());
+                setTimeout(tryLoad, intervalMs);
+            }
+        };
+
+        tryLoad();
+        return () => { cancelled = true };
     }, [priseNumber, obs, metadata]);
 
     const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], prise = priseNumber) => {
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
         let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
-        let url = `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${prise}.mp3`
+        let url = `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${prise}.mp3&_v=${cacheBust}`
         return url
     }
 
@@ -97,7 +103,8 @@ const Waveform = ({
         barWidth: 2,
         barGap: 1,
         barRadius: 2,
-        cursorWidth: 0,
+        cursorWidth: isMainTrack ? 0 : 1,
+        interact: isMainTrack,
     };
 
     const { wavesurfer, currentTime, isPlaying } = useWavesurfer(waveformConfig);
@@ -117,9 +124,7 @@ const Waveform = ({
             }
         };
 
-        const handleClick = () => {
-            setCursorTime(wavesurfer.getCurrentTime());
-        };
+        const handleClick = () => {};
 
         const handleInteraction = () => {
             setCurrentTrack(priseNumber);
@@ -133,52 +138,158 @@ const Waveform = ({
             };
 
             const handleRegionClick = (region) => {
+                if (onRegionSelect) {
                     onRegionSelect([region, priseNumber, regionsPlugin]);
+                }
+            };
+
+            const handleRegionUpdate = (region) => {
+                if (onRegionSelect) {
+                    onRegionSelect([region, priseNumber, regionsPlugin]);
+                }
             };
 
             regionsPlugin?.on('region-created', handleRegionCreate);
             regionsPlugin?.on('region-clicked', handleRegionClick);
+            regionsPlugin?.on('region-updated', handleRegionUpdate);
         }
 
         wavesurfer?.on('ready', handleReady);
-        wavesurfer?.on('click', handleClick);
         wavesurfer?.on('interaction', handleInteraction);
 
     }, [wavesurfer, enableRegions, onRegionSelect, maxDuration, priseNumber, setCursorTime, setCurrentTrack, onDurationUpdate]);
 
     useEffect(() => {
-        regionsPlugin?.enableDragSelection({
-            drag: true,
-            color: 'rgba(0, 0, 0, 0.2)',
-        }, 1);
-    }, []);
+        const el = waveformRef.current?.parentElement;
+        if (!el) return;
+        let cancelled = false;
+        const tick = () => {
+            if (cancelled) return;
+            const w = el.clientWidth || 0;
+            if (w > 0) {
+                try { wavesurfer?.setOptions({ width: undefined }); } catch (_) {}
+                return;
+            }
+            setTimeout(tick, 60);
+        };
+        tick();
+        return () => { cancelled = true };
+    }, [audioUrl, maxDuration]);
+
+    useEffect(() => {
+        if (!regionsPlugin) return;
+        if (disableDragSelectionRef.current) {
+            try { disableDragSelectionRef.current(); } catch (_) {}
+            disableDragSelectionRef.current = null;
+        }
+        if (enableRegions && wavesurfer) {
+            disableDragSelectionRef.current = regionsPlugin.enableDragSelection({
+                drag: true,
+                color: 'rgba(0, 0, 0, 0.2)'
+            });
+        }
+        return () => {
+            if (disableDragSelectionRef.current) {
+                try { disableDragSelectionRef.current(); } catch (_) {}
+                disableDragSelectionRef.current = null;
+            }
+        };
+    }, [enableRegions, regionsPlugin, wavesurfer]);
 
     const updateActualDuration = () => {
         const duration = wavesurfer?.getDuration();
-        if (maxDuration && maxDuration >= duration) {
-            let newDuration = mainTrackRef.current.clientWidth / maxDuration * duration;
+        if (maxDuration && duration && maxDuration >= duration) {
+            const mainWidth = mainTrackRef?.current?.clientWidth || 0;
+            const newDuration = mainWidth ? (mainWidth / maxDuration) * duration : 0;
             setActualDuration(newDuration);
+            return;
+        }
+        const fallbackWidth = mainTrackRef?.current?.clientWidth;
+        if (fallbackWidth) {
+            setActualDuration(fallbackWidth);
         }
     }
+
+    const handleOverlayClick = (e) => {
+        if (!wavesurfer) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width || 0));
+        const mainWidth = mainTrackRef?.current?.clientWidth || 0;
+        const globalDuration = (maxDuration && maxDuration > 0) ? maxDuration : (wavesurfer.getDuration?.() || 0);
+        const denom = (mainWidth && globalDuration) ? mainWidth : rect.width;
+        if (!denom || !globalDuration) return;
+        const time = (x / denom) * globalDuration;
+        const snapped = Math.round(time * 10) / 10;
+        const trackDuration = wavesurfer.getDuration?.() || 0;
+        const clamped = Math.max(0, Math.min(snapped, trackDuration || snapped));
+        if (typeof wavesurfer.seekTo === 'function' && (wavesurfer.getDuration?.() || 0) > 0) {
+            const frac = clamped / wavesurfer.getDuration();
+            wavesurfer.seekTo(Math.max(0, Math.min(1, frac)));
+        } else {
+            wavesurfer.setTime(clamped);
+        }
+        setCurrentTrack?.(priseNumber);
+        e.stopPropagation();
+        e.preventDefault();
+    };
+
+    const swallow = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+    };
+
+    const handleContainerClick = (e) => {
+        if (!wavesurfer || isMainTrack) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width || 0));
+        const mainWidth = mainTrackRef?.current?.clientWidth || 0;
+        const globalDuration = (maxDuration && maxDuration > 0) ? maxDuration : (wavesurfer.getDuration?.() || 0);
+        const denom = (mainWidth && globalDuration) ? mainWidth : rect.width;
+        if (!denom || !globalDuration) return;
+        const time = (x / denom) * globalDuration;
+        const snapped = Math.round(time * 10) / 10;
+        const trackDuration = wavesurfer.getDuration?.() || 0;
+        const clamped = Math.max(0, Math.min(snapped, trackDuration || snapped));
+        if (typeof wavesurfer.seekTo === 'function' && (wavesurfer.getDuration?.() || 0) > 0) {
+            const frac = clamped / wavesurfer.getDuration();
+            wavesurfer.seekTo(Math.max(0, Math.min(1, frac)));
+        } else {
+            wavesurfer.setTime(clamped);
+        }
+        setCurrentTrack?.(priseNumber);
+    };
 
     useEffect(() => {
         updateActualDuration();
     }, [maxDuration, mainTrackRef]);
 
     useEffect(() => {
-        regionsPlugin.getRegions().forEach(region => { 
-            if(selectedRegion[0] != region) {
-                region.remove();
-            }
-        });
-    }, [selectedRegion])
+        if (!wavesurfer) return;
+        updateActualDuration();
+        try {
+            wavesurfer.setOptions({ width: undefined });
+        } catch (_) {
+        }
+    }, [containerWidth, wavesurfer]);
 
     useEffect(() => {
-        if (wavesurfer && cursorTime !== undefined) {
-            const clampedTime = Math.min(cursorTime, actualDuration);
-            wavesurfer?.setTime(clampedTime);
+        if (!selectedRegion || selectedRegion.length === 0) return;
+        const [, selectedPrise] = selectedRegion;
+        if (selectedPrise === priseNumber) {
+            regionsPlugin.getRegions().forEach(region => {
+                if (selectedRegion[0] !== region) {
+                    region.remove();
+                }
+            });
+            return;
         }
-    }, [cursorTime, wavesurfer, actualDuration]);
+        if (selectedPrise === "0") {
+            regionsPlugin.getRegions().forEach(region => {
+                region.remove();
+            });
+        }
+    }, [selectedRegion, regionsPlugin, priseNumber])
+
 
     const onPlayPause = () => {
         wavesurfer && wavesurfer?.playPause();
@@ -204,14 +315,50 @@ const Waveform = ({
             }}>
             <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
                 {fileExists ? (
-                <div
-                    ref={waveformRef}
-                    style={{
-                        width: actualDuration,
-                        height: isMainTrack ? '100px' : '80px',
-                        overflow: 'hidden',
-                    }}
-                />) : (
+                <Box sx={{ position: 'relative', width: actualDuration || (mainTrackRef?.current?.clientWidth || '100%'), height: isMainTrack ? '100px' : '80px', overflow: 'hidden' }}>
+                    {gridPx > 0 && (
+                        <Box
+                            aria-hidden
+                            sx={{
+                                position: 'absolute',
+                                inset: 0,
+                                zIndex: 0,
+                                pointerEvents: 'none',
+                                backgroundImage: majorGridPx && majorGridPx >= 1
+                                    ? 'linear-gradient(to right, rgba(0,0,0,0.08) 1px, transparent 1px), linear-gradient(to right, rgba(0,0,0,0.15) 1px, transparent 1px)'
+                                    : 'linear-gradient(to right, rgba(0,0,0,0.12) 1px, transparent 1px)',
+                                backgroundSize: majorGridPx
+                                    ? `${Math.max(1, gridPx)}px 100%, ${Math.max(1, majorGridPx)}px 100%`
+                                    : `${gridPx}px 100%`,
+                                backgroundRepeat: 'repeat',
+                            }}
+                        />
+                    )}
+                    {!isMainTrack && !enableRegions && (
+                        <div
+                            onMouseDown={handleOverlayClick}
+                            onMouseUp={swallow}
+                            onClick={swallow}
+                            style={{
+                                position: 'absolute',
+                                inset: 0,
+                                zIndex: 2,
+                                cursor: 'pointer',
+                            }}
+                        />
+                    )}
+                    <div
+                        ref={waveformRef}
+                        onClick={(!isMainTrack && enableRegions) ? handleContainerClick : undefined}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            overflow: 'hidden',
+                            position: 'relative',
+                            zIndex: 1,
+                        }}
+                    />
+                </Box>) : (
                     <Box sx={{ width: actualDuration, height: isMainTrack ? '100px' : '80px', overflow: 'hidden' }}>
                         <p>File does not exist</p>
                     </Box>

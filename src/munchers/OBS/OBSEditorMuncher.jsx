@@ -138,7 +138,7 @@ function OBSEditorMuncher({ metadata }) {
         if (response.ok) {
             updateChecksums(i);
         } else {
-            console.log(`Failed to save file ${fileName}`);
+            console.error(`Failed to save file ${fileName}`);
             throw new Error(`Failed to save file ${fileName}: ${response.status}, ${response.error}`);
         }
     }
