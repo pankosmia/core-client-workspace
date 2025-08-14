@@ -7,6 +7,7 @@ import OBSNavigator from "../../components/OBSNavigator";
 import SaveOBSButton from "../../components/SaveOBSButton";
 import AudioRecorder from "../../components/AudioRecorder";
 import MarkdownField from "../../components/MarkdownField";
+import { IconButton, Menu, MenuItem } from "@mui/material"; 
 
 import "./OBSMuncher.css";
 
@@ -17,14 +18,6 @@ import {
 } from "pithekos-lib";
 import md5 from "md5";
 import Switch from "@mui/material/Switch";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 
 
 function OBSEditorMuncher({ metadata }) {
@@ -62,7 +55,6 @@ function OBSEditorMuncher({ metadata }) {
             newChapterChecksums[obs[0]] = calculateChapterChecksum(chapterContent);
             setChapterChecksums(newChapterChecksums);
         }
-        // console.log(`Chapter Checksums: ${chapterChecksums}`);
     }
     const handleChange = (event) => {
         setIngredient(prevIngredient => {
@@ -83,14 +75,12 @@ function OBSEditorMuncher({ metadata }) {
         for (let i = 0; i < chapter.length; i++) {
             checksum += md5(chapter[i]);
         }
-        // console.log(`Chapter Checksum: ${checksum} for ${chapter} `);
         return checksum;
     }
 
     const initChecksums = (chapterIndex, paragraphIndex, content) => {
         const key = `${chapterIndex}-${paragraphIndex}`;
         const checksum = md5(content);
-        // console.log(`Key: ${key}, Checksum: ${checksum}`);
         setChecksums(prev => ({ ...prev, [key]: checksum }));
     };
 
@@ -101,8 +91,6 @@ function OBSEditorMuncher({ metadata }) {
             return false;
         }
         const currentChecksum = calculateChapterChecksum(ingredient[chapterIndex]);
-        // console.log(`Comparaison: ${originalChecksum} !== ${currentChecksum} ${originalChecksum !== currentChecksum}`);
-        // console.log(`Content: ${ingredient[chapterIndex]}`);
 
         return originalChecksum !== currentChecksum;
     };
@@ -140,7 +128,6 @@ function OBSEditorMuncher({ metadata }) {
         let fileName = (i) <= 9 ? `0${i}` : (i);
         const obsString = await getStringifyIngredient(ingredientItem, fileName);
         const payload = JSON.stringify({ payload: obsString });
-        // console.log(payload)
         const response = await postText(
             `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
             payload,
@@ -148,7 +135,6 @@ function OBSEditorMuncher({ metadata }) {
             "application/json"
         );
         if (response.ok) {
-            // console.log(`Saved file ${fileName}`);
             updateChecksums(i);
         } else {
             console.error(`Failed to save file ${fileName}`);
@@ -186,15 +172,6 @@ function OBSEditorMuncher({ metadata }) {
     function AudioViewer({ chapter, paragraph }) {
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
         let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
-
-        // A faire: Faire en sorte d'afficher un message si le fichier n'existe pas
-
-        // if (!paragraph) {
-        //     return <audio controls src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=content/${chapterString}.mp3`}></audio>
-        // }
-        // return <Stack>
-        //         <audio controls src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=content/${chapterString}_${paragraphString}.mp3`}></audio>
-        // </Stack>
     }
 
     const currentChapter = ingredient[obs[0]] || [];
@@ -205,33 +182,6 @@ function OBSEditorMuncher({ metadata }) {
             initIngredient().then();
         }, [obs[0]]
     );
-
-    // useEffect(() => {
-    //     const onBeforeUnload = ev => {
-    //         console.log("isDocModified", isModified());
-
-    //         if (isModified()) {
-    //             ev.returnValue = "You have unsaved changes. Are you sure you want to leave?";
-    //             ev.preventDefault();
-    //         }
-    //     };
-    //     window.addEventListener('beforeunload', onBeforeUnload);
-    //     return () =>{
-    //         window.removeEventListener('beforeunload', onBeforeUnload);
-    //     }
-    // }, [isModified()]);
-
-    const [showExitDialog, setShowExitDialog] = useState(false);
-
-	const handleForceExit = () => {
-		setShowExitDialog(false);
-		const isElectron = !!window.electronAPI;
-		if (isElectron && typeof window.electronAPI.forceClose === 'function') {
-			window.electronAPI.forceClose();
-		} else {
-			window.close();
-		}
-	};
 
     // Intercepter les tentatives de navigation
     useEffect(() => {
@@ -298,48 +248,42 @@ function OBSEditorMuncher({ metadata }) {
 
     return (
         <Stack sx={{ p: 2 }}>
-            <OBSNavigator max={currentChapter.length - 1} title={chapterTitle} />
-            <Box>
-                Audio: <Switch checked={audioEnabled} onChange={() => setAudioEnabled(!audioEnabled)} />
+            <Box sx={{ display: 'flex', justifyContent: 'left', alignItems: 'center', mb: 1 }}>
+                {/* <Box /> */}
+                <Box>
+                    <SaveOBSButton obs={obs} isModified={isModified} handleSave={handleSaveOBS} />
+                </Box>
+                <Box sx={{ ml: 2 }}>
+                    Audio 
+                    <Switch checked={audioEnabled} onChange={() => setAudioEnabled(!audioEnabled)} />
+                </Box>
+                <Box>
+                    <IconButton
+                        id="obs-export-button"
+                        aria-controls={isMenuOpen ? 'obs-export-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={isMenuOpen ? 'true' : undefined}
+                        onClick={(event) => setMenuAnchorEl(event.currentTarget)}
+                    >
+                        <ImportExportIcon />
+                    </IconButton>
+                    <Menu
+                        id="obs-export-menu"
+                        anchorEl={menuAnchorEl}
+                        open={isMenuOpen}
+                        onClose={() => setMenuAnchorEl(null)}
+                        slotProps={{ list: { 'aria-labelledby': 'obs-export-button' } }}
+                    >
+                        <MenuItem onClick={() => handleExportVideoParagraph()} disabled={obs[1] === 0}>Export video paragraph</MenuItem>
+                        <MenuItem onClick={() => handleExportVideoStory()}>Export video story</MenuItem>
+                    </Menu>
+                </Box>
             </Box>
-			<Box>
-				<IconButton
-					id="obs-export-button"
-					aria-controls={isMenuOpen ? 'obs-export-menu' : undefined}
-					aria-haspopup="true"
-					aria-expanded={isMenuOpen ? 'true' : undefined}
-					onClick={(event) => setMenuAnchorEl(event.currentTarget)}
-				>
-					<ImportExportIcon />
-				</IconButton>
-				<Menu
-					id="obs-export-menu"
-					anchorEl={menuAnchorEl}
-					open={isMenuOpen}
-					onClose={() => setMenuAnchorEl(null)}
-					slotProps={{ list: { 'aria-labelledby': 'obs-export-button' } }}
-				>
-					<MenuItem onClick={() => handleExportVideoParagraph()} disabled={obs[1] === 0}>Export video paragraph</MenuItem>
-					<MenuItem onClick={() => handleExportVideoStory()}>Export video story</MenuItem>
-				</Menu>
-			</Box>
+            <OBSNavigator max={currentChapter.length - 1} title={chapterTitle} />
             <Stack>
                 <MarkdownField currentRow={obs[1]} columnNames={currentChapter} onChangeNote={handleChange} value={currentChapter[obs[1]] || ""} mode="write" />
                 {audioEnabled && <AudioRecorder audioUrl={audioUrl} setAudioUrl={setAudioUrl} metadata={metadata} obs={obs} />}
-                <SaveOBSButton obs={obs} isModified={isModified} handleSave={handleSaveOBS} />
             </Stack>
-            {showExitDialog && (
-            <Dialog open={showExitDialog}>
-                <DialogTitle>Quitter sans sauvegarder ?</DialogTitle>
-                <DialogContent>
-                Des modifications non sauvegardées seront perdues.
-                </DialogContent>
-                <DialogActions>
-                <Button onClick={() => setShowExitDialog(false)}>Annuler</Button>
-                <Button onClick={handleForceExit}>Quitter</Button>
-                </DialogActions>
-            </Dialog>
-            )}
         </Stack>
     );
 }
