@@ -48,12 +48,12 @@ export function FindReplaceDialog() {
     <Dialog
       fullWidth
       open={isVisible}
-      onClose={handleClose}
       sx={{
         '& .MuiDialog-container': {
           justifyContent: 'flex-end',
           alignItems: 'flex-start',
-          backgroundColor: 'transparent'
+          backgroundColor: 'transparent',
+          background:'none'
         },
       }}
     >
@@ -99,7 +99,7 @@ export function FindReplaceDialog() {
           <Typography sx={{ p: 1 }}>
             {isSearching ? (
               <>
-                <Loader2 size={14} className="animate-spin mr-1" />
+                <Loader2 size={14}/>
                 <Typography>{doI18n("pages:core-local-workspace:searching", i18nRef.current)}</Typography>
               </>
             ) : results.length > 0 ? (
@@ -118,7 +118,7 @@ export function FindReplaceDialog() {
             onChange={(e) => setReplaceText(e.target.value)}
             placeholder={`${doI18n("pages:core-local-workspace:replace_with", i18nRef.current)}`}
           />
-          <DialogActions>
+          <DialogActions sx={{ justifyContent: "center" }}>
             <Button
               onClick={handleReplace}
               disabled={results.length === 0 || currentResultIndex === -1 || isSearching}

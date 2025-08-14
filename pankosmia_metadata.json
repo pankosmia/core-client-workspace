@@ -263,6 +263,10 @@
     "listening":{
       "en":"Listening...",
       "fr":"Ecoute..."
+    },
+    "press_keys_now":{
+      "en":"Press key now",
+      "fr":"Appuyer sur une touche maintenant"
     }
   }
 }
