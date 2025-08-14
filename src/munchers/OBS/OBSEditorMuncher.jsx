@@ -30,6 +30,7 @@ function OBSEditorMuncher({ metadata }) {
     const [chapterChecksums, setChapterChecksums] = useState([]);
 	const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 	const isMenuOpen = Boolean(menuAnchorEl);
+    const [isExportingParaEnabled, setIsExportingParaEnabled] = useState(false);
 
     /* Données de l'ingredient */
     const initIngredient = async () => {
@@ -176,12 +177,26 @@ function OBSEditorMuncher({ metadata }) {
 
     const currentChapter = ingredient[obs[0]] || [];
 
+    const updateIsExportingParaEnabled = async () => {
+        if (obs[1] === 0) {
+            setIsExportingParaEnabled(false);
+        } else if (await getMainTrack() === null) {
+            setIsExportingParaEnabled(false);
+        } else {
+            setIsExportingParaEnabled(true);
+        }
+    }
+
     useEffect(
         () => {
             handleSaveOBS();
             initIngredient().then();
         }, [obs[0]]
     );
+
+    useEffect(() => {
+        updateIsExportingParaEnabled();
+    }, [obs]);
 
     // Intercepter les tentatives de navigation
     useEffect(() => {
@@ -274,7 +289,7 @@ function OBSEditorMuncher({ metadata }) {
                         onClose={() => setMenuAnchorEl(null)}
                         slotProps={{ list: { 'aria-labelledby': 'obs-export-button' } }}
                     >
-                        <MenuItem onClick={() => handleExportVideoParagraph()} disabled={obs[1] === 0}>Export video paragraph</MenuItem>
+                        <MenuItem onClick={() => handleExportVideoParagraph()} disabled={!isExportingParaEnabled}>Export video paragraph</MenuItem>
                         <MenuItem onClick={() => handleExportVideoStory()}>Export video story</MenuItem>
                     </Menu>
                 </Box>
