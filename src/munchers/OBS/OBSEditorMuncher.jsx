@@ -16,11 +16,6 @@ import {
 } from "pithekos-lib";
 import md5 from "md5";
 import Switch from "@mui/material/Switch";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
 
 
 function OBSEditorMuncher({ metadata }) {
