@@ -5,8 +5,6 @@ import OBSContext from "../../contexts/obsContext";
 import OBSNavigator from "../../components/OBSNavigator";
 import SaveOBSButton from "../../components/SaveOBSButton";
 import AudioRecorder from "../../components/AudioRecorder";
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import MarkdownField from "../../components/MarkdownField";
 
 import "./OBSMuncher.css";
@@ -136,7 +134,7 @@ function OBSEditorMuncher({ metadata }) {
         let fileName = (i) <= 9 ? `0${i}` : (i);
         const obsString = await getStringifyIngredient(ingredientItem, fileName);
         const payload = JSON.stringify({ payload: obsString });
-        console.log(payload)
+        // console.log(payload)
         const response = await postText(
             `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
             payload,
@@ -144,12 +142,16 @@ function OBSEditorMuncher({ metadata }) {
             "application/json"
         );
         if (response.ok) {
-            console.log(`Saved file ${fileName}`);
+            // console.log(`Saved file ${fileName}`);
             updateChecksums(i);
         } else {
-            console.log(`Failed to save file ${fileName}`);
+            console.error(`Failed to save file ${fileName}`);
             throw new Error(`Failed to save file ${fileName}: ${response.status}, ${response.error}`);
         }
+    }
+    const getOs = () => {
+        const os = ['Windows', 'Linux', 'Mac'];
+        return os.find(v => navigator.userAgent.indexOf(v) >= 0);
     }
     const getStringifyIngredient = async (ingredientItem, fileName) => {
         const response = await getText(
@@ -157,15 +159,19 @@ function OBSEditorMuncher({ metadata }) {
             debugRef
         );
         if (response.ok) {
-            return response.text.split(/\n\r?\n\r?/).map((line, index) => {
+            const returnedText = response.text.split(/\n\r?\n\r?/).map((line, index) => {
                 if (index % 2 === 1) {
                     return line.replaceAll(/\n/g, " ");
                 } else {
                     return ingredientItem[index / 2];
                 }
-            }).join("\n\n");
-        } else {
-            return "";
+            })
+            // Detecter l'os
+            if (getOs() == "Windows") {
+                return returnedText.join("\r\n\r\n");
+            } else {
+                return returnedText.join("\n\n");
+            }
         }
     }
 
@@ -223,9 +229,11 @@ function OBSEditorMuncher({ metadata }) {
         }
     }, [isModified]);
 
+    const chapterTitle = (currentChapter[0] || "").replace(/^#+\s*/, '').trim();
+
     return (
         <Stack sx={{ p: 2 }}>
-            <OBSNavigator max={currentChapter.length - 1} />
+            <OBSNavigator max={currentChapter.length - 1} title={chapterTitle} />
             <Box>
                 Audio: <Switch checked={audioEnabled} onChange={() => setAudioEnabled(!audioEnabled)} />
             </Box>
