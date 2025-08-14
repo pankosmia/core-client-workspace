@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
+import ImportExportIcon from '@mui/icons-material/ImportExport';
 import OBSContext from "../../contexts/obsContext";
 import OBSNavigator from "../../components/OBSNavigator";
 import SaveOBSButton from "../../components/SaveOBSButton";
@@ -21,6 +22,9 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 
 function OBSEditorMuncher({ metadata }) {
@@ -31,6 +35,8 @@ function OBSEditorMuncher({ metadata }) {
     const [checksums, setChecksums] = useState({});
     const [audioEnabled, setAudioEnabled] = useState(false);
     const [chapterChecksums, setChapterChecksums] = useState([]);
+	const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+	const isMenuOpen = Boolean(menuAnchorEl);
 
     /* Données de l'ingredient */
     const initIngredient = async () => {
@@ -122,10 +128,10 @@ function OBSEditorMuncher({ metadata }) {
 
     /* Systeme de sauvegarde */
     const handleSaveOBS = async () => {
-        if (!ingredient || ingredient.length == 0) return;
+        if (!ingredient || ingredient.length === 0) return;
 
         for (let i = 0; i < ingredient.length; i++) {
-            if (!ingredient[i] || ingredient[i].length == 0) continue;
+            if (!ingredient[i] || ingredient[i].length === 0) continue;
             await uploadOBSIngredient(ingredient[i], i);
         }
     }
@@ -167,7 +173,7 @@ function OBSEditorMuncher({ metadata }) {
                 }
             })
             // Detecter l'os
-            if (getOs() == "Windows") {
+            if (getOs() === "Windows") {
                 return returnedText.join("\r\n\r\n");
             } else {
                 return returnedText.join("\n\n");
@@ -217,6 +223,16 @@ function OBSEditorMuncher({ metadata }) {
 
     const [showExitDialog, setShowExitDialog] = useState(false);
 
+	const handleForceExit = () => {
+		setShowExitDialog(false);
+		const isElectron = !!window.electronAPI;
+		if (isElectron && typeof window.electronAPI.forceClose === 'function') {
+			window.electronAPI.forceClose();
+		} else {
+			window.close();
+		}
+	};
+
     // Intercepter les tentatives de navigation
     useEffect(() => {
         const isElectron = !!window.electronAPI;
@@ -237,6 +253,27 @@ function OBSEditorMuncher({ metadata }) {
             <Box>
                 Audio: <Switch checked={audioEnabled} onChange={() => setAudioEnabled(!audioEnabled)} />
             </Box>
+			<Box>
+				<IconButton
+					id="obs-export-button"
+					aria-controls={isMenuOpen ? 'obs-export-menu' : undefined}
+					aria-haspopup="true"
+					aria-expanded={isMenuOpen ? 'true' : undefined}
+					onClick={(event) => setMenuAnchorEl(event.currentTarget)}
+				>
+					<ImportExportIcon />
+				</IconButton>
+				<Menu
+					id="obs-export-menu"
+					anchorEl={menuAnchorEl}
+					open={isMenuOpen}
+					onClose={() => setMenuAnchorEl(null)}
+					slotProps={{ list: { 'aria-labelledby': 'obs-export-button' } }}
+				>
+					<MenuItem onClick={() => setMenuAnchorEl(null)}>Export video paragraph</MenuItem>
+					<MenuItem onClick={() => setMenuAnchorEl(null)}>Export video story</MenuItem>
+				</Menu>
+			</Box>
             <Stack>
                 <MarkdownField currentRow={obs[1]} columnNames={currentChapter} onChangeNote={handleChange} value={currentChapter[obs[1]] || ""} mode="write" />
                 {audioEnabled && <AudioRecorder audioUrl={audioUrl} setAudioUrl={setAudioUrl} metadata={metadata} obs={obs} />}
