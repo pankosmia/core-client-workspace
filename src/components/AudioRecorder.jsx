@@ -2,7 +2,7 @@ import { useRef, useState, useMemo, useEffect, useCallback, useContext } from 'r
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
 import PauseIcon from '@mui/icons-material/Pause';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
@@ -23,6 +23,7 @@ import Waveform from './Waveform';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import AutorenewIcon from '@mui/icons-material/Autorenew'
+import Typography from '@mui/material/Typography';
 
 import {
     i18nContext as I18nContext,
@@ -81,7 +82,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     const tracksContainerRef = useRef(null);
     const [waveformWidth, setWaveformWidth] = useState(0);
 
-    const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], newPrise = prise, ext = "mp3") => {
+    const getUrl = (segment = "bytes", chapter = obs[0], paragraph = obs[1], newPrise = prise, ext = "wav") => {
         let chapterString = chapter < 10 ? `0${chapter}` : chapter;
         let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
         return `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newPrise}.${ext}`
@@ -149,8 +150,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
     // ça insert l'audio B a un endroit dans l'audio A
     const insertAudio = async (A, B, insertTime, startTimeB, endTimeB) => {
-        const urlA = getUrl().replace(`_${prise}.mp3`, `_${A}.mp3`);
-        const urlB = getUrl().replace(`_${prise}.mp3`, `_${B}.mp3`);
+        const urlA = getUrl().replace(`_${prise}.wav`, `_${A}.wav`);
+        const urlB = getUrl().replace(`_${prise}.wav`, `_${B}.wav`);
 
         const audioContext = new AudioContext();
 
@@ -223,7 +224,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
         const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
         const prises = data.filter(item => item.includes(`audio_content/${chapterString}-${paragraphString}`) && !item.includes(".bak"));
-        const priseNumbers = prises.map(prise => prise.split(`${chapterString}-${paragraphString}_`)[1].split("_")[0].replace(".mp3", ""));
+        const priseNumbers = prises.map(prise => prise.split(`${chapterString}-${paragraphString}_`)[1].split("_")[0].replace(".wav", ""));
         const newPrise = priseNumbers
             .map(prise => parseInt(prise))
             .filter(prise => !isNaN(prise))
@@ -313,11 +314,18 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
             };
 
             mediaRecorderRef.current.onstop = async () => {
-                const recordedBlob = new Blob(chunksRef.current, { type: 'audio/mp3' });
+                // Convertir l'enregistrement en WAV avant upload
+                const recordedBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+
+                // Décoder puis ré-encoder en WAV
+                const audioContext = new AudioContext();
+                const arrayBuffer = await recordedBlob.arrayBuffer();
+                const sourceBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                const wavBlob = audioBufferToWav(sourceBuffer);
 
                 // Sauvegarder l'enregistrement
                 const formData = new FormData();
-                formData.append("file", recordedBlob);
+                formData.append("file", wavBlob);
 
                 const postUrl = getUrl("bytes", obs[0], obs[1], nextPrise);
                 await fetch(postUrl, {
@@ -328,8 +336,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                 await waitForFileByUrl(createdUrl);
 
                 // Calculer la durée et mettre à jour l'interface
-                const audioContext = new AudioContext();
-                const audioBuffer = await audioContext.decodeAudioData(await recordedBlob.arrayBuffer());
+                const audioBuffer = sourceBuffer;
                 const duration = audioBuffer.getChannelData(0).length / audioBuffer.sampleRate;
                 if (duration > maxDuration) {
                     setMaxDuration(duration);
@@ -626,7 +633,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         const updateAudioUrl = async () => {
             setIsLoading(true);
             let url = getUrl("bytes", obs[0], obs[1], prise);
-            if (url.includes("_null.mp3")) {
+            if (url.includes("_null.wav")) {
                 const newPrise = await updatePrise();
                 url = getUrl("bytes", obs[0], obs[1], newPrise);
                 
@@ -654,7 +661,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     // Réinitialiser l'état lié aux fichiers lorsque l'OBS change pour éviter les 404 transitoires
     const updatePrise = async () => {
         const mainTrack = await getMainTrack()
-        const newPrise = mainTrack?.split("/")?.pop().split("_")[2]?.replace(".mp3", "");
+        const newPrise = mainTrack?.split("/")?.pop().split("_")[2]?.replace(".wav", "");
         setPrise(newPrise);
         return newPrise;
     }
@@ -788,8 +795,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
             return;
         }
         
-        const srcPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName}.mp3`;
-        const targetPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName.split("_")[0]}_${newName}.mp3`;
+        const srcPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName}.wav`;
+        const targetPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName.split("_")[0]}_${newName}.wav`;
         let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${srcPath}&target_path=${targetPath}&delete_src=true`;
         await fetch(url, {
             method: "POST",
@@ -840,7 +847,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
             const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
             const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-            const newPrises = prises.map(prise => prise.split(`/${chapterString}-${paragraphString}_`)[1].replace(".mp3", ""));
+            const newPrises = prises.map(prise => prise.split(`/${chapterString}-${paragraphString}_`)[1].replace(".wav", ""));
             const sortedPrises = newPrises.sort((a, b) => a.split("_")[0] - b.split("_")[0]);
             setOtherPrises(sortedPrises.filter(prise => !prise.includes(".json")));
 
@@ -864,7 +871,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
         if (existing0) {
             const fileName = existing0.split("/").pop() || "";
-            const suffix = fileName.split(`${chapterString}-${paragraphString}_`)[1]?.replace(".mp3", "");
+            const suffix = fileName.split(`${chapterString}-${paragraphString}_`)[1]?.replace(".wav", "");
             if (suffix) {
                 setPrise(suffix);
                 return;
@@ -874,7 +881,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         // Rechercher la première prise existante (avec son éventuel nom)
         const prises = await listPrises(obs[0], obs[1]);
         const newPrises = prises
-            .map(prise => prise.split(`/${chapterString}-${paragraphString}_`)[1].replace(".mp3", ""))
+            .map(prise => prise.split(`/${chapterString}-${paragraphString}_`)[1].replace(".wav", ""))
             .filter(prise => !prise.includes(".json"))
             // Ne pas utiliser une piste déjà 0_* comme source
             .filter(prise => !(prise || "").startsWith("0"));
@@ -912,8 +919,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         await saveMainTrack()        
         const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
         const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-        const trackPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newTrackNumber}.mp3`;
-        const mainTrack = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_0_${newTrackNumber.split("_")[0]}.mp3`;
+        const trackPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newTrackNumber}.wav`;
+        const mainTrack = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_0_${newTrackNumber.split("_")[0]}.wav`;
 
         let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${trackPath}&target_path=${mainTrack}`;
         await fetch(url, {  
@@ -929,16 +936,16 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
     const saveMainTrack = async () => {
         const mainTrack = await getMainTrack()
-        const saveTrackNumber = mainTrack.split("/").pop().split("_")[2]?.replace(".mp3", "")
+        const saveTrackNumber = mainTrack.split("/").pop().split("_")[2]?.replace(".wav", "")
         const saveTrack = await getTrackByNumber(saveTrackNumber)
-        const saveTrackName = saveTrack.split("/").pop().split("_")[2]?.replace(".mp3", "")
+        const saveTrackName = saveTrack.split("/").pop().split("_")[2]?.replace(".wav", "")
 
         const track = `${saveTrackNumber}${saveTrackName ? "_" + saveTrackName : ""}`;
        
         if (!saveTrackNumber.includes("0_")) {
             const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
             const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
-            const savePath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${track}.mp3`;
+            const savePath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${track}.wav`;
             let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${mainTrack}&target_path=${savePath}&delete_src=true`;
             await fetch(url, {  
                 method: "POST",
@@ -973,7 +980,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     const getTrackName = async (number) => {
         const track = await getTrackByNumber(number);
         if (!track) return null;
-        return track.split("/").pop().split("_")[2]?.replace(".mp3", "");
+        return track.split("/").pop().split("_")[2]?.replace(".wav", "");
     }
 
     useEffect(() => {
@@ -1053,15 +1060,15 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                         {/*Timer*/}
                         <Box sx={{ fontSize: 16, fontWeight: 600, minWidth: '60px', textAlign: 'center' }}> {formatTime(currentTime)} </Box>
                         {/*Play/Pause Button*/}
-                        <Tooltip title={"Space bar to play/pause"}>
+                        <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_play_pause", i18nRef.current)} (space)`}>
                             <IconButton onClick={onPlayPause} sx={{ color: 'white' }}> {isPlaying ? <PauseIcon /> : <PlayArrowIcon />} </IconButton>
                         </Tooltip>
                         {/*Record Button*/}
-                        <Tooltip title={"r to record"}>
+                        <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_record", i18nRef.current)} (r)`}>
                             <IconButton onClick={isRecording ? stopRecording : startRecording} sx={{ color: 'white' }}> {isRecording ? <StopIcon sx={{ color: 'red' }} /> : <MicIcon />} </IconButton>
                         </Tooltip>
                         {/* Restore Button */}
-                        {bakExists && <Tooltip title={"ctrl+z to restore"}>
+                        {bakExists && <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_restore", i18nRef.current)} (ctrl+z)`}>
                             <IconButton onClick={onRestore} sx={{ color: 'white' }}> <RestoreIcon /> </IconButton>
                         </Tooltip>}
                     </Box>
@@ -1070,7 +1077,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                         {selectedRegion.length > 0 && (
                             <Box sx={{ display: 'flex', gap: 1, mr: 2 }}>
                                 {copiedRegion && (
-                                    <Tooltip title={"ctrl+v to paste"}>
+                                    <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_paste", i18nRef.current)} (ctrl+v)`}>
                                         <IconButton
                                             size="small"
                                             onClick={() => pasteRegion(selectedRegion)}
@@ -1081,7 +1088,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                     </Tooltip>
                                 )}
                                 {selectedRegion[1] != "0" && (
-                                    <Tooltip title={"ctrl+c to copy"}>
+                                    <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_copy", i18nRef.current)} (ctrl+c)`}>
                                         <IconButton
                                             size="small"
                                             onClick={() => copyRegion(selectedRegion)}
@@ -1092,7 +1099,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                     </Tooltip>
                                 )}
                                 {selectedRegion && selectedRegion[1] == "0" && (
-                                    <Tooltip title={"suppr to delete"}>
+                                    <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_delete", i18nRef.current)} (suppr)`}>
                                         <IconButton
                                             size="small"
                                             onClick={() => cutRegion(selectedRegion)}
@@ -1105,18 +1112,6 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
                             </Box>
                         )}
-
-                        {/* Bouton d'affichage pour les autres pistes audio */}
-                        <IconButton
-                            onClick={() => setShowOtherTracks((prev) => !prev)}
-                            sx={{
-                                transition: 'transform 0.2s',
-                                transform: showOtherTracks ? 'rotate(-90deg)' : 'rotate(0deg)',
-                                color: 'white',
-                            }}
-                        >
-                            <ArrowBackIosIcon />
-                        </IconButton>
                     </Box>
                 </Box>
                 <Divider />
@@ -1126,9 +1121,9 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
                     {/* Track principale */}
                     <Box sx={{ p: 1, backgroundColor: 'rgb(245, 245, 245)', height: '100%', position: 'relative', zIndex: 1 }}>
-                    <Box sx={{ fontSize: 12, fontWeight: 600, mb: 1, color: 'rgb(45, 188, 255)' }}>
-                        {doI18n("pages:core-local-workspace:main_track", i18nRef.current)} {prise?.split("_")[1] ? `- ${prise?.split("_")[1]} ` : ""}
-                    </Box>
+                      <Box sx={{ fontSize: 12, fontWeight: 600, mb: 1, color: 'rgb(45, 188, 255)' }}>
+                          {doI18n("pages:core-local-workspace:main_track", i18nRef.current)} {prise?.split("_")[1] ? `- ${prise?.split("_")[1]} ` : ""}
+                      </Box>
                     {isRecording && !hasAnyTrack ? (
                         <Box sx={{
                             width: '100%',
@@ -1194,14 +1189,31 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                             backgroundColor: 'rgb(250, 250, 250)',
                             border: '1px dashed rgb(200, 200, 200)',
                             borderRadius: 1,
-                            color: 'rgb(120, 120, 120)',
-                            fontStyle: 'italic',
-                            fontSize: 14,
+                            color: 'rgb(76, 76, 76)',
                         }}>
-                            Click record to start
+                            {doI18n("pages:core-local-workspace:click_record_to_start", i18nRef.current)} <MicIcon fontSize='small'/> {doI18n("pages:core-local-workspace:or_press_r_to_record", i18nRef.current)}
                         </Box>
                     )}
                     </Box>
+                    {/* En-tête des pistes supplémentaires */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, backgroundColor: 'rgb(235, 235, 235)', px: 1, py: 1, position: 'relative', zIndex: 1 }}>
+                        <IconButton
+                            size="small"
+                            onClick={() => setShowOtherTracks((prev) => !prev)}
+                            sx={{
+                                transition: 'transform 0.2s',
+                                transform: showOtherTracks ? 'rotate(90deg)' : 'rotate(0deg)',
+                                color: 'rgb(76, 76, 76)'
+                            }}
+                            aria-label={showOtherTracks ? "Masquer les autres pistes" : "Afficher les autres pistes"}
+                        >
+                            <ChevronRightIcon />
+                        </IconButton>
+                        <Box sx={{ fontSize: 12, fontWeight: 600, color: 'rgb(76, 76, 76)' }}>
+                            {doI18n("pages:core-local-workspace:supplementary_tracks", i18nRef.current)}
+                        </Box>
+                    </Box>
+
                     {/* Liste des autres pistes audio */}
                     {showOtherTracks && (
                     <Box sx={{ p: 1, backgroundColor: 'rgb(235, 235, 235)', height: '100%', position: 'relative', zIndex: 1 }}>
@@ -1230,7 +1242,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                     sx={{ maxWidth: 240, backgroundColor: 'white' }}
                                                 />
 
-                                                <Tooltip title="Confirm renaming">
+                                                <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_confirm_renaming", i18nRef.current)}`}>
                                                     <IconButton
                                                         size="small"
                                                         onClick={() => editingName?.trim() && editAudio(priseNumber, editingName)}
@@ -1241,7 +1253,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                     </IconButton>
                                                 </Tooltip>
 
-                                                <Tooltip title="Cancel renaming">
+                                                <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_cancel_renaming", i18nRef.current)}`}>
                                                     <IconButton
                                                         size="small"
                                                         onClick={() => setEditingPrise(null)}
@@ -1257,7 +1269,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                     Track {priseNumber.split("_")[0]} {priseNumber.split("_")[1] ? `- ${priseNumber.split("_")[1]}` : ""}
                                                 </Box>
 
-                                                <Tooltip title="Switch with maintrack">
+                                                <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_switch_with_maintrack", i18nRef.current)}`}>
                                                     <IconButton
                                                         onClick={() => switchMainTrack(priseNumber)}
                                                         sx={{ color: 'rgb(120, 120, 120)' }}
@@ -1266,7 +1278,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                     </IconButton>
                                                 </Tooltip>
                                                 
-                                                <Tooltip title="Rename track">
+                                                <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_rename_track", i18nRef.current)}`}>
                                                     <IconButton
                                                         onClick={() => {
                                                             setEditingPrise(priseNumber);
@@ -1277,11 +1289,11 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                         <EditIcon />
                                                     </IconButton>
                                                 </Tooltip>
-                                                <Tooltip title="Delete track">
-                                                    <IconButton aria-label={`Supprimer la piste ${priseNumber}`} onClick={() => deleteAudio(priseNumber)} sx={{ color: 'rgb(120, 120, 120)' }}> <DeleteIcon /> </IconButton>
+                                                <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_delete_track", i18nRef.current)}`}>
+                                                    <IconButton aria-label={`${doI18n("pages:core-local-workspace:delete_track", i18nRef.current)} ${priseNumber}`} onClick={() => deleteAudio(priseNumber)} sx={{ color: 'rgb(120, 120, 120)' }}> <DeleteIcon /> </IconButton>
                                                 </Tooltip>
-                                                <Tooltip title="Play track">
-                                                    <IconButton aria-label={`Lire la piste ${priseNumber}`} onClick={() => playAudio(priseNumber)} sx={{ color: 'rgb(120, 120, 120)' }}> {secondaryIsPlaying[priseNumber] ? <PauseIcon /> : <PlayArrowIcon />} </IconButton>
+                                                <Tooltip title={`${doI18n("pages:core-local-workspace:tooltip_play_track", i18nRef.current)}`}>
+                                                    <IconButton aria-label={`${doI18n("pages:core-local-workspace:play_track", i18nRef.current)} ${priseNumber}`} onClick={() => playAudio(priseNumber)} sx={{ color: 'rgb(120, 120, 120)' }}> {secondaryIsPlaying[priseNumber] ? <PauseIcon /> : <PlayArrowIcon />} </IconButton>
                                                 </Tooltip>
                                             </>
                                         )}
@@ -1319,7 +1331,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                             )
                         ))}
                         {/* Piste vide / visualisateur en bas: visuel si des pistes existent, sinon message */}
-                        {(!isRecording || hasAnyTrack) && (
+                        {(!isRecording || hasAnyTrack) && (otherPrises.length > 0) && (
                             <Box sx={{ mb: 1, mt:4 }} className={`audio-waveform ${isLoading ? 'loading' : 'loaded'}`}>
                                 <Box sx={{
                                     display: 'flex',
@@ -1334,8 +1346,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                     <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden', p: 1 }}>
                                         <Box sx={{ fontSize: 11, color: isRecording && hasAnyTrack ? 'rgb(255, 107, 107)' : 'rgb(120, 120, 120)', mb: 0.5 }}>
                                             {isRecording && hasAnyTrack
-                                                ? `Enregistrement en cours - Prise ${nextPriseNumber}`
-                                                : `Piste vide - Prochaine prise ${nextPriseNumber || '...'}`}
+                                                ? `${doI18n("pages:core-local-workspace:recording_in_progress", i18nRef.current)} - ${nextPriseNumber}`
+                                                : `${doI18n("pages:core-local-workspace:empty_track", i18nRef.current)} - ${nextPriseNumber || '...'}`}
                                         </Box>
                                         {isRecording && hasAnyTrack ? (
                                             <canvas
@@ -1354,11 +1366,11 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
-                                                color: 'rgb(120, 120, 120)',
-                                                fontStyle: 'italic',
+                                                color: 'rgb(76, 76, 76)',
                                                 mb: 1,
                                             }}>
-                                                Click the record button to start
+                                                
+                                                {doI18n("pages:core-local-workspace:click_record_to_start", i18nRef.current)} <MicIcon fontSize='small'/> {doI18n("pages:core-local-workspace:or_press_r_to_record", i18nRef.current)}
                                             </Box>
                                         )}
                                     </Box>
