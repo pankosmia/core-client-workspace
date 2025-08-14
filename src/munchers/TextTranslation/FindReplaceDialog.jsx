@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 import CloseIcon from '@mui/icons-material/Close';
 import { VscReplace } from "react-icons/vsc";
 import { VscReplaceAll } from "react-icons/vsc";
-import { Button, Typography, Box, TextField, IconButton, Stack, Grid2, Toolbar } from "@mui/material";
+import { Button, Typography, Box, TextField, IconButton, Stack, Grid2, Toolbar, Dialog, AppBar, DialogActions } from "@mui/material";
 import {
   i18nContext as I18nContext,
   doI18n,
@@ -45,48 +45,57 @@ export function FindReplaceDialog() {
   }
 
   return (
-    <Box className="fixed top-4 right-4 w-80 bg-white rounded-md shadow-lg overflow-hidden border border-gray-200 z-50">
-      <Toolbar sx={{justifyContent:"space-between"}}>
-        <Typography variant="subtitle1"> {doI18n("pages:core-local-workspace:find_replace", i18nRef.current)}</Typography>
-        <IconButton
-          onClick={handleClose}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Toolbar>
-
+    <Dialog
+      fullWidth
+      open={isVisible}
+      onClose={handleClose}
+      sx={{
+        '& .MuiDialog-container': {
+          justifyContent: 'flex-end',
+          alignItems: 'flex-start',
+          backgroundColor: 'transparent'
+        },
+      }}
+    >
+      <AppBar color="secondary" sx={{ position: 'relative', borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Typography variant="subtitle1"> {doI18n("pages:core-local-workspace:find_replace", i18nRef.current)}</Typography>
+          <IconButton
+            onClick={handleClose}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
       <Box sx={{ p: 2 }}>
         <Box>
-          <Grid2 container spacing={2} justifyItems="flex-end" alignItems="stretch">
-            <Grid2 item size={8}>
-              <TextField
-                ref={searchInputRef}
-                type="text"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                placeholder={`${doI18n("pages:core-local-workspace:find", i18nRef.current)}`}
+          <Box sx={{ display: "flex", flexDirection: "row", gap: 1 }}>
+            <TextField
+              ref={searchInputRef}
+              type="text"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder={`${doI18n("pages:core-local-workspace:find", i18nRef.current)}`}
 
-              />
-            </Grid2>
-            <Grid2 item size={4}>
-              <Box className="flex items-center space-x-1">
-                <IconButton
-                  onClick={handlePrev}
-                  disabled={results.length === 0 || isSearching}
-                  title="Previous"
-                >
-                  <KeyboardArrowUpIcon />
-                </IconButton>
-                <IconButton
-                  onClick={handleNext}
-                  disabled={results.length === 0 || isSearching}
-                  title="Next"
-                >
-                  <KeyboardArrowDownIcon />
-                </IconButton>
-              </Box>
-            </Grid2>
-          </Grid2>
+            />
+            <Box>
+              <IconButton
+                onClick={handlePrev}
+                disabled={results.length === 0 || isSearching}
+                title="Previous"
+              >
+                <KeyboardArrowUpIcon />
+              </IconButton>
+              <IconButton
+                onClick={handleNext}
+                disabled={results.length === 0 || isSearching}
+                title="Next"
+              >
+                <KeyboardArrowDownIcon />
+              </IconButton>
+            </Box>
+          </Box>
+
           <Typography sx={{ p: 1 }}>
             {isSearching ? (
               <>
@@ -109,32 +118,28 @@ export function FindReplaceDialog() {
             onChange={(e) => setReplaceText(e.target.value)}
             placeholder={`${doI18n("pages:core-local-workspace:replace_with", i18nRef.current)}`}
           />
-          <Box>
-            <Grid2 container spacing={2} justifyItems="flex-end" alignItems="stretch">
-              <Grid2 item size={6}>
-                <Button
-                  onClick={handleReplace}
-                  disabled={results.length === 0 || currentResultIndex === -1 || isSearching}
-                  title="Replace"
-                >
-                  <VscReplace/>
-                  <Typography variant="caption">{doI18n("pages:core-local-workspace:replace_one", i18nRef.current)}</Typography>
-                </Button>
-              </Grid2>
-              <Grid2 item size={6}>
-                <Button
-                  onClick={handleReplaceAll}
-                  disabled={results.length === 0 || isSearching}
-                  title="Replace All"
-                >
-                  <VscReplaceAll/>
-                  <Typography variant="caption"> {doI18n("pages:core-local-workspace:replace_all", i18nRef.current)}</Typography>
-                </Button>
-              </Grid2>
-            </Grid2>
-          </Box>
+          <DialogActions>
+            <Button
+              onClick={handleReplace}
+              disabled={results.length === 0 || currentResultIndex === -1 || isSearching}
+              title="Replace"
+            >
+              <VscReplace />
+              <Typography variant="caption">{doI18n("pages:core-local-workspace:replace_one", i18nRef.current)}</Typography>
+            </Button>
+
+            <Button
+              onClick={handleReplaceAll}
+              disabled={results.length === 0 || isSearching}
+              title="Replace All"
+            >
+              <VscReplaceAll />
+              <Typography variant="caption"> {doI18n("pages:core-local-workspace:replace_all", i18nRef.current)}</Typography>
+            </Button>
+          </DialogActions>
         </Box>
       </Box>
-    </Box>
+    </Dialog >
+
   );
 }

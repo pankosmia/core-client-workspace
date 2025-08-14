@@ -113,7 +113,6 @@ export function TriggerKeyDialog({
     <Dialog
       fullWidth={true}
       open={isOpen}
-      //onClose={handleDialogClose}
       sx={{
         backdropFilter: "blur(3px)",
       }}>
@@ -132,37 +131,58 @@ export function TriggerKeyDialog({
             <Typography variant="subtitle1">{currentTrigger}</Typography>
           </Box>
           {/* Capture box */}
-            <Box sx={{backgroundColor:"red",display: "flex", flexDirection: "row", alignItems: "center", gap: 1, pb: 1 }}>
-              {listening ? (
-                <Box>
-                  <Headphones/>
-                  <Typography>Press keys now...</Typography>
-                </Box>
-              ) : capturedKeys.length > 0 ? (
-                <Box>
-                  {capturedKeys.map((key, i) => (
-                    <React.Fragment key={i}>
-                      <kbd>
-                        {key}
-                      </kbd>
-                      {i < capturedKeys.length - 1 && <Typography className="text-gray-400">+</Typography>}
-                    </React.Fragment>
-                  ))}
-                </Box>
-              ) : (
-                <Box sx={{backgroundColor:"green",display: "flex", flexDirection: "row", alignItems: "center", gap: 1, pb: 1 }}>
-                  <VpnKeyOutlinedIcon />
-                  <Typography> {doI18n("pages:core-local-workspace:click_record_below", i18nRef.current)}</Typography>
-                </Box>
-              )}
-            </Box>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 1,
+              pb: 1,
+            }}
+          >
+            {listening ? (
+              <Box sx={{display:"flex", flexDirection:"row", alignItems:"center", gap:1}}>
+                <Headphones />
+                <Typography>Press keys now...</Typography>
+              </Box>
+            ) : capturedKeys.length > 0 ? (
+              <Box sx={{display:"flex", flexDirection:"row", alignItems:"center", gap:1}}>
+                {capturedKeys.map((key, i) => (
+                  <React.Fragment key={i}>
+                    <kbd>{key}</kbd>
+                    {i < capturedKeys.length - 1 && (
+                      <Typography>+</Typography>
+                    )}
+                  </React.Fragment>
+                ))}
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 1,
+                }}
+              >
+                <VpnKeyOutlinedIcon />
+                <Typography>
+                  {doI18n("pages:core-local-workspace:click_record_below", i18nRef.current)}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+
 
           {/* Record Button */}
-          <DialogActions sx={{alignItems:"center"}}>
+          <DialogActions sx={{ justifyContent: "center" }}>
             <Button
               onClick={startListening}
               disabled={listening}
               color="primary"
+              fullWidth
             >
               {listening ? (
                 <>
@@ -180,10 +200,12 @@ export function TriggerKeyDialog({
 
 
           {/* Info tip */}
-          <Typography variant="caption">
+          <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 1, pb: 1 }}>
             <InfoIcon />
-            {doI18n("pages:core-local-workspace:modification_key", i18nRef.current)}
-          </Typography>
+            <Typography variant="caption">
+              {doI18n("pages:core-local-workspace:modification_key", i18nRef.current)}
+            </Typography>
+          </Box>
 
           {/* Action buttons */}
           <DialogActions>
