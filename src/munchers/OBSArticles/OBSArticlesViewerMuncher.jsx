@@ -46,9 +46,9 @@ function OBSArticlesViewerMuncher({metadata}) {
                 for (const row of ingredient
                     .filter(l => l[0] === `${obs[0]}:${obs[1]}`)) {
                     let payloadLink = row[5];
-                    console.log('payloadLink', payloadLink);
+                    // console.log('payloadLink', payloadLink);
                     let payloadResponse = await getText(`/burrito/ingredient/raw/git.door43.org/uW/en_tw?ipath=${payloadLink.slice(2)}.md`);
-                    console.log('payloadResponse', payloadResponse);
+                    // console.log('payloadResponse', payloadResponse);
                     if (payloadResponse.ok) {
                         ret.push(payloadResponse.text);
                     }
