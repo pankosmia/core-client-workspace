@@ -107,13 +107,13 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
         setContentChanged(true);
     }
 
-    useEffect(() => {
-        const onBeforeUnload = ev => {
-            ev.preventDefault();
-        };
-        window.addEventListener('beforeunload', onBeforeUnload);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // useEffect(() => {
+    //     const onBeforeUnload = ev => {
+    //         ev.preventDefault();
+    //     };
+    //     window.addEventListener('beforeunload', onBeforeUnload);
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
 
 
     const { referenceHandler } = useAppReferenceHandler();
