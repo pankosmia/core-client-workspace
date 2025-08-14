@@ -3,7 +3,8 @@ import { HiOutlineKey, HiOutlineInformationCircle } from "react-icons/hi";
 import { MdKeyboard } from "react-icons/md";
 import { Keyboard, KeySquare, Headphones, Check, X } from "lucide-react";
 import KeyIcon from '@mui/icons-material/Key';
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close';
 import {
   i18nContext as I18nContext,
   doI18n,
@@ -116,15 +117,15 @@ export function TriggerKeyDialog({
           <Box className="flex items-center justify-between mb-4">
             <Box className="flex items-center gap-2">
              <KeyIcon/>
-              <Typography className="font-semibold text-lg text-gray-900">Set Trigger Key</Typography>
+              <Typography className="font-semibold text-lg text-gray-900">{doI18n("pages:core-local-workspace:set_trigger_key", i18nRef.current)}</Typography>
             </Box>
-            <Button
+            <IconButton
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700 focus:outline-none"
               aria-label="Close"
             >
-              <X className="h-5 w-5" />
-            </Button>
+              <CloseIcon/>
+            </IconButton>
           </Box>
 
           {/* Current trigger */}
@@ -217,7 +218,6 @@ export function TriggerKeyDialog({
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-1"
             >
-              <X className="h-4 w-4" />
              {doI18n("pages:core-local-workspace:cancel", i18nRef.current)}
             </Button>
             <Button

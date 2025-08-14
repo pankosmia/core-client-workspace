@@ -173,24 +173,19 @@
       "fr":"Numéro du chapitre"
     },
      "usfm_button_q":{
-      "en":"Poetry text, level 1 indent",
-      "fr":""
+      "en":"Poetry text, level 1 indent"
     },
      "usfm_button_m":{
-      "en":"Paragraph text, with no first line indent",
-      "fr":""
+      "en":"Paragraph text, with no first line indent"
     },
      "usfm_button_q1":{
-      "en":"Poetry text, level 1 indent",
-      "fr":""
+      "en":"Poetry text, level 1 indent"
     },
      "usfm_button_q2":{
-      "en":"Poetry text, level 2 indent",
-      "fr":""
+      "en":"Poetry text, level 2 indent"
     },
      "usfm_button_s2":{
-      "en":"A section heading, level 2",
-      "fr":""
+      "en":"A section heading, level 2"
     },
      "usfm_button_mt":{
       "en":"The main title of the book",
@@ -207,8 +202,7 @@
       "fr":"Le numéro de verset"
     },
     "usfm_button_p":{
-      "en":"A paragraph text, with first line indent",
-      "fr":""
+      "en":"A paragraph text, with first line indent"
     },
     "choose_resources_workspace":{
       "en":"Choose what resources to open in the Workspace, alongside your editable Content."
@@ -256,6 +250,9 @@
     "replace_with":{
       "en":"Replace with ",
       "fr":"Remplacer avec"
+    },
+    "set_trigger-key":{
+      "en":"Set triggrt Key"
     }
   }
 }
