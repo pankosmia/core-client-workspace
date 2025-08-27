@@ -140,7 +140,6 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <Chip
                                 label={pageOptions.find((opt) => opt.value === selected)?.label}
-                                color="primary"
                             />
                         </Box>
                     )}
