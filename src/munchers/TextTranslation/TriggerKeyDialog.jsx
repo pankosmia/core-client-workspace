@@ -145,7 +145,7 @@ export function TriggerKeyDialog({
             {listening ? (
               <Box sx={{display:"flex", flexDirection:"row", alignItems:"center", gap:1}}>
                 <Headphones />
-                <Typography>Press keys now...</Typography>
+                <Typography>{doI18n("pages:core-local-workspace:press_keys_now", i18nRef.current)}</Typography>
               </Box>
             ) : capturedKeys.length > 0 ? (
               <Box sx={{display:"flex", flexDirection:"row", alignItems:"center", gap:1}}>
