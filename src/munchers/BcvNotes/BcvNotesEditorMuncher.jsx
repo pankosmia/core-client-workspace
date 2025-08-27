@@ -63,6 +63,27 @@ function BcvNotesEditorMuncher({ metadata }) {
     //     window.addEventListener('beforeunload', onBeforeUnload);
     //     // eslint-disable-next-line react-hooks/exhaustive-deps
     // }, []);
+    
+     const isModified = () => {
+        const originalChecksum = md5Ingredient;
+        if (!originalChecksum) {
+            return false;
+        }
+        const currentChecksum = md5(JSON.stringify(ingredient)) === md5Ingredient;
+
+        return originalChecksum !== currentChecksum;
+    };
+
+    useEffect(() => {
+        const isElectron = !!window.electronAPI;
+        if (isElectron) {
+            if (isModified()) {
+                window.electronAPI.setCanClose(false);
+            } else {
+                window.electronAPI.setCanClose(true);
+            }
+        }
+    }, [isModified]);
 
     return (
         <Stack sx={{
