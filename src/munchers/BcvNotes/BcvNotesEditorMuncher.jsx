@@ -69,11 +69,11 @@ function BcvNotesEditorMuncher({ metadata }) {
         if (!originalChecksum) {
             return false;
         }
-        const currentChecksum = md5(JSON.stringify(ingredient)) === md5Ingredient;
-
+        const currentChecksum = md5(JSON.stringify(ingredient));
         return originalChecksum !== currentChecksum;
     };
-
+    console.log("md5Ingredient",md5Ingredient)
+    console.log("le reste",md5(JSON.stringify(ingredient)))
     useEffect(() => {
         const isElectron = !!window.electronAPI;
         if (isElectron) {
