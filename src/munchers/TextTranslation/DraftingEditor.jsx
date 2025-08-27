@@ -12,6 +12,7 @@ import RequireResources from "../../components/RequireResources";
 import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
 import SaveButtonDrafting from "../../components/SaveButtonDrafting";
+import { CustomToolbar } from "./CustomToolbar";
 
 function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const { systemBcv } = useContext(BcvContext);

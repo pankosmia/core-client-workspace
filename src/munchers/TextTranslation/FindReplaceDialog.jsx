@@ -1,9 +1,16 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useContext } from "react";
 import { useFindReplace } from "@scriptural/react";
-import { X, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import CloseIcon from '@mui/icons-material/Close';
 import { VscReplace } from "react-icons/vsc";
 import { VscReplaceAll } from "react-icons/vsc";
-
+import { Button, Typography, Box, TextField, IconButton, Toolbar,AppBar, DialogActions, Paper } from "@mui/material";
+import {
+  i18nContext as I18nContext,
+  doI18n,
+} from "pithekos-lib";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 export function FindReplaceDialog() {
   const {
     searchText,
@@ -22,6 +29,7 @@ export function FindReplaceDialog() {
   } = useFindReplace();
 
   const searchInputRef = useRef(null);
+  const { i18nRef } = useContext(I18nContext);
 
   // Focus the search input when the component becomes visible
   useEffect(() => {
@@ -37,93 +45,111 @@ export function FindReplaceDialog() {
   }
 
   return (
-    <div className="fixed top-4 right-4 w-80 bg-white rounded-md shadow-lg overflow-hidden border border-gray-200 z-50">
-      <div className="flex items-center content-center justify-between px-4 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-sm font-medium text-gray-700">Find & Replace</h3>
-        <button
-          onClick={handleClose}
-          className="text-gray-400 hover:text-gray-600 focus:outline-none"
-        >
-          <X size={18} />
-        </button>
-      </div>
+    <Paper
+      sx={{
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        zIndex: 1300,
+        width: '100%',
+        maxWidth: 500,
+        borderRadius: 2,
+      }}
+    >
+      <AppBar
+        color="secondary"
+        sx={{
+          position: 'relative',
+          borderTopLeftRadius: 8,
+          borderTopRightRadius: 8,
+        }}
+      >
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <Typography variant="subtitle1">
+            {doI18n('pages:core-local-workspace:find_replace', i18nRef.current)}
+          </Typography>
+          <IconButton onClick={handleClose}>
+            <CloseIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
 
-      <div className="p-4 space-y-3">
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <input
-              ref={searchInputRef}
-              type="text"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              placeholder="Find"
-              className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <div className="flex items-center space-x-1">
-              <button
-                onClick={handlePrev}
-                disabled={results.length === 0 || isSearching}
-                className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
-                title="Previous"
-              >
-                <ChevronUp size={16} />
-              </button>
-              <button
-                onClick={handleNext}
-                disabled={results.length === 0 || isSearching}
-                className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
-                title="Next"
-              >
-                <ChevronDown size={16} />
-              </button>
-            </div>
-          </div>
-          <div className="text-xs text-gray-500 flex items-center h-5">
-            {isSearching ? (
-              <>
-                <Loader2 size={14} className="animate-spin mr-1" />
-                <span>Searching...</span>
-              </>
-            ) : results.length > 0 ? (
-              `${currentResultIndex + 1} of ${results.length}`
-            ) : searchText ? (
-              "No results"
-            ) : (
-              "Type to search"
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <input
+      <Box sx={{ p: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1}}>
+          <TextField
+            fullWidth
+            inputRef={searchInputRef}
             type="text"
-            value={replaceText}
-            onChange={(e) => setReplaceText(e.target.value)}
-            placeholder="Replace with"
-            className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder={doI18n('pages:core-local-workspace:find', i18nRef.current)}
           />
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={handleReplace}
-              disabled={results.length === 0 || currentResultIndex === -1 || isSearching}
-              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-              title="Replace"
-            >
-              <VscReplace size={14} className="mr-1.5" />
-              <span>Replace</span>
-            </button>
-            <button
-              onClick={handleReplaceAll}
+            <IconButton
+              onClick={handlePrev}
               disabled={results.length === 0 || isSearching}
-              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-              title="Replace All"
+              title="Previous"
             >
-              <VscReplaceAll size={14} className="mr-1.5" />
-              <span>Replace All</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+              <KeyboardArrowUpIcon />
+            </IconButton>
+            <IconButton
+              onClick={handleNext}
+              disabled={results.length === 0 || isSearching}
+              title="Next"
+            >
+              <KeyboardArrowDownIcon />
+            </IconButton>
+        </Box>
+
+        <Typography sx={{ p: 1 }}>
+          {isSearching ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Loader2 size={14} />
+              <Typography>
+                {doI18n('pages:core-local-workspace:searching', i18nRef.current)}
+              </Typography>
+            </Box>
+          ) : results.length > 0 ? (
+            `${currentResultIndex + 1} of ${results.length}`
+          ) : searchText ? (
+            `${doI18n('pages:core-local-workspace:no_result', i18nRef.current)}`
+          ) : (
+            `${doI18n('pages:core-local-workspace:type_to_search', i18nRef.current)}`
+          )}
+        </Typography>
+
+        <TextField
+          fullWidth
+          value={replaceText}
+          onChange={(e) => setReplaceText(e.target.value)}
+          placeholder={doI18n('pages:core-local-workspace:replace_with', i18nRef.current)}
+          sx={{ mb: 2 }}
+        />
+
+        <DialogActions sx={{ justifyContent: 'center' }}>
+          <Button
+            onClick={handleReplace}
+            disabled={results.length === 0 || currentResultIndex === -1 || isSearching}
+            title="Replace"
+            startIcon={<VscReplace />}
+          >
+            <Typography variant="caption">
+              {doI18n('pages:core-local-workspace:replace_one', i18nRef.current)}
+            </Typography>
+          </Button>
+
+          <Button
+            onClick={handleReplaceAll}
+            disabled={results.length === 0 || isSearching}
+            title="Replace All"
+            startIcon={<VscReplaceAll />}
+          >
+            <Typography variant="caption">
+              {doI18n('pages:core-local-workspace:replace_all', i18nRef.current)}
+            </Typography>
+          </Button>
+        </DialogActions>
+      </Box>
+    </Paper>
+
   );
 }
