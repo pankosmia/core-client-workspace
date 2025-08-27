@@ -146,6 +146,94 @@
     },
     "choose_resources_workspace":{
       "en":"Choose what resources to open in the Workspace, alongside your editable Content."
+    },
+     "required_field":{
+      "en":"* Required fields",
+      "fr":"* Champ obligatoire"
+    },
+    "main_track": {
+      "en": "Main track",
+      "fr": "Piste principale"
+    },
+    "recording_in_progress": {
+      "en": "Recording in progress",
+      "fr": "Enregistrement en cours"
+    },
+    "no_other_tracks": {
+      "en": "No other tracks found",
+      "fr": "Aucune autre piste trouvée"
+    },
+    "click_record_to_start": {
+      "en": "Click",
+      "fr": "Cliquez sur"
+    },
+    "or_press_r_to_record": {
+      "en": "or press R to record",
+      "fr": "ou appuyez sur R pour enregistrer"
+    },
+    "supplementary_tracks": {
+      "en": "SUPPLEMENTARY TRACKS",
+      "fr": "Pistes supplémentaires"
+    },
+    "delete_track": {
+      "en": "Delete track",
+      "fr": "Supprimer la piste"
+    },
+    "play_track": {
+      "en": "Play track",
+      "fr": "Lire la piste"
+    },
+    "empty_track": {
+      "en": "Empty track",
+      "fr": "Piste vide - Prochaine prise"
+    },
+    "tooltip_record": {
+      "en": "Record",
+      "fr": "Enregistrer"
+    },
+    "tooltip_play_pause": {
+      "en": "Play/Pause",
+      "fr": "Lire/Pause"
+    },
+    "tooltip_restore": {
+      "en": "Restore",
+      "fr": "Restaurer"
+    },
+    "tooltip_paste": {
+      "en": "Paste",
+      "fr": "Coller"
+    },
+    "tooltip_copy": {
+      "en": "Copy",
+      "fr": "Copier"
+    },
+    "tooltip_delete": {
+      "en": "Delete",
+      "fr": "Supprimer"
+    },
+    "tooltip_confirm_renaming": {
+      "en": "Confirm renaming",
+      "fr": "Confirmer le renommage"
+    },
+    "tooltip_cancel_renaming": {
+      "en": "Cancel renaming",
+      "fr": "Annuler le renommage"
+    },
+    "tooltip_switch_with_maintrack": {
+      "en": "Switch with maintrack",
+      "fr": "Changer avec la piste principale"
+    },
+    "tooltip_rename_track": {
+      "en": "Rename track",
+      "fr": "Renommer la piste"
+    },
+    "tooltip_play_track": {
+      "en": "Play track",
+      "fr": "Lire la piste"
+    },
+    "tooltip_delete_track": {
+      "en": "Delete track",
+      "fr": "Supprimer la piste"
     }
   }
 }
