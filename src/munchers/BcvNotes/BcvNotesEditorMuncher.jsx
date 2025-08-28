@@ -55,15 +55,14 @@ function BcvNotesEditorMuncher({ metadata }) {
         );
        
     }
-    console.log("updateBCV",updateBcv)
     
-    useEffect(() => {
-        const onBeforeUnload = ev => {
-            ev.preventDefault();
-        };
-        window.addEventListener('beforeunload', onBeforeUnload);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // useEffect(() => {
+    //     const onBeforeUnload = ev => {
+    //         ev.preventDefault();
+    //     };
+    //     window.addEventListener('beforeunload', onBeforeUnload);
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
 
     return (
         <Stack sx={{
@@ -71,7 +70,7 @@ function BcvNotesEditorMuncher({ metadata }) {
         }}
         >
             {/* <SearchNavBar getAllData={getAllData} /> */}
-            <Box sx={{ display: 'flex', gap: 2, padding: 1, justifyContent: "space-between" }}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
                 <AddFab
                     currentRowN={currentRowN}
                     setCurrentRowN={setCurrentRowN}

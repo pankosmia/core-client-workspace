@@ -49,7 +49,6 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                             sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
-                                    background: "#eaeaea",
                                     color: "#424242"
                                 }
                             }}
@@ -64,7 +63,6 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                             sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
-                                    background: "#eaeaea",
                                     color: '#bebbbbff'
                                 }
                             }}
@@ -82,7 +80,6 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                             sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
-                                    background: "#eaeaea",
                                     color: '#bebbbbff'
                                 }
                             }}
@@ -94,7 +91,6 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                             sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
-                                    background: "#eaeaea",
                                     color: '#bebbbbff'
                                 }
                             }}
@@ -107,7 +103,6 @@ function ActionsButtons({ ingredient, setIngredient, currentRowN, setCurrentRowN
                             sx={{
                                 mt: 2,
                                 "&.Mui-disabled": {
-                                    background: "#eaeaea",
                                     color: "#424242"
                                 }
                             }}

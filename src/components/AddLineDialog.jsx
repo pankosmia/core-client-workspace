@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { AppBar, Dialog, IconButton, Toolbar, Typography, Button } from "@mui/material";
+import { AppBar, Dialog, IconButton, Toolbar, Typography, Button, DialogActions, DialogTitle } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import TsvLineForm from "./TsvLineForm";
 import {
@@ -7,6 +7,7 @@ import {
     doI18n,
 } from "pithekos-lib";
 import { v4 as uuidv4 } from 'uuid';
+
 function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRowN, cellValueChanged, setCellValueChanged }) {
     const { i18nRef } = useContext(I18nContext);
     const [newCurrentRow, setNewCurrentRow] = useState(Array(7).fill("", 0, 7));
@@ -51,33 +52,21 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
 
     return (
         <Dialog
-            fullScreen
+            fullWidth={true}
             open={open}
             onClose={handleCloseModalNewNote}
+            sx={{
+                backdropFilter: "blur(3px)",
+            }}
         >
-            <AppBar sx={{ position: 'relative' }}>
-                <Toolbar sx={{justifyContent:"space-between"}}>
-                    <IconButton
-                        edge="start"
-                        color="inherit"
-                        onClick={handleCloseModalNewNote}
-                        aria-label={doI18n("pages:core-local-workspace:close", i18nRef.current)}
-                    >
-                        <CloseIcon />
-                        <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                            {doI18n("pages:core-local-workspace:new_bcv_note", i18nRef.current)}
-                        </Typography>
-                    </IconButton>
-                    <Button
-                        autoFocus
-                        color="inherit"
-                        disabled={!cellValueChanged}
-                        onClick={() => { handleSaveNewTsvRow(currentRowN, newCurrentRow); setCellValueChanged(false) }}
-                    >
-                           {doI18n("pages:core-local-workspace:create", i18nRef.current)}
-                    </Button>
+            <AppBar color="secondary" sx={{ position: 'relative', borderTopLeftRadius: 4, borderTopRightRadius: 4}}>
+                <Toolbar>
+                    <Typography variant="h6" component="div" sx={{color:"black" }}>
+                        {doI18n("pages:core-local-workspace:new_bcv_note", i18nRef.current)}
+                    </Typography>
                 </Toolbar>
             </AppBar>
+            <Typography variant='subtitile2' sx={{ ml: 1, p: 1 }}>{doI18n("pages:content:required_field", i18nRef.current)}</Typography>
             <TsvLineForm
                 mode="add"
                 currentRow={newCurrentRow}
@@ -90,8 +79,24 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                 cellValueChanged={cellValueChanged}
                 setCellValueChanged={setCellValueChanged}
             />
+            <DialogActions>
+                <Button
+                    onClick={handleCloseModalNewNote}
+                    color="primary"
+                >
+                    {doI18n("pages:core-local-workspace:cancel", i18nRef.current)}
+                </Button>
+                <Button
+                    autoFocus
+                    variant="contained"
+                    color="primary"
+                    disabled={!cellValueChanged}
+                    onClick={() => { handleSaveNewTsvRow(currentRowN, newCurrentRow); setCellValueChanged(false) }}
+                >
+                    {doI18n("pages:core-local-workspace:create", i18nRef.current)}
+                </Button>
+            </DialogActions>
         </Dialog>
-
     )
 }
 

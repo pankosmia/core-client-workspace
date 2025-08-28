@@ -23,7 +23,7 @@ function OBSViewerMuncher({metadata}) {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`;
         let response = await getText(ingredientLink, debugRef.current);
         if (response.ok) {
-            let lines = response.text.split("\n\n"); // Récupérer seulement le texte et les images
+            let lines = response.text.split(/\n\r?\n\r?/); // Récupérer seulement le texte et les images
 
             const index = (obs[1]) * 2 - 1 < 0 ? 0 : (obs[1]) * 2 - 1;  // L'index d'un paragraphe
             const index2 = index === 0 ? undefined : index + 1;

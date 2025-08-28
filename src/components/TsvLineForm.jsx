@@ -2,7 +2,7 @@ import { Box, FormControl, TextField } from "@mui/material";
 import MarkdownField from "./MarkdownField";
 import ActionsButtons from "./ActionsButtons";
 
-function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction,cellValueChanged,setCellValueChanged }) {
+function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction, cellValueChanged, setCellValueChanged }) {
     const columnNames = ingredient[0] || [];
 
     // Permet la modification d'une note
@@ -20,7 +20,7 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
 
     // Permet d'annuler les modications faites sur la note 
     const handleCancel = () => {
-        const newRowData = (mode === "edit" ? [...currentRow] : Array(7).fill("", 0, 7))
+        const newRowData = (mode === "edit" ? [...ingredient[currentRowN]] : Array(7).fill("", 0, 7))
         setCurrentRow(newRowData);
     };
 
