@@ -128,6 +128,30 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
             }
         }
     }
+    
+     // Récupération du code Electron 
+    // const isModified = () => {
+    //     const chapterIndex = obs[0];
+    //     const originalChecksum = chapterChecksums[chapterIndex];
+    //     if (!originalChecksum) {
+    //         return false;
+    //     }
+    //     const currentChecksum = calculateChapterChecksum(ingredient[chapterIndex]);
+
+    //     return originalChecksum !== currentChecksum;
+    // };
+
+    // // Intercepter les tentatives de navigation
+    // useEffect(() => {
+    //     const isElectron = !!window.electronAPI;
+    //     if (isElectron) {
+    //         if (isModified()) {
+    //             window.electronAPI.setCanClose(false);
+    //         } else {
+    //             window.electronAPI.setCanClose(true);
+    //         }
+    //     }
+    // }, [isModified]);
 
     if (isDownloading) {
         return <p>loading...</p>
