@@ -355,6 +355,9 @@
     "tooltip_delete_track": {
       "en": "Delete track",
       "fr": "Supprimer la piste"
+    },
+    "editor_mode":{
+      "en":"Editor mode"
     }
   }
 }
