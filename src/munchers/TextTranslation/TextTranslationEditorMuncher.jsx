@@ -14,7 +14,7 @@ import { enqueueSnackbar } from "notistack";
 import Editor from "./Editor";
 import { useAppReferenceHandler } from "./useAppReferenceHandler";
 import DraftingEditor from "./DraftingEditor";
-import { Box, Chip, FormControl, InputLabel, MenuItem, Select, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Box, Chip, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
 
 function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
     const { bcvRef } = useContext(BcvContext);
@@ -23,7 +23,7 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
     const [usj, setUsj] = useState(null);
     const [contentChanged, _setContentChanged] = useState(false);
 
-    const [viewEditor, setViewEditor] = useState("usfm");
+    const [viewEditor, setViewEditor] = useState("units");
     const [bookCode, setBookCode] = useState(
         (bcvRef.current && bcvRef.current.bookCode) ||
         "TIT"
@@ -127,31 +127,34 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
 
     return (
         <Box sx={{ p: 2 }}>
-            <FormControl sx={{backgroundColor:'red',position:"relative"}}>
-                <InputLabel id="page-selector-label">
-                    {doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}
-                </InputLabel>
-                <Select
-                    labelId="page-selector-label"
-                    value={viewEditor}
-                    onChange={handleChange}
-                    label={doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}
-                    renderValue={(selected) => (
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <Chip
-                                label={pageOptions.find((opt) => opt.value === selected)?.label}
-                            />
-                        </Box>
-                    )}
-                    sx={{ borderRadius: "28px" }}
-                >
-                    {pageOptions.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', right: "20px" }}>
+                <FormControl >
+                    <InputLabel id="page-selector-label">
+                        {doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}
+                    </InputLabel>
+                    <Select
+                        labelId="page-selector-label"
+                        value={viewEditor}
+                        onChange={handleChange}
+                        label={doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}
+                        renderValue={(selected) => (
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Chip
+                                    label={pageOptions.find((opt) => opt.value === selected)?.label}
+                                />
+                            </Box>
+                        )}
+                        sx={{ borderRadius: "28px" }}
+                    >
+                        {pageOptions.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
+
 
             <Box>
                 {viewEditor === 'usfm' ? (
