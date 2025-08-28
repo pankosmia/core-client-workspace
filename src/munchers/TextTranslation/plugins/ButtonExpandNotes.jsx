@@ -1,7 +1,8 @@
 import { useScripturalComposerContext } from "@scriptural/react";
 import { ScrollText } from "lucide-react";
-import { useEffect, useState } from "react";
 
+import { useEffect, useState } from "react";
+import ExpandIcon from '@mui/icons-material/Expand';
 export function ButtonExpandNotes({ defaultState }) {
   const { editorRef } = useScripturalComposerContext();
   const [isActive, setIsActive] = useState(defaultState);
@@ -24,7 +25,7 @@ export function ButtonExpandNotes({ defaultState }) {
       title={isActive ? "Fold All Notes" : "Unfold All Notes"}
       className={isActive ? "active" : ""}
     >
-      <ScrollText size={20} />
+      <ExpandIcon size={20} />
     </button>
   );
 }

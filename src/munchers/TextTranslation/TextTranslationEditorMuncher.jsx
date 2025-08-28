@@ -107,13 +107,29 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
         setContentChanged(true);
     }
 
+    // Récupération du code Electron 
+    // const isModified = () => {
+    //     const chapterIndex = obs[0];
+    //     const originalChecksum = chapterChecksums[chapterIndex];
+    //     if (!originalChecksum) {
+    //         return false;
+    //     }
+    //     const currentChecksum = calculateChapterChecksum(ingredient[chapterIndex]);
+
+    //     return originalChecksum !== currentChecksum;
+    // };
+
+    // // Intercepter les tentatives de navigation
     // useEffect(() => {
-    //     const onBeforeUnload = ev => {
-    //         ev.preventDefault();
-    //     };
-    //     window.addEventListener('beforeunload', onBeforeUnload);
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, []);
+      //     const isElectron = !!window.electronAPI;
+    //     if (isElectron) {
+    //         if (isModified()) {
+    //             window.electronAPI.setCanClose(false);
+    //         } else {
+    //             window.electronAPI.setCanClose(true);
+    //         }
+    //     }
+    // }, [isModified]);
 
     const pageOptions = [
         { value: 'usfm', label: 'Chapter' },
@@ -122,7 +138,7 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
     const handleChange = (event) => {
         setViewEditor(event.target.value);
     };
-
+  
     const { referenceHandler } = useAppReferenceHandler();
 
     return (

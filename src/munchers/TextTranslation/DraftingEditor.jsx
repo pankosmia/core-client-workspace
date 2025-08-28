@@ -12,6 +12,7 @@ import RequireResources from "../../components/RequireResources";
 import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
 import SaveButtonDrafting from "../../components/SaveButtonDrafting";
+import { CustomToolbar } from "./CustomToolbar";
 
 function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const { systemBcv } = useContext(BcvContext);
@@ -127,6 +128,30 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
             }
         }
     }
+    
+     // Récupération du code Electron 
+    // const isModified = () => {
+    //     const chapterIndex = obs[0];
+    //     const originalChecksum = chapterChecksums[chapterIndex];
+    //     if (!originalChecksum) {
+    //         return false;
+    //     }
+    //     const currentChecksum = calculateChapterChecksum(ingredient[chapterIndex]);
+
+    //     return originalChecksum !== currentChecksum;
+    // };
+
+    // // Intercepter les tentatives de navigation
+    // useEffect(() => {
+    //     const isElectron = !!window.electronAPI;
+    //     if (isElectron) {
+    //         if (isModified()) {
+    //             window.electronAPI.setCanClose(false);
+    //         } else {
+    //             window.electronAPI.setCanClose(true);
+    //         }
+    //     }
+    // }, [isModified]);
 
     if (isDownloading) {
         return <p>loading...</p>
