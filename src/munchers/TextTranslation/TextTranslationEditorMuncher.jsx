@@ -127,7 +127,7 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
 
     return (
         <Box sx={{ p: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', right: "20px" }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <FormControl >
                     <InputLabel id="page-selector-label">
                         {doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}
