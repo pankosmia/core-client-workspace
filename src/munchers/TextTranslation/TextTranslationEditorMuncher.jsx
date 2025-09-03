@@ -132,8 +132,8 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
     // }, [isModified]);
 
     const pageOptions = [
-        { value: 'usfm', label: 'Chapter' },
         { value: 'units', label: 'Units of meaning' },
+        { value: 'usfm', label: 'Chapter' },
     ];
     const handleChange = (event) => {
         setViewEditor(event.target.value);
