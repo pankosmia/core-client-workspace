@@ -14,7 +14,7 @@ import { enqueueSnackbar } from "notistack";
 import Editor from "./Editor";
 import { useAppReferenceHandler } from "./useAppReferenceHandler";
 import DraftingEditor from "./DraftingEditor";
-import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Box, Chip, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
 
 function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
     const { bcvRef } = useContext(BcvContext);
@@ -23,7 +23,7 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
     const [usj, setUsj] = useState(null);
     const [contentChanged, _setContentChanged] = useState(false);
 
-    const [viewEditor, setViewEditor] = useState("usfm");
+    const [viewEditor, setViewEditor] = useState("units");
     const [bookCode, setBookCode] = useState(
         (bcvRef.current && bcvRef.current.bookCode) ||
         "TIT"
@@ -121,7 +121,7 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
 
     // // Intercepter les tentatives de navigation
     // useEffect(() => {
-    //     const isElectron = !!window.electronAPI;
+      //     const isElectron = !!window.electronAPI;
     //     if (isElectron) {
     //         if (isModified()) {
     //             window.electronAPI.setCanClose(false);
@@ -131,32 +131,61 @@ function TextTranslationEditorMuncher({ metadata, adjSelectedFontClass }) {
     //     }
     // }, [isModified]);
 
+    const pageOptions = [
+        { value: 'units', label: 'Units of meaning' },
+        { value: 'usfm', label: 'Chapter' },
+    ];
+    const handleChange = (event) => {
+        setViewEditor(event.target.value);
+    };
+  
     const { referenceHandler } = useAppReferenceHandler();
 
     return (
         <Box sx={{ p: 2 }}>
-            <ToggleButtonGroup
-                variant="contained"
-                value={viewEditor}
-                exclusive
-                onClick={handleSwitchPage}
-            >
-                <ToggleButton value="usfm"> USFM </ToggleButton>
-                <ToggleButton value="units">UNITS </ToggleButton>
-            </ToggleButtonGroup>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <FormControl >
+                    <InputLabel id="page-selector-label">
+                        {doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}
+                    </InputLabel>
+                    <Select
+                        labelId="page-selector-label"
+                        value={viewEditor}
+                        onChange={handleChange}
+                        label={doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}
+                        renderValue={(selected) => (
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Chip
+                                    label={pageOptions.find((opt) => opt.value === selected)?.label}
+                                />
+                            </Box>
+                        )}
+                        sx={{ borderRadius: "28px" }}
+                    >
+                        {pageOptions.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
 
-            <Box mt={4}>
+
+            <Box>
                 {viewEditor === 'usfm' ? (
-                    usj ? <Editor
-                        key={md5sum(JSON.stringify(usj))}
-                        usj={usj}
-                        editable={true}
-                        bookCode={bcvRef.current && bcvRef.current.bookCode}
-                        onSave={onSave}
-                        onHistoryChange={onHistoryChange}
-                        scriptureReferenceHandler={referenceHandler}
-                        referenceHandlerSource="text-translation-editor" mode="Editor" />
-                        : <p>Loading data</p>
+                    usj ? (
+                        <Editor key={md5sum(JSON.stringify(usj))}
+                            usj={usj}
+                            editable={true}
+                            bookCode={bcvRef.current && bcvRef.current.bookCode}
+                            onSave={onSave}
+                            onHistoryChange={onHistoryChange}
+                            scriptureReferenceHandler={referenceHandler}
+                            referenceHandlerSource="text-translation-editor" mode="Editor" />
+                    ) : (
+                        <Typography variant="body2">Loading data...</Typography>
+                    )
                 ) : (
                     <DraftingEditor mode="units" metadata={metadata} />
                 )}
