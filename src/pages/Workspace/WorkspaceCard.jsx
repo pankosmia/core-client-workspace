@@ -18,8 +18,12 @@ import OBSQuestionsViewerMuncher from '../../munchers/OBSQuestions/OBSQuestionsV
 import OBSArticlesViewerMuncher from '../../munchers/OBSArticles/OBSArticlesViewerMuncher';
 import JuxtalinearViewerMuncher from "../../munchers/Juxtalinear/JuxtalinearViewer";
 
-function WorkspaceCard({metadata, style}) {
+function WorkspaceCard({metadata, style, distractionModeCount}) {
     const scriptDirectionString =  metadata.script_direction === 'rtl' ? 'rtl' : 'ltr';
+    if (!metadata.primary && (distractionModeCount % 2) > 0) {
+        return <div style={{...style, backgroundColor: "#CCC"}} dir={scriptDirectionString}>
+        </div>
+    }
     if (metadata.primary && metadata.flavor === "textTranslation") {
         return <div style={style} dir={scriptDirectionString}>
           <TextTranslationEditorMuncher
