@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState, useCallback } from 'react';
+import {useContext, useState} from 'react';
 import {useLocation} from "react-router-dom";
-import {Box} from "@mui/material";
+import {Box, Button} from "@mui/material";
 import WorkspaceCard from "./WorkspaceCard";
 import BcvPicker from "./BcvPicker";
 import GraphiteTest from "./GraphiteTest";
@@ -8,8 +8,9 @@ import {
     createTilePanes,
     TileContainer,
     TileProvider,
+
 } from 'react-tile-pane'
-import {Header} from "pithekos-lib";
+import {i18nContext, doI18n, Header} from "pithekos-lib";
 import {typographyContext} from "pithekos-lib";
 import OBSContext from '../../contexts/obsContext';
 
@@ -19,14 +20,24 @@ const paneStyle = {
     overflow: 'scroll'
 }
 
+const DistractionToggle = ({distractionModeCount, setDistractionModeCount}) => {
+    const {i18nRef} = useContext(i18nContext);
+    return <Button style={{color: "#FFF"}} size="small" onClick={() => {
+        setDistractionModeCount(distractionModeCount + 1);
+    }}>
+        {doI18n(`pages:core-local-workspace:${(distractionModeCount % 2) === 0 ? "distraction": "no_distraction"}_mode`, i18nRef.current)}
+    </Button>
+}
+
 const Workspace = () => {
-    const { typographyRef } = useContext(typographyContext);
+
+    const {typographyRef} = useContext(typographyContext);
     const locationState = Object.entries(useLocation().state);
     const resources = locationState
         .map(kv => {
             return {...kv[1], local_path: kv[0]}
-        })
-
+        });
+    const [distractionModeCount, setDistractionModeCount] = useState(0);
     const tileElements = {};
     const rootPane = {
         children: [
@@ -42,6 +53,7 @@ const Workspace = () => {
         tileElements[title] = <WorkspaceCard
             metadata={resource}
             style={paneStyle}
+            distractionModeCount={distractionModeCount}
         />;
         if (resource.primary) {
             rootPane.children[0] = {children: title};
@@ -53,7 +65,7 @@ const Workspace = () => {
         rootPane.children.pop();
     }
     const paneList = createTilePanes(tileElements)[0];
-    
+
     const isGraphite = GraphiteTest()
     /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
     const adjSelectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
@@ -62,22 +74,34 @@ const Workspace = () => {
 
     return <>
         <Header
-            titleKey="pages:core-local-workspace:title" 
+            titleKey="pages:core-local-workspace:title"
             requireNet={false}
             currentId="core-local-workspace"
-            widget={<BcvPicker/>}
+            widget={<span style={{display: "flex"}}>
+                <BcvPicker/>
+                <DistractionToggle
+                    distractionModeCount={distractionModeCount}
+                    setDistractionModeCount={setDistractionModeCount}/>
+        </span>}
         />
         <div className={adjSelectedFontClass}>
-          <OBSContext.Provider value={{obs, setObs}}  >
-            <TileProvider
-                tilePanes={paneList}
-                rootNode={rootPane}
-            >
-            <Box style={{position: 'fixed', top: '48px', bottom: 0, right: 0, overflow: 'scroll', width: '100vw'}}>
-                <TileContainer/>
-            </Box>
-            </TileProvider>
-          </OBSContext.Provider>
+            <OBSContext.Provider value={{obs, setObs}}>
+                <TileProvider
+                    tilePanes={paneList}
+                    rootNode={rootPane}
+                >
+                    <Box style={{
+                        position: 'fixed',
+                        top: '48px',
+                        bottom: 0,
+                        right: 0,
+                        overflow: 'scroll',
+                        width: '100vw'
+                    }}>
+                        <TileContainer/>
+                    </Box>
+                </TileProvider>
+            </OBSContext.Provider>
         </div>
     </>
 }

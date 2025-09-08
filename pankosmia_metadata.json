@@ -358,6 +358,14 @@
     },
     "editor_mode":{
       "en":"Editor mode"
+    },
+    "distraction_mode": {
+      "en": "Normal view",
+      "fr": "Vue normale"
+    },
+    "no_distraction_mode": {
+      "en": "Edit-only view",
+      "fr": "Vue éditeur seul"
     }
   }
 }
