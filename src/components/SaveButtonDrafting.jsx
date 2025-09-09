@@ -6,9 +6,8 @@ import { enqueueSnackbar } from "notistack";
 import I18nContext from "pithekos-lib/dist/contexts/i18nContext";
 import { useContext, useState } from "react";
 
-function SaveButtonDrafting({ metadata, systemBcv, usfmHeader, unitData }) {
+function SaveButtonDrafting({ metadata, systemBcv, usfmHeader, unitData, modified, setModified }) {
     const { i18nRef } = useContext(I18nContext);
-    const [contentChanged, _setContentChanged] = useState(false);
 
     // Permet de sauvegarder dans le fichier TSV 
     const handleSaveUsfm = async (debugBool) => {
@@ -44,18 +43,18 @@ function SaveButtonDrafting({ metadata, systemBcv, usfmHeader, unitData }) {
                 `${doI18n("pages:core-local-workspace:save_error", i18nRef.current)}: ${response.status}`,
                 { variant: "error" }
             );
-            throw new Error(`Failed to save: ${response.status}, ${response.error}`);
         }
     }
 
     // Montre le changement d'état du contenu 
     const setContentChanged = nv => {
-        _setContentChanged(nv);
+        setModified(nv);
     }
     return (
         <IconButton
             variant="contained"
-            onClick={() => { handleSaveUsfm() }}
+            onClick={() => { handleSaveUsfm().then() }}
+            disabled={!modified}
         >
             <SaveIcon
                 size="large"

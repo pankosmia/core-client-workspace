@@ -366,6 +366,18 @@
     "no_distraction_mode": {
       "en": "Edit-only view",
       "fr": "Vue éditeur seul"
+    },
+    "change_editor_title": {
+      "en": "Changing editor",
+      "fr": "Changement d'éditeur"
+    },
+    "change_editor_without_saving": {
+      "en": "You have unsaved edits. If you change editor now you will lose those changes. If that is not what you want, hit 'cancel'",
+      "fr": "Il existe des modifications non-enregistrées. Si vous changez tout de suite d'éditeur vous perdrez ces modifications. Si ce n'est pas votre souhait, cliquez sur 'annuler'."
+    },
+    "do_change_editor": {
+      "en": "Change editor anyway",
+      "fr": "Changer néanmoins d'editeur"
     }
   }
 }

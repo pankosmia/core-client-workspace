@@ -13,7 +13,7 @@ import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
 import SaveButtonDrafting from "../../components/SaveButtonDrafting";
 
-function DraftingEditor({ metadata, adjSelectedFontClass }) {
+function DraftingEditor({ metadata, modified, setModified }) {
     const { systemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const [units, setUnits] = useState([]);
@@ -162,6 +162,8 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                 systemBcv={systemBcv}
                 usfmHeader={usfmHeader}
                 unitData={unitData}
+                modified={modified}
+                setModified={setModified}
             />
             <NavBarDrafting currentChapter={currentChapter} setCurrentChapter={setCurrentChapter} units={units} />
             <Box>
@@ -186,6 +188,7 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                                             updateBcv(index)
                                         }}
                                         onChange={(e) => {
+                                            setModified(true);
                                             setCurrentText(e.target.value)
                                         }}
                                         onBlur={() => handleSaveUnit(index, currentText)}

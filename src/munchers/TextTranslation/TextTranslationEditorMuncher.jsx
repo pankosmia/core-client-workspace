@@ -5,18 +5,80 @@ import {
     doI18n
 } from "pithekos-lib";
 import DraftingEditor from "./DraftingEditor";
-import {Box, Chip, FormControl, InputLabel, MenuItem, Select} from "@mui/material";
+import {
+    Box,
+    Button,
+    Chip,
+    Dialog,
+    DialogActions, DialogContent, DialogContentText,
+    DialogTitle,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select, Typography
+} from "@mui/material";
 import SharedEditor from "./SharedEditor";
+
+function ChangeEditorDialog({modeChangeDialogOpen, setModeChangeDialogOpen, newEditor, setEditor, setModified}) {
+    const {i18nRef} = useContext(I18nContext);
+    return <Dialog
+        open={modeChangeDialogOpen}
+        onClose={() => setModeChangeDialogOpen(false)}
+        slotProps={{
+            paper: {
+                component: 'form',
+            },
+        }}
+    >
+        <DialogTitle><b>{doI18n("pages:core-local-workspace:change_editor_title", i18nRef.current)}</b></DialogTitle>
+        <DialogContent>
+            <DialogContentText>
+                <Typography>
+                    {doI18n("pages:core-local-workspace:change_editor_without_saving", i18nRef.current)}
+                </Typography>
+            </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+            <Button
+                variant='contained'
+                color="primary"
+                onClick={
+                () => {
+                    setModeChangeDialogOpen(false);
+                }
+            }
+            >
+                {doI18n("pages:core-local-workspace:cancel", i18nRef.current)}
+            </Button>
+            <Button
+                variant='outlined'
+                color="secondary"
+                onClick={async () => {
+                    setEditor(newEditor);
+                    setModified(false);
+                    setModeChangeDialogOpen(false);
+                }}
+            >{doI18n("pages:core-local-workspace:do_change_editor", i18nRef.current)}</Button>
+        </DialogActions>
+    </Dialog>
+}
 
 function TextTranslationEditorMuncher({metadata}) {
     const {i18nRef} = useContext(I18nContext);
     const [editor, setEditor] = useState("units");
+    const [modified, setModified] = useState(false);
+    const [modeChangeDialogOpen, setModeChangeDialogOpen] = useState(false);
     const pageOptions = [
         {value: 'units', label: 'Units of meaning'},
         {value: 'chapter', label: 'Chapter'},
     ];
     const handleChange = (event) => {
-        setEditor(event.target.value);
+        if (modified) {
+            setModeChangeDialogOpen(true);
+        } else {
+            setEditor(event.target.value);
+            setModified(false);
+        }
     };
 
     return (
@@ -49,8 +111,27 @@ function TextTranslationEditorMuncher({metadata}) {
                 </FormControl>
             </Box>
             <Box>
-                {editor === 'chapter' ? <SharedEditor  metadata={metadata}/>: <DraftingEditor metadata={metadata}/>}
+                {
+                    editor === 'chapter' ?
+                        <SharedEditor
+                            metadata={metadata}
+                            modified={modified}
+                            setModified={setModified}
+                        /> :
+                        <DraftingEditor
+                            metadata={metadata}
+                            modified={modified}
+                            setModified={setModified}
+                        />
+                }
             </Box>
+            <ChangeEditorDialog
+                modeChangeDialogOpen={modeChangeDialogOpen}
+                setModeChangeDialogOpen={setModeChangeDialogOpen}
+                newEditor={editor === "chapter" ? "units" : "chapter"}
+                setEditor={setEditor}
+                setModified={setModified}
+            />
         </Box>
     );
 }

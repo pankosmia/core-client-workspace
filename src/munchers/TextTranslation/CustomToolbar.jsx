@@ -61,7 +61,7 @@ function TriggerKeyButton({ triggerKeyCombo, onClick, className, }) {
   );
 }
 
-export function CustomToolbar({ onSave }) {
+export function CustomToolbar({ onSave, modified }) {
   const [editor] = useLexicalComposerContext();
   const editable = useMemo(() => editor.isEditable(), [editor]);
   const [triggerKeyCombo, setTriggerKeyCombo] = useState("\\");
@@ -119,7 +119,7 @@ export function CustomToolbar({ onSave }) {
               </IconButton>
               <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
 
-              <IconButton>
+              <IconButton disabled={!modified}>
                 <SaveButton onSave={onSave} title={doI18n("pages:core-local-workspace:add", i18nRef.current)}>
                   <SaveIcon />
                 </SaveButton>

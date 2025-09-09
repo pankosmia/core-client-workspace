@@ -13,24 +13,18 @@ import { enqueueSnackbar } from "notistack";
 
 import Editor from "./Editor";
 import { useAppReferenceHandler } from "./useAppReferenceHandler";
-import DraftingEditor from "./DraftingEditor";
 import { Box, Typography } from "@mui/material";
 
-function SharedEditor({ metadata }) {
+function SharedEditor({ metadata, modified, setModified }) {
     const { bcvRef } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const { i18nRef } = useContext(I18nContext);
     const [usj, setUsj] = useState(null);
-    const [contentChanged, _setContentChanged] = useState(false);
 
     const [bookCode, setBookCode] = useState(
         (bcvRef.current && bcvRef.current.bookCode) ||
         "TIT"
     )
-    const setContentChanged = nv => {
-        console.log("setContentChanged", nv);
-        _setContentChanged(nv);
-    }
 
     // Fetch new USFM as USJ, put in incoming
     useEffect(
@@ -71,20 +65,19 @@ function SharedEditor({ metadata }) {
                 `${doI18n("pages:core-local-workspace:saved", i18nRef.current)}`,
                 { variant: "success" }
             );
-            setContentChanged(false);
+            setModified(false);
             return response.json;
         } else {
             enqueueSnackbar(
                 `${doI18n("pages:core-local-workspace:save_error", i18nRef.current)}: ${response.status}`,
                 { variant: "error" }
             );
-            throw new Error(`Failed to save: ${response.status}, ${response.error}`);
         }
     }
 
     const onSave = (usj) => {
         if (usj.content.length > 0) {
-            uploadJsonIngredient(metadata.local_path, bcvRef.current.bookCode + ".usfm", usj, debugRef.current);
+            uploadJsonIngredient(metadata.local_path, bcvRef.current.bookCode + ".usfm", usj, debugRef.current).then();
         }
     }
 
@@ -97,7 +90,7 @@ function SharedEditor({ metadata }) {
          */
         const recoverableState = editorState.toJSON();
         debugRef && debugRef.current && console.log("onHistoryChange", recoverableState);
-        setContentChanged(true);
+        setModified(true);
     }
 
     // Récupération du code Electron 
@@ -131,6 +124,7 @@ function SharedEditor({ metadata }) {
         <Box sx={{ p: 2 }}>
             <Box>
                 {usj ? <Editor key={md5sum(JSON.stringify(usj))}
+                            modified={modified}
                             usj={usj}
                             editable={true}
                             bookCode={bcvRef.current && bcvRef.current.bookCode}
