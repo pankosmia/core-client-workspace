@@ -12,7 +12,6 @@ import RequireResources from "../../components/RequireResources";
 import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
 import SaveButtonDrafting from "../../components/SaveButtonDrafting";
-import { CustomToolbar } from "./CustomToolbar";
 
 function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const { systemBcv } = useContext(BcvContext);
@@ -30,14 +29,13 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
         if (unitData[unitN]) {
             const newCurrentUnitCV = unitData[unitN].reference.split(":")
             postEmptyJson(
-                `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1]}`,
+                `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1].split("-")[0]}`,
                 debugRef.current
             );
         }
 
     }
 
-    console.log("newCurrentUnit", )
     useEffect(() => {
         const juxtaJson = async () => {
             let jsonResponse = await getJson(`/burrito/ingredient/raw/git.door43.org/BurritoTruck/fr_juxta/?ipath=${systemBcv.bookCode}.json`, debugRef.current);
@@ -71,7 +69,7 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
             };
             getProskomma().then();
         },
-        [debugRef, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum, metadata.local_path]
+        [debugRef, systemBcv.bookCode, metadata.local_path]
     );
     const getUnitTexts = async () => {
 
@@ -168,8 +166,10 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
             <NavBarDrafting currentChapter={currentChapter} setCurrentChapter={setCurrentChapter} units={units} />
             <Box>
                 {unitData
-                    .filter(u => u.reference.startsWith(`${currentChapter}:`))
                     .map((u, index) => {
+                        if (!u.reference.startsWith(`${currentChapter}:`)) {
+                            return;
+                        }
                         return (
                             <Box key={index} >
                                 <FormControl fullWidth margin="normal">

@@ -50,7 +50,7 @@ function BcvNotesEditorMuncher({ metadata }) {
     const updateBcv = rowN => {
         const newCurrentRowCV = ingredient[rowN][0].split(":")
         postEmptyJson(
-            `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1]}`,
+            `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1].split("-")[0]}`,
             debugRef.current
         );
        
