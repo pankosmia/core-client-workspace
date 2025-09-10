@@ -1,4 +1,5 @@
 import { useEffect, useContext, useState } from "react";
+import md5 from "md5";
 import { Proskomma } from 'proskomma-core';
 import {
     bcvContext as BcvContext,
@@ -24,6 +25,7 @@ function DraftingEditor({ metadata, modified, setModified }) {
     const [currentText, setCurrentText] = useState("");
     const [selectedReference, setSelectedReference] = useState("");
     const [usfmHeader, setUsfmHeader] = useState("");
+    const [savedChecksum, setSavedChecksum] = useState(null);
 
     const updateBcv = unitN => {
         if (unitData[unitN]) {
@@ -98,7 +100,9 @@ function DraftingEditor({ metadata, modified, setModified }) {
             newUnitData.push({ reference: cv, text: cvText })
         }
         setUnitData(newUnitData)
-        setIsDownloading(false)
+        setIsDownloading(false);
+        setModified(false);
+        setSavedChecksum(md5(JSON.stringify(newUnitData,null, 2)))
     }
 
     useEffect(() => {
@@ -107,10 +111,16 @@ function DraftingEditor({ metadata, modified, setModified }) {
         }
     }, [units, pk]);
 
-    const handleSaveUnit = (unitN, newText) => {
+    const handleCacheUnit = (unitN, newText) => {
+        console.log(`text: '${newText}'`)
         const newUnit = { ...unitData[unitN], text: newText }
         let newUnitData = [...unitData]
         newUnitData[unitN] = newUnit
+        const newChecksum = md5(JSON.stringify(newUnitData,null, 2));
+        const notSaved = newChecksum !== savedChecksum;
+        if (notSaved !== modified) {
+            setModified(notSaved);
+        }
         setUnitData(newUnitData)
     }
 
@@ -127,29 +137,6 @@ function DraftingEditor({ metadata, modified, setModified }) {
         }
     }
     
-     // Récupération du code Electron 
-    // const isModified = () => {
-    //     const chapterIndex = obs[0];
-    //     const originalChecksum = chapterChecksums[chapterIndex];
-    //     if (!originalChecksum) {
-    //         return false;
-    //     }
-    //     const currentChecksum = calculateChapterChecksum(ingredient[chapterIndex]);
-
-    //     return originalChecksum !== currentChecksum;
-    // };
-
-    // // Intercepter les tentatives de navigation
-    // useEffect(() => {
-    //     const isElectron = !!window.electronAPI;
-    //     if (isElectron) {
-    //         if (isModified()) {
-    //             window.electronAPI.setCanClose(false);
-    //         } else {
-    //             window.electronAPI.setCanClose(true);
-    //         }
-    //     }
-    // }, [isModified]);
 
     if (isDownloading) {
         return <p>loading...</p>
@@ -164,6 +151,7 @@ function DraftingEditor({ metadata, modified, setModified }) {
                 unitData={unitData}
                 modified={modified}
                 setModified={setModified}
+                setSavedChecksum={setSavedChecksum}
             />
             <NavBarDrafting currentChapter={currentChapter} setCurrentChapter={setCurrentChapter} units={units} />
             <Box>
@@ -188,10 +176,9 @@ function DraftingEditor({ metadata, modified, setModified }) {
                                             updateBcv(index)
                                         }}
                                         onChange={(e) => {
-                                            setModified(true);
                                             setCurrentText(e.target.value)
                                         }}
-                                        onBlur={() => handleSaveUnit(index, currentText)}
+                                        onBlur={() => handleCacheUnit(index, currentText)}
                                     />
                                 </FormControl>
                             </Box>
@@ -202,5 +189,29 @@ function DraftingEditor({ metadata, modified, setModified }) {
         </RequireResources>
     );
 }
+
+// Récupération du code Electron
+// const isModified = () => {
+//     const chapterIndex = obs[0];
+//     const originalChecksum = chapterChecksums[chapterIndex];
+//     if (!originalChecksum) {
+//         return false;
+//     }
+//     const currentChecksum = calculateChapterChecksum(ingredient[chapterIndex]);
+
+//     return originalChecksum !== currentChecksum;
+// };
+
+// // Intercepter les tentatives de navigation
+// useEffect(() => {
+//     const isElectron = !!window.electronAPI;
+//     if (isElectron) {
+//         if (isModified()) {
+//             window.electronAPI.setCanClose(false);
+//         } else {
+//             window.electronAPI.setCanClose(true);
+//         }
+//     }
+// }, [isModified]);
 
 export default DraftingEditor;
