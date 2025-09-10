@@ -17,7 +17,7 @@ import {
     MenuItem,
     Select, Typography
 } from "@mui/material";
-import SharedEditor from "./SharedEditor";
+import SharedEditorWrapper from "./SharedEditorWrapper";
 
 function ChangeEditorDialog({modeChangeDialogOpen, setModeChangeDialogOpen, newEditor, setEditor, setModified}) {
     const {i18nRef} = useContext(I18nContext);
@@ -113,7 +113,7 @@ function TextTranslationEditorMuncher({metadata}) {
             <Box>
                 {
                     editor === 'chapter' ?
-                        <SharedEditor
+                        <SharedEditorWrapper
                             metadata={metadata}
                             modified={modified}
                             setModified={setModified}
