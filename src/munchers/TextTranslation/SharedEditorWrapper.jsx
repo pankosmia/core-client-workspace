@@ -14,12 +14,14 @@ import { enqueueSnackbar } from "notistack";
 import SharedEditor from "./SharedEditor";
 import { useAppReferenceHandler } from "./useAppReferenceHandler";
 import { Box, Typography } from "@mui/material";
+import md5 from "md5";
 
 function SharedEditorWrapper({ metadata, modified, setModified }) {
     const { bcvRef } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const { i18nRef } = useContext(I18nContext);
     const [usj, setUsj] = useState(null);
+    const [savedChecksum, setSavedChecksum] = useState(null);
 
     const [bookCode, setBookCode] = useState(
         (bcvRef.current && bcvRef.current.bookCode) ||
@@ -78,6 +80,8 @@ function SharedEditorWrapper({ metadata, modified, setModified }) {
     const onSave = (usj) => {
         if (usj.content.length > 0) {
             uploadJsonIngredient(metadata.local_path, bcvRef.current.bookCode + ".usfm", usj, debugRef.current).then();
+            setSavedChecksum(null);
+            setModified(false);
         }
     }
 
@@ -89,8 +93,18 @@ function SharedEditorWrapper({ metadata, modified, setModified }) {
          * This JSON object can be used to recover the editorState and save it to the browser local storage.
          */
         const recoverableState = editorState.toJSON();
+        const newStateChecksum = md5(JSON.stringify(recoverableState,null, 2));
+        console.log(savedChecksum, newStateChecksum);
+        const notSame = newStateChecksum !== savedChecksum;
+        if (notSame) {
+            setSavedChecksum(newStateChecksum);
+            const notSaved = notSame && !(savedChecksum === null);
+            if (notSaved !== modified) {
+                setModified(notSaved);
+            }
+        }
+
         debugRef && debugRef.current && console.log("onHistoryChange", recoverableState);
-        setModified(true);
     }
 
     // Récupération du code Electron 
