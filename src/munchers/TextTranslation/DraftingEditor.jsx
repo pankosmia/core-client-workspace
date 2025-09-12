@@ -1,6 +1,6 @@
-import { useEffect, useContext, useState } from "react";
+import {useEffect, useContext, useState} from "react";
 import md5 from "md5";
-import { Proskomma } from 'proskomma-core';
+import {Proskomma} from 'proskomma-core';
 import {
     bcvContext as BcvContext,
     debugContext as DebugContext,
@@ -8,15 +8,15 @@ import {
     getText,
     postEmptyJson,
 } from "pithekos-lib";
-import { Box, FormControl, TextField } from "@mui/material";
+import {Box, FormControl, TextField} from "@mui/material";
 import RequireResources from "../../components/RequireResources";
 import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
 import SaveButtonDrafting from "../../components/SaveButtonDrafting";
 
-function DraftingEditor({ metadata, modified, setModified }) {
-    const { systemBcv } = useContext(BcvContext);
-    const { debugRef } = useContext(DebugContext);
+function DraftingEditor({metadata, modified, setModified}) {
+    const {systemBcv} = useContext(BcvContext);
+    const {debugRef} = useContext(DebugContext);
     const [units, setUnits] = useState([]);
     const [currentChapter, setCurrentChapter] = useState(1);
     const [pk, setPk] = useState(null);
@@ -26,6 +26,13 @@ function DraftingEditor({ metadata, modified, setModified }) {
     const [selectedReference, setSelectedReference] = useState("");
     const [usfmHeader, setUsfmHeader] = useState("");
     const [savedChecksum, setSavedChecksum] = useState(null);
+
+    useEffect(() => {
+        const isElectron = !!window.electronAPI;
+        if (isElectron) {
+            window.electronAPI.setCanClose(!modified);
+        }
+    }, [modified]);
 
     const updateBcv = unitN => {
         if (unitData[unitN]) {
@@ -60,9 +67,9 @@ function DraftingEditor({ metadata, modified, setModified }) {
                     setUsfmHeader(usfmText.split("\\c")[0])
                     const newPk = new Proskomma();
                     newPk.importDocument({
-                        lang: "xxx",
-                        abbr: "yyy"
-                    },
+                            lang: "xxx",
+                            abbr: "yyy"
+                        },
                         "usfm",
                         usfmText
                     );
@@ -97,12 +104,12 @@ function DraftingEditor({ metadata, modified, setModified }) {
                     .map(i => i.payload)
                     .join("")
                 ).join("\n\n")
-            newUnitData.push({ reference: cv, text: cvText })
+            newUnitData.push({reference: cv, text: cvText})
         }
         setUnitData(newUnitData)
         setIsDownloading(false);
         setModified(false);
-        setSavedChecksum(md5(JSON.stringify(newUnitData,null, 2)))
+        setSavedChecksum(md5(JSON.stringify(newUnitData, null, 2)))
     }
 
     useEffect(() => {
@@ -113,10 +120,10 @@ function DraftingEditor({ metadata, modified, setModified }) {
 
     const handleCacheUnit = (unitN, newText) => {
         console.log(`text: '${newText}'`)
-        const newUnit = { ...unitData[unitN], text: newText }
+        const newUnit = {...unitData[unitN], text: newText}
         let newUnitData = [...unitData]
         newUnitData[unitN] = newUnit
-        const newChecksum = md5(JSON.stringify(newUnitData,null, 2));
+        const newChecksum = md5(JSON.stringify(newUnitData, null, 2));
         const notSaved = newChecksum !== savedChecksum;
         if (notSaved !== modified) {
             setModified(notSaved);
@@ -136,7 +143,7 @@ function DraftingEditor({ metadata, modified, setModified }) {
             }
         }
     }
-    
+
 
     if (isDownloading) {
         return <p>loading...</p>
@@ -153,7 +160,7 @@ function DraftingEditor({ metadata, modified, setModified }) {
                 setModified={setModified}
                 setSavedChecksum={setSavedChecksum}
             />
-            <NavBarDrafting currentChapter={currentChapter} setCurrentChapter={setCurrentChapter} units={units} />
+            <NavBarDrafting currentChapter={currentChapter} setCurrentChapter={setCurrentChapter} units={units}/>
             <Box>
                 {unitData
                     .map((u, index) => {
@@ -161,7 +168,7 @@ function DraftingEditor({ metadata, modified, setModified }) {
                             return;
                         }
                         return (
-                            <Box key={index} >
+                            <Box key={index}>
                                 <FormControl fullWidth margin="normal">
                                     <TextField
                                         label={u.reference}
@@ -189,29 +196,5 @@ function DraftingEditor({ metadata, modified, setModified }) {
         </RequireResources>
     );
 }
-
-// Récupération du code Electron
-// const isModified = () => {
-//     const chapterIndex = obs[0];
-//     const originalChecksum = chapterChecksums[chapterIndex];
-//     if (!originalChecksum) {
-//         return false;
-//     }
-//     const currentChecksum = calculateChapterChecksum(ingredient[chapterIndex]);
-
-//     return originalChecksum !== currentChecksum;
-// };
-
-// // Intercepter les tentatives de navigation
-// useEffect(() => {
-//     const isElectron = !!window.electronAPI;
-//     if (isElectron) {
-//         if (isModified()) {
-//             window.electronAPI.setCanClose(false);
-//         } else {
-//             window.electronAPI.setCanClose(true);
-//         }
-//     }
-// }, [isModified]);
 
 export default DraftingEditor;

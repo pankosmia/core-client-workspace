@@ -1,4 +1,4 @@
-import {useEffect, useState, useContext} from "react";
+import {useEffect, useState, useContext, useCallback} from "react";
 import {Box, Stack} from "@mui/material";
 import {
     debugContext as DebugContext,
@@ -7,7 +7,6 @@ import {
     postEmptyJson,
 } from "pithekos-lib";
 
-//import SearchNavBar from "../../components/SearchNavBar";
 import SearchWithVerses from "../../components/SearchWithVerses";
 import Editor from "../../components/Editor"
 import AddFab from "../../components/AddFab";
@@ -16,7 +15,7 @@ import md5 from "md5";
 
 function BcvNotesEditorMuncher({metadata}) {
     const [ingredient, setIngredient] = useState([]);
-    const {systemBcv, setSystemBcv} = useContext(BcvContext);
+    const {systemBcv} = useContext(BcvContext);
     const {debugRef} = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
     const [md5Ingredient, setMd5Ingredient] = useState([]);
@@ -60,22 +59,17 @@ function BcvNotesEditorMuncher({metadata}) {
         }
     }
 
-    // useEffect(() => {
-    //     const onBeforeUnload = ev => {
-    //         ev.preventDefault();
-    //     };
-    //     window.addEventListener('beforeunload', onBeforeUnload);
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, []);
-
-    const isModified = () => {
+    const isModified = useCallback(
+        () => {
         const originalChecksum = md5Ingredient;
         if (!originalChecksum) {
             return false;
         }
         const currentChecksum = md5(JSON.stringify(ingredient));
         return originalChecksum !== currentChecksum;
-    };
+    },
+        [ingredient, md5Ingredient]
+    );
     useEffect(() => {
         const isElectron = !!window.electronAPI;
         if (isElectron) {

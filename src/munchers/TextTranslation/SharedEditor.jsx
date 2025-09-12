@@ -1,4 +1,4 @@
-import {useMemo, useState} from "react";
+import {useEffect, useMemo} from "react";
 
 import {
     ScripturalEditorComposer,
@@ -40,8 +40,8 @@ export default function SharedEditor(
         return {
             bookCode,
             usj,
-            onError,
             editable,
+            onError,
             initialLexicalState: initialState,
             initialSettings: {
                 ...DEFAULT_SCRIPTURAL_BASE_SETTINGS,
@@ -50,6 +50,12 @@ export default function SharedEditor(
         };
     }, [usj, editable, onSave, bookCode, initialState]);
 
+    useEffect(() => {
+        const isElectron = !!window.electronAPI;
+        if (isElectron) {
+            window.electronAPI.setCanClose(!modified);
+        }
+    }, [modified]);
 
     return (
         <div className="editor-wrapper prose">
