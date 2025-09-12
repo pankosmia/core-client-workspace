@@ -1,5 +1,5 @@
-import { useEffect, useState, useContext } from "react";
-import { Box, Stack } from "@mui/material";
+import {useEffect, useState, useContext} from "react";
+import {Box, Stack} from "@mui/material";
 import {
     debugContext as DebugContext,
     bcvContext as BcvContext,
@@ -14,10 +14,10 @@ import AddFab from "../../components/AddFab";
 import SaveTsvButton from "../../components/SaveTsvButton";
 import md5 from "md5";
 
-function BcvNotesEditorMuncher({ metadata }) {
+function BcvNotesEditorMuncher({metadata}) {
     const [ingredient, setIngredient] = useState([]);
-    const { systemBcv, setSystemBcv } = useContext(BcvContext);
-    const { debugRef } = useContext(DebugContext);
+    const {systemBcv, setSystemBcv} = useContext(BcvContext);
+    const {debugRef} = useContext(DebugContext);
     const [currentRowN, setCurrentRowN] = useState(1);
     const [md5Ingredient, setMd5Ingredient] = useState([]);
     const [cellValueChanged, setCellValueChanged] = useState(false);
@@ -48,15 +48,18 @@ function BcvNotesEditorMuncher({ metadata }) {
     );
 
     const updateBcv = rowN => {
-        const newCurrentRowCV = ingredient[rowN][0].split(":")
-        postEmptyJson(
-            `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1].split("-")[0]}`,
-            debugRef.current
-        );
-       
+        const newCurrentRow = ingredient[rowN][0];
+        if (newCurrentRow[0]) {
+            const newCurrentRowCV = newCurrentRow[0].split(":");
+            if (newCurrentRowCV.length === 2) {
+                postEmptyJson(
+                    `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1].split("-")[0]}`,
+                    debugRef.current
+                );
+            }
+        }
     }
-    console.log("updateBCV",updateBcv)
-    
+
     // useEffect(() => {
     //     const onBeforeUnload = ev => {
     //         ev.preventDefault();
@@ -64,8 +67,8 @@ function BcvNotesEditorMuncher({ metadata }) {
     //     window.addEventListener('beforeunload', onBeforeUnload);
     //     // eslint-disable-next-line react-hooks/exhaustive-deps
     // }, []);
-    
-     const isModified = () => {
+
+    const isModified = () => {
         const originalChecksum = md5Ingredient;
         if (!originalChecksum) {
             return false;
@@ -90,7 +93,7 @@ function BcvNotesEditorMuncher({ metadata }) {
         }}
         >
             {/* <SearchNavBar getAllData={getAllData} /> */}
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{display: 'flex', gap: 2}}>
                 <AddFab
                     currentRowN={currentRowN}
                     setCurrentRowN={setCurrentRowN}
@@ -111,7 +114,7 @@ function BcvNotesEditorMuncher({ metadata }) {
                 />
             </Box>
 
-            <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, padding: 2 }}>
+            <Box sx={{display: 'flex', gap: 2, flexGrow: 1, padding: 2}}>
 
                 <SearchWithVerses
                     ingredient={ingredient}
@@ -133,7 +136,7 @@ function BcvNotesEditorMuncher({ metadata }) {
                 />
             </Box>
 
-        </Stack >
+        </Stack>
     );
 
 }
