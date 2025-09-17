@@ -37,9 +37,17 @@
       "en": "Could not save!",
       "fr": "Enregistrement a échoué !"
     },
+    "usfm_conversion_error": {
+      "en": "Error while converting USFM to USJ",
+      "fr": "Erreur pendant la conversion d'USFM en USJ"
+    },
     "load_error": {
       "en": "Could not load",
       "fr": "Le chargement a échoué"
+    },
+    "parse_error": {
+      "en": "Could not convert to USJ",
+      "fr": "La conversion en USJ a échoué"
     },
     "choose_resources": {
       "en": "Choose resources to display in your workspace",
