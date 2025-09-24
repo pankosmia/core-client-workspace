@@ -74,7 +74,7 @@ function SharedEditorWrapper({ metadata, modified, setModified }) {
             pk.importDocument({"lang": "eng", "abbr": "xyz"}, "usj", jsonString);
             const query = "{documents {usfm}}";
             const result = pk.gqlQuerySync(query);
-            usfm = JSON.parse(result.data.documents[0].usfm);
+            usfm = result.data.documents[0].usfm;
         } catch (err) {
             enqueueSnackbar(
                 `${doI18n("pages:core-local-workspace:usfm_conversion_error", i18nRef.current)}: ${err}`,
@@ -83,7 +83,7 @@ function SharedEditorWrapper({ metadata, modified, setModified }) {
         }
         const response = await postJson(
             `/burrito/ingredient/raw/${repoPath}?ipath=${ingredientPath}`,
-            usfm,
+            JSON.stringify({payload: usfm}),
             debugBool
         );
         if (response.ok) {
