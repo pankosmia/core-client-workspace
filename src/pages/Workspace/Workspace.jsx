@@ -22,7 +22,7 @@ const paneStyle = {
 
 const DistractionToggle = ({distractionModeCount, setDistractionModeCount}) => {
     const {i18nRef} = useContext(i18nContext);
-    return <Button style={{color: "#FFF"}} size="small" onClick={() => {
+    return <Button style={{color: "#FFF", marginLeft:"1em"}} size="small" onClick={() => {
         setDistractionModeCount(distractionModeCount + 1);
     }}>
         {doI18n(`pages:core-local-workspace:${(distractionModeCount % 2) === 0 ? "distraction": "no_distraction"}_mode`, i18nRef.current)}
