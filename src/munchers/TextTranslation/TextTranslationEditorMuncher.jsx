@@ -65,7 +65,7 @@ function ChangeEditorDialog({modeChangeDialogOpen, setModeChangeDialogOpen, newE
 
 function TextTranslationEditorMuncher({metadata}) {
     const {i18nRef} = useContext(I18nContext);
-    const [editor, setEditor] = useState("units");
+    const [editor, setEditor] = useState("chapter");
     const [modified, setModified] = useState(false);
     const [modeChangeDialogOpen, setModeChangeDialogOpen] = useState(false);
     const pageOptions = [
