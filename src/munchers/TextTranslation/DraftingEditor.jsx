@@ -1,5 +1,6 @@
-import { useEffect, useContext, useState } from "react";
-import { Proskomma } from 'proskomma-core';
+import {useEffect, useContext, useState} from "react";
+import md5 from "md5";
+import {Proskomma} from 'proskomma-core';
 import {
     bcvContext as BcvContext,
     debugContext as DebugContext,
@@ -7,15 +8,15 @@ import {
     getText,
     postEmptyJson,
 } from "pithekos-lib";
-import { Box, FormControl, TextField } from "@mui/material";
+import {Box, FormControl, TextField} from "@mui/material";
 import RequireResources from "../../components/RequireResources";
 import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
 import SaveButtonDrafting from "../../components/SaveButtonDrafting";
 
-function DraftingEditor({ metadata, adjSelectedFontClass }) {
-    const { systemBcv } = useContext(BcvContext);
-    const { debugRef } = useContext(DebugContext);
+function DraftingEditor({metadata, modified, setModified}) {
+    const {systemBcv} = useContext(BcvContext);
+    const {debugRef} = useContext(DebugContext);
     const [units, setUnits] = useState([]);
     const [currentChapter, setCurrentChapter] = useState(1);
     const [pk, setPk] = useState(null);
@@ -24,19 +25,26 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
     const [currentText, setCurrentText] = useState("");
     const [selectedReference, setSelectedReference] = useState("");
     const [usfmHeader, setUsfmHeader] = useState("");
+    const [savedChecksum, setSavedChecksum] = useState(null);
+
+    useEffect(() => {
+        const isElectron = !!window.electronAPI;
+        if (isElectron) {
+            window.electronAPI.setCanClose(!modified);
+        }
+    }, [modified]);
 
     const updateBcv = unitN => {
         if (unitData[unitN]) {
             const newCurrentUnitCV = unitData[unitN].reference.split(":")
             postEmptyJson(
-                `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1]}`,
+                `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1].split("-")[0]}`,
                 debugRef.current
             );
         }
 
     }
 
-    console.log("newCurrentUnit", )
     useEffect(() => {
         const juxtaJson = async () => {
             let jsonResponse = await getJson(`/burrito/ingredient/raw/git.door43.org/BurritoTruck/fr_juxta/?ipath=${systemBcv.bookCode}.json`, debugRef.current);
@@ -59,9 +67,9 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                     setUsfmHeader(usfmText.split("\\c")[0])
                     const newPk = new Proskomma();
                     newPk.importDocument({
-                        lang: "xxx",
-                        abbr: "yyy"
-                    },
+                            lang: "xxx",
+                            abbr: "yyy"
+                        },
                         "usfm",
                         usfmText
                     );
@@ -70,7 +78,7 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
             };
             getProskomma().then();
         },
-        [debugRef, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum, metadata.local_path]
+        [debugRef, systemBcv.bookCode, metadata.local_path]
     );
     const getUnitTexts = async () => {
 
@@ -96,10 +104,12 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                     .map(i => i.payload)
                     .join("")
                 ).join("\n\n")
-            newUnitData.push({ reference: cv, text: cvText })
+            newUnitData.push({reference: cv, text: cvText})
         }
         setUnitData(newUnitData)
-        setIsDownloading(false)
+        setIsDownloading(false);
+        setModified(false);
+        setSavedChecksum(md5(JSON.stringify(newUnitData, null, 2)))
     }
 
     useEffect(() => {
@@ -108,10 +118,16 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
         }
     }, [units, pk]);
 
-    const handleSaveUnit = (unitN, newText) => {
-        const newUnit = { ...unitData[unitN], text: newText }
+    const handleCacheUnit = (unitN, newText) => {
+        console.log(`text: '${newText}'`)
+        const newUnit = {...unitData[unitN], text: newText}
         let newUnitData = [...unitData]
         newUnitData[unitN] = newUnit
+        const newChecksum = md5(JSON.stringify(newUnitData, null, 2));
+        const notSaved = newChecksum !== savedChecksum;
+        if (notSaved !== modified) {
+            setModified(notSaved);
+        }
         setUnitData(newUnitData)
     }
 
@@ -128,6 +144,7 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
         }
     }
 
+
     if (isDownloading) {
         return <p>loading...</p>
     }
@@ -139,14 +156,19 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                 systemBcv={systemBcv}
                 usfmHeader={usfmHeader}
                 unitData={unitData}
+                modified={modified}
+                setModified={setModified}
+                setSavedChecksum={setSavedChecksum}
             />
-            <NavBarDrafting currentChapter={currentChapter} setCurrentChapter={setCurrentChapter} units={units} />
+            <NavBarDrafting currentChapter={currentChapter} setCurrentChapter={setCurrentChapter} units={units}/>
             <Box>
                 {unitData
-                    .filter(u => u.reference.startsWith(`${currentChapter}:`))
                     .map((u, index) => {
+                        if (!u.reference.startsWith(`${currentChapter}:`)) {
+                            return;
+                        }
                         return (
-                            <Box key={index} >
+                            <Box key={index}>
                                 <FormControl fullWidth margin="normal">
                                     <TextField
                                         label={u.reference}
@@ -163,7 +185,7 @@ function DraftingEditor({ metadata, adjSelectedFontClass }) {
                                         onChange={(e) => {
                                             setCurrentText(e.target.value)
                                         }}
-                                        onBlur={() => handleSaveUnit(index, currentText)}
+                                        onBlur={() => handleCacheUnit(index, currentText)}
                                     />
                                 </FormControl>
                             </Box>

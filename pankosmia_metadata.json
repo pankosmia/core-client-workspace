@@ -14,7 +14,8 @@
     },
     "Select_Resources": {
       "en": "Select Resources",
-      "fr": "Sélectionner des ressources"
+      "fr": "Sélectionner des ressources",
+      "id": "Pilih Sumber Daya"
     },
     "summary": {
       "ar": "تسييير و تغيير الموارد المحلية",
@@ -23,217 +24,459 @@
       "id": "Kelola dan edit sumber daya lokal"
     },
     "flavor": {
-      "en": "flavor"
+      "en": "flavor",
+      "id": "rasa"
     },
     "editing": {
       "en": "Edit",
-      "fr": "Editer"
+      "fr": "Editer",
+      "id": "Edit"
     },
     "saved": {
       "en": "Saved!",
-      "fr": "Enregistré !"
+      "fr": "Enregistré !",
+      "id": "Telah disimpan!"
     },
     "save_error": {
       "en": "Could not save!",
-      "fr": "Enregistrement a échoué !"
+      "fr": "Enregistrement a échoué !",
+      "id": "Tidak dapat disimpan!"
+    },
+    "usfm_conversion_error": {
+      "en": "Error while converting USFM to USJ",
+      "fr": "Erreur pendant la conversion d'USFM en USJ",
+      "id": "Kesalahan terjadi saat mengubah USFM ke USJ"
     },
     "load_error": {
       "en": "Could not load",
-      "fr": "Le chargement a échoué"
+      "fr": "Le chargement a échoué",
+      "id": "Tidak dapat memuat"
+    },
+    "parse_error": {
+      "en": "Could not convert to USJ",
+      "fr": "La conversion en USJ a échoué"
     },
     "choose_resources": {
       "en": "Choose resources to display in your workspace",
-      "fr": "Choisissez des ressources qui seront affichées sur votre plan de travail"
+      "fr": "Choisissez des ressources qui seront affichées sur votre plan de travail",
+      "id": "Pilih sumber daya buat ditampilkan di ruang kerja"
     },
     "save_your_work": {
       "en": "Save your work before leaving this page!",
-      "fr": "Enregistrez votre travail avant de quitter cette page !"
+      "fr": "Enregistrez votre travail avant de quitter cette page !",
+      "id": "Simpan perubahannya sebelum meninggalkan halaman ini!"
     },
     "change_book": {
       "en": "Changing Book",
       "fr": "Changer de livre",
-      "es": "Cambiar de libro"
+      "es": "Cambiar de libro",
+      "id": "Beralih Buku"
     },
     "change_book_question": {
       "en": "You are about to change to a different book. This will discard any unsaved changes you have made to the current book. Do you wish to continue?",
       "fr": "Vous êtes sur le point de changer de livre. Cette opération annulera toutes les modifications non sauvegardées que vous avez apportées au livre actuel. Souhaitez-vous continuer ?",
-      "es": "Está a punto de cambiar de libro. Esto descartará cualquier cambio no guardado que haya realizado en el libro actual. ¿Desea continuar?"
+      "es": "Está a punto de cambiar de libro. Esto descartará cualquier cambio no guardado que haya realizado en el libro actual. ¿Desea continuar?",
+      "id": "Akan beralih ke buku lain. Tindakan ini akan menghapus semua perubahan yang belum disimpan yang telah dibuat pada buku saat ini. Ingin melanjutkan?"
     },
     "accept": {
       "en": "Accept",
       "fr": "Accepter",
-      "es": "Aceptar"
+      "es": "Aceptar",
+      "id": "Terima"
     },
     "cancel": {
       "en": "Cancel",
       "fr": "Annuler",
-      "es": "Cancelar"
+      "es": "Cancelar",
+      "id": "Batal"
     },
     "language": {
       "en": "Language",
       "fr": "Langue",
-      "es": "Lenguaje"
+      "es": "Lenguaje",
+      "id": "Bahasa"
     },
     "previous": {
       "en": "Previous",
-      "fr": "Précédent"
+      "fr": "Précédent",
+      "id": "Sebelumnya"
     },
     "next": {
       "en": "Next",
-      "fr": "Suivant"
+      "fr": "Suivant",
+      "id": "Berikutnya"
     },
     "add": {
       "en": "Add",
-      "fr": "Ajouter"
+      "fr": "Ajouter",
+      "id": "Tambah"
     },
     "save_note": {
       "en": "Save note",
-      "fr": "Enregistrez votre nouvelle note"
+      "fr": "Enregistrez votre nouvelle note",
+      "id": "Simpan catatan"
     },
     "save_tsv": {
       "en": "Save to file",
-      "fr": "Sauvegarder dans le fichier "
+      "fr": "Sauvegarder dans le fichier ",
+      "id": "Simpan ke file"
     },
     "new_bcv_note": {
       "en": "New note",
-      "fr": "Nouvelle note"
+      "fr": "Nouvelle note",
+      "id": "Catatan baru"
     },
     "delete_note_bcv": {
       "en": "About to delete this content. This operation cannot be undone. Click \"cancel\" unless you are sure you want to delete this content permanently.",
-      "fr": "Vous êtes sur le point de supprimer ce contenu. Cette opération est permanent. Cliquez sur \"Annuler\", sauf si vous voulez vraiment effacer ce contenu de façon irréversible."
+      "fr": "Vous êtes sur le point de supprimer ce contenu. Cette opération est permanent. Cliquez sur \"Annuler\", sauf si vous voulez vraiment effacer ce contenu de façon irréversible.",
+      "id": "Akan menghapus konten ini. Operasi ini tidak dapat dibalikkan. Klik \"batal\" kecuali yakin ingin menghapus konten ini secara permanen."
     },
     "do_delete_button": {
       "en": "Delete",
-      "fr": "Supprimer"
+      "fr": "Supprimer",
+      "id": "Hapus"
     },
     "ok": {
       "en": "Ok",
-      "fr": "Ok"
+      "fr": "Ok",
+      "id": "Oke"
     },
     "reset": {
       "en": "Reset",
-      "fr": "Annuler"
+      "fr": "Annuler",
+      "id": "Atur ulang"
     },
     "row_name": {
       "en": "Name",
       "fr": "Nom",
-      "es": "Nombre"
+      "es": "Nombre",
+      "id": "Nama"
     },
     "row_description": {
       "en": "Description",
       "fr": "Description",
-      "es": "Descripción"
+      "es": "Descripción",
+      "id": "Deskripsi"
     },
     "row_type": {
       "en": "Type",
       "fr": "Type",
-      "es": "Tipo"
+      "es": "Tipo",
+      "id": "Jenis"
     },
     "row_language": {
       "en": "Language",
       "fr": "Langue",
-      "es": "Idioma"
+      "es": "Idioma",
+      "id": "Bahasa"
     },
     "create": {
       "en": "Create",
       "es": "Crear",
-      "fr": "Créer"
+      "fr": "Créer",
+      "id": "Buat"
     },
     "close": {
       "en": "close",
       "es": "cerrar",
-      "fr": "fermer"
+      "fr": "fermer",
+      "id": "tutup"
     },
-    "choose_resources_workspace":{
-      "en":"Choose what resources to open in the Workspace, alongside your editable Content."
+    "undo": {
+      "en": "Undo",
+      "fr": "Annuler",
+      "id": "Balikkan"
     },
-     "required_field":{
-      "en":"* Required fields",
-      "fr":"* Champ obligatoire"
+    "redo": {
+      "en": "Redo",
+      "fr": "Refaire",
+      "id": "Buat lagi"
+    },
+    "toggle_block_view": {
+      "en": "Toggle block view",
+      "fr": "Changer les blocs ",
+      "id": "Alihkan tampilan blok"
+    },
+    "toggle_markup": {
+      "en": "Toggle markup",
+      "fr": "Activer/désactiver le balisage",
+      "id": "Alihkan markup"
+    },
+    "search_tool": {
+      "en": "Find and replace",
+      "fr": "Chercher et remplace ",
+      "id": "Cari dan ganti"
+    },
+    "key_combination": {
+      "en": "Set trigger key combination",
+      "fr": "Définir la combinaison de touches de déclenchement ",
+      "id": "Atur kombinasi tombol pemicu"
+    },
+    "usfm_button_c": {
+      "en": "Chapter number",
+      "fr": "Numéro du chapitre",
+      "id": "Nomor fasal"
+    },
+    "usfm_button_q": {
+      "en": "Poetry text, level 1 indent",
+      "id": "Teks puisi, indentasi tingkat 1"
+    },
+    "usfm_button_m": {
+      "en": "Paragraph text, with no first line indent",
+      "id": "Teks paragraf, tanpa indentasi di baris pertama"
+    },
+    "usfm_button_q1": {
+      "en": "Poetry text, level 1 indent",
+      "id": "Teks puisi, indentasi tingkat 1"
+    },
+    "usfm_button_q2": {
+      "en": "Poetry text, level 2 indent",
+      "id": "Teks puisi, indentasi tingkat 2"
+    },
+    "usfm_button_s2": {
+      "en": "A section heading, level 2",
+      "id": "Judul bagian, tingkat 2"
+    },
+    "usfm_button_mt": {
+      "en": "The main title of the book",
+      "fr": "Le titre principal du livre",
+      "id": "Judul utama buku"
+    },
+    "usfm_button_s3": {
+      "en": "A section heading, level 3",
+      "id": "Judul bagian, tingkat 3"
+    },
+    "usfm_button_s": {
+      "en": "A section heading, level 1",
+      "id": "Judul bagian, tingkat 1"
+    },
+    "usfm_button_v": {
+      "en": "A verse number",
+      "fr": "Le numéro de verset",
+      "id": "Nomor ayat"
+    },
+    "usfm_button_p": {
+      "en": "A paragraph text, with first line indent",
+      "id": "Teks paragraf, dengan indentasi di baris pertama"
+    },
+    "choose_resources_workspace": {
+      "en": "Choose what resources to open in the Workspace, alongside your editable Content.",
+      "id": "Pilih sumber daya yg akan dibuka di Ruang Kerja, dipertunjukkan di samping koten yg dapat diedit"
+    },
+    "type_to_search": {
+      "en": "Type to search",
+      "fr": "Taper pour rechercher",
+      "id": "Ketik buat cari"
+    },
+    "no_result": {
+      "en": "No results",
+      "fr": "Pas de résultat",
+      "id": "Tidak ada hasil"
+    },
+    "current": {
+      "en": "Current",
+      "fr": "Actuel",
+      "id": "Saat Ini"
+    },
+    "apply": {
+      "en": "Apply",
+      "fr": "Appliquer",
+      "id": "Terap"
+    },
+    "modification_key": {
+      "en": "Press modifier keys (Ctrl, Alt, Shift) together with another key.",
+      "id": "Tekan tombol pengubah (Ctrl, Alt, Shift) bersamaan dengan tombol lainnya."
+    },
+    "replace_all": {
+      "en": "Replace all",
+      "fr": "Tout remplacer",
+      "id": "Ganti semuanya"
+    },
+    "searching": {
+      "en": "searching...",
+      "fr": "recherche...",
+      "id": "mencari..."
+    },
+    "replace_one": {
+      "en": "replace",
+      "fr": "remplacer",
+      "id": "ganti"
+    },
+    "find_replace": {
+      "en": "Find & replace",
+      "fr": "Chercher et remplacer",
+      "id": "Cari dan ganti"
+    },
+    "find": {
+      "en": "Find",
+      "fr": "Chercher",
+      "id": "Cari"
+    },
+    "replace_with": {
+      "en": "Replace with ",
+      "fr": "Remplacer avec",
+      "id": "Ganti dgn"
+    },
+    "set_trigger_key": {
+      "en": "Set trigger Key",
+      "id": "Atur kunci pemicu"
+    },
+    "record_key_combination": {
+      "en": "Record key combination",
+      "id": "Rekam kombinasi tombol"
+    },
+    "click_record_below": {
+      "en": "Click 'record' below",
+      "id": "Klik 'rekam' di bawah"
+    },
+    "listening": {
+      "en": "Listening...",
+      "fr": "Ecoute...",
+      "id": "Mendengarkan..."
+    },
+    "press_keys_now": {
+      "en": "Press key now",
+      "fr": "Appuyer sur une touche maintenant",
+      "id": "Tekan tombol sekarang"
+    },
+    "required_field": {
+      "en": "* Required fields",
+      "fr": "* Champ obligatoire",
+      "id": "* Data yg diperlukan"
     },
     "main_track": {
       "en": "Main track",
-      "fr": "Piste principale"
+      "fr": "Piste principale",
+      "id": "Trek utama"
     },
     "recording_in_progress": {
       "en": "Recording in progress",
-      "fr": "Enregistrement en cours"
+      "fr": "Enregistrement en cours",
+      "id": "Sedang rekaman"
     },
     "no_other_tracks": {
       "en": "No other tracks found",
-      "fr": "Aucune autre piste trouvée"
+      "fr": "Aucune autre piste trouvée",
+      "id": "Tidak ada trek lain yang ditemukan"
     },
     "click_record_to_start": {
       "en": "Click",
-      "fr": "Cliquez sur"
+      "fr": "Cliquez sur",
+      "id": "Klik"
     },
     "or_press_r_to_record": {
       "en": "or press R to record",
-      "fr": "ou appuyez sur R pour enregistrer"
+      "fr": "ou appuyez sur R pour enregistrer",
+      "id": "atau tekan R buat merekam"
     },
     "supplementary_tracks": {
       "en": "SUPPLEMENTARY TRACKS",
-      "fr": "Pistes supplémentaires"
+      "fr": "Pistes supplémentaires",
+      "id": "TREK-TREK TAMBAHAN"
     },
     "delete_track": {
       "en": "Delete track",
-      "fr": "Supprimer la piste"
+      "fr": "Supprimer la piste",
+      "id": "Hapus trek"
     },
     "play_track": {
       "en": "Play track",
-      "fr": "Lire la piste"
+      "fr": "Lire la piste",
+      "id": "Putar trek"
     },
     "empty_track": {
       "en": "Empty track",
-      "fr": "Piste vide - Prochaine prise"
+      "fr": "Piste vide - Prochaine prise",
+      "id": "Trek kosong"
     },
     "tooltip_record": {
       "en": "Record",
-      "fr": "Enregistrer"
+      "fr": "Enregistrer",
+      "id": "Rekam"
     },
     "tooltip_play_pause": {
       "en": "Play/Pause",
-      "fr": "Lire/Pause"
+      "fr": "Lire/Pause",
+      "id": "Putar/Jeda"
     },
     "tooltip_restore": {
       "en": "Restore",
-      "fr": "Restaurer"
+      "fr": "Restaurer",
+      "id": "Pulihkan"
     },
     "tooltip_paste": {
       "en": "Paste",
-      "fr": "Coller"
+      "fr": "Coller",
+      "id": "Tempel"
     },
     "tooltip_copy": {
       "en": "Copy",
-      "fr": "Copier"
+      "fr": "Copier",
+      "id": "Duplikasi"
     },
     "tooltip_delete": {
       "en": "Delete",
-      "fr": "Supprimer"
+      "fr": "Supprimer",
+      "id": "Hapus"
     },
     "tooltip_confirm_renaming": {
       "en": "Confirm renaming",
-      "fr": "Confirmer le renommage"
+      "fr": "Confirmer le renommage",
+      "id": "Konfirmasikan penggantian nama"
     },
     "tooltip_cancel_renaming": {
       "en": "Cancel renaming",
-      "fr": "Annuler le renommage"
+      "fr": "Annuler le renommage",
+      "id": "Batalkan perubahan nama"
     },
     "tooltip_switch_with_maintrack": {
       "en": "Switch with maintrack",
-      "fr": "Changer avec la piste principale"
+      "fr": "Changer avec la piste principale",
+      "id": "Beralih dengan trek utama"
     },
     "tooltip_rename_track": {
       "en": "Rename track",
-      "fr": "Renommer la piste"
+      "fr": "Renommer la piste",
+      "id": "Ganti nama trek"
     },
     "tooltip_play_track": {
       "en": "Play track",
-      "fr": "Lire la piste"
+      "fr": "Lire la piste",
+      "id": "Putar trek"
     },
     "tooltip_delete_track": {
       "en": "Delete track",
-      "fr": "Supprimer la piste"
+      "fr": "Supprimer la piste",
+      "id": "Hapus trek"
+    },
+    "editor_mode": {
+      "en": "Editor mode",
+      "id": "Mode editor"
+    },
+    "distraction_mode": {
+      "en": "Normal view",
+      "fr": "Vue normale",
+      "id": "Tampilan normal"
+    },
+    "no_distraction_mode": {
+      "en": "Edit-only view",
+      "fr": "Vue éditeur seul",
+      "id": "Tampilan edit saja"
+    },
+    "change_editor_title": {
+      "en": "Changing editor",
+      "fr": "Changement d'éditeur",
+      "id": "Sedang mengganti editor"
+    },
+    "change_editor_without_saving": {
+      "en": "You have unsaved edits. If you change editor now you will lose those changes. If that is not what you want, hit 'cancel'",
+      "fr": "Il existe des modifications non-enregistrées. Si vous changez tout de suite d'éditeur vous perdrez ces modifications. Si ce n'est pas votre souhait, cliquez sur 'annuler'.",
+      "id": "Ada suntingan yang belum disimpan. Jika mengganti editor sekarang, perubahan tersebut akan hilang. Tekan 'batal' jika tidak sesuai keinginan."
+    },
+    "do_change_editor": {
+      "en": "Change editor anyway",
+      "fr": "Changer néanmoins d'editeur",
+      "id": "Ganti saja editornya"
     }
   }
 }

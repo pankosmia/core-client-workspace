@@ -40,7 +40,7 @@ export  function ReferenceSyncPlugin() {
       systemBcvData.verseNum === parseInt(editorBcvData.verse);
   }, []);
 
-  // System → Editor sync
+  // System → SharedEditor sync
   useEffect(() => {
     if (systemBcv && !isEditorUpdate.current) {
       // Avoid unnecessary updates if references are already equivalent
@@ -58,7 +58,7 @@ export  function ReferenceSyncPlugin() {
     isEditorUpdate.current = false;
   }, [systemBcv, setEditorBcv, editorBcv, areReferencesEqual]);
 
-  // Editor → System sync
+  // SharedEditor → System sync
   useEffect(() => {
     if (!isSystemUpdate.current && editorBcv?.book) {
       setSystemBcv(editorBcv);
