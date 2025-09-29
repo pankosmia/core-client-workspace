@@ -101,7 +101,7 @@ function DraftingEditor({metadata, modified, setModified}) {
             const cvText = result.data.documents[0].mainSequence.blocks
                 .map(b => b.items
                     .filter(i => i.type === "token")
-                    .map(i => i.payload)
+                    .map(i => i.payload.replace(/\s+/g, " "))
                     .join("")
                 ).join("\n\n")
             newUnitData.push({reference: cv, text: cvText})
