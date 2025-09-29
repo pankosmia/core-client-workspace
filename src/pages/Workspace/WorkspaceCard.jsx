@@ -21,8 +21,9 @@ import JuxtalinearViewerMuncher from "../../munchers/Juxtalinear/JuxtalinearView
 function WorkspaceCard({metadata, style, distractionModeCount}) {
     const scriptDirectionString =  metadata.script_direction === 'rtl' ? 'rtl' : 'ltr';
     if (!metadata.primary && (distractionModeCount % 2) > 0) {
-        return <div style={{...style, backgroundColor: "#edeafd", filter:'blur(2px)'}} dir={scriptDirectionString}>
+        return <div style={{...style, backgroundImage:'url("/app-resources/pages/workspace/tile_blur.png")', filter: "blur(1px)"}} dir={scriptDirectionString}>
         </div>
+        
     }
     if (metadata.primary && metadata.flavor === "textTranslation") {
         return <div style={style} dir={scriptDirectionString}>
