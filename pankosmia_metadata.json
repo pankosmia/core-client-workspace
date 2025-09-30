@@ -451,7 +451,8 @@
     },
     "editor_mode": {
       "en": "Editor mode",
-      "id": "Mode editor"
+      "id": "Mode editor",
+      "es": "Modo del editor"
     },
     "distraction_mode": {
       "en": "Normal view",
@@ -466,17 +467,24 @@
     "change_editor_title": {
       "en": "Changing editor",
       "fr": "Changement d'éditeur",
-      "id": "Sedang mengganti editor"
+      "id": "Sedang mengganti editor",
+      "es": "Cambiando el editor"
     },
     "change_editor_without_saving": {
       "en": "You have unsaved edits. If you change editor now you will lose those changes. If that is not what you want, hit 'cancel'",
       "fr": "Il existe des modifications non-enregistrées. Si vous changez tout de suite d'éditeur vous perdrez ces modifications. Si ce n'est pas votre souhait, cliquez sur 'annuler'.",
-      "id": "Ada suntingan yang belum disimpan. Jika mengganti editor sekarang, perubahan tersebut akan hilang. Tekan 'batal' jika tidak sesuai keinginan."
+      "id": "Ada suntingan yang belum disimpan. Jika mengganti editor sekarang, perubahan tersebut akan hilang. Tekan 'batal' jika tidak sesuai keinginan.",
+      "es": "Tienes cambios sin guardar. Si cambias de editor ahora, perderás esos cambios. Si no es lo que deseas, pulsa 'cancelar'."
     },
     "do_change_editor": {
       "en": "Change editor anyway",
       "fr": "Changer néanmoins d'editeur",
-      "id": "Ganti saja editornya"
+      "id": "Ganti saja editornya",
+      "es": "Cambiar el editor de todas formas"
+    },
+    "editor_warning": {
+      "en": "Markup such as headings may be lost when using the unit editor.",
+      "es": "Las notas de los encabezados pueden perderse al usar el editor por secciones."
     }
   }
 }

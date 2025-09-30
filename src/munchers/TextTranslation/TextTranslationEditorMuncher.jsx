@@ -1,4 +1,4 @@
-import {useState, useContext} from "react";
+import {useState, useContext, useRef} from "react";
 import "./TextTranslationEditorMuncher.css";
 import {
     i18nContext as I18nContext,
@@ -69,26 +69,34 @@ function TextTranslationEditorMuncher({metadata}) {
     const [modified, setModified] = useState(false);
     const [modeChangeDialogOpen, setModeChangeDialogOpen] = useState(false);
     const [warningOpen, setWarningOpen] = useState(false);
+    const newEditorRef = useRef('');
 
     const pageOptions = [
         {value: 'units', label: 'Units of meaning'},
         {value: 'chapter', label: 'Chapter'},
     ];
 
-    const handleChange1 = (event) => {
+    /* const handleChange1 = (event) => {
         if (editor === 'chapter') {
             handleWarningOpen()
         } else {
             handleChange(event.target.value)
         }
-    };
+    }; */
 
     const handleChange = (event) => {
-        if (modified) {
-            setModeChangeDialogOpen(true);
+        if (!warningOpen){
+            newEditorRef.current = event.target.value;
+        }
+        if (editor === 'chapter' && !warningOpen) {
+            handleWarningOpen();
         } else {
-            setEditor(event/* .target.value */);
-            setModified(false);
+            if (modified) {
+                setModeChangeDialogOpen(true);
+            } else {
+                setEditor(newEditorRef.current);
+                setModified(false);
+            }
         }
     };
 
@@ -110,7 +118,7 @@ function TextTranslationEditorMuncher({metadata}) {
                     <Select
                         labelId="page-selector-label"
                         value={editor}
-                        onChange={handleChange1}
+                        onChange={handleChange}
                         label={doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}
                         renderValue={(selected) => (
                             <Box sx={{display: 'flex', alignItems: 'center'}}>
@@ -168,7 +176,7 @@ function TextTranslationEditorMuncher({metadata}) {
                     <Button onClick={handleWarningClose}>{doI18n("pages:core-local-workspace:close", i18nRef.current)}</Button>
                     <Button onClick={async () => {
                         handleChange();
-                        handleWarningClose()
+                        handleWarningClose();
                     }}>{doI18n("pages:core-local-workspace:accept", i18nRef.current)}</Button>
                 </DialogActions>
             </Dialog>
