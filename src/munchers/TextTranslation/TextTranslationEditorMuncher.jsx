@@ -76,14 +76,6 @@ function TextTranslationEditorMuncher({metadata}) {
         {value: 'chapter', label: 'Chapter'},
     ];
 
-    /* const handleChange1 = (event) => {
-        if (editor === 'chapter') {
-            handleWarningOpen()
-        } else {
-            handleChange(event.target.value)
-        }
-    }; */
-
     const handleChange = (event) => {
         if (!warningOpen){
             newEditorRef.current = event.target.value;
@@ -164,20 +156,32 @@ function TextTranslationEditorMuncher({metadata}) {
                 onClose={handleWarningClose}
                 slotProps={{paper: {component: 'form'}}}
             >
-                <DialogTitle><b>{doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}</b></DialogTitle>
+                <DialogTitle><b>{doI18n("pages:core-local-workspace:change_editor_title", i18nRef.current)}</b></DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         <Typography>
-                            {doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}
+                            {doI18n("pages:core-local-workspace:editor_warning", i18nRef.current)}
                         </Typography>
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleWarningClose}>{doI18n("pages:core-local-workspace:close", i18nRef.current)}</Button>
-                    <Button onClick={async () => {
-                        handleChange();
-                        handleWarningClose();
-                    }}>{doI18n("pages:core-local-workspace:accept", i18nRef.current)}</Button>
+                    <Button  
+                        variant='contained'
+                        color="primary"
+                        onClick={handleWarningClose}
+                    >
+                        {doI18n("pages:core-local-workspace:close", i18nRef.current)}
+                    </Button>
+                    <Button 
+                        variant='outlined'
+                        color="secondary"
+                        onClick={async () => {
+                            handleChange();
+                            handleWarningClose();
+                        }}
+                    >
+                        {doI18n("pages:core-local-workspace:do_change_editor", i18nRef.current)}
+                    </Button>
                 </DialogActions>
             </Dialog>
         </Box>
