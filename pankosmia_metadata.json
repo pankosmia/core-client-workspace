@@ -483,8 +483,7 @@
       "es": "Cambiar el editor de todas formas"
     },
     "editor_warning": {
-      "en": "Markup such as headings may be lost when using the unit editor.",
-      "es": "Las notas de los encabezados pueden perderse al usar el editor por secciones."
+      "en": "The unit editor retains biblical text, chapters and verses. Anything else, such as heading or footnotes will be lost."
     }
   }
 }
