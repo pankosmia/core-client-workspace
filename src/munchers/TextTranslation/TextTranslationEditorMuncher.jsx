@@ -68,17 +68,36 @@ function TextTranslationEditorMuncher({metadata}) {
     const [editor, setEditor] = useState("chapter");
     const [modified, setModified] = useState(false);
     const [modeChangeDialogOpen, setModeChangeDialogOpen] = useState(false);
+    const [warningOpen, setWarningOpen] = useState(false);
+
     const pageOptions = [
         {value: 'units', label: 'Units of meaning'},
         {value: 'chapter', label: 'Chapter'},
     ];
+
+    const handleChange1 = (event) => {
+        if (editor === 'chapter') {
+            handleWarningOpen()
+        } else {
+            handleChange(event.target.value)
+        }
+    };
+
     const handleChange = (event) => {
         if (modified) {
             setModeChangeDialogOpen(true);
         } else {
-            setEditor(event.target.value);
+            setEditor(event/* .target.value */);
             setModified(false);
         }
+    };
+
+    const handleWarningOpen = () => {
+        setWarningOpen(true);
+    };
+
+    const handleWarningClose = () => {
+        setWarningOpen(false);
     };
 
     return (
@@ -91,7 +110,7 @@ function TextTranslationEditorMuncher({metadata}) {
                     <Select
                         labelId="page-selector-label"
                         value={editor}
-                        onChange={handleChange}
+                        onChange={handleChange1}
                         label={doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}
                         renderValue={(selected) => (
                             <Box sx={{display: 'flex', alignItems: 'center'}}>
@@ -132,6 +151,27 @@ function TextTranslationEditorMuncher({metadata}) {
                 setEditor={setEditor}
                 setModified={setModified}
             />
+            <Dialog
+                open={warningOpen}
+                onClose={handleWarningClose}
+                slotProps={{paper: {component: 'form'}}}
+            >
+                <DialogTitle><b>{doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}</b></DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        <Typography>
+                            {doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}
+                        </Typography>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleWarningClose}>{doI18n("pages:core-local-workspace:close", i18nRef.current)}</Button>
+                    <Button onClick={async () => {
+                        handleChange();
+                        handleWarningClose()
+                    }}>{doI18n("pages:core-local-workspace:accept", i18nRef.current)}</Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }
