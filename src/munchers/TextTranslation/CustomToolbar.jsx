@@ -1,6 +1,6 @@
 import { useContext, useMemo, useState } from "react";
 import { FindReplaceDialog } from "./FindReplaceDialog";
-
+import "./custom-editor.css"
 import {
   FindReplacePlugin,
   FormatButton,
@@ -139,17 +139,14 @@ export function CustomToolbar({ onSave, modified }) {
               </IconButton>
               <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
 
-              <ToggleButton value={"block_view"} sx={{ border: 0 }}>
-                  <ViewButton title={doI18n("pages:core-local-workspace:toggle_block_view", i18nRef.current)}>
-                    <FormatListNumberedIcon />
-                  </ViewButton>
-              </ToggleButton>
+              <ViewButton value={"block_view"} className="viewButtonx" title={doI18n("pages:core-local-workspace:toggle_block_view", i18nRef.current)}>
+                <FormatListNumberedIcon />
+              </ViewButton>
 
-              <ToggleButton value={"toggle_markup"} sx={{ border: 0, borderBottomRightRadius: 1, borderTopRightRadius: 1 }}>
-                <FormatButton title={doI18n("pages:core-local-workspace:toggle_markup", i18nRef.current)}>
-                  <SvgParaph />
-                </FormatButton>
-              </ToggleButton>
+              <FormatButton value={"toggle_markup"} className="formatButton" title={doI18n("pages:core-local-workspace:toggle_markup", i18nRef.current)}>
+                <SvgParaph />
+              </FormatButton>
+
             </Box>
             <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
             <CustomMarkersToolbar customMarkers={markerGroups} doI18n={doI18n} i18nRef={i18nRef} />
@@ -157,7 +154,7 @@ export function CustomToolbar({ onSave, modified }) {
 
 
           {/* The FindReplaceDialog is also a child of FindReplacePlugin */}
-          <FindReplaceDialog/>
+          <FindReplaceDialog />
           <ScripturalNodesMenuPlugin trigger={triggerKeyCombo} />
         </FindReplacePlugin>
       ) : null
