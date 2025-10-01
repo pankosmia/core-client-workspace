@@ -73,44 +73,8 @@
   line-height: inherit;
 }
 
-.viewButtony {
+.paddingButtonNavBar {
 display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  background-color: transparent;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  color: gray;
-  border-radius:5px 0 0 5px;
+padding: 10px;
 }
 
-.viewButtonx {
-display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  color: rgb(202, 25, 25);
-  border-radius:5px 0 0 5px;
-}
-
-.formatButton {
-display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  color: gray;
-  border-radius:0 5px 5px 0;
-}
-.formatButton:hover {
-  background-color: rgba(0, 0, 0, 0.04);
-}
-
-.formatButton:active {
-  color: rgba(31, 23, 23, 0.12);
-  background-color: orange;
-}
