@@ -51,6 +51,25 @@ function DraftingEditor({metadata, modified, setModified}) {
             if (jsonResponse.ok) {
                 let newUnits = juxta2Units(jsonResponse.json)
                 setUnits(newUnits)
+            } else { // Generate from Proskomma versification
+                const vrsQuery = `{
+                versification(id: "eng") {
+                  cvBook(bookCode: "${systemBcv.bookCode}") {
+                    chapters {
+                      chapter
+                      maxVerse
+                    }
+                  }
+                }
+                }`;
+                const pk = new Proskomma();
+                const result = pk.gqlQuerySync(vrsQuery);
+                const chapters = result.data.versification.cvBook.chapters;
+                setUnits(
+                    chapters.map(
+                        c => [...Array(c.maxVerse + 1).keys()].map(c2 => `${c.chapter}:${c2}`).slice(1)
+                    ).reduce((a, b) => [...a, ...b], [])
+                );
             }
         }
         juxtaJson().then()
@@ -130,26 +149,12 @@ function DraftingEditor({metadata, modified, setModified}) {
         }
         setUnitData(newUnitData)
     }
-
-    const contentSpec = {
-        "general": {
-            "ntjxt": {
-                "_all": {
-                    "dcs": {
-                        "name": "Juxtalinéaire grec-français du Nouveau Testament, créée par Xenizo (NTJXT)",
-                        "repoPath": "git.door43.org/BurritoTruck/fr_juxta"
-                    }
-                }
-            }
-        }
-    }
-
-
+    
     if (isDownloading) {
         return <p>loading...</p>
     }
     return (
-        <RequireResources contentSpec={contentSpec}>
+        <>
 
             <SaveButtonDrafting
                 metadata={metadata}
@@ -193,7 +198,7 @@ function DraftingEditor({metadata, modified, setModified}) {
                     })
                 }
             </Box>
-        </RequireResources>
+        </>
     );
 }
 
