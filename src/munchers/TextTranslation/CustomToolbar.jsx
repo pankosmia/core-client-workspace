@@ -89,13 +89,7 @@ export function CustomToolbar({ onSave, modified }) {
   const handleFormat = (event, newFormats) => {
     setFormats(newFormats);
   };
-
-  const [active, setActive] = useState(false);
-
-  const handleClick = () => {
-    setActive(!active); // bascule entre actif/inactif
-  };
-
+  
   return (
     <>
       <TriggerKeyDialog

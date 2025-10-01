@@ -1,17 +1,18 @@
-import {useContext, useState} from 'react';
-import {useLocation} from "react-router-dom";
-import {Box, Button} from "@mui/material";
+import { useContext, useState } from 'react';
+import { useLocation } from "react-router-dom";
+import { Box, Button, Chip, Stack } from "@mui/material";
 import WorkspaceCard from "./WorkspaceCard";
 import BcvPicker from "./BcvPicker";
 import GraphiteTest from "./GraphiteTest";
+import CenterFocusWeakIcon from '@mui/icons-material/CenterFocusWeak';
 import {
     createTilePanes,
     TileContainer,
     TileProvider,
 
 } from 'react-tile-pane'
-import {i18nContext, doI18n, Header} from "pithekos-lib";
-import {typographyContext} from "pithekos-lib";
+import { i18nContext, doI18n, Header } from "pithekos-lib";
+import { typographyContext } from "pithekos-lib";
 import OBSContext from '../../contexts/obsContext';
 
 const paneStyle = {
@@ -20,22 +21,14 @@ const paneStyle = {
     overflow: 'scroll'
 }
 
-const DistractionToggle = ({distractionModeCount, setDistractionModeCount}) => {
-    const {i18nRef} = useContext(i18nContext);
-    return <Button style={{color: "#FFF", marginLeft:"1em"}} size="small" onClick={() => {
-        setDistractionModeCount(distractionModeCount + 1);
-    }}>
-        {doI18n(`pages:core-local-workspace:${(distractionModeCount % 2) === 0 ? "distraction": "no_distraction"}_mode`, i18nRef.current)}
-    </Button>
-}
 
 const Workspace = () => {
 
-    const {typographyRef} = useContext(typographyContext);
+    const { typographyRef } = useContext(typographyContext);
     const locationState = Object.entries(useLocation().state);
     const resources = locationState
         .map(kv => {
-            return {...kv[1], local_path: kv[0]}
+            return { ...kv[1], local_path: kv[0] }
         });
     const [distractionModeCount, setDistractionModeCount] = useState(0);
     const tileElements = {};
@@ -56,9 +49,9 @@ const Workspace = () => {
             distractionModeCount={distractionModeCount}
         />;
         if (resource.primary) {
-            rootPane.children[0] = {children: title};
+            rootPane.children[0] = { children: title };
         } else {
-            rootPane.children[1].children.push({children: title});
+            rootPane.children[1].children.push({ children: title });
         }
     }
     if (rootPane.children[1].children.length === 0) {
@@ -72,20 +65,36 @@ const Workspace = () => {
 
     const [obs, setObs] = useState([1, 0]);
 
+    const DistractionToggle = ({ distractionModeCount, setDistractionModeCount, resource }) => {
+        const { i18nRef } = useContext(i18nContext);
+        return (
+            <Stack sx={{ marginLeft: "1rem"}} >
+                <Chip
+                    onClick={() => { setDistractionModeCount(distractionModeCount + 1); }}
+                    icon={<CenterFocusWeakIcon color={(distractionModeCount % 2) === 0 ? "#FFF" : "#555"} />}
+                    label={`${doI18n("pages:core-local-workspace:focus_mode", i18nRef.current)}`}
+                    style={{ color: (distractionModeCount % 2) === 0 ? "#FFF" : "#555" }}
+                    variant="outlined"
+                    disabled={resources.length === 1}
+                />
+            </Stack >
+        )
+    }
+
     return <>
         <Header
             titleKey="pages:core-local-workspace:title"
             requireNet={false}
             currentId="core-local-workspace"
-            widget={<span style={{display: "flex"}}>
-                <BcvPicker/>
+            widget={<span style={{ display: "flex" }}>
+                {["scripture", "parascriptural"].includes(resources.filter(r => r.primary)[0].flavor_type) && <BcvPicker />}
                 <DistractionToggle
                     distractionModeCount={distractionModeCount}
-                    setDistractionModeCount={setDistractionModeCount}/>
-        </span>}
+                    setDistractionModeCount={setDistractionModeCount} />
+            </span>}
         />
         <div className={adjSelectedFontClass}>
-            <OBSContext.Provider value={{obs, setObs}}>
+            <OBSContext.Provider value={{ obs, setObs }}>
                 <TileProvider
                     tilePanes={paneList}
                     rootNode={rootPane}
@@ -98,7 +107,7 @@ const Workspace = () => {
                         overflow: 'scroll',
                         width: '100vw'
                     }}>
-                        <TileContainer/>
+                        <TileContainer />
                     </Box>
                 </TileProvider>
             </OBSContext.Provider>
