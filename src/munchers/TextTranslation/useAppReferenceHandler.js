@@ -35,7 +35,7 @@ export function useAppReferenceHandler(initialReference) {
         
         // If the change is from the app (not editor), update app state
         if (source !== 'react_state_update') {
-          setReference(ref || { book: "TIT", chapter: 1, verse: 1 });
+          setReference(ref);
         }
         
         // Notify all subscribers
