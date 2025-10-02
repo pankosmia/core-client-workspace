@@ -487,7 +487,13 @@
       "es": "Cambiar el editor de todas formas"
     },
     "editor_warning": {
-      "en": "The unit editor retains biblical text, chapters and verses. Anything else, such as heading or footnotes will be lost."
+      "en": "The unit editor retains biblical text, chapters and verses. Anything else, such as heading or footnotes will be lost.",
+      "id": "Ganti saja editornya"
+    },
+    "editable": {
+      "en": "editable",
+      "fr": "editable",
+      "id": "dapat diedit"
     }
   }
 }

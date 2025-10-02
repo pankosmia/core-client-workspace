@@ -23,7 +23,6 @@ const paneStyle = {
 
 
 const Workspace = () => {
-
     const { typographyRef } = useContext(typographyContext);
     const locationState = Object.entries(useLocation().state);
     const resources = locationState
@@ -42,7 +41,7 @@ const Workspace = () => {
         ],
     }
     for (const resource of resources) {
-        const title = resource.name;
+        const title = resource.name + (resource.path.split('/')[1] === "_local_" ? ` (${doI18n("pages:core-local-workspace:editable", i18nRef.current)})` : "");
         tileElements[title] = <WorkspaceCard
             metadata={resource}
             style={paneStyle}
