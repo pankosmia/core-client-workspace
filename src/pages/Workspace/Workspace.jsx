@@ -68,7 +68,7 @@ const Workspace = () => {
     const DistractionToggle = ({ distractionModeCount, setDistractionModeCount, resource }) => {
         const { i18nRef } = useContext(i18nContext);
         return (
-            <Stack sx={{ marginLeft: "1rem"}} >
+            <Stack sx={{marginLeft: "60rem"}}  >
                 <Chip
                     onClick={() => { setDistractionModeCount(distractionModeCount + 1); }}
                     icon={<CenterFocusWeakIcon color={(distractionModeCount % 2) === 0 ? "#FFF" : "#555"} />}
