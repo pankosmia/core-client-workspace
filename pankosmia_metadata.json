@@ -464,6 +464,10 @@
       "fr": "Vue éditeur seul",
       "id": "Tampilan edit saja"
     },
+    "focus_mode":{
+      "en": "Focus mode"
+    },
+    
     "change_editor_title": {
       "en": "Changing editor",
       "fr": "Changement d'éditeur",

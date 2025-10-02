@@ -1,6 +1,6 @@
 import { useContext, useMemo, useState } from "react";
 import { FindReplaceDialog } from "./FindReplaceDialog";
-
+import "./custom-editor.css"
 import {
   FindReplacePlugin,
   FormatButton,
@@ -18,10 +18,10 @@ import { TriggerKeyDialog } from "./TriggerKeyDialog";
 import SaveIcon from '@mui/icons-material/Save';
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardCommandKeyIcon from '@mui/icons-material/KeyboardCommandKey';
-import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import WrapTextOutlinedIcon from '@mui/icons-material/WrapTextOutlined';
 import { Divider, ToggleButton, IconButton, Box, } from "@mui/material";
 import {
   i18nContext as I18nContext,
@@ -68,6 +68,8 @@ export function CustomToolbar({ onSave, modified }) {
   const [isDialogOpenTriggerKey, setIsDialogOpenTriggerKey] = useState(false);
   const [formats, setFormats] = useState(() => [""])
   const { i18nRef } = useContext(I18nContext);
+  const [activeView, setActiveView] = useState(null);
+
 
   // Define the markers to show in the toolbar
   const markerGroups = {
@@ -87,7 +89,7 @@ export function CustomToolbar({ onSave, modified }) {
   const handleFormat = (event, newFormats) => {
     setFormats(newFormats);
   };
-
+  
   return (
     <>
       <TriggerKeyDialog
@@ -106,58 +108,60 @@ export function CustomToolbar({ onSave, modified }) {
             size="small"
           >
             <Box sx={{ display: "flex", flexDirection: 'row', borderRadius: 4 }}>
-              <IconButton>
-                <UndoButton title={doI18n("pages:core-local-workspace:undo", i18nRef.current)}>
+              <IconButton sx={{ padding: 0, margin: 0 }}>
+                <UndoButton className="paddingButtonNavBar" title={doI18n("pages:core-local-workspace:undo", i18nRef.current)}>
                   <UndoIcon />
                 </UndoButton>
               </IconButton>
 
-              <IconButton >
-                <RedoButton title={doI18n("pages:core-local-workspace:redo", i18nRef.current)}>
+              <IconButton sx={{ padding: 0, margin: 0 }}>
+                <RedoButton className="paddingButtonNavBar" title={doI18n("pages:core-local-workspace:redo", i18nRef.current)}>
                   <RedoIcon />
                 </RedoButton>
               </IconButton>
               <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
 
-              <IconButton disabled={!modified}>
-                <SaveButton onSave={onSave} title={doI18n("pages:core-local-workspace:add", i18nRef.current)}>
+              <IconButton disabled={!modified} sx={{ padding: 0, margin: 0 }}>
+                <SaveButton className="paddingButtonNavBar" onSave={onSave} title={doI18n("pages:core-local-workspace:add", i18nRef.current)}>
                   <SaveIcon />
                 </SaveButton>
               </IconButton>
               <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
 
               {/* <ButtonExpandNotes defaultState={false} /> */}
-              <IconButton>
+              <IconButton sx={{ padding: 0, margin: 0 }}>
                 <TriggerKeyButton
+                  className="paddingButtonNavBar"
                   triggerKeyCombo={triggerKeyCombo}
                   onClick={openDialog}
                 />
               </IconButton>
 
-              <IconButton>
-                <SearchButton />
+              <IconButton sx={{ padding: 0, margin: 0 }}>
+                <SearchButton className="paddingButtonNavBar"/>
               </IconButton>
               <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
 
-              <ToggleButton value={"block_view"} sx={{ border: 0 }}>
-                  <ViewButton title={doI18n("pages:core-local-workspace:toggle_block_view", i18nRef.current)}>
-                    <FormatListNumberedIcon />
-                  </ViewButton>
+              <ToggleButton value={"block_view"} sx={{ border: 0, padding: 0, margin: 0}}>
+                <ViewButton className="paddingButtonNavBar" title={doI18n("pages:core-local-workspace:toggle_block_view", i18nRef.current)}>
+                  <WrapTextOutlinedIcon />
+                </ViewButton>
               </ToggleButton>
 
-              <ToggleButton value={"toggle_markup"} sx={{ border: 0, borderBottomRightRadius: 1, borderTopRightRadius: 1 }}>
-                <FormatButton title={doI18n("pages:core-local-workspace:toggle_markup", i18nRef.current)}>
+              <ToggleButton value={"toggle_markup"} sx={{ border: 0, padding: 0, margin: 0 }}>
+                <FormatButton className="paddingButtonNavBar" title={doI18n("pages:core-local-workspace:toggle_markup", i18nRef.current)}>
                   <SvgParaph />
                 </FormatButton>
               </ToggleButton>
             </Box>
             <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
             <CustomMarkersToolbar customMarkers={markerGroups} doI18n={doI18n} i18nRef={i18nRef} />
+
           </ToggleButtonGroup>
 
 
           {/* The FindReplaceDialog is also a child of FindReplacePlugin */}
-          <FindReplaceDialog/>
+          <FindReplaceDialog />
           <ScripturalNodesMenuPlugin trigger={triggerKeyCombo} />
         </FindReplacePlugin>
       ) : null
