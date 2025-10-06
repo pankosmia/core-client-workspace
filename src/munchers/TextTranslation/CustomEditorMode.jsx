@@ -118,7 +118,7 @@ function CustomEditorMode({editor,modified,setEditor,setModified }) {
     };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box>
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
             <FormControl size="small">
               <InputLabel id="page-selector-label">

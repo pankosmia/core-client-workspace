@@ -1,8 +1,7 @@
 import { useContext, useState } from 'react';
 import { useLocation } from "react-router-dom";
-import { Box, Button, Chip, Stack } from "@mui/material";
+import { Box, Chip, Stack } from "@mui/material";
 import WorkspaceCard from "./WorkspaceCard";
-import BcvPicker from "./BcvPicker";
 import GraphiteTest from "./GraphiteTest";
 import CenterFocusWeakIcon from '@mui/icons-material/CenterFocusWeak';
 import {
@@ -87,7 +86,7 @@ const Workspace = () => {
             requireNet={false}
             currentId="core-local-workspace"
             widget={<span style={{ display: "flex" }}>
-                {["scripture", "parascriptural"].includes(resources.filter(r => r.primary)[0].flavor_type) && <BcvPicker />}
+                {["scripture", "parascriptural"].includes(resources.filter(r => r.primary)[0].flavor_type)}
                 <DistractionToggle
                     distractionModeCount={distractionModeCount}
                     setDistractionModeCount={setDistractionModeCount} />

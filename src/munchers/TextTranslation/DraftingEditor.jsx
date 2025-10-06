@@ -8,7 +8,7 @@ import {
   getText,
   postEmptyJson,
 } from "pithekos-lib";
-import { Box, FormControl, TextField } from "@mui/material";
+import { Box, FormControl, Grid2, TextField } from "@mui/material";
 import RequireResources from "../../components/RequireResources";
 import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
@@ -178,31 +178,43 @@ function DraftingEditor({
           left: 0,
           right: 0,
           display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          px: 2,
+          padding: 2,
         }}
       >
-        <SaveButtonDrafting
-          metadata={metadata}
-          systemBcv={systemBcv}
-          usfmHeader={usfmHeader}
-          unitData={unitData}
-          modified={modified}
-          setModified={setModified}
-          setSavedChecksum={setSavedChecksum}
-        />
-        <NavBarDrafting
-          currentChapter={currentChapter}
-          setCurrentChapter={setCurrentChapter}
-          units={units}
-        />
-        <CustomEditorMode
-          editor={editorMode}
-          setEditor={setEditor}
-          modified={modified}
-          setModified={setModified}
-        />
+        <Grid2
+          container
+          spacing={2}
+          justifyContent="space-around"
+          alignItems="stretch"
+          width="100%"
+        >
+          <Grid2 item size={3}>
+            <SaveButtonDrafting
+              metadata={metadata}
+              systemBcv={systemBcv}
+              usfmHeader={usfmHeader}
+              unitData={unitData}
+              modified={modified}
+              setModified={setModified}
+              setSavedChecksum={setSavedChecksum}
+            />
+          </Grid2>
+          <Grid2 item size={6}>
+            <NavBarDrafting
+              currentChapter={currentChapter}
+              setCurrentChapter={setCurrentChapter}
+              units={units}
+            />
+          </Grid2>
+          <Grid2 item size={3}>
+            <CustomEditorMode
+              editor={editorMode}
+              setEditor={setEditor}
+              modified={modified}
+              setModified={setModified}
+            />
+          </Grid2>
+        </Grid2>
       </Box>
       <Box>
         {unitData.map((u, index) => {
