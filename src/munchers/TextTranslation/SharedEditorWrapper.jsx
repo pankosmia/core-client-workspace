@@ -17,7 +17,7 @@ import { Box, Typography } from "@mui/material";
 import md5 from "md5";
 import {Proskomma} from "proskomma-core";
 
-function SharedEditorWrapper({ metadata, modified, setModified }) {
+function SharedEditorWrapper({ metadata, modified, setModified,editorMode, setEditor }) {
     const { bcvRef } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const { i18nRef } = useContext(I18nContext);
@@ -138,6 +138,9 @@ function SharedEditorWrapper({ metadata, modified, setModified }) {
             <Box>
                 {usj ? <SharedEditor key={md5sum(JSON.stringify(usj))}
                                      modified={modified}
+                                     setModified={setModified}
+                                     editorMode={editorMode}
+                                     setEditor={setEditor}
                                      usj={usj}
                                      editable={true}
                                      bookCode={bcvRef.current && bcvRef.current.bookCode}

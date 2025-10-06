@@ -101,7 +101,7 @@ const Workspace = () => {
                 >
                     <Box style={{
                         position: 'fixed',
-                        top: '48px',
+                        top: '110px',
                         bottom: 0,
                         right: 0,
                         overflow: 'scroll',
