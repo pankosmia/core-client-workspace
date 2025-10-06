@@ -43,7 +43,11 @@ const Workspace = () => {
         ],
     }
     for (const resource of resources) {
-        const title = resource.name + (resource.path.split('/')[1] === "_local_" ? ` (${doI18n("pages:core-local-workspace:editable", i18nRef.current)})` : "");
+        let location = `${resource.local_path.split('/').slice(0, 2).reverse().join(" - ")}`;
+        if (resource.local_path.split('/')[1].startsWith("_")) {
+            location = doI18n(`pages:core-local-workspace:${resource.local_path.split('/')[1]}`, i18nRef.current);
+        }
+        const title = `${resource.name} (${location})`;
         tileElements[title] = <WorkspaceCard
             metadata={resource}
             style={paneStyle}
