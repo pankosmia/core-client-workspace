@@ -68,13 +68,14 @@ const Workspace = () => {
     const DistractionToggle = ({ distractionModeCount, setDistractionModeCount, resource }) => {
         const { i18nRef } = useContext(i18nContext);
         return (
-            <Stack sx={{ marginLeft: "60rem" }}  >
+            <Stack sx={{ marginLeft: "1rem" }}  >
                 <Chip
                     onClick={() => { setDistractionModeCount(distractionModeCount + 1); }}
-                    icon={<CenterFocusWeakIcon color={(distractionModeCount % 2) === 0 ? "#FFF" : "#555"} />}
+                    icon={<CenterFocusWeakIcon color={(distractionModeCount % 2) === 0 ? "appbar-chip-inactive" : "secondary"} />}
                     label={`${doI18n("pages:core-local-workspace:focus_mode", i18nRef.current)}`}
-                    style={{ color: (distractionModeCount % 2) === 0 ? "#FFF" : "#555" }}
-                    variant="outlined"
+                    color={(distractionModeCount % 2) === 0 ? "appbar-chip-inactive" : "secondary"}
+    
+                    variant="Filled"
                     disabled={resources.length === 1}
                 />
             </Stack >
