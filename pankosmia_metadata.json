@@ -490,10 +490,14 @@
       "en": "The unit editor retains biblical text, chapters and verses. Anything else, such as heading or footnotes will be lost.",
       "id": "Ganti saja editornya"
     },
-    "editable": {
-      "en": "editable",
-      "fr": "editable",
+    "_local_": {
+      "en": "editable on this machine",
+      "fr": "peut editer sur cette machine",
       "id": "dapat diedit"
+    },
+    "_sideloaded_": {
+      "en": "imported manually",
+      "fr": "importé manuellement"
     }
   }
 }

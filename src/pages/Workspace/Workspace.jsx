@@ -3,7 +3,8 @@ import { useLocation } from "react-router-dom";
 import { Box, Chip, Stack } from "@mui/material";
 import WorkspaceCard from "./WorkspaceCard";
 import GraphiteTest from "./GraphiteTest";
-import CenterFocusWeakIcon from '@mui/icons-material/CenterFocusWeak';
+import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
+import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import {
     createTilePanes,
     TileContainer,
@@ -41,7 +42,11 @@ const Workspace = () => {
         ],
     }
     for (const resource of resources) {
-        const title = resource.name + (resource.path.split('/')[1] === "_local_" ? ` (${doI18n("pages:core-local-workspace:editable", i18nRef.current)})` : "");
+        let location = `${resource.local_path.split('/').slice(0, 2).reverse().join(" - ")}`;
+        if (resource.local_path.split('/')[1].startsWith("_")) {
+            location = doI18n(`pages:core-local-workspace:${resource.local_path.split('/')[1]}`, i18nRef.current);
+        }
+        const title = `${resource.name} (${location})`;
         tileElements[title] = <WorkspaceCard
             metadata={resource}
             style={paneStyle}
@@ -67,13 +72,14 @@ const Workspace = () => {
     const DistractionToggle = ({ distractionModeCount, setDistractionModeCount, resource }) => {
         const { i18nRef } = useContext(i18nContext);
         return (
-            <Stack sx={{ marginLeft: "60rem" }}  >
+            <Stack sx={{ marginLeft: "1rem" }}  >
                 <Chip
                     onClick={() => { setDistractionModeCount(distractionModeCount + 1); }}
-                    icon={<CenterFocusWeakIcon color={(distractionModeCount % 2) === 0 ? "#FFF" : "#555"} />}
+                    icon={(distractionModeCount % 2) === 0 ? <CenterFocusStrongOutlinedIcon/> : <CenterFocusStrongIcon/> }
                     label={`${doI18n("pages:core-local-workspace:focus_mode", i18nRef.current)}`}
-                    style={{ color: (distractionModeCount % 2) === 0 ? "#FFF" : "#555" }}
-                    variant="outlined"
+                    color={(distractionModeCount % 2) === 0 ? "appbar-chip-inactive" : "secondary"}
+    
+                    variant="Filled"
                     disabled={resources.length === 1}
                 />
             </Stack >
