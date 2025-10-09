@@ -120,11 +120,11 @@ export function CustomToolbar({
           <Grid2
             container
             spacing={2}
-            justifyContent="space-around"
+            justifyContent="space-between"
             alignItems="stretch"
             width="100%"
           >
-            <Grid2 item size={3}>
+            <Grid2 item size={4}>
               <ToggleButtonGroup
                 value={formats}
                 onChange={handleFormat}
@@ -241,17 +241,17 @@ export function CustomToolbar({
                   orientation="vertical"
                   sx={{ mx: 0.5, my: 1 }}
                 />
-                <CustomMarkersToolbar
+                {/* <CustomMarkersToolbar
                   customMarkers={markerGroups}
                   doI18n={doI18n}
                   i18nRef={i18nRef}
-                />
+                /> */}
               </ToggleButtonGroup>
             </Grid2>
-            <Grid2 item size={6}>
-              <BcvPicker />
+            <Grid2 item size={4}>
+              <BcvPicker/>
             </Grid2>
-            <Grid2 item size={3}>
+            <Grid2 item size={4}>
               <CustomEditorMode
                 editor={editorMode}
                 setEditor={setEditor}
