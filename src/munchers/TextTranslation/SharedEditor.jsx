@@ -17,6 +17,7 @@ import "./editor.css";
 import {CustomToolbar} from "./CustomToolbar";
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import {ReferenceSyncPlugin} from "./plugins/ReferenceSyncPlugin";
+import CustomEditorMode from "./CustomEditorMode";
 
 function onError(error) {
     console.error(error);
@@ -25,6 +26,7 @@ function onError(error) {
 export default function SharedEditor(
     {
         modified,
+        setModified,
         usj,
         initialState,
         bookCode,
@@ -35,6 +37,8 @@ export default function SharedEditor(
         scriptureReferenceHandler,
         referenceHandlerSource,
         enableScrollToReference = true,
+        editorMode,
+        setEditor
     }
 ) {
     const initialConfig = useMemo(() => {
@@ -68,7 +72,8 @@ export default function SharedEditor(
             <ScripturalEditorComposer initialConfig={initialConfig}
                                       scriptureReferenceHandler={scriptureReferenceHandler}>
                 <EditorPlugins
-                    modified={modified}
+                    modified={modified} setModified={setModified}
+                    editorMode={editorMode} setEditor={setEditor}
                     onSave={onSave} onHistoryChange={onHistoryChange}
                     enableScrollToReference={enableScrollToReference}/>
                 {children}
@@ -80,6 +85,9 @@ export default function SharedEditor(
 function EditorPlugins(
     {
         modified,
+        setModified,
+        editorMode,
+        setEditor,
         onSave,
         onHistoryChange,
         enableScrollToReference = true,
@@ -91,7 +99,7 @@ function EditorPlugins(
     return (
         <>
             <MarkersMenuProvider>
-                <CustomToolbar onSave={onSave} modified={modified}/>
+                <CustomToolbar onSave={onSave} modified={modified} setModified={setModified} editorMode={editorMode} setEditor={setEditor} />
                 {editable && (
                     <>
                         {enhancedCursorPosition && (

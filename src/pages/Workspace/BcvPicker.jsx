@@ -70,7 +70,7 @@ function BcvPicker() {
         handleDialogClose();
     };
 
-    return <Box sx={{m: 0}}>
+    return <Box sx={{m: 0, justifyContent:"space-between"}}>
         <Button
             id="book-button"
             variant="contained"
@@ -79,7 +79,7 @@ function BcvPicker() {
             aria-haspopup="true"
             aria-expanded={menuIsOpen ? 'true' : undefined}
             onClick={event => handleMenuOpen(event.currentTarget)}
-            sx={{backgroundColor: "#E0E0E0", color: "#000", ml: 4}}
+            sx={{backgroundColor: "#E0E0E0", color: "#000", ml: 4,position:"fixed"}}
         >
             {doI18n(`scripture:books:${bcvRef.current.bookCode}`, i18nRef.current)}
         </Button>
