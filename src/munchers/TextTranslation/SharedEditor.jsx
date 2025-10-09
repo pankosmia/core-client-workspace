@@ -1,5 +1,6 @@
 import {useEffect, useMemo} from "react";
 
+import { Box } from "@mui/material";
 import {
     ScripturalEditorComposer,
     HistoryPlugin,
@@ -58,7 +59,12 @@ export default function SharedEditor(
     }, [modified]);
 
     return (
-        <div className="editor-wrapper prose">
+        <Box
+          sx={{
+              lineHeight: 'normal', // Override tailwind line-height settings to support Awami Nastaliq
+          }}
+          className="editor-wrapper prose"
+        >
             <ScripturalEditorComposer initialConfig={initialConfig}
                                       scriptureReferenceHandler={scriptureReferenceHandler}>
                 <EditorPlugins
@@ -67,7 +73,7 @@ export default function SharedEditor(
                     enableScrollToReference={enableScrollToReference}/>
                 {children}
             </ScripturalEditorComposer>
-        </div>
+        </Box>
     );
 }
 

@@ -31,8 +31,9 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
           />
         </div>
     }
+    // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
     if (metadata.flavor === "textTranslation") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={{...style, lineHeight: 'normal'}} dir={scriptDirectionString}>
             <TextTranslationViewerMuncher
                 metadata={metadata}
             />
