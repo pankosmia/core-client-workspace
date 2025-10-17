@@ -8,12 +8,14 @@ import {
   getText,
   postEmptyJson,
 } from "pithekos-lib";
-import { Box, FormControl, Grid2, TextField } from "@mui/material";
+import { Box, FormControl, Grid2, IconButton, TextField } from "@mui/material";
 import RequireResources from "../../components/RequireResources";
 import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
 import SaveButtonDrafting from "../../components/SaveButtonDrafting";
 import CustomEditorMode from "./CustomEditorMode";
+import PreviewText from "./plugins/PreviewText";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 function DraftingEditor({
   metadata,
@@ -33,6 +35,11 @@ function DraftingEditor({
   const [selectedReference, setSelectedReference] = useState("");
   const [usfmHeader, setUsfmHeader] = useState("");
   const [savedChecksum, setSavedChecksum] = useState(null);
+  const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
+
+  const handlePreviewText = () => {
+    setOpenModalPreviewText(true)
+  }
 
   useEffect(() => {
     const isElectron = !!window.electronAPI;
@@ -45,8 +52,7 @@ function DraftingEditor({
     if (unitData[unitN]) {
       const newCurrentUnitCV = unitData[unitN].reference.split(":");
       postEmptyJson(
-        `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${
-          newCurrentUnitCV[1].split("-")[0]
+        `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1].split("-")[0]
         }`,
         debugRef.current
       );
@@ -146,7 +152,6 @@ function DraftingEditor({
     setModified(false);
     setSavedChecksum(md5(JSON.stringify(newUnitData, null, 2)));
   };
-
   useEffect(() => {
     if (pk) {
       getUnitTexts().then();
@@ -199,7 +204,15 @@ function DraftingEditor({
               setSavedChecksum={setSavedChecksum}
             />
           </Grid2>
-          <Grid2 item size={6}>
+          <Grid2 item size={3}>
+            <IconButton>
+              <VisibilityIcon onClick={() => {
+                handlePreviewText();
+              }} />
+            </IconButton>
+            <PreviewText metadata={metadata} systemBcv={systemBcv} open={openModalPreviewText === true} closeModal={() => setOpenModalPreviewText(false)} />
+          </Grid2>
+          <Grid2 item size={3}>
             <NavBarDrafting
               currentChapter={currentChapter}
               setCurrentChapter={setCurrentChapter}
