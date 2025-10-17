@@ -12,6 +12,7 @@ import Editor from "../../components/Editor"
 import AddFab from "../../components/AddFab";
 import SaveTsvButton from "../../components/SaveTsvButton";
 import md5 from "md5";
+import BcvPicker from "../../pages/Workspace/BcvPicker";
 
 function BcvNotesEditorMuncher({metadata}) {
     const [ingredient, setIngredient] = useState([]);
@@ -24,6 +25,7 @@ function BcvNotesEditorMuncher({metadata}) {
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
+        console.log("ingredientLink",ingredientLink);
         let response = await getText(ingredientLink, debugRef.current);
         if (response.ok) {
             const newIngredient = response.text
@@ -87,7 +89,14 @@ function BcvNotesEditorMuncher({metadata}) {
         }}
         >
             {/* <SearchNavBar getAllData={getAllData} /> */}
-            <Box sx={{display: 'flex', gap: 2}}>
+            <Box sx={{
+                position: "fixed",
+                top: "48px",
+                left: 0,
+                right: 0,
+                display: "flex",
+                padding: 2,
+            }}>
                 <AddFab
                     currentRowN={currentRowN}
                     setCurrentRowN={setCurrentRowN}
@@ -106,6 +115,7 @@ function BcvNotesEditorMuncher({metadata}) {
                     md5Ingredient={md5Ingredient}
                     setMd5Ingredient={setMd5Ingredient}
                 />
+                <BcvPicker/>
             </Box>
 
             <Box sx={{display: 'flex', gap: 2, flexGrow: 1, padding: 2}}>
