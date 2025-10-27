@@ -14,7 +14,7 @@ import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
 import SaveButtonDrafting from "../../components/SaveButtonDrafting";
 import CustomEditorMode from "./CustomEditorMode";
-import PreviewText from "./plugins/PreviewText";
+import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
 function DraftingEditor({
