@@ -25,7 +25,6 @@ function BcvNotesEditorMuncher({metadata}) {
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
-        console.log("ingredientLink",ingredientLink);
         let response = await getText(ingredientLink, debugRef.current);
         if (response.ok) {
             const newIngredient = response.text
