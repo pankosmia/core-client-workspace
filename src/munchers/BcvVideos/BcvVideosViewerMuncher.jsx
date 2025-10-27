@@ -129,13 +129,13 @@ function BcvImagesViewerMuncher({metadata}) {
                             }}
                         >
                             {verseNotes.map((v, n) => (
-                                <div key={n} /* className="w-full h-full flex-shrink-0 flex items-center justify-center" style={{ width: `${100 / verseNotes.length}%` }} */>
+                                <div key={n} className="w-full h-full flex-shrink-0 flex items-center justify-center" style={{ width: `${100 / verseNotes.length}%` }}>
                                     {/* <img
                                         src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.jpg`}
                                         alt="resource image"
                                         className="w-full h-full object-contain"
                                     /> */}
-                                    <video /* width="320" height="240" */ controls className="w-full h-full object-cover"/* object-contain */>
+                                    <video /* width="320" height="240" */ controls className="w-full h-full object-contain"/* object-cover */>
                                       <source src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.mp4`} type="video/mp4"/>
                                       {/* doI18n("munchers:video_links_viewer:offline_mode", i18nRef.current) */"video"}
                                   </video>
@@ -144,7 +144,7 @@ function BcvImagesViewerMuncher({metadata}) {
                         </div>
 
                         {/* Navigation buttons for the slider */}
-                       {/*  <div className="absolute inset-0 flex items-center justify-between pointer-events-none px-4">
+                        <div className="absolute inset-0 flex items-center justify-between pointer-events-none px-4">
                             <button
                                 className="cursor-pointer pointer-events-auto bg-blue-300 hover:bg-blue-400 rounded-full p-1 text-white"
                                 onClick={previousSlide}
@@ -157,10 +157,10 @@ function BcvImagesViewerMuncher({metadata}) {
                             >
                                 <ArrowCircleRightIcon />
                             </button>
-                        </div> */}
+                        </div>
 
                         {/* Circle buttons bottom of the image */}
-                        {/* <div className="absolute inset-0 flex items-end justify-center pointer-events-none pb-16">
+                        <div className="absolute inset-0 flex items-end justify-center pointer-events-none pb-16">
                             <div className="flex justify-center gap-3 pointer-events-none">
                                 {verseNotes.map((v, n) => {
                                     return (
@@ -176,12 +176,12 @@ function BcvImagesViewerMuncher({metadata}) {
                                     );
                                 })}
                             </div>
-                        </div> */}
+                        </div>
                         
                         {/* Caption below the slider */}
                         <div className="absolute bottom-0 left-0 right-0 text-center py-4 px-4 text-base font-medium text-gray-800 bg-white bg-opacity-95 shadow-lg">
-                            {/* {`${verseCaptions[current]} (${current + 1} of ${verseNotes.length})`} */}
-                            {`${verseCaptions[current]}`}
+                            {`${verseCaptions[current]} (${current + 1} of ${verseNotes.length})`}
+                            {/* {`${verseCaptions[current]}`} */}
                         </div>
                     </div> :
                     "No notes found for this verse"
