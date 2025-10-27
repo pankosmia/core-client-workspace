@@ -43,6 +43,7 @@ function ConfigureWorkspace() {
         "x-bcvquestions": "myBcvList",
         "x-bcvQuestions": "myBcvList",
         "x-bcvimages": "myBcvList",
+        "x-bcvvideo": "myBcvList",
         "x-juxtalinear": "myBcvList",
         "x-parallel": "myBcvList",
         "x-bcvImages": "myBcvList",
