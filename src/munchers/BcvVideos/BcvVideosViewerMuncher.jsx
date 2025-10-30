@@ -27,13 +27,22 @@ function BcvImagesViewerMuncher({metadata}) {
     const {i18nRef} = useContext(I18nContext);
     
     let [current, setCurrent] = useState(0);
+    const videoRefs = useRef([]);
 
     let previousSlide = () => {
+        // Pause current video before changing slide
+        if (videoRefs.current[current]) {
+            try { videoRefs.current[current].pause(); videoRefs.current[current].currentTime = 0; } catch (e) {}
+        }
         if (current === 0) setCurrent(verseNotes.length - 1);
         else setCurrent(current - 1);
     };
 
     let nextSlide = () => {
+        // Pause current video before changing slide
+        if (videoRefs.current[current]) {
+            try { videoRefs.current[current].pause(); videoRefs.current[current].currentTime = 0; } catch (e) {}
+        }
         if (current === verseNotes.length - 1) setCurrent(0);
         else setCurrent(current + 1);
     };
@@ -68,16 +77,20 @@ function BcvImagesViewerMuncher({metadata}) {
                 setVerseNotes(ret);
                 // Reset current index when verseNotes changes
                 setCurrent(0);
+                // Reset video refs
+                videoRefs.current = [];
             }
             doVerseNotes().then();
         },
-        [ingredient]
+        [ingredient, metadata?.local_path, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum]
     );
 
     const [ verseCaptions, setVerseCaptions ] = useState([]);
 
     useEffect(
         () => {
+            // clear captions when verse notes change to avoid stale text
+            setVerseCaptions([]);
             if (verseNotes.length > 0){
             const doVerseCaptions = async () => {
                 let captions = [];
@@ -97,6 +110,23 @@ function BcvImagesViewerMuncher({metadata}) {
         [verseNotes]
     );
 
+    // Pause any playing videos before resource/verse changes and ensure cleanup
+    useEffect(
+        () => {
+            return () => {
+                for (const vid of videoRefs.current) {
+                    if (vid) {
+                        try {
+                            vid.pause();
+                            vid.currentTime = 0;
+                        } catch (e) {}
+                    }
+                }
+            };
+        },
+        [metadata?.local_path, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum]
+    );
+
     const get = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
         let response = await getText(ingredientLink, debugRef.current);
@@ -108,6 +138,8 @@ function BcvImagesViewerMuncher({metadata}) {
             );
         }
     };
+    console.log(ingredient);
+    console.log(verseNotes);
     
     return (
         <Box className="h-full w-full flex flex-col overflow-hidden">
@@ -118,70 +150,69 @@ function BcvImagesViewerMuncher({metadata}) {
             <div className="flex-1 min-h-0 min-w-0 overflow-hidden p-2">
                 {ingredient &&
                 verseNotes.length > 0 ? 
-                    <div className="relative w-full h-full overflow-hidden">
+                    <div className="w-full h-full flex flex-col overflow-hidden">
 
-                        {/* Slider images */}
-                        <div
-                            className="flex transition-transform duration-300 ease-out h-full"
-                            style={{
-                                transform: `translateX(-${current * (100 / verseNotes.length)}%)`,
-                                width: `${verseNotes.length * 100}%`,
-                            }}
-                        >
-                            {verseNotes.map((v, n) => (
-                                <div key={n} className="w-full h-full flex-shrink-0 flex items-center justify-center" style={{ width: `${100 / verseNotes.length}%` }}>
-                                    {/* <img
-                                        src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.jpg`}
-                                        alt="resource image"
-                                        className="w-full h-full object-contain"
-                                    /> */}
-                                    <video /* width="320" height="240" */ controls className="w-full h-full object-contain"/* object-cover */>
-                                      <source src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.mp4`} type="video/mp4"/>
-                                      {/* doI18n("munchers:video_links_viewer:offline_mode", i18nRef.current) */"video"}
-                                  </video>
+                        {/* Slider area */}
+                        <div className="relative flex-1 min-h-0 min-w-0">
+                            <div
+                                className="flex transition-transform duration-300 ease-out h-full"
+                                style={{
+                                    transform: `translateX(-${current * (100 / verseNotes.length)}%)`,
+                                    width: `${verseNotes.length * 100}%`,
+                                }}
+                            >
+                                {verseNotes.map((v, n) => (
+                                    <div key={`${metadata.local_path}-${v}`} className="w-full h-full flex-shrink-0 flex items-center justify-center" style={{ width: `${100 / verseNotes.length}%` }}>
+                                        <video ref={el => (videoRefs.current[n] = el)} controls className="max-w-full max-h-full w-auto h-auto object-contain">
+                                            <source src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.mp4`} type="video/mp4"/>
+                                            {"video"}
+                                        </video>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Navigation buttons for the slider */}
+                            <div className="absolute inset-0 flex items-center justify-between pointer-events-none px-4">
+                                <button
+                                    className="cursor-pointer pointer-events-auto bg-blue-300 hover:bg-blue-400 rounded-full p-1 text-white"
+                                    onClick={previousSlide}
+                                >
+                                    <ArrowCircleLeftIcon />
+                                </button>
+                                <button
+                                    className="cursor-pointer pointer-events-auto bg-blue-300 hover:bg-blue-400 rounded-full p-1 text-white"
+                                    onClick={nextSlide}
+                                >
+                                    <ArrowCircleRightIcon />
+                                </button>
+                            </div>
+
+                            {/* Circle buttons bottom of the image */}
+                            <div className="absolute left-0 right-0 bottom-8 md:bottom-12 flex items-center justify-center pointer-events-none">
+                                <div className="flex justify-center gap-2 pointer-events-none">
+                                    {verseNotes.map((v, n) => {
+                                        return (
+                                            <div
+                                                onClick={() => {
+                                                    if (videoRefs.current[current]) {
+                                                        try { videoRefs.current[current].pause(); videoRefs.current[current].currentTime = 0; } catch (e) {}
+                                                    }
+                                                    setCurrent(n);
+                                                }}
+                                                key={`circle-${metadata.local_path}-${v}`}
+                                                className={`rounded-full w-3 h-3 cursor-pointer pointer-events-auto hover:bg-opacity-80 border border-gray-300/30 shadow-sm ${
+                                                n == current ? "bg-blue-300" : "bg-gray-700"
+                                                }`}
+                                            ></div>
+                                        );
+                                    })}
                                 </div>
-                            ))}
-                        </div>
-
-                        {/* Navigation buttons for the slider */}
-                        <div className="absolute inset-0 flex items-center justify-between pointer-events-none px-4">
-                            <button
-                                className="cursor-pointer pointer-events-auto bg-blue-300 hover:bg-blue-400 rounded-full p-1 text-white"
-                                onClick={previousSlide}
-                            >
-                                <ArrowCircleLeftIcon />
-                            </button>
-                            <button
-                                className="cursor-pointer pointer-events-auto bg-blue-300 hover:bg-blue-400 rounded-full p-1 text-white"
-                                onClick={nextSlide}
-                            >
-                                <ArrowCircleRightIcon />
-                            </button>
-                        </div>
-
-                        {/* Circle buttons bottom of the image */}
-                        <div className="absolute inset-0 flex items-end justify-center pointer-events-none pb-16">
-                            <div className="flex justify-center gap-3 pointer-events-none">
-                                {verseNotes.map((v, n) => {
-                                    return (
-                                        <div
-                                            onClick={() => {
-                                            setCurrent(n);
-                                            }}
-                                            key={"circle" + n}
-                                            className={`rounded-full w-4 h-4 cursor-pointer pointer-events-auto hover:bg-opacity-80 border border-gray-300/30 shadow-sm ${
-                                            n == current ? "bg-blue-300" : "bg-gray-700"
-                                            }`}
-                                        ></div>
-                                    );
-                                })}
                             </div>
                         </div>
                         
-                        {/* Caption below the slider */}
-                        <div className="absolute bottom-0 left-0 right-0 text-center py-4 px-4 text-base font-medium text-gray-800 bg-white bg-opacity-95 shadow-lg">
+                        {/* Caption below the slider, outside of the video area */}
+                        <div className="text-center py-3 px-4 text-base font-medium text-gray-800 bg-white/80 shadow-inner">
                             {`${verseCaptions[current]} (${current + 1} of ${verseNotes.length})`}
-                            {/* {`${verseCaptions[current]}`} */}
                         </div>
                     </div> :
                     "No notes found for this verse"
