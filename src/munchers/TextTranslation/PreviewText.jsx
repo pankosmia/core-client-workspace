@@ -1,4 +1,3 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, Typography } from "@mui/material";
 import { SofriaRenderFromProskomma, render } from "proskomma-json-tools";
 import { Proskomma } from 'proskomma-core';
 import { getText, debugContext, i18nContext, doI18n, getJson, typographyContext } from "pithekos-lib";
@@ -24,6 +23,12 @@ function PreviewText({ open, closeModal, metadata, systemBcv }) {
 
     const { typographyRef } = useContext(typographyContext);
     const isFirefox = useAssumeGraphite({});
+
+    useEffect(() => {
+        if (open) {
+            generatePdf(fileExport.current);
+        }
+    }, [open]);
 
     const isGraphite = GraphiteTest()
     /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
@@ -96,29 +101,6 @@ function PreviewText({ open, closeModal, metadata, systemBcv }) {
         newPage.document.head.appendChild(link)
         return true;
     }
-    return (
-        <Dialog
-            fullWidth={true}
-            open={open}
-            onClose={closeModal}
-        >
-            <Box>
-                <DialogActions>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => {
-                            generatePdf(fileExport.current).then();
-                        }
-
-                        }
-                    >{doI18n("pages:content:export_label", i18nRef.current)}</Button>
-                </DialogActions>
-
-            </Box>
-
-        </Dialog>
-    )
 }
 
 export default PreviewText;
