@@ -7,6 +7,7 @@ import BcvNotesEditorMuncher from '../../munchers/BcvNotes/BcvNotesEditorMuncher
 import BcvQuestionsViewerMuncher from "../../munchers/BcvQuestions/BcvQuestionsViewerMuncher";
 import BcvArticlesViewerMuncher from "../../munchers/BcvArticles/BcvArticlesViewerMuncher";
 import BcvImagesViewerMuncher from "../../munchers/BcvImages/BcvImagesViewerMuncher";
+import BcvVideosViewerMuncher from "../../munchers/BcvVideos/BcvVideosViewerMuncher";
 import TastelessMuncher from "../../munchers/Tasteless/TastelessMuncher";
 import './tiles_styles.css'
 import VideoLinksViewerMuncher from "../../munchers/VideoLinks/VideoLinksViewerMuncher";
@@ -140,6 +141,13 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
     if (metadata.flavor.toLowerCase() === "x-obsarticles") {
         return <div style={style} dir={scriptDirectionString}>
             <OBSArticlesViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
+    if (metadata.flavor.toLowerCase() === "x-bcvvideo") {
+        return <div style={style} dir={scriptDirectionString}>
+            <BcvVideosViewerMuncher
                 metadata={metadata}
             />
         </div>
