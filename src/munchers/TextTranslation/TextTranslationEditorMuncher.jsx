@@ -4,10 +4,12 @@ import {
 } from "@mui/material";
 import SharedEditorWrapper from "./SharedEditorWrapper";
 import DraftingEditor from "./DraftingEditor";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import {debugContext} from "pithekos-lib";
 
 function TextTranslationEditorMuncher({metadata}) {
-    const [editor, setEditor] = useState("chapter");
+    const {debugRef} = useContext(debugContext);
+    const [editor, setEditor] = useState(debugRef.current ? "chapter" : "units");
     const [modified, setModified] = useState(false);
 
     return (

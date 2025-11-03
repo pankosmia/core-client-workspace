@@ -1,6 +1,6 @@
-import { useState, useContext, useRef } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import "./TextTranslationEditorMuncher.css";
-import { i18nContext as I18nContext, doI18n } from "pithekos-lib";
+import { i18nContext as I18nContext, doI18n, debugContext } from "pithekos-lib";
 import {
   Box,
   Button,
@@ -84,6 +84,7 @@ function ChangeEditorDialog({
 
 function CustomEditorMode({editor,modified,setEditor,setModified }) {
   const { i18nRef } = useContext(I18nContext);
+  const {debugRef} = useContext(debugContext);
  
   const [modeChangeDialogOpen, setModeChangeDialogOpen] = useState(false);
   const [warningOpen, setWarningOpen] = useState(false);
@@ -119,7 +120,9 @@ function CustomEditorMode({editor,modified,setEditor,setModified }) {
 
   return (
     <Box>
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+        {
+          debugRef.current &&
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
             <FormControl size="small">
               <InputLabel id="page-selector-label">
                   {doI18n("pages:core-local-workspace:editor_mode", i18nRef.current)}
@@ -151,7 +154,8 @@ function CustomEditorMode({editor,modified,setEditor,setModified }) {
                   ))}
               </Select>
             </FormControl>
-        </Box>
+          </Box>
+        }
         
         <ChangeEditorDialog
             modeChangeDialogOpen={modeChangeDialogOpen}
