@@ -15,15 +15,14 @@ import SharedEditor from "./SharedEditor";
 import { useAppReferenceHandler } from "./useAppReferenceHandler";
 import { Box, Typography } from "@mui/material";
 import md5 from "md5";
-import {Proskomma} from "proskomma-core";
-
-function SharedEditorWrapper({ metadata, modified, setModified,editorMode, setEditor }) {
+import { Proskomma } from "proskomma-core";
+import defaultUsj from "./plugins/defaultUsj.json"
+function SharedEditorWrapper({ metadata, modified, setModified, editorMode, setEditor }) {
     const { bcvRef } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const { i18nRef } = useContext(I18nContext);
-    const [usj, setUsj] = useState(null);
+    const [usj, setUsj] = useState(defaultUsj);
     const [savedChecksum, setSavedChecksum] = useState(null);
-
     const [bookCode, setBookCode] = useState(
         (bcvRef.current && bcvRef.current.bookCode) ||
         "TIT"
@@ -32,7 +31,10 @@ function SharedEditorWrapper({ metadata, modified, setModified,editorMode, setEd
     // Fetch new USFM, convert to USJ, put in incoming
     useEffect(
         () => {
-            if (!usj || bookCode !== bcvRef.current.bookCode) { // Changes arrive via context after POSTing new BCV from BcvPicker
+            if (bookCode !== bcvRef.current.bookCode) {
+                setUsj(defaultUsj);
+            }
+            if (usj || bookCode !== bcvRef.current.bookCode) { // Changes arrive via context after POSTing new BCV from BcvPicker
                 const usfmLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${bcvRef.current.bookCode}.usfm`;
                 getText(usfmLink, debugRef.current)
                     .then(
@@ -41,7 +43,7 @@ function SharedEditorWrapper({ metadata, modified, setModified,editorMode, setEd
                                 const usfm = res.text;
                                 try {
                                     const pk = new Proskomma();
-                                    pk.importDocument({"lang": "eng", "abbr": "xyz"}, "usfm", usfm);
+                                    pk.importDocument({ "lang": "eng", "abbr": "xyz" }, "usfm", usfm);
                                     const query = "{documents {usj}}";
                                     const result = pk.gqlQuerySync(query);
                                     const usj = JSON.parse(result.data.documents[0].usj);
@@ -71,7 +73,7 @@ function SharedEditorWrapper({ metadata, modified, setModified,editorMode, setEd
         let usfm;
         try {
             const pk = new Proskomma();
-            pk.importDocument({"lang": "eng", "abbr": "xyz"}, "usj", jsonString);
+            pk.importDocument({ "lang": "eng", "abbr": "xyz" }, "usj", jsonString);
             const query = "{documents {usfm}}";
             const result = pk.gqlQuerySync(query);
             usfm = result.data.documents[0].usfm;
@@ -83,7 +85,7 @@ function SharedEditorWrapper({ metadata, modified, setModified,editorMode, setEd
         }
         const response = await postJson(
             `/burrito/ingredient/raw/${repoPath}?ipath=${ingredientPath}`,
-            JSON.stringify({payload: usfm}),
+            JSON.stringify({ payload: usfm }),
             debugBool
         );
         if (response.ok) {
@@ -117,7 +119,7 @@ function SharedEditorWrapper({ metadata, modified, setModified,editorMode, setEd
          * This JSON object can be used to recover the editorState and save it to the browser local storage.
          */
         const recoverableState = editorState.toJSON();
-        const newStateChecksum = md5(JSON.stringify(recoverableState,null, 2));
+        const newStateChecksum = md5(JSON.stringify(recoverableState, null, 2));
         debugRef && debugRef.current && console.log(savedChecksum, newStateChecksum);
         const notSame = newStateChecksum !== savedChecksum;
         if (notSame) {
@@ -136,20 +138,19 @@ function SharedEditorWrapper({ metadata, modified, setModified,editorMode, setEd
     return (
         <Box sx={{ p: 2 }}>
             <Box>
-                {usj ? <SharedEditor key={md5sum(JSON.stringify(usj))}
-                                     modified={modified}
-                                     setModified={setModified}
-                                     editorMode={editorMode}
-                                     setEditor={setEditor}
-                                     usj={usj}
-                                     editable={true}
-                                     bookCode={bcvRef.current && bcvRef.current.bookCode}
-                                     onSave={onSave}
-                                     onHistoryChange={onHistoryChange}
-                                     scriptureReferenceHandler={referenceHandler}
-                                     referenceHandlerSource="text-translation-editor" mode="SharedEditor" /> :
-                    <Typography variant="body2">Loading data...</Typography>
-                    }
+                {<SharedEditor key={md5sum(JSON.stringify(usj))}
+                    modified={modified}
+                    setModified={setModified}
+                    editorMode={editorMode}
+                    setEditor={setEditor}
+                    usj={usj}
+                    editable={true}
+                    bookCode={bcvRef.current && bcvRef.current.bookCode}
+                    onSave={onSave}
+                    onHistoryChange={onHistoryChange}
+                    scriptureReferenceHandler={referenceHandler}
+                    referenceHandlerSource="text-translation-editor" mode="SharedEditor" />
+                }
             </Box>
         </Box>
     );
