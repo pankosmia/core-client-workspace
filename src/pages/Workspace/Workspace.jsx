@@ -18,7 +18,7 @@ import OBSContext from '../../contexts/obsContext';
 const paneStyle = {
     width: '100%',
     height: '100%',
-    overflow: 'scroll'
+    overflow: 'auto'
 }
 
 
@@ -109,7 +109,7 @@ const Workspace = () => {
                         top: '110px',
                         bottom: 0,
                         right: 0,
-                        overflow: 'scroll',
+                        overflow: 'auto',
                         width: '100vw'
                     }}>
                         <TileContainer />
