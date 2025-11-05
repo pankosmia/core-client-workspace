@@ -14,6 +14,7 @@ import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
 import SaveButtonDrafting from "../../components/SaveButtonDrafting";
 import CustomEditorMode from "./CustomEditorMode";
+import BcvPicker from "../../pages/Workspace/BcvPicker";
 import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
@@ -188,12 +189,12 @@ function DraftingEditor({
       >
         <Grid2
           container
-          spacing={2}
+          spacing={1}
           justifyContent="space-around"
           alignItems="stretch"
           width="100%"
         >
-          <Grid2 item size={3}>
+          <Grid2 item size={2}>
             <SaveButtonDrafting
               metadata={metadata}
               systemBcv={systemBcv}
@@ -204,7 +205,7 @@ function DraftingEditor({
               setSavedChecksum={setSavedChecksum}
             />
           </Grid2>
-          <Grid2 item size={3}>
+          <Grid2 item size={2}>
             <IconButton onClick={() => {
               handlePreviewText();
             }}>
@@ -212,14 +213,17 @@ function DraftingEditor({
             </IconButton>
             <PreviewText metadata={metadata} systemBcv={systemBcv} open={openModalPreviewText === true} closeModal={() => setOpenModalPreviewText(false)} />
           </Grid2>
-          <Grid2 item size={3}>
+          <Grid2 item size={4}>
             <NavBarDrafting
               currentChapter={currentChapter}
               setCurrentChapter={setCurrentChapter}
               units={units}
             />
           </Grid2>
-          <Grid2 item size={3}>
+          <Grid2 item size={2}>
+            <BcvPicker />
+          </Grid2>
+          <Grid2 item size={2}>
             <CustomEditorMode
               editor={editorMode}
               setEditor={setEditor}
