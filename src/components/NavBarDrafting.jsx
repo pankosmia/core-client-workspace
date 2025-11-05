@@ -38,8 +38,6 @@ function NavBarDrafting({ units, currentChapter, setCurrentChapter }) {
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
                 display: 'flex',
                 backgroundColor: '#fafafa',
-                paddingX: '1rem',
-                paddingY: '0.3rem',
             }}>
                 <NumberInput
                     value={`Chap ${currentChapter}`}

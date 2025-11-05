@@ -79,7 +79,7 @@ function BcvPicker() {
             aria-haspopup="true"
             aria-expanded={menuIsOpen ? 'true' : undefined}
             onClick={event => handleMenuOpen(event.currentTarget)}
-            sx={{backgroundColor: "#E0E0E0", color: "#000", ml: 4,position:"fixed"}}
+            sx={{backgroundColor: "#E0E0E0", color: "#000",position:"fixed"}}
         >
             {doI18n(`scripture:books:${bcvRef.current.bookCode}`, i18nRef.current)}
         </Button>

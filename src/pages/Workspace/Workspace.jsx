@@ -98,7 +98,7 @@ const Workspace = () => {
                     setDistractionModeCount={setDistractionModeCount} />
             </span>}
         />
-        <div className={adjSelectedFontClass}>
+        <div className={adjSelectedFontClass} id="fontWrapper">
             <OBSContext.Provider value={{ obs, setObs }}>
                 <TileProvider
                     tilePanes={paneList}
