@@ -14,6 +14,7 @@ import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
 import SaveButtonDrafting from "../../components/SaveButtonDrafting";
 import CustomEditorMode from "./CustomEditorMode";
+import BcvPicker from "../../pages/Workspace/BcvPicker";
 
 function DraftingEditor({
   metadata,
@@ -45,8 +46,7 @@ function DraftingEditor({
     if (unitData[unitN]) {
       const newCurrentUnitCV = unitData[unitN].reference.split(":");
       postEmptyJson(
-        `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${
-          newCurrentUnitCV[1].split("-")[0]
+        `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1].split("-")[0]
         }`,
         debugRef.current
       );
@@ -199,12 +199,15 @@ function DraftingEditor({
               setSavedChecksum={setSavedChecksum}
             />
           </Grid2>
-          <Grid2 item size={6}>
+          <Grid2 item size={3}>
             <NavBarDrafting
               currentChapter={currentChapter}
               setCurrentChapter={setCurrentChapter}
               units={units}
             />
+          </Grid2>
+          <Grid2 item size={3}>
+            <BcvPicker />
           </Grid2>
           <Grid2 item size={3}>
             <CustomEditorMode
