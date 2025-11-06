@@ -218,6 +218,7 @@ function DraftingEditor({
               currentChapter={currentChapter}
               setCurrentChapter={setCurrentChapter}
               units={units}
+              metadata={metadata}
             />
           </Grid2>
           <Grid2 item size={2}>
