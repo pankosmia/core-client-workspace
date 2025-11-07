@@ -1,45 +1,27 @@
-import { useEffect, useState, useContext } from "react";
-import { Box, Grid2, Typography, Accordion, AccordionSummary, AccordionDetails, Card, CardContent } from "@mui/material";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Markdown from 'react-markdown';
-import OBSContext from "../../contexts/obsContext";
-
-import {
-    i18nContext as I18nContext,
-    debugContext as DebugContext,
-    doI18n,
-    getText
-} from "pithekos-lib";
+import { useEffect, useState}from "react";
+import { Box, Grid2} from "@mui/material";
 
 function TranslationPlanViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
-    const { obs } = useContext(OBSContext);
-    const { debugRef } = useContext(DebugContext);
-    const { i18nRef } = useContext(I18nContext);
-
 
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=plan.json`;
-        let response = await getText(ingredientLink, debugRef.current);
+        const response = await fetch(ingredientLink);
+
         if (response.ok) {
-            setIngredient(
-                response.text
-                .split("\n")
-                .map(l => l.split("\t").map(f => f.replace(/\\n/g, "\n\n")))
-            );
+            const data = await response.json();
+            setIngredient(data);
         } else {
-            setIngredient([])
+            setIngredient([]);
         }
     };
-    console.log("ingredientLink",ingredient)
     
     useEffect(
         () => {
             getAllData().then();
         },
-        [obs]
+        []
     );
-
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -61,10 +43,13 @@ function TranslationPlanViewerMuncher({ metadata }) {
                         alignItems: "center"
                     }}
                 >
-                    <Typography variant="subtitle1">{`(${obs[0]}:${obs[1]})`}</Typography>
+
                 </Grid2>
                 <Grid2 item size={12}>
-                    
+                    <pre >
+                        {JSON.stringify(ingredient, null, 2)}
+                    </pre>
+
                 </Grid2>
             </Grid2>
         </Box>
