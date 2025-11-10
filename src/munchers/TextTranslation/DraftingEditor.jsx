@@ -8,7 +8,7 @@ import {
   getText,
   postEmptyJson,
 } from "pithekos-lib";
-import { Box, FormControl, Grid2, IconButton, TextField } from "@mui/material";
+import { Box, Divider, FormControl, Grid2, IconButton, TextField, Typography } from "@mui/material";
 import RequireResources from "../../components/RequireResources";
 import juxta2Units from "../../components/juxta2Units";
 import NavBarDrafting from "../../components/NavBarDrafting";
@@ -37,7 +37,8 @@ function DraftingEditor({
   const [usfmHeader, setUsfmHeader] = useState("");
   const [savedChecksum, setSavedChecksum] = useState(null);
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
-
+  const [data, setData] = useState(null);
+  const [formData, setFormData] = useState({});
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
   }
@@ -60,6 +61,24 @@ function DraftingEditor({
     }
   };
 
+  useEffect(
+    () => {
+      const getAllData = async () => {
+        const ingredientLink = `/burrito/ingredient/raw/git.door43.org/BurritoTruck/en_stctw-template?ipath=plan.json`;
+        const response = await fetch(ingredientLink);
+
+        if (response.ok) {
+          const json = await response.json();
+          setData(json);
+        } else {
+          setData(null);
+        }
+      };
+      getAllData();
+    },
+    []
+  );
+console.log("data",data);
   useEffect(() => {
     const juxtaJson = async () => {
       let jsonResponse = await getJson(
@@ -175,6 +194,7 @@ function DraftingEditor({
   if (isDownloading) {
     return <p>loading...</p>;
   }
+
   return (
     <>
       <Box
@@ -242,25 +262,65 @@ function DraftingEditor({
           return (
             <Box key={index}>
               <FormControl fullWidth margin="normal">
-                <TextField
-                  label={u.reference}
-                  value={
-                    u.reference === selectedReference ? currentText : u.text
-                  }
-                  multiline
-                  minRows={6}
-                  maxRows={9}
-                  autoFocus={u.reference === selectedReference}
-                  onFocus={() => {
-                    setCurrentText(u.text);
-                    setSelectedReference(u.reference);
-                    updateBcv(index);
-                  }}
-                  onChange={(e) => {
-                    setCurrentText(e.target.value);
-                  }}
-                  onBlur={() => handleCacheUnit(index, currentText)}
-                />
+                {data ? (
+                  <>
+                    {Object.entries(data).map(([key, value]) => {
+                      if (key === 'sectionStructure') return null;
+                      return (
+                        <Box key={key} mb={2}>
+                          <Typography variant="subtitle1">{key}</Typography>
+                          <TextField
+                            fullWidth
+                            size="small"
+                            value={value || ''}
+                            onChange={(e) =>
+                              setData(prev => ({ ...prev, [key]: e.target.value }))
+                            }
+                          />
+                        </Box>
+                      );
+                    })}
+                    {data.sectionStructure.map((item, index) => (
+                      <Box key={index} mb={2} p={1}>
+                        {item.name === "introBody" ? (
+                          <TextField
+                            label={u.reference}
+                            value={
+                              u.reference === selectedReference ? currentText : u.text
+                            }
+                            multiline
+                            minRows={6}
+                            maxRows={9}
+                            autoFocus={u.reference === selectedReference}
+                            onFocus={() => {
+                              setCurrentText(u.text);
+                              setSelectedReference(u.reference);
+                              updateBcv(index);
+                            }}
+                            onChange={(e) => {
+                              setCurrentText(e.target.value);
+                            }}
+                            onBlur={() => handleCacheUnit(index, currentText)}
+                          />
+                        ) : <TextField
+                          label="Name"
+                          fullWidth
+                          size="small"
+                          value={item.name}
+                        />}
+                        <TextField
+                          label="ParaTag"
+                          fullWidth
+                          size="small"
+                          value={item.paraTag}
+                          sx={{ mt: 1 }}
+                        />
+                      </Box>
+                    ))}
+                  </>
+                ) : (
+                  <Typography>Chargement...</Typography>
+                )}
               </FormControl>
             </Box>
           );
