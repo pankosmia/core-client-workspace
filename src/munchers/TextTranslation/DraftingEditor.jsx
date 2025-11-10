@@ -39,6 +39,7 @@ function DraftingEditor({
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
   const [data, setData] = useState(null);
   const [formData, setFormData] = useState({});
+
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
   }
@@ -78,7 +79,7 @@ function DraftingEditor({
     },
     []
   );
-console.log("data",data);
+
   useEffect(() => {
     const juxtaJson = async () => {
       let jsonResponse = await getJson(
@@ -262,65 +263,26 @@ console.log("data",data);
           return (
             <Box key={index}>
               <FormControl fullWidth margin="normal">
-                {data ? (
-                  <>
-                    {Object.entries(data).map(([key, value]) => {
-                      if (key === 'sectionStructure') return null;
-                      return (
-                        <Box key={key} mb={2}>
-                          <Typography variant="subtitle1">{key}</Typography>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            value={value || ''}
-                            onChange={(e) =>
-                              setData(prev => ({ ...prev, [key]: e.target.value }))
-                            }
-                          />
-                        </Box>
-                      );
-                    })}
-                    {data.sectionStructure.map((item, index) => (
-                      <Box key={index} mb={2} p={1}>
-                        {item.name === "introBody" ? (
-                          <TextField
-                            label={u.reference}
-                            value={
-                              u.reference === selectedReference ? currentText : u.text
-                            }
-                            multiline
-                            minRows={6}
-                            maxRows={9}
-                            autoFocus={u.reference === selectedReference}
-                            onFocus={() => {
-                              setCurrentText(u.text);
-                              setSelectedReference(u.reference);
-                              updateBcv(index);
-                            }}
-                            onChange={(e) => {
-                              setCurrentText(e.target.value);
-                            }}
-                            onBlur={() => handleCacheUnit(index, currentText)}
-                          />
-                        ) : <TextField
-                          label="Name"
-                          fullWidth
-                          size="small"
-                          value={item.name}
-                        />}
-                        <TextField
-                          label="ParaTag"
-                          fullWidth
-                          size="small"
-                          value={item.paraTag}
-                          sx={{ mt: 1 }}
-                        />
-                      </Box>
-                    ))}
-                  </>
-                ) : (
-                  <Typography>Chargement...</Typography>
-                )}
+
+                <TextField
+                  label={u.reference}
+                  value={
+                    u.reference === selectedReference ? currentText : u.text
+                  }
+                  multiline
+                  minRows={6}
+                  maxRows={9}
+                  autoFocus={u.reference === selectedReference}
+                  onFocus={() => {
+                    setCurrentText(u.text);
+                    setSelectedReference(u.reference);
+                    updateBcv(index);
+                  }}
+                  onChange={(e) => {
+                    setCurrentText(e.target.value);
+                  }}
+                  onBlur={() => handleCacheUnit(index, currentText)}
+                />
               </FormControl>
             </Box>
           );
