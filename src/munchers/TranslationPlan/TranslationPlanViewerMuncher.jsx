@@ -1,10 +1,20 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, Grid2, TextField, Typography } from "@mui/material";
+import { Box, Dialog, Grid2, IconButton, TextField, Typography } from "@mui/material";
 import { postEmptyJson, bcvContext as BcvContext, } from "pithekos-lib";
+import InfoIcon from '@mui/icons-material/Info';
 
 function TranslationPlanViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState();
     const { systemBcv } = useContext(BcvContext);
+    const [openDialogAbout, setOpenDialogAbout] = useState(false);
+
+    const handleOpenDialogAbout = () => {
+        setOpenDialogAbout(true);
+    }
+    const handleCloseDialogAbout = () => {
+        setOpenDialogAbout(false);
+    }
+
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=plan.json`;
         const response = await fetch(ingredientLink);
@@ -17,63 +27,72 @@ function TranslationPlanViewerMuncher({ metadata }) {
         }
     };
 
+    async function loadCSS() {
+        const url = "/app-resources/usfm/bible_page_styles.css";
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.error("Erreur de chargement du CSS :", response.status);
+            return;
+        }
+        const cssText = await response.text();
+        const style = document.createElement("style");
+        style.textContent = cssText;
+        document.head.appendChild(style);
+    }
+
     useEffect(
         () => {
             getAllData().then();
+            loadCSS();
         },
         []
     );
-    const section = ingredient.sections[0];
-
-
-    const enrichedSectionStructure = ingredient.sectionStructure.map(item => {
-
-        const value = section.fieldInitialValues[item.name] || ingredient.fieldInitialValues[item.name] || "";
-
-        return {
-            ...item,
-            value,
-            bookCode: section.bookCode
-        };
-    });
-
-    console.log(ingredient);
+    console.log("systembcv", systemBcv);
     return (
-        <Box>
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 2
+            }}
+        >
             {ingredient ? (
                 <>
-                    <Typography>About </Typography>
-                    {Object.entries(ingredient).map(([key, value]) => {
-                        if (key === "sectionStructure" | key === "sections" | key === "fieldInitialValues") return null;
-                        return (
-                            <Box key={key} mb={2}>
-                                <Typography fullWidth size="small" value={value || ''}> {value}</Typography>
-                            </Box>
-                        );
-                    })}
-
-                    <Typography>{systemBcv.bookCode}</Typography>
-                    <pre >
-                        {JSON.stringify(ingredient, null, 2)}
-                    </pre>
                     {ingredient.sections.map((section, index) => (
-                        <Box key={index} mb={2} p={1}>
+                        <Box sx={{
+                            flex: 1,
+                            borderBlockColor: 'secondary.main',
+                            borderRadius: 2,
+                            
+                        }} key={index}
+                        >
                             {section.bookCode === systemBcv.bookCode ? (
                                 <>
-                                    <Typography color="success.main">
-                                        Livre trouvé : {section.bookCode}
-                                    </Typography>
-                                    {ingredient.sectionStructure.map((item, idx) => (
-                                        <Box key={idx} mb={2} p={1}>
-                                            <TextField
-                                                label={item.paraTag}
-                                                fullWidth
-                                                size="small"
-                                              value={ingredient.fieldInitialValues[item.name] || ""}
-                                                sx={{ mt: 1 }}
-                                            />
+                                    {ingredient.sections.map((section, sectionIdx) => (
+                                        <Box key={sectionIdx}>
+                                            {ingredient.sectionStructure.map((field, idx) => {
+                                                const className = field.paraTag || "";
+                                                if (field.type === "scripture") {
+                                                    return (
+                                                        <Box key={idx} mt={2}>
+                                                            <Typography>{field.type}</Typography>
+                                                        </Box>
+                                                    );
+                                                }
+
+                                                const value =
+                                                    section.fieldInitialValues?.[field.name] ??
+                                                    ingredient.fieldInitialValues?.[field.name] ??
+                                                    "";
+
+                                                return (
+                                                    <Typography className={className} fullWidth size="small" value={value || ''}> {value}</Typography>
+                                                );
+                                            })}
+                                            {/* {ingredient.section.paragraphs.map()} */}
                                         </Box>
                                     ))}
+
                                 </>
                             ) : (
                                 <Typography color="error.main">
@@ -82,6 +101,33 @@ function TranslationPlanViewerMuncher({ metadata }) {
                             )}
                         </Box>
                     ))}
+                    <IconButton onClick={() => {
+                        handleOpenDialogAbout()
+                    }}>
+                        <InfoIcon />
+                    </IconButton>
+                    <Dialog
+                        open={openDialogAbout}
+                        onClose={handleCloseDialogAbout}
+                    >
+                        <Box sx={{
+                            flex: 1,
+                            borderBlockColor: 'primary.main',
+                            borderRadius: 2,
+                            margin: 1,
+                            padding: 1
+                        }}>
+                            <Typography>About </Typography>
+                            {Object.entries(ingredient).map(([key, value]) => {
+                                if (key === "sectionStructure" | key === "sections" | key === "fieldInitialValues") return null;
+                                return (
+                                    <Box key={key} mb={2}>
+                                        <Typography fullWidth size="small" value={value || ''}> {value}</Typography>
+                                    </Box>
+                                );
+                            })}
+                        </Box>
+                    </Dialog>
 
                 </>
 
