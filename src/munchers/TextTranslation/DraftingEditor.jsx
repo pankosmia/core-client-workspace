@@ -180,7 +180,6 @@ function DraftingEditor({
   }, [units, pk]);
 
   const handleCacheUnit = (unitN, newText) => {
-    console.log(`text: '${newText}'`);
     const newUnit = { ...unitData[unitN], text: newText };
     let newUnitData = [...unitData];
     newUnitData[unitN] = newUnit;
