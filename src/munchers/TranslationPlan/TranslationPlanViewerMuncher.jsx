@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Box, Dialog, FormControl, Grid2, IconButton, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
-import { postEmptyJson, bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, } from "pithekos-lib";
+import { postEmptyJson, bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, getJson, } from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
 import { Proskomma } from "proskomma-core";
 
@@ -23,29 +23,33 @@ function TranslationPlanViewerMuncher({ metadata }) {
     useEffect(
         () => {
             const getVerseText = async () => {
-                let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
-                    debugRef.current
-                );
-                console.log(usfmResponse);
-                if (usfmResponse.ok) {
-                    const pk = new Proskomma();
-                    pk.importDocument({
-                        lang: "xxx",
-                        abbr: "yyy"
-                    },
-                        "usfm",
-                        usfmResponse.text
+                if (selectedBurrito) {
+                    let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
+                        debugRef.current
                     );
-                    const query = `{docSets { documents { mainSequence { blocks(withScriptureCV: "${systemBcv.chapterNum}:${systemBcv.verseNum}") {text items {type subType payload}}}}}}`;
-                    const result = pk.gqlQuerySync(query);
-                    setVerseText(result.data.docSets[0].documents[0].mainSequence.blocks);
-                } else {
-                    setVerseText([]);
+                    console.log(usfmResponse);
+                    if (usfmResponse.ok) {
+                        const pk = new Proskomma();
+                        pk.importDocument({
+                            lang: "xxx",
+                            abbr: "yyy"
+                        },
+                            "usfm",
+                            usfmResponse.text
+                        );
+                        const query = `{docSets { documents { mainSequence { blocks(withScriptureCV: "${systemBcv.chapterNum}:${systemBcv.verseNum}") {text items {type subType payload}}}}}}`;
+                        const result = pk.gqlQuerySync(query);
+                        setVerseText(result.data.docSets[0].documents[0].mainSequence.blocks);
+                    } else {
+                        setVerseText([]);
+                    }
                 }
+
             };
+
             getVerseText().then();
         },
-        [debugRef, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum, metadata.local_path]
+        [debugRef, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum, metadata.local_path, selectedBurrito]
     );
     useEffect(() => {
         async function fetchSummaries() {
@@ -80,7 +84,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
     };
 
     const getAllData = async () => {
-        const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=plan.json`;
+        const ingredientLink = `/burrito/ingredient/raw/_local_/_local_/stctw-test?ipath=plan.json`;
         const response = await fetch(ingredientLink);
 
         if (response.ok) {

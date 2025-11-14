@@ -65,7 +65,7 @@ function DraftingEditor({
   useEffect(
     () => {
       const getAllData = async () => {
-        const ingredientLink = `/burrito/ingredient/raw/git.door43.org/BurritoTruck/en_stctw-template?ipath=plan.json`;
+        const ingredientLink = `/burrito/ingredient/raw/_local_/_local_/stctw-test?ipath=plan.json`;
         const response = await fetch(ingredientLink);
 
         if (response.ok) {
