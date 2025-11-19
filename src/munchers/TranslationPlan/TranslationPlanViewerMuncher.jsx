@@ -13,6 +13,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const [verseText, setVerseText] = useState([]);
     const [burritos, setBurritos] = useState([]);
     const [selectedBurrito, setSelectedBurrito] = useState(null);
+    const [storyArrayNum, setStoryArrayNum] = useState(0);
 
     const handleOpenDialogAbout = () => {
         setOpenDialogAbout(true);
@@ -155,26 +156,51 @@ function TranslationPlanViewerMuncher({ metadata }) {
                 </IconButton>
             </Box>
             <Box>
-                <FormControl fullWidth sx={{ mt: 2 }}>
-                    <InputLabel required id="burrito-select-label">
-                        {doI18n(`pages:content:choose_document`, i18nRef.current)}
-                    </InputLabel>
-                    <Select
-                        labelId="burrito-select-label"
-                        value={selectedBurrito?.name || ""}
-                        label="Choose Burrito"
-                        onChange={handleSelectBurrito}
-                    >
-                        {burritos.map((burrito) => (
-                            <MenuItem key={burrito.name} value={burrito.name}>
-                                {burrito.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    width: "100%" 
+                  }}
+                >
+                    <FormControl sx={{ minWidth: 250, mt: 2 }}>
+                        <InputLabel required id="burrito-select-label">
+                            {doI18n(`pages:core-local-workspace:choose_document`, i18nRef.current)}
+                        </InputLabel>
+                        <Select
+                            labelId="burrito-select-label"
+                            value={selectedBurrito?.name || ""}
+                            label="Choose Burrito"
+                            onChange={handleSelectBurrito}
+                        >
+                            {burritos.map((burrito) => (
+                                <MenuItem key={burrito.name} value={burrito.name}>
+                                    {burrito.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl sx={{ minWidth: 150, mt: 2 }}>
+                        <InputLabel required id="one-to-35-label">
+                            {doI18n(`pages:core-local-workspace:choose_story`, i18nRef.current)}
+                        </InputLabel>
+                        <Select
+                          labelId="one-to-35-label"
+                          label="Choose Story"
+                          value={storyArrayNum}
+                          onChange={(e) => setStoryArrayNum(Number(e.target.value))}
+                        >
+                            {Array.from({ length: 35 }, (_, i) => (
+                              <MenuItem key={i} value={i}>
+                                {i + 1}
+                              </MenuItem>
+                            ))}
+                        </Select>
+                  </FormControl>
+                </Box>
                 {ingredient && selectedBurrito ? (
                     <>
-                        {ingredient.sections
+                        {ingredient.stories[storyArrayNum].sections
                             .filter(section => isInInterval(section, systemBcv))
                             .map((section, index) => (
                                 <Box
@@ -187,7 +213,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
                                                 const className = field.paraTag || "";
                                                 const value =
                                                     section.fieldInitialValues?.[field.name] ??
-                                                    ingredient.fieldInitialValues?.[field.name] ??
+                                                    ingredient.stories[storyArrayNum].fieldInitialValues?.[field.name] ??
                                                     "";
 
                                                 if (field.type === "scripture") {

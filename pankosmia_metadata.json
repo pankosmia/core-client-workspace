@@ -498,6 +498,14 @@
     "_sideloaded_": {
       "en": "imported manually",
       "fr": "importé manuellement"
+    },
+    "choose_story": {
+      "en": "Choose Story",
+      "id": "Pilih Cerita"
+    },
+    "choose_document": {
+      "en": "Choose Reference Text",
+      "id": "Pilih Teks Referensi"
     }
   }
 }
