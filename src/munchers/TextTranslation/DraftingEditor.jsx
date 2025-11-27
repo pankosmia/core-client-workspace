@@ -17,6 +17,7 @@ import CustomEditorMode from "./CustomEditorMode";
 import BcvPicker from "../../pages/Workspace/BcvPicker";
 import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import usfm2draftJson from './usfm2draftJson';
 
 function DraftingEditor({
   metadata,
@@ -126,6 +127,7 @@ function DraftingEditor({
       );
       if (usfmResponse.ok) {
         const usfmText = usfmResponse.text;
+        usfm2draftJson(usfmText);
         setUsfmHeader(usfmText.split("\\c")[0]);
         const newPk = new Proskomma();
         newPk.importDocument(
