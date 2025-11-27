@@ -50,7 +50,12 @@ function processBlocks(blocks, sequenceType, sequences) {
             const blockChapter = parseInt(blockChapterOb.payload.split("/")[1]);
             if (blockChapter !== chapterNo) {
                 chapterNo = blockChapter;
-                ret.push({chapter: chapterNo});
+                ret.push(
+                    {
+                        type: "chapter",
+                        chapter: chapterNo
+                    }
+                    );
             }
         }
         for (const bg of block.bg) {
