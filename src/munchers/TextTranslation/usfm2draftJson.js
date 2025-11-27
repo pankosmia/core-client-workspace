@@ -22,7 +22,7 @@ function processCvItems(items, os) {
             }
         );
     }
-    // Build content, start over on verses
+    // Build content, push chapters, start over on verses
     for (const item of items) {
         if (item.subType === "start" && item.payload.startsWith("verses")) {
             ret.push(
@@ -40,9 +40,18 @@ function processCvItems(items, os) {
 
 function processBlocks(blocks, sequenceType, sequences) {
     let ret = [];
+    let chapterNo = 0;
     for (const block of blocks) {
         if (block.bs.payload.split("/")[1] === "hangingGraft") {
             continue;
+        }
+        let blockChapterOb = [...block.is.filter(s => s.payload.startsWith("chapter")), ...block.os.filter(s => s.payload.startsWith("chapter"))][0];
+        if (blockChapterOb) {
+            const blockChapter = parseInt(blockChapterOb.payload.split("/")[1]);
+            if (blockChapter !== chapterNo) {
+                chapterNo = blockChapter;
+                ret.push({chapter: chapterNo});
+            }
         }
         for (const bg of block.bg) {
             const graftedSequence = sequences.filter(s => s.id === bg.payload)[0];
@@ -72,6 +81,7 @@ export default function usfm2draftJson(usfm) {
                     bs {payload}
                     bg {payload}
                     os {payload}
+                    is {payload}
                     items {type subType payload}
                 }
             }
