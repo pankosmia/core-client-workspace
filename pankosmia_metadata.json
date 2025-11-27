@@ -498,6 +498,10 @@
     "_sideloaded_": {
       "en": "imported manually",
       "fr": "importé manuellement"
+    },
+    "choose_document":{
+      "en":"Choose your document",
+      "fr":"Choix de sa ressource"
     }
   }
 }

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, Dialog, FormControl, Grid2, IconButton, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
-import { postEmptyJson, bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, getJson, } from "pithekos-lib";
+import { Box, Dialog, FormControl, IconButton, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n } from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
 import { Proskomma } from "proskomma-core";
 
@@ -67,7 +67,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
                 const scriptures = burritoArray.filter(
                     (item) => item?.flavor === "textTranslation"
                 );
-                console.log(scriptures)
+
                 setBurritos(scriptures);
             } catch (err) {
                 console.error("Error fetching summaries:", err);
@@ -116,7 +116,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
         []
     );
 
-    if (!ingredient) { return <Typography> chargement...</Typography> }
+    if (!ingredient) { return <Typography> loading...</Typography> }
 
     const isInInterval = (section, systemBcv) => {
 
@@ -131,6 +131,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
         );
     };
 
+
     const renderItem = item => {
         if (item.type === "token") {
             return item.payload;
@@ -140,6 +141,9 @@ function TranslationPlanViewerMuncher({ metadata }) {
             return ""
         }
     }
+    const section = ingredient.sections
+        .filter(section => isInInterval(section, systemBcv))
+        .find(section => section.bookCode === systemBcv.bookCode);
 
     return (
         <Box
@@ -157,7 +161,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
             <Box>
                 <FormControl fullWidth sx={{ mt: 2 }}>
                     <InputLabel required id="burrito-select-label">
-                        {doI18n(`pages:content:choose_document`, i18nRef.current)}
+                        {doI18n(`pages:core-local-workspace:choose_document`, i18nRef.current)}
                     </InputLabel>
                     <Select
                         labelId="burrito-select-label"
@@ -172,66 +176,46 @@ function TranslationPlanViewerMuncher({ metadata }) {
                         ))}
                     </Select>
                 </FormControl>
-                {ingredient && selectedBurrito ? (
+                {ingredient && selectedBurrito && (
                     <>
-                        {ingredient.sections
-                            .filter(section => isInInterval(section, systemBcv))
-                            .map((section, index) => (
-                                <Box
-                                    sx={{ padding: 1 }}
-                                    key={index}
-                                >
-                                    {section.bookCode === systemBcv.bookCode ? (
-                                        <>
-                                            {ingredient.sectionStructure.map((field, idx) => {
-                                                const className = field.paraTag || "";
-                                                const value =
-                                                    section.fieldInitialValues?.[field.name] ??
-                                                    ingredient.fieldInitialValues?.[field.name] ??
-                                                    "";
+                        {section ? (
+                            <Box sx={{ padding: 1 }}>
+                                {ingredient.sectionStructure.map((field, i) => {
+                                    const className = field.paraTag || "";
+                                    const value =
+                                        section.fieldInitialValues?.[field.name] ??
+                                        ingredient.fieldInitialValues?.[field.name] ??
+                                        "";
 
-                                                if (field.type === "scripture") {
-                                                    return (
-                                                        <>
-                                                            {/* {section.paragraphs.map((p, idx) => (
-                                                                <Box key={idx} mt={2}>
-                                                                    <Typography className={className}>{p.paraTag}</Typography>
-                                                                    <Typography>{p.units}</Typography>
-                                                                </Box>
-                                                            ))} */}
-                                                            {
-                                                                verseText.length > 0 ?
-                                                                    verseText.map(b => <p style={{ marginBottom: "1em" }}>{b.items.map(i => renderItem(i))}</p>) :
-                                                                    <p>No text found</p>
-                                                            }
-                                                        </>
-                                                    );
-                                                }
-
-                                                return (
-                                                    <Typography
-                                                        key={idx}
-                                                        className={className}
-                                                        fullWidth
-                                                        size="small"
-                                                        value={value || ''}
-                                                    >
-                                                        {value}
-                                                    </Typography>
-                                                );
-                                            })}
-
-
-                                        </>
-                                    ) : (
-                                        <Typography>aucun livre disponible</Typography>
-                                    )}
-                                </Box>
-                            ))}
-
+                                    if (field.type === "scripture") {
+                                        return (
+                                            <>
+                                                {verseText.length > 0
+                                                    ? verseText.map((b, i) => (
+                                                        <p key={i} style={{ marginBottom: "1em" }}>
+                                                            {b.items.map(i => renderItem(i))}
+                                                        </p>
+                                                    ))
+                                                    : <p>No text found</p>}
+                                            </>
+                                        );
+                                    }
+                                    return (
+                                        <Typography
+                                            key={i}
+                                            className={className}
+                                            fullWidth
+                                            size="small"
+                                        >
+                                            {value}
+                                        </Typography>
+                                    );
+                                })}
+                            </Box>
+                        ) : (
+                            <Typography> no book found </Typography>
+                        )}
                     </>
-                ) : (
-                    <Typography>Chargement...</Typography>
                 )}
             </Box>
 
