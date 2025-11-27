@@ -3,6 +3,7 @@ import { Box, Dialog, FormControl, IconButton, InputLabel, MenuItem, Select, Typ
 import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n } from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
 import { Proskomma } from "proskomma-core";
+import usfm2draftJson from "../TextTranslation/usfm2draftJson";
 
 function TranslationPlanViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState();
@@ -13,6 +14,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const [verseText, setVerseText] = useState([]);
     const [burritos, setBurritos] = useState([]);
     const [selectedBurrito, setSelectedBurrito] = useState(null);
+    const [scriptureJson, setScriptureJson] = useState(null);
 
     const handleOpenDialogAbout = () => {
         setOpenDialogAbout(true);
@@ -20,6 +22,20 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const handleCloseDialogAbout = () => {
         setOpenDialogAbout(false);
     }
+    useEffect(() => {
+        const doScriptureJson = async () => {
+            let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
+                debugRef.current
+            );
+            if (usfmResponse.ok) {
+                setScriptureJson(usfm2draftJson(usfmResponse.text))
+            }
+        }
+        if (selectedBurrito) {
+            doScriptureJson().then();
+        }
+    }, [selectedBurrito])
+
     useEffect(
         () => {
             const getVerseText = async () => {
@@ -189,15 +205,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
 
                                     if (field.type === "scripture") {
                                         return (
-                                            <>
-                                                {verseText.length > 0
-                                                    ? verseText.map((b, i) => (
-                                                        <p key={i} style={{ marginBottom: "1em" }}>
-                                                            {b.items.map(i => renderItem(i))}
-                                                        </p>
-                                                    ))
-                                                    : <p>No text found</p>}
-                                            </>
+                                            <pre>{JSON.stringify(scriptureJson.blocks, null, 2)}</pre>
                                         );
                                     }
                                     return (
