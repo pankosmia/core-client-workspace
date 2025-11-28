@@ -1,4 +1,4 @@
-import {Proskomma} from 'proskomma-core';
+import { Proskomma } from 'proskomma-core';
 
 function processGraftItems(items, os) {
     let ret = [""];
@@ -55,7 +55,7 @@ function processBlocks(blocks, sequenceType, sequences) {
                         type: "chapter",
                         chapter: chapterNo
                     }
-                    );
+                );
             }
         }
         for (const bg of block.bg) {
@@ -75,7 +75,7 @@ function processBlocks(blocks, sequenceType, sequences) {
 
 export default function usfm2draftJson(usfm) {
     const pk = new Proskomma();
-    pk.importDocument({abbr: "xxx", "lang": "yyy"}, "usfm", usfm);
+    pk.importDocument({ abbr: "xxx", "lang": "yyy" }, "usfm", usfm);
     const query = `{
         documents {
             headers {key value}
@@ -101,14 +101,9 @@ export default function usfm2draftJson(usfm) {
     );
     const mainSequence = document.sequences.filter(s => s.type === "main")[0];
     const blocks = processBlocks(mainSequence.blocks, mainSequence.type, document.sequences);
-    console.log(
-        JSON.stringify(
-            {
-                headers,
-                blocks
-            },
-            null,
-            2
-        )
-    );
+    return {
+            headers,
+            blocks
+        }
+    
 };
