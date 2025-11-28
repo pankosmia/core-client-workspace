@@ -2,8 +2,8 @@ import "./TextTranslationEditorMuncher.css";
 import {
     Box,
 } from "@mui/material";
-import SharedEditorWrapper from "./SharedEditorWrapper";
-import DraftingEditor from "./DraftingEditor";
+import SharedEditorWrapper from "./SharedEditor/SharedEditorWrapper";
+import DraftingEditor from "./SimplifiedEditor/DraftingEditor";
 import { useState, useContext } from "react";
 import {debugContext} from "pithekos-lib";
 

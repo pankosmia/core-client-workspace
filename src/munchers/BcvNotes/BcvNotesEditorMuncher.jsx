@@ -7,10 +7,10 @@ import {
     postEmptyJson,
 } from "pithekos-lib";
 
-import SearchWithVerses from "../../components/SearchWithVerses";
-import Editor from "../../components/Editor"
-import AddFab from "../../components/AddFab";
-import SaveTsvButton from "../../components/SaveTsvButton";
+import SearchWithVerses from "./components/SearchWithVerses";
+import Editor from "./components/Editor"
+import AddFab from "./components/AddFab";
+import SaveTsvButton from "./components/SaveTsvButton";
 import md5 from "md5";
 import BcvPicker from "../../pages/Workspace/BcvPicker";
 
