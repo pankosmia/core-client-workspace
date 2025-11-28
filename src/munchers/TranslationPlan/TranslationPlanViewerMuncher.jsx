@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, Dialog, FormControl, IconButton, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import { Box, Dialog, FormControl, IconButton, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n } from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
 import { Proskomma } from "proskomma-core";
 import usfm2draftJson from "../../components/usfm2draftJson";
 
 function TranslationPlanViewerMuncher({ metadata }) {
-    const [ingredient, setIngredient] = useState();
+    const [planIngredient, setPlanIngredient] = useState();
     const { i18nRef } = useContext(i18nContext);
     const { systemBcv } = useContext(BcvContext);
     const [openDialogAbout, setOpenDialogAbout] = useState(false);
@@ -43,7 +43,6 @@ function TranslationPlanViewerMuncher({ metadata }) {
                     let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
                         debugRef.current
                     );
-                    console.log(usfmResponse);
                     if (usfmResponse.ok) {
                         const pk = new Proskomma();
                         pk.importDocument({
@@ -53,9 +52,41 @@ function TranslationPlanViewerMuncher({ metadata }) {
                             "usfm",
                             usfmResponse.text
                         );
-                        const query = `{docSets { documents { mainSequence { blocks(withScriptureCV: "${systemBcv.chapterNum}:${systemBcv.verseNum}") {text items {type subType payload}}}}}}`;
+                        const query = `{
+                                            documents {
+                                                header(id: "bookCode")
+                                                cvIndexes {
+                                                chapter
+                                                verses {
+                                                    verse {
+                                                    verseRange
+                                                    text
+                                                    }
+                                                }
+                                                }
+                                            }
+                                        }`;
+
                         const result = pk.gqlQuerySync(query);
-                        setVerseText(result.data.docSets[0].documents[0].mainSequence.blocks);
+                        const newVerseText = Object.fromEntries(
+                            result.data.documents[0].cvIndexes
+                                .map(
+                                    i => [
+                                        i.chapter,
+                                        Object.fromEntries(
+                                            i.verses
+                                                .map((v, n) => [
+                                                    `${n}`,
+                                                    v.verse.length > 0 ?
+                                                        v.verse[0].text :
+                                                        []
+                                                ])
+                                                .filter(kv => typeof kv[1] === "string")
+                                        )
+                                    ]
+                                )
+                        )
+                        setVerseText(newVerseText);
                     } else {
                         setVerseText([]);
                     }
@@ -83,7 +114,6 @@ function TranslationPlanViewerMuncher({ metadata }) {
                 const scriptures = burritoArray.filter(
                     (item) => item?.flavor === "textTranslation"
                 );
-
                 setBurritos(scriptures);
             } catch (err) {
                 console.error("Error fetching summaries:", err);
@@ -105,9 +135,9 @@ function TranslationPlanViewerMuncher({ metadata }) {
 
         if (response.ok) {
             const data = await response.json();
-            setIngredient(data);
+            setPlanIngredient(data);
         } else {
-            setIngredient([]);
+            setPlanIngredient([]);
         }
     };
 
@@ -132,7 +162,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
         []
     );
 
-    if (!ingredient) { return <Typography> loading...</Typography> }
+    if (!planIngredient) { return <Typography> loading...</Typography> }
 
     const isInInterval = (section, systemBcv) => {
 
@@ -148,16 +178,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
     };
 
 
-    const renderItem = item => {
-        if (item.type === "token") {
-            return item.payload;
-        } else if (item.type === "scope" && item.subType === "start" && item.payload.startsWith("verses/")) {
-            return <b style={{ fontSize: "smaller", paddingRight: "0.25em" }}>{item.payload.split("/")[1]}</b>
-        } else {
-            return ""
-        }
-    }
-    const section = ingredient.sections
+    const section = planIngredient.sections
         .filter(section => isInInterval(section, systemBcv))
         .find(section => section.bookCode === systemBcv.bookCode);
 
@@ -175,50 +196,78 @@ function TranslationPlanViewerMuncher({ metadata }) {
                 </IconButton>
             </Box>
             <Box>
-                <FormControl fullWidth sx={{ mt: 2 }}>
-                    <InputLabel required id="burrito-select-label">
-                        {doI18n(`pages:core-local-workspace:choose_document`, i18nRef.current)}
-                    </InputLabel>
-                    <Select
-                        labelId="burrito-select-label"
+                <FormControl fullWidth
+                    sx={{ paddingLeft: "1rem", paddingRight: "1rem" }}>
+                    <TextField
+                        required
+                        id="burrito-select-label"
+                        select
                         value={selectedBurrito?.name || ""}
-                        label="Choose Burrito"
                         onChange={handleSelectBurrito}
+                        label={doI18n(`pages:core-local-workspace:choose_document`, i18nRef.current)}
+
                     >
                         {burritos.map((burrito) => (
                             <MenuItem key={burrito.name} value={burrito.name}>
                                 {burrito.name}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </TextField>
                 </FormControl>
-                {ingredient && selectedBurrito && (
+
+                {planIngredient && selectedBurrito && (
                     <>
                         {section ? (
                             <Box sx={{ padding: 1 }}>
-                                {ingredient.sectionStructure.map((field, i) => {
+                                {planIngredient.sectionStructure.map((field, i) => {
                                     const className = field.paraTag || "";
                                     const value =
                                         section.fieldInitialValues?.[field.name] ??
-                                        ingredient.fieldInitialValues?.[field.name] ??
+                                        planIngredient.fieldInitialValues?.[field.name] ??
                                         "";
 
-                                    // if (scriptureJson || field.type === "scripture") {
-                                    //     return (
-                                    //         <pre>{JSON.stringify(scriptureJson.blocks, null, 2)}</pre>
-                                    //     );
-                                    // }
-                                     if (field.type === "scripture") {
+                                    if (verseText && field.type === "scripture") {
+                                        let chapterN = "0"
                                         return (
-                                            <>
-                                                {verseText.length > 0
-                                                    ? verseText.map((b, i) => (
-                                                        <p key={i} style={{ marginBottom: "1em" }}>
-                                                            {b.items.map(i => renderItem(i))}
-                                                        </p>
-                                                    ))
-                                                    : <p>No text found</p>}
-                                            </>
+                                            <div>
+                                                {
+                                                    section.paragraphs
+                                                        .map(
+                                                            p => {
+                                                                if (p.units) {
+                                                                    const [c, v] = p.units[0].split(":")
+                                                                    const newChapter = c !== chapterN
+                                                                    if (newChapter) {
+                                                                        chapterN = c
+                                                                    }
+                                                                    return (
+                                                                        <>
+                                                                            {newChapter && <div className="marks_chapter_label">{c}</div>}
+                                                                            <div className={p.paraTag}>
+                                                                                {
+                                                                                    p.units.map(
+                                                                                        cv => <span>
+                                                                                            <span className="marks_verses_label">{cv.split(":")[1]} </span>
+                                                                                            <span>{verseText[cv.split(":")[0]][cv.split(":")[1]]} </span>
+                                                                                        </span>
+                                                                                    )
+                                                                                }
+                                                                            </div>
+                                                                        </>
+                                                                    )
+                                                                } else {
+                                                                    return <div className={p.paraTag}>
+                                                                        {section.fieldInitialValues[p.name]}
+                                                                        {" "}
+                                                                        ({p.cv.join(" - ")})
+                                                                    </div>
+                                                                }
+
+                                                            }
+
+                                                        )
+                                                }
+                                            </div>
                                         );
                                     }
                                     return (
@@ -249,7 +298,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
                     padding: 1
                 }}>
                     <Typography>About </Typography>
-                    {Object.entries(ingredient).map(([key, value]) => {
+                    {Object.entries(planIngredient).map(([key, value]) => {
                         if (key === "sectionStructure" || key === "sections" || key === "fieldInitialValues") return null;
                         return (
                             <Box key={key} mb={2}>
