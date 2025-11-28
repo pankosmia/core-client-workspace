@@ -3,9 +3,9 @@ import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import ImportExportIcon from '@mui/icons-material/ImportExport';
 import OBSContext from "../../contexts/obsContext";
-import OBSNavigator from "../../components/OBSNavigator";
-import SaveOBSButton from "../../components/SaveOBSButton";
-import AudioRecorder from "../../components/AudioRecorder";
+import OBSNavigator from "./components/OBSNavigator";
+import SaveOBSButton from "./components/SaveOBSButton";
+import AudioRecorder from "./components/AudioRecorder";
 import MarkdownField from "../../components/MarkdownField";
 import { IconButton, Menu, MenuItem } from "@mui/material"; 
 

@@ -9,15 +9,15 @@ import {
   postEmptyJson,
 } from "pithekos-lib";
 import { Box, Divider, FormControl, Grid2, IconButton, TextField, Typography } from "@mui/material";
-import RequireResources from "../../components/RequireResources";
-import juxta2Units from "../../components/juxta2Units";
-import NavBarDrafting from "../../components/NavBarDrafting";
-import SaveButtonDrafting from "../../components/SaveButtonDrafting";
-import CustomEditorMode from "./CustomEditorMode";
-import BcvPicker from "../../pages/Workspace/BcvPicker";
+import RequireResources from "../../../components/RequireResources";
+import juxta2Units from "../../../components/juxta2Units";
+import NavBarDrafting from "./components/NavBarDrafting";
+import SaveButtonDrafting from "./components/SaveButtonDrafting";
+import CustomEditorMode from "../CustomEditorMode";
+import BcvPicker from "../../../pages/Workspace/BcvPicker";
 import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import usfm2draftJson from './usfm2draftJson';
+import usfm2draftJson from '../../../components/usfm2draftJson';
 
 function DraftingEditor({
   metadata,
@@ -39,7 +39,6 @@ function DraftingEditor({
   const [savedChecksum, setSavedChecksum] = useState(null);
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
   const [data, setData] = useState(null);
-  const [formData, setFormData] = useState({});
 
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)

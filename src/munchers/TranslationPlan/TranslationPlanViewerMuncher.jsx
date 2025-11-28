@@ -3,7 +3,7 @@ import { Box, Dialog, FormControl, IconButton, InputLabel, MenuItem, Select, Typ
 import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n } from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
 import { Proskomma } from "proskomma-core";
-import usfm2draftJson from "../TextTranslation/usfm2draftJson";
+import usfm2draftJson from "../../components/usfm2draftJson";
 
 function TranslationPlanViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState();
@@ -203,9 +203,22 @@ function TranslationPlanViewerMuncher({ metadata }) {
                                         ingredient.fieldInitialValues?.[field.name] ??
                                         "";
 
-                                    if (field.type === "scripture") {
+                                    // if (scriptureJson || field.type === "scripture") {
+                                    //     return (
+                                    //         <pre>{JSON.stringify(scriptureJson.blocks, null, 2)}</pre>
+                                    //     );
+                                    // }
+                                     if (field.type === "scripture") {
                                         return (
-                                            <pre>{JSON.stringify(scriptureJson.blocks, null, 2)}</pre>
+                                            <>
+                                                {verseText.length > 0
+                                                    ? verseText.map((b, i) => (
+                                                        <p key={i} style={{ marginBottom: "1em" }}>
+                                                            {b.items.map(i => renderItem(i))}
+                                                        </p>
+                                                    ))
+                                                    : <p>No text found</p>}
+                                            </>
                                         );
                                     }
                                     return (
