@@ -1,5 +1,5 @@
 import { Box, FormControl, TextField } from "@mui/material";
-import MarkdownField from "./MarkdownField";
+import MarkdownField from "../../../components/MarkdownField";
 import ActionsButtons from "./ActionsButtons";
 
 function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction, cellValueChanged, setCellValueChanged }) {

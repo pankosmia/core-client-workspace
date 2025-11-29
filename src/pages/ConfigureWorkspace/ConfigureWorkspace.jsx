@@ -51,7 +51,8 @@ function ConfigureWorkspace() {
         "x-obsimages": [],
         "x-obsarticles": "myObsList",
         "x-obsquestions": "myObsList",
-        "x-obsnotes": "myObsList"
+        "x-obsnotes": "myObsList",
+        "x-translationplan":"myBcvList"
     };
 
     const flavorTypes = {
@@ -63,7 +64,7 @@ function ConfigureWorkspace() {
         "x-bcvquestions": "parascriptural",
         "x-bcvimages": "parascriptural",
         "x-juxtalinear": "scripture",
-        "x-parallel": "parascriptural"
+        "x-parallel": "parascriptural",
     };
 
     const columns = [

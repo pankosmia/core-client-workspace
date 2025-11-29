@@ -1,5 +1,5 @@
-import {useEffect, useState, useContext} from "react";
-import {Box, Grid2, Typography} from "@mui/material";
+import { useEffect, useState, useContext } from "react";
+import { Box, Grid2, Typography } from "@mui/material";
 import Markdown from 'react-markdown';
 
 import {
@@ -10,11 +10,11 @@ import {
     getText
 } from "pithekos-lib";
 
-function BcvNotesViewerMuncher({metadata}) {
+function BcvNotesViewerMuncher({ metadata }) {
     const [ingredient, setIngredient] = useState([]);
-    const {systemBcv} = useContext(BcvContext);
-    const {debugRef} = useContext(DebugContext);
-    const {i18nRef} = useContext(I18nContext);
+    const { systemBcv } = useContext(BcvContext);
+    const { debugRef } = useContext(DebugContext);
+    const { i18nRef } = useContext(I18nContext);
 
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -60,38 +60,38 @@ function BcvNotesViewerMuncher({metadata}) {
 
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <Grid2 
+            <Grid2
                 container
                 direction="row"
                 sx={{
-                    display:"flex",
+                    display: "flex",
                     justifyContent: "center",
                     alignItems: "center"
-                 }}
-            >   
+                }}
+            >
                 <Grid2
-                    item 
-                    size={3} 
+                    item
+                    size={3}
                     sx={{
-                        display:"flex",
+                        display: "flex",
                         justifyContent: "center",
                         alignItems: "center"
                     }}
                 >
                     <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</Typography>
                 </Grid2>
-                <Grid2 item size={12} sx={{paddingRight:"5%"}}>
+                <Grid2 item size={12} sx={{ paddingRight: "5%" }}>
                     {ingredient &&
                         <Markdown className='markdown'>{
                             verseNotes.length > 0
-                            ?
-                            verseNotes
-                                .map((v, n) => {
-                                    return `* (**${verseIds[n]}**) ${v.replace(". \n\n\n\n ", ". \n\n * ")}${!(verseSupReferences[n] === "") ? ` (${verseSupReferences[n].replace("rc://*/ta/man/translate/", "")})` : ""}`
-                                })
-                                .join("\n")
-                            :
-                            "No notes found for this verse"
+                                ?
+                                verseNotes
+                                    .map((v, n) => {
+                                        return `* (**${verseIds[n]}**) ${v.replace(". \n\n\n\n ", ". \n\n * ")}${!(verseSupReferences[n] === "") ? ` (${verseSupReferences[n].replace("rc://*/ta/man/translate/", "")})` : ""}`
+                                    })
+                                    .join("\n")
+                                :
+                                <Typography>{doI18n("pages:core-local-workspace:no_verse", i18nRef.current)}</Typography>
                         }</Markdown>
                     }
                 </Grid2>

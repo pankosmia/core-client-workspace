@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import "./TextTranslationEditorMuncher.css";
+import "../TextTranslationEditorMuncher";
 import {
     bcvContext as BcvContext,
     debugContext as DebugContext,
@@ -12,11 +12,12 @@ import md5sum from 'md5';
 import { enqueueSnackbar } from "notistack";
 
 import SharedEditor from "./SharedEditor";
-import { useAppReferenceHandler } from "./useAppReferenceHandler";
+import { useAppReferenceHandler } from "../useAppReferenceHandler";
 import { Box, Typography } from "@mui/material";
 import md5 from "md5";
 import { Proskomma } from "proskomma-core";
-import defaultUsj from "./plugins/defaultUsj.json"
+import defaultUsj from "../plugins/defaultUsj.json"
+
 function SharedEditorWrapper({ metadata, modified, setModified, editorMode, setEditor }) {
     const { bcvRef } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);

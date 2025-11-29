@@ -29,7 +29,7 @@ function SearchWithVerses({ ingredient, setCurrentRowN, currentRowN, updateBcv }
     };
 
     return (
-        <List sx={{ maxHeight: "70vh", overflowY: "auto", width:"15vh" }}>
+        <List sx={{ maxHeight: "100vh", overflowY: "auto", width:"15rem" }}>
             {bookCode.splice(1).filter(chap => chap && chap.trim() !== "").map(chap => (
                 <>
                     <ListItemButton

@@ -4,7 +4,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { Box, IconButton, Typography } from "@mui/material";
 import { useContext } from "react";
-import OBSContext from "../contexts/obsContext";
+import OBSContext from "../../../contexts/obsContext";
 import { ButtonGroup } from '@mui/material';
 
 function OBSNavigator({ max, title }) {
