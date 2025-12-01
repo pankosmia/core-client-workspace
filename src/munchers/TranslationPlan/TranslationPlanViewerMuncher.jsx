@@ -11,7 +11,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const { systemBcv } = useContext(BcvContext);
     const [openDialogAbout, setOpenDialogAbout] = useState(false);
     const { debugRef } = useContext(debugContext);
-    const [verseText, setVerseText] = useState([]);
+    const [verseText, setVerseText] = useState({});
     const [burritos, setBurritos] = useState([]);
     const [selectedBurrito, setSelectedBurrito] = useState(null);
     const [scriptureJson, setScriptureJson] = useState(null);
@@ -22,6 +22,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const handleCloseDialogAbout = () => {
         setOpenDialogAbout(false);
     }
+
     useEffect(() => {
         const doScriptureJson = async () => {
             let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
@@ -34,7 +35,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
         if (selectedBurrito) {
             doScriptureJson().then();
         }
-    }, [selectedBurrito])
+    }, [debugRef, selectedBurrito, systemBcv.bookCode])
 
     useEffect(
         () => {
@@ -96,7 +97,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
 
             getVerseText().then();
         },
-        [debugRef, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum, metadata.local_path, selectedBurrito]
+        [debugRef, systemBcv.bookCode, selectedBurrito]
     );
     useEffect(() => {
         async function fetchSummaries() {
@@ -121,7 +122,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
             }
         }
         fetchSummaries();
-    }, []);
+    }, [selectedBurrito]);
 
     const handleSelectBurrito = (event) => {
         const name = event.target.value;
@@ -170,7 +171,6 @@ function TranslationPlanViewerMuncher({ metadata }) {
         const [endChapter, endVerse] = section.cv[1].split(":").map(Number);
         const chapterNum = systemBcv.chapterNum;
         const verseNum = systemBcv.verseNum;
-
         return (
             (chapterNum > startChapter || (chapterNum === startChapter && verseNum >= startVerse)) &&
             (chapterNum < endChapter || (chapterNum === endChapter && verseNum <= endVerse))
@@ -180,7 +180,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
 
     const section = planIngredient.sections
         .filter(section => isInInterval(section, systemBcv))
-        .find(section => section.bookCode === systemBcv.bookCode);
+        .find(section => section.bookCode === systemBcv.bookCode)
 
     return (
         <Box
@@ -196,6 +196,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
                 </IconButton>
             </Box>
             <Box>
+                {/* choose your resources */}
                 <FormControl fullWidth
                     sx={{ paddingLeft: "1rem", paddingRight: "1rem" }}>
                     <TextField
@@ -222,11 +223,12 @@ function TranslationPlanViewerMuncher({ metadata }) {
                                 {planIngredient.sectionStructure.map((field, i) => {
                                     const className = field.paraTag || "";
                                     const value =
-                                        section.fieldInitialValues?.[field.name] ??
-                                        planIngredient.fieldInitialValues?.[field.name] ??
+                                        section.fieldInitialValues[field.name] ??
+                                        planIngredient.fieldInitialValues[field.name] ??
                                         "";
-
-                                    if (verseText && field.type === "scripture") {
+                                        
+                                    // affichage du texte
+                                    if (Object.keys(verseText).length > 0 && field.type === "scripture") {
                                         let chapterN = "0"
                                         return (
                                             <div>
@@ -269,7 +271,10 @@ function TranslationPlanViewerMuncher({ metadata }) {
                                                 }
                                             </div>
                                         );
+                                    } else {
+                                        <Typography> loading ...</Typography>
                                     }
+                                    // reste du texte
                                     return (
                                         <Typography
                                             key={i}
@@ -289,6 +294,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
                 )}
             </Box>
 
+            {/* Dialog d'information */}
             <Dialog
                 open={openDialogAbout}
                 onClose={handleCloseDialogAbout}
