@@ -3,7 +3,6 @@ import { Box, Dialog, FormControl, IconButton, MenuItem, Select, TextField, Typo
 import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n } from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
 import { Proskomma } from "proskomma-core";
-import usfm2draftJson from "../../components/usfm2draftJson";
 
 function TranslationPlanViewerMuncher({ metadata }) {
     const [planIngredient, setPlanIngredient] = useState();
@@ -14,7 +13,6 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const [verseText, setVerseText] = useState({});
     const [burritos, setBurritos] = useState([]);
     const [selectedBurrito, setSelectedBurrito] = useState(null);
-    const [scriptureJson, setScriptureJson] = useState(null);
 
     const handleOpenDialogAbout = () => {
         setOpenDialogAbout(true);
@@ -22,20 +20,6 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const handleCloseDialogAbout = () => {
         setOpenDialogAbout(false);
     }
-
-    // useEffect(() => {
-    //     const doScriptureJson = async () => {
-    //         let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
-    //             debugRef.current
-    //         );
-    //         if (usfmResponse.ok) {
-    //             setScriptureJson(usfm2draftJson(usfmResponse.text))
-    //         }
-    //     }
-    //     if (selectedBurrito) {
-    //         doScriptureJson().then();
-    //     }
-    // }, [debugRef, selectedBurrito, systemBcv.bookCode])
 
     useEffect(
         () => {

@@ -19,6 +19,7 @@ import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import usfm2draftJson from '../../../components/usfm2draftJson';
 import StoryChapter from "./components/StoryChapter";
+import StoryBibleBlock from "./components/StoryBibleBlock";
 
 function DraftingEditor({
   metadata,
@@ -66,7 +67,7 @@ function DraftingEditor({
 
   useEffect(() => {
     const doScriptureJson = async () => {
-      let usfmResponse = await getText(`/burrito/ingredient/raw/_local_/_local_/en_web?ipath=${systemBcv.bookCode}.usfm`,
+      let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
         debugRef.current
       );
       if (usfmResponse.ok) {
@@ -74,7 +75,7 @@ function DraftingEditor({
       }
     }
     doScriptureJson().then();
-  }, [debugRef, systemBcv.bookCode])
+  }, [debugRef, systemBcv.bookCode, metadata])
 
   console.log("scriptureJson", scriptureJson);
 
@@ -255,7 +256,10 @@ function DraftingEditor({
       </Box>
       <Box>
         {scriptureJson ? (
-          <StoryChapter scriptureJson={scriptureJson} />
+          <>
+            <StoryChapter scriptureJson={scriptureJson} />
+            <StoryBibleBlock scriptureJson={scriptureJson}/>
+          </>
 
         ) : (<Typography> loading ...</Typography>)}
 
