@@ -8,15 +8,16 @@ import {
   getText,
   postEmptyJson,
 } from "pithekos-lib";
-import { Box, FormControl, Grid2, IconButton, TextField } from "@mui/material";
-import RequireResources from "../../components/RequireResources";
-import juxta2Units from "../../components/juxta2Units";
-import NavBarDrafting from "../../components/NavBarDrafting";
-import SaveButtonDrafting from "../../components/SaveButtonDrafting";
-import CustomEditorMode from "./CustomEditorMode";
-import BcvPicker from "../../pages/Workspace/BcvPicker";
+import { Box, Divider, FormControl, Grid2, IconButton, TextField, Typography } from "@mui/material";
+import RequireResources from "../../../components/RequireResources";
+import juxta2Units from "../../../components/juxta2Units";
+import NavBarDrafting from "./components/NavBarDrafting";
+import SaveButtonDrafting from "./components/SaveButtonDrafting";
+import CustomEditorMode from "../CustomEditorMode";
+import BcvPicker from "../../../pages/Workspace/BcvPicker";
 import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import usfm2draftJson from '../../../components/usfm2draftJson';
 
 function DraftingEditor({
   metadata,
@@ -37,6 +38,7 @@ function DraftingEditor({
   const [usfmHeader, setUsfmHeader] = useState("");
   const [savedChecksum, setSavedChecksum] = useState(null);
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
+  const [data, setData] = useState(null);
 
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
@@ -59,6 +61,24 @@ function DraftingEditor({
       );
     }
   };
+
+  useEffect(
+    () => {
+      const getAllData = async () => {
+        const ingredientLink = `/burrito/ingredient/raw/_local_/_local_/stctw-test?ipath=plan.json`;
+        const response = await fetch(ingredientLink);
+
+        if (response.ok) {
+          const json = await response.json();
+          setData(json);
+        } else {
+          setData(null);
+        }
+      };
+      getAllData();
+    },
+    []
+  );
 
   useEffect(() => {
     const juxtaJson = async () => {
@@ -106,6 +126,7 @@ function DraftingEditor({
       );
       if (usfmResponse.ok) {
         const usfmText = usfmResponse.text;
+        usfm2draftJson(usfmText);
         setUsfmHeader(usfmText.split("\\c")[0]);
         const newPk = new Proskomma();
         newPk.importDocument(
@@ -160,7 +181,6 @@ function DraftingEditor({
   }, [units, pk]);
 
   const handleCacheUnit = (unitN, newText) => {
-    console.log(`text: '${newText}'`);
     const newUnit = { ...unitData[unitN], text: newText };
     let newUnitData = [...unitData];
     newUnitData[unitN] = newUnit;
@@ -175,6 +195,7 @@ function DraftingEditor({
   if (isDownloading) {
     return <p>loading...</p>;
   }
+
   return (
     <>
       <Box
@@ -242,6 +263,7 @@ function DraftingEditor({
           return (
             <Box key={index}>
               <FormControl fullWidth margin="normal">
+
                 <TextField
                   label={u.reference}
                   value={

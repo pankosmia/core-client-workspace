@@ -1,0 +1,320 @@
+import { useContext, useEffect, useState } from "react";
+import { Box, Dialog, FormControl, IconButton, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n } from "pithekos-lib";
+import InfoIcon from '@mui/icons-material/Info';
+import { Proskomma } from "proskomma-core";
+import usfm2draftJson from "../../components/usfm2draftJson";
+
+function TranslationPlanViewerMuncher({ metadata }) {
+    const [planIngredient, setPlanIngredient] = useState();
+    const { i18nRef } = useContext(i18nContext);
+    const { systemBcv } = useContext(BcvContext);
+    const [openDialogAbout, setOpenDialogAbout] = useState(false);
+    const { debugRef } = useContext(debugContext);
+    const [verseText, setVerseText] = useState({});
+    const [burritos, setBurritos] = useState([]);
+    const [selectedBurrito, setSelectedBurrito] = useState(null);
+    const [scriptureJson, setScriptureJson] = useState(null);
+
+    const handleOpenDialogAbout = () => {
+        setOpenDialogAbout(true);
+    }
+    const handleCloseDialogAbout = () => {
+        setOpenDialogAbout(false);
+    }
+
+    useEffect(() => {
+        const doScriptureJson = async () => {
+            let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
+                debugRef.current
+            );
+            if (usfmResponse.ok) {
+                setScriptureJson(usfm2draftJson(usfmResponse.text))
+            }
+        }
+        if (selectedBurrito) {
+            doScriptureJson().then();
+        }
+    }, [debugRef, selectedBurrito, systemBcv.bookCode])
+
+    useEffect(
+        () => {
+            const getVerseText = async () => {
+                if (selectedBurrito) {
+                    let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
+                        debugRef.current
+                    );
+                    if (usfmResponse.ok) {
+                        const pk = new Proskomma();
+                        pk.importDocument({
+                            lang: "xxx",
+                            abbr: "yyy"
+                        },
+                            "usfm",
+                            usfmResponse.text
+                        );
+                        const query = `{
+                                            documents {
+                                                header(id: "bookCode")
+                                                cvIndexes {
+                                                chapter
+                                                verses {
+                                                    verse {
+                                                    verseRange
+                                                    text
+                                                    }
+                                                }
+                                                }
+                                            }
+                                        }`;
+
+                        const result = pk.gqlQuerySync(query);
+                        const newVerseText = Object.fromEntries(
+                            result.data.documents[0].cvIndexes
+                                .map(
+                                    i => [
+                                        i.chapter,
+                                        Object.fromEntries(
+                                            i.verses
+                                                .map((v, n) => [
+                                                    `${n}`,
+                                                    v.verse.length > 0 ?
+                                                        v.verse[0].text :
+                                                        []
+                                                ])
+                                                .filter(kv => typeof kv[1] === "string")
+                                        )
+                                    ]
+                                )
+                        )
+                        setVerseText(newVerseText);
+                    } else {
+                        setVerseText([]);
+                    }
+                }
+
+            };
+
+            getVerseText().then();
+        },
+        [debugRef, systemBcv.bookCode, selectedBurrito]
+    );
+    useEffect(() => {
+        async function fetchSummaries() {
+            try {
+                const response = await fetch("/burrito/metadata/summaries");
+                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                const data = await response.json();
+                // Filter only those with flavor_type = scripture
+                const burritoArray = Object.entries(data).map(([key, value]) => ({
+                    path: key,
+                    ...value,
+                }));
+
+                // Filter only scripture burritos
+                const scriptures = burritoArray.filter(
+                    (item) => item?.flavor === "textTranslation"
+                );
+                setBurritos(scriptures);
+            } catch (err) {
+                console.error("Error fetching summaries:", err);
+            } finally {
+            }
+        }
+        fetchSummaries();
+    }, [selectedBurrito]);
+
+    const handleSelectBurrito = (event) => {
+        const name = event.target.value;
+        const burrito = burritos.find((b) => b.name === name);
+        setSelectedBurrito(burrito);
+    };
+
+    const getAllData = async () => {
+        const ingredientLink = `/burrito/ingredient/raw/_local_/_local_/stctw-test?ipath=plan.json`;
+        const response = await fetch(ingredientLink);
+
+        if (response.ok) {
+            const data = await response.json();
+            setPlanIngredient(data);
+        } else {
+            setPlanIngredient([]);
+        }
+    };
+
+    async function loadCSS() {
+        const url = "/app-resources/usfm/bible_page_styles.css";
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.error("Erreur de chargement du CSS :", response.status);
+            return;
+        }
+        const cssText = await response.text();
+        const style = document.createElement("style");
+        style.textContent = cssText;
+        document.head.appendChild(style);
+    }
+
+    useEffect(
+        () => {
+            getAllData().then();
+            loadCSS();
+        },
+        []
+    );
+
+    if (!planIngredient) { return <Typography> loading...</Typography> }
+
+    const isInInterval = (section, systemBcv) => {
+
+        const [startChapter, startVerse] = section.cv[0].split(":").map(Number);
+        const [endChapter, endVerse] = section.cv[1].split(":").map(Number);
+        const chapterNum = systemBcv.chapterNum;
+        const verseNum = systemBcv.verseNum;
+        return (
+            (chapterNum > startChapter || (chapterNum === startChapter && verseNum >= startVerse)) &&
+            (chapterNum < endChapter || (chapterNum === endChapter && verseNum <= endVerse))
+        );
+    };
+
+
+    const section = planIngredient.sections
+        .filter(section => isInInterval(section, systemBcv))
+        .find(section => section.bookCode === systemBcv.bookCode)
+
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+            }}
+        >
+            <Box
+                sx={{ marginLeft: "auto" }}>
+                <IconButton onClick={() => handleOpenDialogAbout()}>
+                    <InfoIcon />
+                </IconButton>
+            </Box>
+            <Box>
+                {/* choose your resources */}
+                <FormControl fullWidth
+                    sx={{ paddingLeft: "1rem", paddingRight: "1rem" }}>
+                    <TextField
+                        required
+                        id="burrito-select-label"
+                        select
+                        value={selectedBurrito?.name || ""}
+                        onChange={handleSelectBurrito}
+                        label={doI18n(`pages:core-local-workspace:choose_document`, i18nRef.current)}
+
+                    >
+                        {burritos.map((burrito) => (
+                            <MenuItem key={burrito.name} value={burrito.name}>
+                                {burrito.name}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                </FormControl>
+
+                {planIngredient && selectedBurrito && (
+                    <>
+                        {section ? (
+                            <Box sx={{ padding: 1 }}>
+                                {planIngredient.sectionStructure.map((field, i) => {
+                                    const className = field.paraTag || "";
+                                    const value =
+                                        section.fieldInitialValues[field.name] ??
+                                        planIngredient.fieldInitialValues[field.name] ??
+                                        "";
+                                        
+                                    // affichage du texte
+                                    if (Object.keys(verseText).length > 0 && field.type === "scripture") {
+                                        let chapterN = "0"
+                                        return (
+                                            <div>
+                                                {
+                                                    section.paragraphs
+                                                        .map(
+                                                            p => {
+                                                                if (p.units) {
+                                                                    const [c, v] = p.units[0].split(":")
+                                                                    const newChapter = c !== chapterN
+                                                                    if (newChapter) {
+                                                                        chapterN = c
+                                                                    }
+                                                                    return (
+                                                                        <>
+                                                                            {newChapter && <div className="marks_chapter_label">{c}</div>}
+                                                                            <div className={p.paraTag}>
+                                                                                {
+                                                                                    p.units.map(
+                                                                                        cv => <span>
+                                                                                            <span className="marks_verses_label">{cv.split(":")[1]} </span>
+                                                                                            <span>{verseText[cv.split(":")[0]][cv.split(":")[1]]} </span>
+                                                                                        </span>
+                                                                                    )
+                                                                                }
+                                                                            </div>
+                                                                        </>
+                                                                    )
+                                                                } else {
+                                                                    return <div className={p.paraTag}>
+                                                                        {section.fieldInitialValues[p.name]}
+                                                                        {" "}
+                                                                        ({p.cv.join(" - ")})
+                                                                    </div>
+                                                                }
+
+                                                            }
+
+                                                        )
+                                                }
+                                            </div>
+                                        );
+                                    } else {
+                                        <Typography> loading ...</Typography>
+                                    }
+                                    // reste du texte
+                                    return (
+                                        <Typography
+                                            key={i}
+                                            className={className}
+                                            fullWidth
+                                            size="small"
+                                        >
+                                            {value}
+                                        </Typography>
+                                    );
+                                })}
+                            </Box>
+                        ) : (
+                            <Typography> no book found </Typography>
+                        )}
+                    </>
+                )}
+            </Box>
+
+            {/* Dialog d'information */}
+            <Dialog
+                open={openDialogAbout}
+                onClose={handleCloseDialogAbout}
+            >
+                <Box sx={{
+                    margin: 1,
+                    padding: 1
+                }}>
+                    <Typography>About </Typography>
+                    {Object.entries(planIngredient).map(([key, value]) => {
+                        if (key === "sectionStructure" || key === "sections" || key === "fieldInitialValues") return null;
+                        return (
+                            <Box key={key} mb={2}>
+                                <Typography fullWidth size="small" value={value || ''}> {value}</Typography>
+                            </Box>
+                        );
+                    })}
+                </Box>
+            </Dialog>
+        </Box>
+    );
+}
+export default TranslationPlanViewerMuncher;

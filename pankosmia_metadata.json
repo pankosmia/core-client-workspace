@@ -498,6 +498,14 @@
     "_sideloaded_": {
       "en": "imported manually",
       "fr": "importé manuellement"
+    },
+    "choose_document":{
+      "en":"Choose your document",
+      "fr":"Choix de sa ressource"
+    },
+    "no_verse":{
+      "en":"No notes found for this verse",
+      "fr": "Pas de note pour ce verset"
     }
   }
 }

@@ -18,6 +18,7 @@ import OBSNotesViewerMuncher from '../../munchers/OBSNotes/OBSNotesViewerMuncher
 import OBSQuestionsViewerMuncher from '../../munchers/OBSQuestions/OBSQuestionsViewerMuncher';
 import OBSArticlesViewerMuncher from '../../munchers/OBSArticles/OBSArticlesViewerMuncher';
 import JuxtalinearViewerMuncher from "../../munchers/Juxtalinear/JuxtalinearViewer";
+import TranslationPlanViewerMuncher from '../../munchers/TranslationPlan/TranslationPlanViewerMuncher';
 
 function WorkspaceCard({metadata, style, distractionModeCount}) {
     const scriptDirectionString =  metadata.script_direction === 'rtl' ? 'rtl' : 'ltr';
@@ -148,6 +149,13 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
     if (metadata.flavor.toLowerCase() === "x-bcvvideo") {
         return <div style={style} dir={scriptDirectionString}>
             <BcvVideosViewerMuncher
+                metadata={metadata}
+            />
+        </div>
+    }
+     if (metadata.flavor.toLowerCase() === "x-translationplan") {
+        return <div style={style} dir={scriptDirectionString}>
+            <TranslationPlanViewerMuncher
                 metadata={metadata}
             />
         </div>
