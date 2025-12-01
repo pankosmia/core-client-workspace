@@ -18,6 +18,7 @@ import BcvPicker from "../../../pages/Workspace/BcvPicker";
 import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import usfm2draftJson from '../../../components/usfm2draftJson';
+import StoryChapter from "./components/StoryChapter";
 
 function DraftingEditor({
   metadata,
@@ -38,6 +39,7 @@ function DraftingEditor({
   const [usfmHeader, setUsfmHeader] = useState("");
   const [savedChecksum, setSavedChecksum] = useState(null);
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
+  const [scriptureJson, setScriptureJson] = useState(null);
   const [data, setData] = useState(null);
 
   const handlePreviewText = () => {
@@ -62,23 +64,19 @@ function DraftingEditor({
     }
   };
 
-  useEffect(
-    () => {
-      const getAllData = async () => {
-        const ingredientLink = `/burrito/ingredient/raw/_local_/_local_/stctw-test?ipath=plan.json`;
-        const response = await fetch(ingredientLink);
+  useEffect(() => {
+    const doScriptureJson = async () => {
+      let usfmResponse = await getText(`/burrito/ingredient/raw/_local_/_local_/en_web?ipath=${systemBcv.bookCode}.usfm`,
+        debugRef.current
+      );
+      if (usfmResponse.ok) {
+        setScriptureJson(usfm2draftJson(usfmResponse.text))
+      }
+    }
+    doScriptureJson().then();
+  }, [debugRef, systemBcv.bookCode])
 
-        if (response.ok) {
-          const json = await response.json();
-          setData(json);
-        } else {
-          setData(null);
-        }
-      };
-      getAllData();
-    },
-    []
-  );
+  console.log("scriptureJson", scriptureJson);
 
   useEffect(() => {
     const juxtaJson = async () => {
@@ -256,6 +254,11 @@ function DraftingEditor({
         </Grid2>
       </Box>
       <Box>
+        {scriptureJson ? (
+          <StoryChapter scriptureJson={scriptureJson} />
+
+        ) : (<Typography> loading ...</Typography>)}
+
         {unitData.map((u, index) => {
           if (!u.reference.startsWith(`${currentChapter}:`)) {
             return;

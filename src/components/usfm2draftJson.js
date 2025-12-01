@@ -62,13 +62,18 @@ function processBlocks(blocks, sequenceType, sequences) {
             const graftedSequence = sequences.filter(s => s.id === bg.payload)[0];
             ret = [...ret, ...processBlocks(graftedSequence.blocks, graftedSequence.type, sequences)];
         }
-        ret.push(
+        const blockOb = 
             {
                 tag: block.bs.payload.split("/")[1],
                 type: sequenceType,
-                units: sequenceType === "main" ? processCvItems(block.items, block.os) : processGraftItems(block.items, block.os)
             }
-        );
+            if(sequenceType === "main"){
+                blockOb.units =  processCvItems(block.items, block.os)
+            } else {
+                blockOb.content = processGraftItems(block.items, block.os)
+            }
+        ret.push (blockOb);
+
     }
     return ret;
 }
@@ -104,6 +109,7 @@ export default function usfm2draftJson(usfm) {
     return {
             headers,
             blocks
+            
         }
     
 };

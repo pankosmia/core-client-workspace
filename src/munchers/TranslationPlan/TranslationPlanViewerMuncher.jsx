@@ -23,19 +23,19 @@ function TranslationPlanViewerMuncher({ metadata }) {
         setOpenDialogAbout(false);
     }
 
-    useEffect(() => {
-        const doScriptureJson = async () => {
-            let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
-                debugRef.current
-            );
-            if (usfmResponse.ok) {
-                setScriptureJson(usfm2draftJson(usfmResponse.text))
-            }
-        }
-        if (selectedBurrito) {
-            doScriptureJson().then();
-        }
-    }, [debugRef, selectedBurrito, systemBcv.bookCode])
+    // useEffect(() => {
+    //     const doScriptureJson = async () => {
+    //         let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
+    //             debugRef.current
+    //         );
+    //         if (usfmResponse.ok) {
+    //             setScriptureJson(usfm2draftJson(usfmResponse.text))
+    //         }
+    //     }
+    //     if (selectedBurrito) {
+    //         doScriptureJson().then();
+    //     }
+    // }, [debugRef, selectedBurrito, systemBcv.bookCode])
 
     useEffect(
         () => {
