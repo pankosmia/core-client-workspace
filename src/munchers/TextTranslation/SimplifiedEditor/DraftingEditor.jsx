@@ -19,7 +19,7 @@ import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import usfm2draftJson from '../../../components/usfm2draftJson';
 import StoryChapter from "./components/StoryChapter";
-import StoryBibleBlock from "./components/StoryBibleBlock";
+import ScriptureBible from "./components/ScriptureBible";
 
 function DraftingEditor({
   metadata,
@@ -65,17 +65,44 @@ function DraftingEditor({
     }
   };
 
+  const filterByChapter = (usfmJson, requiredChapter) => {
+    let chapterBlocks = [];
+    let currentChapter = 0;
+    for (const block of usfmJson.blocks) {
+      if (block.type === "chapter") {
+        currentChapter = block.chapter
+      }
+      if (currentChapter === requiredChapter) {
+        chapterBlocks.push(block)
+      }
+    }
+    return {
+      headers: usfmJson.headers,
+      blocks: chapterBlocks
+    }
+  }
+
   useEffect(() => {
     const doScriptureJson = async () => {
       let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
         debugRef.current
       );
       if (usfmResponse.ok) {
-        setScriptureJson(usfm2draftJson(usfmResponse.text))
+        setScriptureJson(
+          filterByChapter(
+            usfm2draftJson(
+              usfmResponse.text
+            ),
+            systemBcv.chapterNum
+          )
+
+        )
+
+
       }
     }
     doScriptureJson().then();
-  }, [debugRef, systemBcv.bookCode, metadata])
+  }, [debugRef, systemBcv.bookCode, metadata,systemBcv.chapterNum])
 
   console.log("scriptureJson", scriptureJson);
 
@@ -117,79 +144,79 @@ function DraftingEditor({
     juxtaJson().then();
   }, [debugRef, systemBcv.bookCode]);
 
-  useEffect(() => {
-    const getProskomma = async () => {
-      let usfmResponse = await getText(
-        `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
-        debugRef.current
-      );
-      if (usfmResponse.ok) {
-        const usfmText = usfmResponse.text;
-        usfm2draftJson(usfmText);
-        setUsfmHeader(usfmText.split("\\c")[0]);
-        const newPk = new Proskomma();
-        newPk.importDocument(
-          {
-            lang: "xxx",
-            abbr: "yyy",
-          },
-          "usfm",
-          usfmText
-        );
-        setPk(newPk);
-      }
-    };
-    getProskomma().then();
-  }, [debugRef, systemBcv.bookCode, metadata.local_path]);
-  const getUnitTexts = async () => {
-    let newUnitData = [];
-    setIsDownloading(true);
-    for (const cv of units) {
-      const query = `{
-                documents {
-                    mainSequence {
-                        blocks(withScriptureCV:"${cv}"){
-                            items(withScriptureCV:"${cv}") {
-                                type subType payload
-                            }
-                        }
-                    }
+  // useEffect(() => {
+  //   const getProskomma = async () => {
+  //     let usfmResponse = await getText(
+  //       `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
+  //       debugRef.current
+  //     );
+  //     if (usfmResponse.ok) {
+  //       const usfmText = usfmResponse.text;
+  //       usfm2draftJson(usfmText);
+  //       setUsfmHeader(usfmText.split("\\c")[0]);
+  //       const newPk = new Proskomma();
+  //       newPk.importDocument(
+  //         {
+  //           lang: "xxx",
+  //           abbr: "yyy",
+  //         },
+  //         "usfm",
+  //         usfmText
+  //       );
+  //       setPk(newPk);
+  //     }
+  //   };
+  //   getProskomma().then();
+  // }, [debugRef, systemBcv.bookCode, metadata.local_path]);
+  // const getUnitTexts = async () => {
+  //   let newUnitData = [];
+  //   setIsDownloading(true);
+  //   for (const cv of units) {
+  //     const query = `{
+  //               documents {
+  //                   mainSequence {
+  //                       blocks(withScriptureCV:"${cv}"){
+  //                           items(withScriptureCV:"${cv}") {
+  //                               type subType payload
+  //                           }
+  //                       }
+  //                   }
 
-                }
-            }`;
-      const result = await pk.gqlQuery(query);
-      const cvText = result.data.documents[0].mainSequence.blocks
-        .map((b) =>
-          b.items
-            .filter((i) => i.type === "token")
-            .map((i) => i.payload.replace(/\s+/g, " "))
-            .join("")
-        )
-        .join("\n\n");
-      newUnitData.push({ reference: cv, text: cvText });
-    }
-    setUnitData(newUnitData);
-    setIsDownloading(false);
-    setModified(false);
-    setSavedChecksum(md5(JSON.stringify(newUnitData, null, 2)));
-  };
-  useEffect(() => {
-    if (pk) {
-      getUnitTexts().then();
-    }
-  }, [units, pk]);
+  //               }
+  //           }`;
+  //     const result = await pk.gqlQuery(query);
+  //     const cvText = result.data.documents[0].mainSequence.blocks
+  //       .map((b) =>
+  //         b.items
+  //           .filter((i) => i.type === "token")
+  //           .map((i) => i.payload.replace(/\s+/g, " "))
+  //           .join("")
+  //       )
+  //       .join("\n\n");
+  //     newUnitData.push({ reference: cv, text: cvText });
+  //   }
+  //   setUnitData(newUnitData);
+  //   setIsDownloading(false);
+  //   setModified(false);
+  //   setSavedChecksum(md5(JSON.stringify(newUnitData, null, 2)));
+  // };
+  // useEffect(() => {
+  //   if (pk) {
+  //     getUnitTexts().then();
+  //   }
+  // }, [units, pk]);
 
-  const handleCacheUnit = (unitN, newText) => {
-    const newUnit = { ...unitData[unitN], text: newText };
-    let newUnitData = [...unitData];
-    newUnitData[unitN] = newUnit;
-    const newChecksum = md5(JSON.stringify(newUnitData, null, 2));
-    const notSaved = newChecksum !== savedChecksum;
-    if (notSaved !== modified) {
-      setModified(notSaved);
-    }
-    setUnitData(newUnitData);
-  };
+  // const handleCacheUnit = (unitN, newText) => {
+  //   const newUnit = { ...unitData[unitN], text: newText };
+  //   let newUnitData = [...unitData];
+  //   newUnitData[unitN] = newUnit;
+  //   const newChecksum = md5(JSON.stringify(newUnitData, null, 2));
+  //   const notSaved = newChecksum !== savedChecksum;
+  //   if (notSaved !== modified) {
+  //     setModified(notSaved);
+  //   }
+  //   setUnitData(newUnitData);
+  // };
 
   if (isDownloading) {
     return <p>loading...</p>;
@@ -257,13 +284,12 @@ function DraftingEditor({
       <Box>
         {scriptureJson ? (
           <>
-            <StoryChapter scriptureJson={scriptureJson} />
-            <StoryBibleBlock scriptureJson={scriptureJson}/>
+            <ScriptureBible scriptureJson={scriptureJson} />
           </>
 
         ) : (<Typography> loading ...</Typography>)}
 
-        {unitData.map((u, index) => {
+        {/* {unitData.map((u, index) => {
           if (!u.reference.startsWith(`${currentChapter}:`)) {
             return;
           }
@@ -293,7 +319,7 @@ function DraftingEditor({
               </FormControl>
             </Box>
           );
-        })}
+        })} */}
       </Box>
     </>
   );

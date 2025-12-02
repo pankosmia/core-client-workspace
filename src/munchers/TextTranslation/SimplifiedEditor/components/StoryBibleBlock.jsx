@@ -1,42 +1,19 @@
-import PropTypes from "prop-types";
+import EditableSpan from "./EditableSpan";
 
-export default function StoryBibleBlock({ scriptureJson }) {
-
-    StoryBibleBlock.propTypes = {
-        scriptureJson: PropTypes.object
-    }
-
+export default function StoryBibleBlock({ type }) {
     return (
-        <div>
-            {scriptureJson.blocks
-                .map(
-                    t => {
-                        if (t.type !== "main") {
-                            return (
-                                <>
-                                    <div style={{ flexDirection: "column" }}>
-                                        <span>{t.tag} </span>
-                                        <span> {t.content}</span>
-                                    </div>
-                                </>
-
-                            )
-                        } else {
-                            return  <div style={{ flexDirection: "column" }}>
-                                        <span>{t.tag} </span>
-                                        <span> {t.units.map(u => u.content.join("")).join(" ")}</span>
-                                    </div>
-  
-                        }
+        <div style={{ flexDirection: "column" }} className={type.tag}>
+            <span>{type.tag} </span>
+            <span>
+                {type.units.map((u, i) => (
+                    <span>
+                        <span className="marks_verses_label">{u.verses}</span>
+                        <EditableSpan type={type} unit={u}/>
+                    </span>
+                ))}
+            </span>
 
 
-                    }
-
-
-                )}
         </div>
-
     );
-
-
 }

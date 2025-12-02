@@ -1,15 +1,9 @@
-import { Typography } from "@mui/material";
-
-export default function StoryChapter({ scriptureJson }) {
+export default function StoryChapter({ type }) {
 
     return (
-        scriptureJson.blocks.filter(t => t.type === "chapter").map((t) => (
-            <Typography>
-                {t.type} - {t.chapter}
-            </Typography>
-
-        ))
-
+        <div className="marks_chapter_label">
+            <span>{type.chapter} </span>
+        </div>
     );
 
 }
