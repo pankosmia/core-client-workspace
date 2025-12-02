@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-export default function EditableSpan({type, unit }) {
+export default function EditableSpan({block, unit }) {
     const [value, setValue] = useState(unit.content[0]);
     const span = useRef(null);
     span.current = {value};
@@ -10,7 +10,7 @@ export default function EditableSpan({type, unit }) {
         setValue(span.current.value);
     };
 
-    return <span contentEditable ref={span} onInput={onUpdate} className={type.tag}>{value}</span>
+    return <span contentEditable ref={span} onInput={onUpdate} className={block.tag}>{value}</span>
        
 
 }

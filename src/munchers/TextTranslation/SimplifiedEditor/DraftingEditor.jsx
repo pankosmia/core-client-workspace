@@ -18,7 +18,6 @@ import BcvPicker from "../../../pages/Workspace/BcvPicker";
 import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import usfm2draftJson from '../../../components/usfm2draftJson';
-import StoryChapter from "./components/StoryChapter";
 import ScriptureBible from "./components/ScriptureBible";
 
 function DraftingEditor({
@@ -42,6 +41,7 @@ function DraftingEditor({
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
   const [scriptureJson, setScriptureJson] = useState(null);
   const [data, setData] = useState(null);
+  const [chapterNumbers, setChapterNumbers] = useState([]);
 
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
@@ -82,27 +82,39 @@ function DraftingEditor({
     }
   }
 
+  const allChapters = (usfmJson) => {
+    let chapters = []
+    for (const block of usfmJson.blocks) {
+      if (block.type === "chapter") {
+        chapters.push(block.chapter)
+      }
+    }
+    return chapters
+  }
+
+  console.log("chapternumbers", chapterNumbers);
   useEffect(() => {
     const doScriptureJson = async () => {
       let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
         debugRef.current
       );
       if (usfmResponse.ok) {
+        const usfmDraftJson = usfm2draftJson(usfmResponse.text)
+        setChapterNumbers(
+          allChapters(
+            usfmDraftJson
+          )
+        )
         setScriptureJson(
           filterByChapter(
-            usfm2draftJson(
-              usfmResponse.text
-            ),
+            usfmDraftJson,
             systemBcv.chapterNum
           )
-
         )
-
-
       }
     }
     doScriptureJson().then();
-  }, [debugRef, systemBcv.bookCode, metadata,systemBcv.chapterNum])
+  }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum])
 
   console.log("scriptureJson", scriptureJson);
 

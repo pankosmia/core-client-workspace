@@ -1,8 +1,8 @@
-export default function StoryChapter({ type }) {
+export default function StoryChapter({ block }) {
 
     return (
         <div className="marks_chapter_label">
-            <span>{type.chapter} </span>
+            <span>{block.chapter} </span>
         </div>
     );
 

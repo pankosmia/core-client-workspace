@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 
-export default function StoryGraft({ type }) {
-    const [value, setValue] = useState(type.content[0]);
+export default function StoryGraft({ block }) {
+    const [value, setValue] = useState(block.content[0]);
     const span = useRef(null);
     span.current = {value};
 
@@ -11,8 +11,8 @@ export default function StoryGraft({ type }) {
     };
 
     return (
-        <div style={{ flexDirection: "column" }} className={type.tag}>
-            <span>{type.tag} </span>
+        <div style={{ flexDirection: "column" }} className={block.tag}>
+            <span>{block.tag} </span>
             <span contentEditable ref={span} onInput={onUpdate}> {value}</span>
         </div>
     );
