@@ -28,6 +28,7 @@ function DraftingEditor({
   setEditor,
 }) {
   const { systemBcv } = useContext(BcvContext);
+  const { bcvRef } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
   const [units, setUnits] = useState([]);
   const [currentPosition, setCurrentPosition] = useState(0);
@@ -42,7 +43,7 @@ function DraftingEditor({
   const [scriptureJson, setScriptureJson] = useState(null);
   const [data, setData] = useState(null);
   const [chapterNumbers, setChapterNumbers] = useState([]);
-  const [currentBookCode,setCurrentBookCode]= useState();
+  const [currentBookCode,setCurrentBookCode]= useState(bcvRef.current.bookCode)
 
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)

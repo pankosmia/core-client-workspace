@@ -26,10 +26,7 @@ function NavBarDrafting({ currentPosition, setCurrentPosition, metadata, chapter
 
     useEffect(() => {
         if ((!currentPosition && chapterNumbers.length > 0) || currentBookCode !== systemBcv.bookCode ) {
-            setCurrentPosition(chapterNumbers[0]);
-            setCurrentBookCode(systemBcv.bookCode);
-            console.log("bookcode",currentBookCode)
-        }    
+            setCurrentPosition(chapterNumbers[0]);        }    
     },[chapterNumbers,currentPosition,setCurrentPosition, systemBcv.bookCode, currentBookCode,setCurrentBookCode]);
     
     console.log("chapterNumbers",chapterNumbers)
