@@ -30,7 +30,7 @@ function DraftingEditor({
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
   const [units, setUnits] = useState([]);
-  const [currentChapter, setCurrentChapter] = useState(0);
+  const [currentPosition, setCurrentPosition] = useState(0);
   const [pk, setPk] = useState(null);
   const [unitData, setUnitData] = useState([]);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -42,6 +42,7 @@ function DraftingEditor({
   const [scriptureJson, setScriptureJson] = useState(null);
   const [data, setData] = useState(null);
   const [chapterNumbers, setChapterNumbers] = useState([]);
+  const [currentBookCode,setCurrentBookCode]= useState();
 
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
@@ -54,18 +55,18 @@ function DraftingEditor({
     }
   }, [modified]);
 
-  const updateBcv = (currentChapter) => {
-    if (currentChapter) {
+  const updateBcv = (currentPosition) => {
+    if (currentPosition) {
       postEmptyJson(
-        `/navigation/bcv/${systemBcv["bookCode"]}/${currentChapter}/1`,
+        `/navigation/bcv/${systemBcv["bookCode"]}/${currentPosition}/1`,
         debugRef.current
       );
     }
   };
 
   useEffect(()=>{
-    updateBcv(currentChapter)
-  },[currentChapter,systemBcv.bookCode])
+    updateBcv(currentPosition)
+  },[currentPosition,systemBcv.bookCode])
 
 
 
@@ -202,11 +203,13 @@ function DraftingEditor({
           </Grid2>
           <Grid2 item size={4}>
             <NavBarDrafting
-              currentChapter={currentChapter}
-              setCurrentChapter={setCurrentChapter}
+              currentPosition={currentPosition}
+              setCurrentPosition={setCurrentPosition}
               chapterNumbers={chapterNumbers}
               metadata={metadata}
               systemBcv={systemBcv}
+              currentBookCode={currentBookCode}
+              setCurrentBookCode={setCurrentBookCode}
             />
           </Grid2>
           <Grid2 item size={2}>
