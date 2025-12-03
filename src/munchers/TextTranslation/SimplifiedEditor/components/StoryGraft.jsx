@@ -11,9 +11,9 @@ export default function StoryGraft({ block }) {
     };
 
     return (
-        <div style={{ flexDirection: "column" }} className={block.tag}>
+        <div style={{ flexDirection: "column" }}>
             <span>{block.tag} </span>
-            <span contentEditable ref={span} onInput={onUpdate}> {value}</span>
+            <span  className={block.tag} contentEditable ref={span} onInput={onUpdate}> {value}</span>
         </div>
     );
 }

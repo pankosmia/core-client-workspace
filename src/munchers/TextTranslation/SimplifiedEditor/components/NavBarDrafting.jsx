@@ -25,11 +25,11 @@ function NavBarDrafting({ currentChapter, setCurrentChapter, metadata, chapterNu
     },[]);
 
     useEffect(() => {
-        if (currentChapter === 0 && chapterNumbers.length > 0) {
+        if ((currentChapter === 0 && systemBcv.bookCode) || systemBcv.bookCode ) {
             setCurrentChapter(chapterNumbers[0]);
         }
     }, [chapterNumbers, setCurrentChapter,currentChapter,systemBcv.bookCode]);
-
+    console.log("systembcvB",systemBcv.bookCode)
     // changer de page -1 
     const previousChapter = () => {
         if (!chapterNumbers || chapterNumbers.length === 0) return;

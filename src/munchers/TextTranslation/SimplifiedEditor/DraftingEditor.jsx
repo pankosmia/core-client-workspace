@@ -67,8 +67,7 @@ function DraftingEditor({
     updateBcv(currentChapter)
   },[currentChapter,systemBcv.bookCode])
 
-  console.log("sys",systemBcv.chapterNum);
-  console.log("currentChapter",currentChapter);
+
 
   const filterByChapter = (usfmJson, requiredChapter) => {
     let chapterBlocks = [];

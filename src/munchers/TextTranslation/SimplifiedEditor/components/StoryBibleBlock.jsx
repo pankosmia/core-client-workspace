@@ -2,9 +2,9 @@ import EditableSpan from "./EditableSpan";
 
 export default function StoryBibleBlock({ block }) {
     return (
-        <div style={{ flexDirection: "column" }} className={block.tag}>
+        <div style={{ flexDirection: "column" }}>
             <span>{block.tag} </span>
-            <span>
+            <span className={block.tag}>
                 {block.units.map((u, i) => (
                     <span>
                         <span className="marks_verses_label">{u.verses}</span>
