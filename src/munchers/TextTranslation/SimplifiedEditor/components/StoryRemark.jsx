@@ -1,8 +1,8 @@
-export default function StoryRemark({ t }) {
+export default function StoryRemark({ block }) {
 
     return (
         <div>
-            <span> {t.content}</span>
+            <span> {block.content}</span>
         </div>
     );
 }

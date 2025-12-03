@@ -1,15 +1,13 @@
 import { Unstable_NumberInput as NumberInput } from '@mui/base/Unstable_NumberInput';
 import FastRewindIcon from '@mui/icons-material/FastRewind';
 import FastForwardIcon from '@mui/icons-material/FastForward';
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import { ButtonGroup } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { getJson } from 'pithekos-lib';
 
-function NavBarDrafting({ units, currentChapter, setCurrentChapter, metadata }) {
+function NavBarDrafting({ currentChapter, setCurrentChapter, metadata, chapterNumbers,systemBcv }) {
     const [scriptDirection, setScriptDirection] = useState([]);
-
-    const highestChapter = () => units.length === 0 ? 0 : parseInt(units[units.length - 1].split(":")[0])
 
     const ProjectScriptDirection = async () => {
         const summariesResponse = await getJson(`/burrito/metadata/summary/${metadata.local_path}`);
@@ -24,25 +22,34 @@ function NavBarDrafting({ units, currentChapter, setCurrentChapter, metadata }) 
     };
     useEffect(() => {
         ProjectScriptDirection();
-    }, []);
+    },[]);
+
+    useEffect(() => {
+        if (currentChapter === 0 && chapterNumbers.length > 0) {
+            setCurrentChapter(chapterNumbers[0]);
+        }
+    }, [chapterNumbers, setCurrentChapter,currentChapter,systemBcv.bookCode]);
 
     // changer de page -1 
     const previousChapter = () => {
-        const newChapterN = currentChapter - 1;
-        if (newChapterN >= 1 && units.length > 1 && units[newChapterN]) {
-            setCurrentChapter(newChapterN);
+        if (!chapterNumbers || chapterNumbers.length === 0) return;
 
+        const index = chapterNumbers.indexOf(currentChapter);
+        if (index > 0) {
+            setCurrentChapter(chapterNumbers[index - 1]);
         }
     };
 
     // changer de page +1
     const nextChapter = () => {
-        const newChapterN = currentChapter + 1;
-        if (currentChapter < highestChapter()) {
-            setCurrentChapter(newChapterN);
+        if (!chapterNumbers || chapterNumbers.length === 0) return;
 
+        const index = chapterNumbers.indexOf(currentChapter);
+        if (index < chapterNumbers.length - 1) {
+            setCurrentChapter(chapterNumbers[index + 1]);
         }
     };
+
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             {scriptDirection === "ltr" ? (

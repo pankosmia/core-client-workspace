@@ -8,7 +8,7 @@ import {
   getText,
   postEmptyJson,
 } from "pithekos-lib";
-import { Box, Divider, FormControl, Grid2, IconButton, TextField, Typography } from "@mui/material";
+import { Box, Grid2, IconButton, Typography } from "@mui/material";
 import RequireResources from "../../../components/RequireResources";
 import juxta2Units from "../../../components/juxta2Units";
 import NavBarDrafting from "./components/NavBarDrafting";
@@ -30,7 +30,7 @@ function DraftingEditor({
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
   const [units, setUnits] = useState([]);
-  const [currentChapter, setCurrentChapter] = useState(1);
+  const [currentChapter, setCurrentChapter] = useState(0);
   const [pk, setPk] = useState(null);
   const [unitData, setUnitData] = useState([]);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -54,16 +54,21 @@ function DraftingEditor({
     }
   }, [modified]);
 
-  const updateBcv = (unitN) => {
-    if (unitData[unitN]) {
-      const newCurrentUnitCV = unitData[unitN].reference.split(":");
+  const updateBcv = (currentChapter) => {
+    if (currentChapter) {
       postEmptyJson(
-        `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1].split("-")[0]
-        }`,
+        `/navigation/bcv/${systemBcv["bookCode"]}/${currentChapter}/1`,
         debugRef.current
       );
     }
   };
+
+  useEffect(()=>{
+    updateBcv(currentChapter)
+  },[currentChapter,systemBcv.bookCode])
+
+  console.log("sys",systemBcv.chapterNum);
+  console.log("currentChapter",currentChapter);
 
   const filterByChapter = (usfmJson, requiredChapter) => {
     let chapterBlocks = [];
@@ -92,7 +97,6 @@ function DraftingEditor({
     return chapters
   }
 
-  console.log("chapternumbers", chapterNumbers);
   useEffect(() => {
     const doScriptureJson = async () => {
       let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
@@ -116,7 +120,6 @@ function DraftingEditor({
     doScriptureJson().then();
   }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum])
 
-  console.log("scriptureJson", scriptureJson);
 
   useEffect(() => {
     const juxtaJson = async () => {
@@ -155,80 +158,6 @@ function DraftingEditor({
     };
     juxtaJson().then();
   }, [debugRef, systemBcv.bookCode]);
-
-  // useEffect(() => {
-  //   const getProskomma = async () => {
-  //     let usfmResponse = await getText(
-  //       `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
-  //       debugRef.current
-  //     );
-  //     if (usfmResponse.ok) {
-  //       const usfmText = usfmResponse.text;
-  //       usfm2draftJson(usfmText);
-  //       setUsfmHeader(usfmText.split("\\c")[0]);
-  //       const newPk = new Proskomma();
-  //       newPk.importDocument(
-  //         {
-  //           lang: "xxx",
-  //           abbr: "yyy",
-  //         },
-  //         "usfm",
-  //         usfmText
-  //       );
-  //       setPk(newPk);
-  //     }
-  //   };
-  //   getProskomma().then();
-  // }, [debugRef, systemBcv.bookCode, metadata.local_path]);
-  // const getUnitTexts = async () => {
-  //   let newUnitData = [];
-  //   setIsDownloading(true);
-  //   for (const cv of units) {
-  //     const query = `{
-  //               documents {
-  //                   mainSequence {
-  //                       blocks(withScriptureCV:"${cv}"){
-  //                           items(withScriptureCV:"${cv}") {
-  //                               type subType payload
-  //                           }
-  //                       }
-  //                   }
-
-  //               }
-  //           }`;
-  //     const result = await pk.gqlQuery(query);
-  //     const cvText = result.data.documents[0].mainSequence.blocks
-  //       .map((b) =>
-  //         b.items
-  //           .filter((i) => i.type === "token")
-  //           .map((i) => i.payload.replace(/\s+/g, " "))
-  //           .join("")
-  //       )
-  //       .join("\n\n");
-  //     newUnitData.push({ reference: cv, text: cvText });
-  //   }
-  //   setUnitData(newUnitData);
-  //   setIsDownloading(false);
-  //   setModified(false);
-  //   setSavedChecksum(md5(JSON.stringify(newUnitData, null, 2)));
-  // };
-  // useEffect(() => {
-  //   if (pk) {
-  //     getUnitTexts().then();
-  //   }
-  // }, [units, pk]);
-
-  // const handleCacheUnit = (unitN, newText) => {
-  //   const newUnit = { ...unitData[unitN], text: newText };
-  //   let newUnitData = [...unitData];
-  //   newUnitData[unitN] = newUnit;
-  //   const newChecksum = md5(JSON.stringify(newUnitData, null, 2));
-  //   const notSaved = newChecksum !== savedChecksum;
-  //   if (notSaved !== modified) {
-  //     setModified(notSaved);
-  //   }
-  //   setUnitData(newUnitData);
-  // };
 
   if (isDownloading) {
     return <p>loading...</p>;
@@ -276,8 +205,9 @@ function DraftingEditor({
             <NavBarDrafting
               currentChapter={currentChapter}
               setCurrentChapter={setCurrentChapter}
-              units={units}
+              chapterNumbers={chapterNumbers}
               metadata={metadata}
+              systemBcv={systemBcv}
             />
           </Grid2>
           <Grid2 item size={2}>
@@ -300,38 +230,6 @@ function DraftingEditor({
           </>
 
         ) : (<Typography> loading ...</Typography>)}
-
-        {/* {unitData.map((u, index) => {
-          if (!u.reference.startsWith(`${currentChapter}:`)) {
-            return;
-          }
-          return (
-            <Box key={index}>
-              <FormControl fullWidth margin="normal">
-
-                <TextField
-                  label={u.reference}
-                  value={
-                    u.reference === selectedReference ? currentText : u.text
-                  }
-                  multiline
-                  minRows={6}
-                  maxRows={9}
-                  autoFocus={u.reference === selectedReference}
-                  onFocus={() => {
-                    setCurrentText(u.text);
-                    setSelectedReference(u.reference);
-                    updateBcv(index);
-                  }}
-                  onChange={(e) => {
-                    setCurrentText(e.target.value);
-                  }}
-                  onBlur={() => handleCacheUnit(index, currentText)}
-                />
-              </FormControl>
-            </Box>
-          );
-        })} */}
       </Box>
     </>
   );
