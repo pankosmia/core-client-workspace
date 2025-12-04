@@ -8,7 +8,7 @@ import {
   getText,
   postEmptyJson,
 } from "pithekos-lib";
-import { Box, Grid2, IconButton, Typography } from "@mui/material";
+import { AppBar, Box, Grid2, IconButton, Typography } from "@mui/material";
 import RequireResources from "../../../components/RequireResources";
 import juxta2Units from "../../../components/juxta2Units";
 import NavBarDrafting from "./components/NavBarDrafting";
@@ -104,7 +104,7 @@ function DraftingEditor({
       doScriptureJson().then();
     }
 
-  }, [debugRef, systemBcv.bookCode, metadata,currentBookCode])
+  }, [debugRef, systemBcv.bookCode, metadata, currentBookCode])
 
   useEffect(() => {
     const doScriptureJson = async () => {
@@ -171,7 +171,7 @@ function DraftingEditor({
       <Box
         sx={{
           position: "fixed",
-          top: "48px",
+          top: "40px",
           left: 0,
           right: 0,
           display: "flex",
@@ -204,15 +204,15 @@ function DraftingEditor({
             </IconButton>
             <PreviewText metadata={metadata} systemBcv={systemBcv} open={openModalPreviewText === true} closeModal={() => setOpenModalPreviewText(false)} />
           </Grid2>
+          <Grid2 item size={2}>
+            <BcvPicker />
+          </Grid2>
           <Grid2 item size={4}>
             <NavBarDrafting
               chapterNumbers={chapterNumbers}
               metadata={metadata}
               systemBcv={systemBcv}
             />
-          </Grid2>
-          <Grid2 item size={2}>
-            <BcvPicker />
           </Grid2>
           <Grid2 item size={2}>
             <CustomEditorMode

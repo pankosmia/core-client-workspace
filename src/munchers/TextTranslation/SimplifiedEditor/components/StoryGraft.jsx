@@ -12,7 +12,7 @@ export default function StoryGraft({ block }) {
 
     return (
         <div style={{ flexDirection: "column" }}>
-            <span>{block.tag} </span>
+            <span className="marks_title_label">{block.tag} </span>
             <span  className={block.tag} contentEditable ref={span} onInput={onUpdate}> {value}</span>
         </div>
     );

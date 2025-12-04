@@ -1,7 +1,6 @@
-import { Unstable_NumberInput as NumberInput } from '@mui/base/Unstable_NumberInput';
-import FastRewindIcon from '@mui/icons-material/FastRewind';
-import FastForwardIcon from '@mui/icons-material/FastForward';
-import { Box, IconButton } from "@mui/material";
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { Box, IconButton, MenuItem, TextField } from "@mui/material";
 import { ButtonGroup } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { bcvContext, debugContext, getJson, postEmptyJson } from 'pithekos-lib';
@@ -39,7 +38,7 @@ function NavBarDrafting({ metadata, chapterNumbers, systemBcv }) {
 
         }
 
-    }, [chapterNumbers, systemBcv,currentBookCode, bcvRef,debugRef]);
+    }, [chapterNumbers, systemBcv, currentBookCode, bcvRef, debugRef]);
 
     // changer de page -1 
     const previousChapter = () => {
@@ -51,8 +50,7 @@ function NavBarDrafting({ metadata, chapterNumbers, systemBcv }) {
         }
     };
 
-    console.log(systemBcv.chapterNum)
-    console.log("chapternubers", chapterNumbers)
+
     // changer de page +1
     const nextChapter = () => {
         if (currentPosition < chapterNumbers.length - 1) {
@@ -63,47 +61,55 @@ function NavBarDrafting({ metadata, chapterNumbers, systemBcv }) {
             );
         }
     };
-    console.log("chapterNumbers & currentPosition", chapterNumbers, currentPosition);
+
+    const handleClickMenuChapter = (i) => {
+        setCurrentPosition(i);
+            postEmptyJson(
+                `/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[i]}/1`,
+                debugRef.current
+            );
+    }
+   
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             {scriptDirection === "ltr" ? (
                 <ButtonGroup>
                     <IconButton disabled={currentPosition < 1} onClick={() => { previousChapter() }}>
-                        <FastRewindIcon fontSize="large" />
+                        <KeyboardArrowLeftIcon fontSize="large" />
                     </IconButton>
                 </ButtonGroup>
             ) :
                 <ButtonGroup>
                     <IconButton onClick={() => { previousChapter() }}>
-                        <FastForwardIcon fontSize="large" />
+                        <KeyboardArrowRightIcon fontSize="large" />
                     </IconButton>
                 </ButtonGroup>
             }
 
-            <Box
-                sx={{
-                    border: '1px solid #DAE2ED',
-                    borderRadius: '8px',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-                    display: 'flex',
-                    backgroundColor: '#fafafa',
-                }}
+            <TextField
+                label={`Ch`}
+                select
+                size="small"
+                value={currentPosition}
             >
-                <NumberInput
-                    value={`Chap ${chapterNumbers[currentPosition]}`}
-                />
-            </Box>
+                {chapterNumbers.map((chapter, index) => (
+                    <MenuItem onClick={() => handleClickMenuChapter(index)} key={index} value={index}>
+                        {chapter}
+                    </MenuItem>
+                ))}
+            </TextField>
+
 
             {scriptDirection === "ltr" ? (
                 <ButtonGroup>
                     <IconButton disabled={currentPosition >= (chapterNumbers.length - 1)} onClick={() => { nextChapter() }}>
-                        <FastForwardIcon fontSize="large" />
+                        <KeyboardArrowRightIcon fontSize="large" />
                     </IconButton>
                 </ButtonGroup>
             ) :
                 <ButtonGroup>
                     <IconButton onClick={() => { nextChapter() }}>
-                        <FastRewindIcon fontSize="large" />
+                        <KeyboardArrowLeftIcon fontSize="large" />
                     </IconButton>
                 </ButtonGroup>
             }
