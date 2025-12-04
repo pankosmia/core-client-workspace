@@ -93,7 +93,12 @@ function NavBarDrafting({ metadata, chapterNumbers, systemBcv }) {
                 value={currentPosition}
             >
                 {chapterNumbers.map((chapter, index) => (
-                    <MenuItem onClick={() => handleClickMenuChapter(index)} key={index} value={index}>
+                    <MenuItem 
+                        onClick={() => handleClickMenuChapter(index)} 
+                        key={index} 
+                        value={index}
+                        sx={{maxHeight:"3rem", height:"2rem"}}
+                        >
                         {chapter}
                     </MenuItem>
                 ))}
