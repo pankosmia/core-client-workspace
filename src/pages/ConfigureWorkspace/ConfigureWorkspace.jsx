@@ -132,7 +132,7 @@ function ConfigureWorkspace() {
                 />
             </Box>
             <Box
-                style={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
+                style={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'auto', width: '100%' }}>
                 <Typography
                     sx={{ ml: 2 }}
                 > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)} </Typography>
@@ -181,7 +181,7 @@ function ConfigureWorkspace() {
                 position: 'fixed',
                 top: '105px',
                 bottom: 0,
-                overflow: 'scroll',
+                overflow: 'auto',
                 marginBottom: "16px",
                 width: '100%'
             }}>
