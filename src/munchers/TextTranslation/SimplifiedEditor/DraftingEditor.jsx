@@ -28,10 +28,8 @@ function DraftingEditor({
   setEditor,
 }) {
   const { systemBcv } = useContext(BcvContext);
-  const { bcvRef } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
   const [units, setUnits] = useState([]);
-  const [currentPosition, setCurrentPosition] = useState(0);
   const [pk, setPk] = useState(null);
   const [unitData, setUnitData] = useState([]);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -43,7 +41,8 @@ function DraftingEditor({
   const [scriptureJson, setScriptureJson] = useState(null);
   const [data, setData] = useState(null);
   const [chapterNumbers, setChapterNumbers] = useState([]);
-  const [currentBookCode,setCurrentBookCode]= useState(bcvRef.current.bookCode)
+  const [currentBookCode, setCurrentBookCode] = useState("zzz");
+
 
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
@@ -55,21 +54,6 @@ function DraftingEditor({
       window.electronAPI.setCanClose(!modified);
     }
   }, [modified]);
-
-  const updateBcv = (currentPosition) => {
-    if (currentPosition) {
-      postEmptyJson(
-        `/navigation/bcv/${systemBcv["bookCode"]}/${currentPosition}/1`,
-        debugRef.current
-      );
-    }
-  };
-
-  useEffect(()=>{
-    updateBcv(currentPosition)
-  },[currentPosition,systemBcv.bookCode])
-
-
 
   const filterByChapter = (usfmJson, requiredChapter) => {
     let chapterBlocks = [];
@@ -99,17 +83,36 @@ function DraftingEditor({
   }
 
   useEffect(() => {
+    if (systemBcv.bookCode !== currentBookCode) {
+      const doScriptureJson = async () => {
+        let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
+          debugRef.current
+        );
+        if (usfmResponse.ok) {
+          const usfmDraftJson = usfm2draftJson(usfmResponse.text)
+          const newChapterNumbers = allChapters(usfmDraftJson)
+          setCurrentBookCode(systemBcv.bookCode)
+          setChapterNumbers(
+            newChapterNumbers
+          )
+          postEmptyJson(
+            `/navigation/bcv/${systemBcv.bookCode}/${newChapterNumbers[0]}/1`,
+            debugRef.current);
+
+        }
+      }
+      doScriptureJson().then();
+    }
+
+  }, [debugRef, systemBcv.bookCode, metadata,currentBookCode])
+
+  useEffect(() => {
     const doScriptureJson = async () => {
       let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
         debugRef.current
       );
       if (usfmResponse.ok) {
         const usfmDraftJson = usfm2draftJson(usfmResponse.text)
-        setChapterNumbers(
-          allChapters(
-            usfmDraftJson
-          )
-        )
         setScriptureJson(
           filterByChapter(
             usfmDraftJson,
@@ -120,7 +123,6 @@ function DraftingEditor({
     }
     doScriptureJson().then();
   }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum])
-
 
   useEffect(() => {
     const juxtaJson = async () => {
@@ -204,13 +206,9 @@ function DraftingEditor({
           </Grid2>
           <Grid2 item size={4}>
             <NavBarDrafting
-              currentPosition={currentPosition}
-              setCurrentPosition={setCurrentPosition}
               chapterNumbers={chapterNumbers}
               metadata={metadata}
               systemBcv={systemBcv}
-              currentBookCode={currentBookCode}
-              setCurrentBookCode={setCurrentBookCode}
             />
           </Grid2>
           <Grid2 item size={2}>
