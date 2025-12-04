@@ -20,6 +20,8 @@ function ConfigureWorkspace() {
 
     const [projectSummaries, setProjectSummaries] = useState({});
 
+    const [languageLookup, setLanguageLookup] = useState([]);
+
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
         if (summariesResponse.ok) {
@@ -33,6 +35,12 @@ function ConfigureWorkspace() {
         },
         []
     );
+
+    useEffect(() => {
+      fetch('/app-resources/lookups/languages.json') // ISO_639-1 plus grc
+        .then(r => r.json())
+        .then(data => setLanguageLookup(data));
+    }, []);
 
     const projectFlavors = {
         "textTranslation": "myBcvList",
@@ -108,7 +116,8 @@ function ConfigureWorkspace() {
                 name: `${rep.name} (${rep.abbreviation})`,
                 description: rep.description !== rep.name ? rep.description : "",
                 type: rep.flavor,
-                language: rep.language_code
+                language: languageLookup.find(x => x?.id === rep.language_code)?.en ??
+                          rep.language_code
             }
         });
 
