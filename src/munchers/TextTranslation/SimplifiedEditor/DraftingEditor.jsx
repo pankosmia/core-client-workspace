@@ -19,6 +19,7 @@ import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import usfm2draftJson from '../../../components/usfm2draftJson';
 import ScriptureBible from "./components/ScriptureBible";
+import editBlockTag from "./Controller";
 
 function DraftingEditor({
   metadata,
@@ -33,16 +34,12 @@ function DraftingEditor({
   const [pk, setPk] = useState(null);
   const [unitData, setUnitData] = useState([]);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [currentText, setCurrentText] = useState("");
-  const [selectedReference, setSelectedReference] = useState("");
   const [usfmHeader, setUsfmHeader] = useState("");
   const [savedChecksum, setSavedChecksum] = useState(null);
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
   const [scriptureJson, setScriptureJson] = useState(null);
-  const [data, setData] = useState(null);
   const [chapterNumbers, setChapterNumbers] = useState([]);
   const [currentBookCode, setCurrentBookCode] = useState("zzz");
-
 
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
@@ -73,7 +70,6 @@ function DraftingEditor({
       blocks: chapterBlocks
     }
   }
-
   const allChapters = (usfmJson) => {
     let chapters = []
     for (const block of usfmJson.blocks) {
@@ -83,10 +79,9 @@ function DraftingEditor({
     }
     return chapters
   }
-
   useEffect(() => {
     if (systemBcv.bookCode !== currentBookCode) {
-      const doScriptureJson = async () => {
+      const doScriptureChapterJson = async () => {
         let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
           debugRef.current
         );
@@ -100,10 +95,9 @@ function DraftingEditor({
           postEmptyJson(
             `/navigation/bcv/${systemBcv.bookCode}/${newChapterNumbers[0]}/1`,
             debugRef.current);
-
         }
       }
-      doScriptureJson().then();
+      doScriptureChapterJson().then();
     }
 
   }, [debugRef, systemBcv.bookCode, metadata, currentBookCode])
@@ -118,16 +112,20 @@ function DraftingEditor({
         setScriptureJson(
           usfmDraftJson
         )
-        // filterByChapter(
-        //   usfmDraftJson,
-        //   systemBcv.chapterNum
-        // )
       }
     }
     doScriptureJson().then();
   }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum])
 
-  console.log("scpJ", scriptureJson);
+  const filterChapter = scriptureJson ? filterByChapter(scriptureJson, systemBcv.chapterNum) : null;
+
+  useEffect(() => {
+    if (!scriptureJson) return;
+    filterByChapter(scriptureJson, systemBcv.chapterNum);
+  }, [scriptureJson, systemBcv.chapterNum]);
+
+  console.log(scriptureJson)
+  console.log("filter", filterChapter)
   useEffect(() => {
     const juxtaJson = async () => {
       let jsonResponse = await getJson(
@@ -229,9 +227,9 @@ function DraftingEditor({
         </Grid2>
       </Box>
       <Box>
-        {scriptureJson ? (
+        {filterChapter ? (
           <>
-            <ScriptureBible scriptureJson={scriptureJson} />
+            <ScriptureBible filterScriptureJsonChapter={filterChapter} />
           </>
 
         ) : (<Typography> loading ...</Typography>)}

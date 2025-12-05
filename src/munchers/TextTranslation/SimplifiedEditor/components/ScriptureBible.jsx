@@ -5,7 +5,7 @@ import StoryChapter from "./StoryChapter";
 import StoryRemark from "./StoryRemark";
 import { useEffect } from "react";
 
-export default function ScriptureBible({ scriptureJson }) {
+export default function ScriptureBible({ filterScriptureJsonChapter, scriptureJson }) {
 
     ScriptureBible.propTypes = {
         scriptureJson: PropTypes.object
@@ -28,7 +28,7 @@ export default function ScriptureBible({ scriptureJson }) {
 
     return (
         <div>
-            {scriptureJson.blocks
+            {filterScriptureJsonChapter.blocks
                 .map(
                     (b,n) => {
                         switch (b.type) {
@@ -39,7 +39,7 @@ export default function ScriptureBible({ scriptureJson }) {
                                 return <StoryRemark block={b} position={[n]}/>
 
                             case "main":
-                                return <StoryBibleBlock block={b} position={[n]}/>
+                                return <StoryBibleBlock filterScriptureJsonChapter={filterScriptureJsonChapter} block={b} position={[n]}/>
 
                             default:
                                 return <StoryGraft block={b} position={[n]}/>

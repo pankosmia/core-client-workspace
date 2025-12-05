@@ -1,9 +1,11 @@
 import EditableSpan from "./EditableSpan";
+import EditableTag from "./EditableTag";
 
-export default function StoryBibleBlock({ block, position }) {
+export default function StoryBibleBlock({ block, position,filterScriptureJsonChapter }) {
     return (
         <div style={{ flexDirection: "column",textAlign:"left" }}>
-            <span className="marks_title_label">{block.tag} </span>
+            <EditableTag filterScriptureJsonChapter={filterScriptureJsonChapter} block={block} position={[...position]}/>
+            {/* <span className="marks_title_label">{block.tag} </span> */}
             <span className={block.tag} >
                 {block.units.map((u, i) => (
                     <span>
