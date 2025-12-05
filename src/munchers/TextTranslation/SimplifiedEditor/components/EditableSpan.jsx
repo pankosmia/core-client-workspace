@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-export default function EditableSpan({block, unit }) {
+export default function EditableSpan({block, unit, position }) {
     const [value, setValue] = useState(unit.content[0]);
     const span = useRef(null);
     span.current = {value};

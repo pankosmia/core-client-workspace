@@ -506,6 +506,10 @@
     "no_verse":{
       "en":"No notes found for this verse",
       "fr": "Pas de note pour ce verset"
+    },
+    "book":{
+      "en":"Book",
+      "fr":"Livre"
     }
   }
 }

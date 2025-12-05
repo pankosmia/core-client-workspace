@@ -30,19 +30,19 @@ export default function ScriptureBible({ scriptureJson }) {
         <div>
             {scriptureJson.blocks
                 .map(
-                    b => {
+                    (b,n) => {
                         switch (b.type) {
                             case "chapter":
-                                return <StoryChapter block={b} />
+                                return <StoryChapter block={b} position={[n]} />
 
                             case "remark":
-                                return <StoryRemark block={b} />
+                                return <StoryRemark block={b} position={[n]}/>
 
                             case "main":
-                                return <StoryBibleBlock block={b} />
+                                return <StoryBibleBlock block={b} position={[n]}/>
 
                             default:
-                                return <StoryGraft block={b} />
+                                return <StoryGraft block={b} position={[n]}/>
                         }
 
                     }

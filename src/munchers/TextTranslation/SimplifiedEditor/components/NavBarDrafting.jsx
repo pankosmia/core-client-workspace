@@ -75,13 +75,13 @@ function NavBarDrafting({ metadata, chapterNumbers, systemBcv }) {
             {scriptDirection === "ltr" ? (
                 <ButtonGroup>
                     <IconButton disabled={currentPosition < 1} onClick={() => { previousChapter() }}>
-                        <KeyboardArrowLeftIcon fontSize="large" />
+                        <KeyboardArrowLeftIcon fontSize="small" />
                     </IconButton>
                 </ButtonGroup>
             ) :
                 <ButtonGroup>
                     <IconButton onClick={() => { previousChapter() }}>
-                        <KeyboardArrowRightIcon fontSize="large" />
+                        <KeyboardArrowRightIcon fontSize="small" />
                     </IconButton>
                 </ButtonGroup>
             }
@@ -108,13 +108,13 @@ function NavBarDrafting({ metadata, chapterNumbers, systemBcv }) {
             {scriptDirection === "ltr" ? (
                 <ButtonGroup>
                     <IconButton disabled={currentPosition >= (chapterNumbers.length - 1)} onClick={() => { nextChapter() }}>
-                        <KeyboardArrowRightIcon fontSize="large" />
+                        <KeyboardArrowRightIcon fontSize="small" />
                     </IconButton>
                 </ButtonGroup>
             ) :
                 <ButtonGroup>
                     <IconButton onClick={() => { nextChapter() }}>
-                        <KeyboardArrowLeftIcon fontSize="large" />
+                        <KeyboardArrowLeftIcon fontSize="small" />
                     </IconButton>
                 </ButtonGroup>
             }

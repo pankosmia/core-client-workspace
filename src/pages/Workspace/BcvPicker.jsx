@@ -59,6 +59,7 @@ function BcvPicker() {
     return <Box sx={{ justifyContent: "space-between" }}>
         <div>
             <TextField
+                label={`${doI18n("pages:core-local-workspace:book", i18nRef.current)}`}
                 fullWidth
                 id="book-button"
                 size="small"
@@ -68,7 +69,7 @@ function BcvPicker() {
                 {
                     contentBooks.map((b, n) =>
                         <MenuItem
-                            sx={{maxHeight:"3rem", height:"2rem"}}
+                            sx={{ maxHeight: "3rem", height: "2rem" }}
                             value={b}
                             key={n}
                             onClick={

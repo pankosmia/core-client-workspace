@@ -58,13 +58,15 @@ function DraftingEditor({
   const filterByChapter = (usfmJson, requiredChapter) => {
     let chapterBlocks = [];
     let currentChapter = 0;
+    let blockN = 0;
     for (const block of usfmJson.blocks) {
       if (block.type === "chapter") {
         currentChapter = block.chapter
       }
       if (currentChapter === requiredChapter) {
-        chapterBlocks.push(block)
+        chapterBlocks.push({ ...block, position: blockN })
       }
+      blockN += 1
     }
     return {
       headers: usfmJson.headers,
@@ -114,16 +116,18 @@ function DraftingEditor({
       if (usfmResponse.ok) {
         const usfmDraftJson = usfm2draftJson(usfmResponse.text)
         setScriptureJson(
-          filterByChapter(
-            usfmDraftJson,
-            systemBcv.chapterNum
-          )
+          usfmDraftJson
         )
+        // filterByChapter(
+        //   usfmDraftJson,
+        //   systemBcv.chapterNum
+        // )
       }
     }
     doScriptureJson().then();
   }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum])
 
+  console.log("scpJ", scriptureJson);
   useEffect(() => {
     const juxtaJson = async () => {
       let jsonResponse = await getJson(
