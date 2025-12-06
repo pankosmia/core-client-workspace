@@ -125,7 +125,7 @@ function ConfigureWorkspace() {
                 description: rep.description !== rep.name ? rep.description : "",
                 type: rep.flavor,
                 language: languageLookup.find(x => x?.id === rep.language_code)?.en ??
-                          isoThreeLookup.find(x => x?.id === rep.language_code)?.en ??
+                          isoThreeLookup?.[rep.language_code]?.en ??
                           rep.language_code
             }
         });
