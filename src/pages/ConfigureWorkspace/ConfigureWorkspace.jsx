@@ -20,7 +20,8 @@ function ConfigureWorkspace() {
 
     const [projectSummaries, setProjectSummaries] = useState({});
 
-    const [languageLookup, setLanguageLookup] = useState([]);
+    const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
+    const [isoThreeLookup, setIsoThreeLookup] = useState([]);
 
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
@@ -37,10 +38,17 @@ function ConfigureWorkspace() {
     );
 
     useEffect(() => {
-      fetch('/app-resources/lookups/languages.json') // ISO_639-1 plus grc
+      fetch('/app-resources/lookups/iso639-1-to-3.json') // ISO_639-1 codes mapped to ISO_639-3 codes
         .then(r => r.json())
-        .then(data => setLanguageLookup(data));
+        .then(data => setIsoOneToThreeLookup(data));
     }, []);
+
+    useEffect(() => {
+        fetch('/app-resources/lookups/iso639-3.json') // ISO_639-3 2025-02-21 from https://hisregistries.org/rol/ plus zht, zhs, nep
+
+          .then(r => r.json())
+          .then(data => setIsoThreeLookup(data));
+      }, []);
 
     const projectFlavors = {
         "textTranslation": "myBcvList",
@@ -116,7 +124,7 @@ function ConfigureWorkspace() {
                 name: `${rep.name} (${rep.abbreviation})`,
                 description: rep.description !== rep.name ? rep.description : "",
                 type: rep.flavor,
-                language: languageLookup.find(x => x?.id === rep.language_code)?.en ??
+                language: isoThreeLookup?.[ isoOneToThreeLookup[rep.language_code] ?? rep.language_code ]?.en ??
                           rep.language_code
             }
         });
