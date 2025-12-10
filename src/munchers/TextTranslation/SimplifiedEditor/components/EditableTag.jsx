@@ -1,14 +1,10 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import {useEditable} from "use-editable";
 import editBlockTag from "../Controller";
 
-export default function EditableTag({ block, position, filterScriptureJsonChapter }) {
+export default function EditableTag({ block, position, filterScriptureJsonChapter}) {
     const [value, setValue] = useState(block.tag);
-    const span = useRef(null);
-    span.current =  {value} ;
-
-    const onUpdate = e => {
-        e.stopPropagation();
-        setValue(span.current.value);
-    };
-    return <span contentEditable ref={span} onInput={onUpdate} onBlur={() => { editBlockTag(filterScriptureJsonChapter, position, value) }} className={block.tag}>{value}</span>
+    const editorRef = useRef(null);
+    useEditable(editorRef, setValue);
+    return <span ref={editorRef} onBlur={() => { editBlockTag(filterScriptureJsonChapter, position, value) }} className={block.tag}>{value}</span>
 }

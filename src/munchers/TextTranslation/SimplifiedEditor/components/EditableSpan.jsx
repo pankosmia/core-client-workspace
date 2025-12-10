@@ -1,16 +1,9 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import {useEditable} from "use-editable";
 
-export default function EditableSpan({block, unit, position }) {
+export default function EditableSpan({ block, unit, position }) {
     const [value, setValue] = useState(unit.content[0]);
-    const span = useRef(null);
-    span.current = {value};
-
-    const onUpdate = e => {
-        e.stopPropagation();
-        setValue(span.current.value);
-    };
-
-    return <span contentEditable ref={span} onInput={onUpdate} className={block.tag}>{value}</span>
-       
-
+    const editorRef = useRef(null);
+    useEditable(editorRef, setValue);
+    return <span ref={editorRef} className={block.tag}>{value}</span>
 }

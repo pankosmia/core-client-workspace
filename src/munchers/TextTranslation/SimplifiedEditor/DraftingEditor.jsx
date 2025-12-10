@@ -124,8 +124,6 @@ function DraftingEditor({
     filterByChapter(scriptureJson, systemBcv.chapterNum);
   }, [scriptureJson, systemBcv.chapterNum]);
 
-  console.log(scriptureJson)
-  console.log("filter", filterChapter)
   useEffect(() => {
     const juxtaJson = async () => {
       let jsonResponse = await getJson(
