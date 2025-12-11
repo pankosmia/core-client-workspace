@@ -4,9 +4,7 @@ function updateGraftContent(scriptureJson, position, newValue) {
         blocks: scriptureJson.blocks.map(
             (b, n) => {
                 if (n === position[0]) {
-                    const newBlock = {...b, content: [newValue]};
-                    console.log(newBlock);
-                    return newBlock;
+                    return {...b, content: [newValue]};
                 } else {
                     return b;
                 }
@@ -15,4 +13,33 @@ function updateGraftContent(scriptureJson, position, newValue) {
     }
 }
 
-export {updateGraftContent}
+function updateUnitContent(scriptureJson, position, newValue) {
+    return {
+        headers: scriptureJson.headers,
+        blocks: scriptureJson.blocks.map(
+            (b, n) => {
+                if (n === position[0]) {
+                    const newBlock = {
+                        ...b,
+                        units: b.units.map(
+                            (u, n) => {
+                                if (n === position[1]) {
+                                    return {
+                                        ...u,
+                                        content: [newValue]
+                                    }
+                                } else {
+                                    return u;
+                                }
+                            }
+                        )
+                    };
+                    return newBlock;
+                } else {
+                    return b;
+                }
+            }
+        )
+    }
+}
+export {updateGraftContent, updateUnitContent}

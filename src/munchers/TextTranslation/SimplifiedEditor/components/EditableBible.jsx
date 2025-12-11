@@ -23,6 +23,8 @@ export default function EditableBible({ chapterJson, scriptureJson, setScripture
         loadCSS();
     }, []);
 
+    console.log(scriptureJson.blocks)
+
     return (
         <div>
             {chapterJson.blocks
@@ -36,7 +38,7 @@ export default function EditableBible({ chapterJson, scriptureJson, setScripture
                                 return <EditableRemark key={n} block={b} position={[n]}/>
 
                             case "main":
-                                return <EditableBibleBlock key={n} filterScriptureJsonChapter={chapterJson} block={b} position={[n]}/>
+                                return <EditableBibleBlock key={n} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} position={[b.position]}/>
 
                             default:
                                 return <EditableGraft key={n} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} position={[b.position]}/>

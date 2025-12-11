@@ -7,6 +7,12 @@ export default function EditableGraft({scriptureJson, setScriptureJson, position
     const [firstTime, setFirstTime] = useState(true);
     const incomingBlock = scriptureJson.blocks[position[0]];
     const incomingContent = incomingBlock.content[0];
+
+    const updateScriptureJson = async () =>
+        setTimeout(() => {
+            setScriptureJson(updateGraftContent(scriptureJson, position, value))
+        }, "100");
+
     if (firstTime) {
         setValue(incomingContent);
         setFirstTime(false);
@@ -17,9 +23,8 @@ export default function EditableGraft({scriptureJson, setScriptureJson, position
         <div style={{flexDirection: "column"}}>
             <span className="marks_title_label">{incomingBlock.tag} </span>
             <span
-                className={incomingBlock.tag}
                 ref={editorRef}
-                onBlur={() => setScriptureJson(updateGraftContent(scriptureJson, position, value))}
+                onBlur={() => updateScriptureJson()}
             >
                 {value}
             </span>
