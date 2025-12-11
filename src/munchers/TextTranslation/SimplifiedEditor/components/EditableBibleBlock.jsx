@@ -1,7 +1,7 @@
 import EditableSpan from "./EditableSpan";
 import EditableTag from "./EditableTag";
 
-export default function StoryBibleBlock({ block, position,filterScriptureJsonChapter }) {
+export default function EditableBibleBlock({ block, position,filterScriptureJsonChapter }) {
     return (
         <div style={{ flexDirection: "column",textAlign:"left" }}>
             <EditableTag filterScriptureJsonChapter={filterScriptureJsonChapter} block={block} position={[...position]}/>

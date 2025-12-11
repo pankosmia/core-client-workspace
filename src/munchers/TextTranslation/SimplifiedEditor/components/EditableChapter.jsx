@@ -1,4 +1,4 @@
-export default function StoryChapter({ block }) {
+export default function EditableChapter({ block }) {
 
     return (
         <div className="marks_chapter_label_edition">

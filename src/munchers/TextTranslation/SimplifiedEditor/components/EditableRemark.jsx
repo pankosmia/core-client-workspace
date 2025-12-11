@@ -1,4 +1,4 @@
-export default function StoryRemark({ block }) {
+export default function EditableRemark({ block }) {
 
     return (
         <div>

@@ -1,15 +1,12 @@
 import PropTypes from "prop-types";
-import StoryBibleBlock from "./StoryBibleBlock";
-import StoryGraft from "./StoryGraft";
-import StoryChapter from "./StoryChapter";
-import StoryRemark from "./StoryRemark";
+import EditableBibleBlock from "./EditableBibleBlock";
+import EditableGraft from "./EditableGraft";
+import EditableChapter from "./EditableChapter";
+import EditableRemark from "./EditableRemark";
 import { useEffect } from "react";
 
-export default function ScriptureBible({ filterScriptureJsonChapter, scriptureJson }) {
+export default function EditableBible({ chapterJson, scriptureJson }) {
 
-    ScriptureBible.propTypes = {
-        scriptureJson: PropTypes.object
-    }
     useEffect(() => {
         async function loadCSS() {
             const url = "/app-resources/usfm/bible_page_styles.css";
@@ -28,21 +25,21 @@ export default function ScriptureBible({ filterScriptureJsonChapter, scriptureJs
 
     return (
         <div>
-            {filterScriptureJsonChapter.blocks
+            {chapterJson.blocks
                 .map(
                     (b,n) => {
                         switch (b.type) {
                             case "chapter":
-                                return <StoryChapter block={b} position={[n]} />
+                                return <EditableChapter key={n} block={b} position={[n]} />
 
                             case "remark":
-                                return <StoryRemark block={b} position={[n]}/>
+                                return <EditableRemark key={n} block={b} position={[n]}/>
 
                             case "main":
-                                return <StoryBibleBlock filterScriptureJsonChapter={filterScriptureJsonChapter} block={b} position={[n]}/>
+                                return <EditableBibleBlock key={n} filterScriptureJsonChapter={chapterJson} block={b} position={[n]}/>
 
                             default:
-                                return <StoryGraft block={b} position={[n]}/>
+                                return <EditableGraft key={n} block={b} position={[n]}/>
                         }
 
                     }

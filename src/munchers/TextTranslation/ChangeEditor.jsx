@@ -82,7 +82,7 @@ function ChangeEditorDialog({
   );
 }
 
-function CustomEditorMode({editor,modified,setEditor,setModified }) {
+function ChangeEditor({editor,modified,setEditor,setModified }) {
   const { i18nRef } = useContext(I18nContext);
   const {debugRef} = useContext(debugContext);
  
@@ -201,4 +201,4 @@ function CustomEditorMode({editor,modified,setEditor,setModified }) {
   );
 }
 
-export default CustomEditorMode;
+export default ChangeEditor;
