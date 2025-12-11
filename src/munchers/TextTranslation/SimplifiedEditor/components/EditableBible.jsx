@@ -5,7 +5,7 @@ import EditableChapter from "./EditableChapter";
 import EditableRemark from "./EditableRemark";
 import { useEffect } from "react";
 
-export default function EditableBible({ chapterJson, scriptureJson }) {
+export default function EditableBible({ chapterJson, scriptureJson, setScriptureJson }) {
 
     useEffect(() => {
         async function loadCSS() {
@@ -39,7 +39,7 @@ export default function EditableBible({ chapterJson, scriptureJson }) {
                                 return <EditableBibleBlock key={n} filterScriptureJsonChapter={chapterJson} block={b} position={[n]}/>
 
                             default:
-                                return <EditableGraft key={n} block={b} position={[n]}/>
+                                return <EditableGraft key={n} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} position={[b.position]}/>
                         }
 
                     }

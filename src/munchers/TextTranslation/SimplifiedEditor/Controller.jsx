@@ -1,5 +1,18 @@
-export default function editBlockTag (scriptureJson,position,newTag){
-
-    console.log("les informations trouvées",scriptureJson,position,newTag)
-
+function updateGraftContent(scriptureJson, position, newValue) {
+    return {
+        headers: scriptureJson.headers,
+        blocks: scriptureJson.blocks.map(
+            (b, n) => {
+                if (n === position[0]) {
+                    const newBlock = {...b, content: [newValue]};
+                    console.log(newBlock);
+                    return newBlock;
+                } else {
+                    return b;
+                }
+            }
+        )
+    }
 }
+
+export {updateGraftContent}

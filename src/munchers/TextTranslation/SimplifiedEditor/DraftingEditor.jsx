@@ -6,8 +6,8 @@ import {
   postEmptyJson,
 } from "pithekos-lib";
 import { Box, Grid2, IconButton, Typography } from "@mui/material";
-import NavBarDrafting from "./components/NavBarDrafting";
-import SaveButtonDrafting from "./components/SaveButtonDrafting";
+import NavBar from "./components/NavBar";
+import SaveButton from "./components/SaveButton";
 import ChangeEditor from "../ChangeEditor";
 import BcvPicker from "../../../pages/Workspace/BcvPicker";
 import PreviewText from "./PreviewText";
@@ -143,7 +143,7 @@ function DraftingEditor({
           width="100%"
         >
           <Grid2 item size={2}>
-            <SaveButtonDrafting
+            <SaveButton
               metadata={metadata}
               systemBcv={systemBcv}
               usfmHeader={usfmHeader}
@@ -164,7 +164,7 @@ function DraftingEditor({
             <BcvPicker />
           </Grid2>
           <Grid2 item size={4}>
-            <NavBarDrafting
+            <NavBar
               chapterNumbers={chapterNumbers}
               metadata={metadata}
               systemBcv={systemBcv}
@@ -183,7 +183,7 @@ function DraftingEditor({
       <Box>
         {chapterJson ? (
           <>
-            <EditableBible chapterJson={chapterJson} />
+            <EditableBible chapterJson={chapterJson} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson}/>
           </>
 
         ) : (<Typography> loading ...</Typography>)}

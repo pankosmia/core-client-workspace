@@ -6,7 +6,7 @@ import { enqueueSnackbar } from "notistack";
 import I18nContext from "pithekos-lib/dist/contexts/i18nContext";
 import { useContext, useState } from "react";
 
-function SaveButtonDrafting({ metadata, systemBcv, usfmHeader, unitData, modified, setModified, setSavedChecksum }) {
+function SaveButton({ metadata, systemBcv, usfmHeader, unitData, modified, setModified, setSavedChecksum }) {
     const { i18nRef } = useContext(I18nContext);
 
     // Permet de sauvegarder dans le fichier TSV 
@@ -59,4 +59,4 @@ function SaveButtonDrafting({ metadata, systemBcv, usfmHeader, unitData, modifie
         </IconButton>
     )
 }
-export default SaveButtonDrafting;
+export default SaveButton;

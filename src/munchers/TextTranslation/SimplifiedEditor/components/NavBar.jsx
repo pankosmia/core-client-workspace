@@ -5,7 +5,7 @@ import { ButtonGroup } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { bcvContext, debugContext, getJson, postEmptyJson } from 'pithekos-lib';
 
-function NavBarDrafting({ metadata, chapterNumbers, systemBcv }) {
+function NavBar({ metadata, chapterNumbers, systemBcv }) {
     const [scriptDirection, setScriptDirection] = useState([]);
     const { bcvRef } = useContext(bcvContext);
     const [currentBookCode, setCurrentBookCode] = useState("zzz")
@@ -122,4 +122,4 @@ function NavBarDrafting({ metadata, chapterNumbers, systemBcv }) {
     )
 }
 
-export default NavBarDrafting;
+export default NavBar;

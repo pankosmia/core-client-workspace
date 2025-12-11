@@ -1,17 +1,28 @@
-import { useRef, useState } from "react";
+import {useRef, useState} from "react";
 import {useEditable} from "use-editable";
+import {updateGraftContent} from "../Controller";
 
-export default function EditableGraft({ block }) {
+export default function EditableGraft({scriptureJson, setScriptureJson, position}) {
     const [value, setValue] = useState("");
-    if (block.content[0] !== value) {
-        setValue(block.content[0]);
+    const [firstTime, setFirstTime] = useState(true);
+    const incomingBlock = scriptureJson.blocks[position[0]];
+    const incomingContent = incomingBlock.content[0];
+    if (firstTime) {
+        setValue(incomingContent);
+        setFirstTime(false);
     }
     const editorRef = useRef(null);
     useEditable(editorRef, setValue);
     return (
-        <div style={{ flexDirection: "column" }}>
-            <span className="marks_title_label">{block.tag} </span>
-            <span className={block.tag} ref={editorRef}>{value}</span>
+        <div style={{flexDirection: "column"}}>
+            <span className="marks_title_label">{incomingBlock.tag} </span>
+            <span
+                className={incomingBlock.tag}
+                ref={editorRef}
+                onBlur={() => setScriptureJson(updateGraftContent(scriptureJson, position, value))}
+            >
+                {value}
+            </span>
         </div>
     );
 }
