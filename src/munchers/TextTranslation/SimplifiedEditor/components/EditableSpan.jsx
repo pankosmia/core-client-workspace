@@ -8,22 +8,23 @@ export default function EditableSpan({scriptureJson, setScriptureJson, position}
     const incomingBlock = scriptureJson.blocks[position[0]];
     const incomingContent = incomingBlock.units[position[1]].content[0];
 
-    const updateScriptureJson = async () =>
+    const updateScriptureJson = async (scriptureJson, position, value) =>
     setTimeout(() => {
-                setScriptureJson(updateUnitContent(scriptureJson, position, value))
-            }, "100");
+                setScriptureJson(updateUnitContent(scriptureJson, position, value));
+            }, "50");
 
     if (firstTime && value === "") {
-        setValue(incomingContent);
         setFirstTime(false);
+        setValue(incomingContent);
     }
     const editorRef = useRef(null);
     useEditable(editorRef, setValue);
     return <span
         ref={editorRef}
+        style={{padding: "5px"}}
         onBlur={
             (e) => {
-                updateScriptureJson();
+                updateScriptureJson(scriptureJson, position, value);
             }
         }
     >
