@@ -20,7 +20,7 @@ export default function EditableGraft({scriptureJson, setScriptureJson, position
     const editorRef = useRef(null);
     useEditable(editorRef, setValue);
     return (
-        <div style={{flexDirection: "column"}}>
+        <div style={{flexDirection: "column"}} className={incomingBlock.tag}>
             <span className="marks_title_label">{incomingBlock.tag} </span>
             <span
                 ref={editorRef}
