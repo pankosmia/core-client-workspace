@@ -1,31 +1,35 @@
-import { useRef, useState, useEffect } from "react";
-import {useEditable} from "use-editable";
-import {updateBlockTag} from "../Controller";
-
+import {useState} from 'react';
+import {Menu, MenuItem} from "@mui/material";
 export default function EditableTag({scriptureJson, setScriptureJson, position}) {
-    const [value, setValue] = useState("");
-    const [firstTime, setFirstTime] = useState(true);
-    const incomingBlock = scriptureJson.blocks[position[0]];
-    const editorRef = useRef(null);
-    useEditable(editorRef, setValue);
-    if (!incomingBlock) {
-        return "";
-    }
-    const incomingContent = incomingBlock.tag;
-    const updateScriptureJson = async (scriptureJson, position, value) =>
-        setTimeout(() => {
-            setScriptureJson(updateBlockTag(scriptureJson, position, value));
-        }, "50");
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [value, setValue] = useState("p");
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
-    if (firstTime && value !== incomingContent) {
-        setValue(incomingContent);
-        setFirstTime(false);
-    }
-    return <span ref={editorRef} style={{fontFamily: "monospace", fontSize: "medium"}} onBlur={
-        (e) => {
-            updateScriptureJson(scriptureJson, position, value);
-        }
-    }>
-        {value}
-    </span>
+    return (
+        <>
+            <span
+                style={{fontFamily: "monospace", fontSize: "medium", paddingRight: "1em"}}
+                onClick={handleClick}
+            >
+                {value}
+            </span>
+            <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={!!anchorEl}
+                onClose={handleClose}
+                display="inline"
+            >
+                {
+                    ["p", "m", "li", "li2", "li3"].map((t, n) => <MenuItem key={n} onClick={() => {setValue(t); handleClose()}}>{t}</MenuItem>)
+                }
+
+            </Menu>
+        </>
+    );
 }
