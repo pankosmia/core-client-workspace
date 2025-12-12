@@ -4,8 +4,12 @@ import {updateUnitContent} from "../Controller";
 
 export default function EditableSpan({scriptureJson, setScriptureJson, position}) {
     const [value, setValue] = useState("");
-    const [firstTime, setFirstTime] = useState(true);
     const incomingBlock = scriptureJson.blocks[position[0]];
+    const editorRef = useRef(null);
+    useEditable(editorRef, setValue);
+    if (!incomingBlock.units[position[1]].content) {
+        return "";
+    }
     const incomingContent = incomingBlock.units[position[1]].content[0];
 
     const updateScriptureJson = async (scriptureJson, position, value) =>
@@ -13,12 +17,10 @@ export default function EditableSpan({scriptureJson, setScriptureJson, position}
                 setScriptureJson(updateUnitContent(scriptureJson, position, value));
             }, "50");
 
-    if (firstTime && value === "") {
-        setFirstTime(false);
+    if (value !== incomingContent) {
         setValue(incomingContent);
     }
-    const editorRef = useRef(null);
-    useEditable(editorRef, setValue);
+    
     return <span
         ref={editorRef}
         style={{padding: "5px"}}
