@@ -14,6 +14,7 @@ import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import usfm2draftJson from '../../../components/usfm2draftJson';
 import EditableBible from "./components/EditableBible";
+import md5sum from "md5";
 // import editBlockTag from "./Controller";
 
 function DraftingEditor({
@@ -120,7 +121,7 @@ function DraftingEditor({
           setChapterJson(filterByChapter(scriptureJson, systemBcv.chapterNum))
         }
       },
-      [scriptureJson, systemBcv.chapterNum]
+      [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]
   );
 
   return (
@@ -182,10 +183,7 @@ function DraftingEditor({
       </Box>
       <Box>
         {chapterJson ? (
-          <>
-            <EditableBible chapterJson={chapterJson} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson}/>
-          </>
-
+            <EditableBible key={md5sum(JSON.stringify(chapterJson))} chapterJson={chapterJson} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson}/>
         ) : (<Typography> loading ...</Typography>)}
       </Box>
     </>

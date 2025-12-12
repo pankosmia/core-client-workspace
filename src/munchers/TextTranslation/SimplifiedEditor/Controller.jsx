@@ -13,6 +13,21 @@ function updateGraftContent(scriptureJson, position, newValue) {
     }
 }
 
+function updateBlockTag(scriptureJson, position, newValue) {
+    return {
+        headers: scriptureJson.headers,
+        blocks: scriptureJson.blocks.map(
+            (b, n) => {
+                if (n === position[0]) {
+                    return {...b, tag: newValue};
+                } else {
+                    return b;
+                }
+            }
+        )
+    }
+}
+
 function updateUnitContent(scriptureJson, position, newValue) {
     return {
         headers: scriptureJson.headers,
@@ -42,4 +57,4 @@ function updateUnitContent(scriptureJson, position, newValue) {
         )
     }
 }
-export {updateGraftContent, updateUnitContent}
+export {updateGraftContent, updateBlockTag, updateUnitContent}

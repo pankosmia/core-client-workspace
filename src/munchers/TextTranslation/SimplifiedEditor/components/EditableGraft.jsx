@@ -1,9 +1,11 @@
 import {useRef, useState} from "react";
 import {useEditable} from "use-editable";
 import {updateGraftContent} from "../Controller";
+import EditableTag from "./EditableTag";
 
 export default function EditableGraft({scriptureJson, setScriptureJson, position}) {
     const [value, setValue] = useState("");
+    const [firstTime, setFirstTime] = useState(true);
     const incomingBlock = scriptureJson.blocks[position[0]];
     const editorRef = useRef(null);
     useEditable(editorRef, setValue);
@@ -17,13 +19,15 @@ export default function EditableGraft({scriptureJson, setScriptureJson, position
             setScriptureJson(updateGraftContent(scriptureJson, position, value))
         }, "50");
 
-    if (value !== incomingContent) {
+    if (firstTime && value !== incomingContent) {
         setValue(incomingContent);
+        setFirstTime(false);
     }
     if (scriptureJson.blocks[position[0]]) {
         return (
             <div style={{flexDirection: "column"}} className={incomingBlock.tag}>
-                <span className="marks_title_label">{incomingBlock.tag} </span>
+                <EditableTag scriptureJson={scriptureJson} setScriptureJson={setScriptureJson}
+                             position={position}/>
                 <span
                     ref={editorRef}
                     style={{padding: "5px"}}

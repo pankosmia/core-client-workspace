@@ -5,8 +5,7 @@ import EditableChapter from "./EditableChapter";
 import EditableRemark from "./EditableRemark";
 import { useEffect } from "react";
 
-export default function EditableBible({ chapterJson, scriptureJson, setScriptureJson }) {
-
+export default function EditableBible({chapterJson, scriptureJson, setScriptureJson }) {
     useEffect(() => {
         async function loadCSS() {
             const url = "/app-resources/usfm/bible_page_styles.css";
@@ -22,8 +21,6 @@ export default function EditableBible({ chapterJson, scriptureJson, setScripture
         }
         loadCSS();
     }, []);
-
-    console.log(scriptureJson.blocks)
 
     return (
         <div>
