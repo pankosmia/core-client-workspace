@@ -23,137 +23,145 @@
     "submenu",
     "pages:core-local-workspace:indent_and_alignment_tags",
     [
-      "tag",
-      "pi",
-      "pages:core-local-workspace:usfm_pi"
-    ],
-    [
-      "tag",
-      "mi",
-      "pages:core-local-workspace:usfm_mi"
-    ],
-    [
-      "tag",
-      "pc",
-      "pages:core-local-workspace:usfm_pc"
-    ],
-    [
-      "tag",
-      "pr",
-      "pages:core-local-workspace:usfm_pr"
+      [
+        "tag",
+        "pi",
+        "pages:core-local-workspace:usfm_pi"
+      ],
+      [
+        "tag",
+        "mi",
+        "pages:core-local-workspace:usfm_mi"
+      ],
+      [
+        "tag",
+        "pc",
+        "pages:core-local-workspace:usfm_pc"
+      ],
+      [
+        "tag",
+        "pr",
+        "pages:core-local-workspace:usfm_pr"
+      ]
     ]
   ],
   [
     "submenu",
     "pages:core-local-workspace:poetry",
     [
-      "tag",
-      "q",
-      "pages:core-local-workspace:usfm_q",
       [
-        2,
-        3
-      ]
-    ],
-    [
-      "tag",
-      "qr",
-      "pages:core-local-workspace:usfm_qr"
-    ],
-    [
-      "tag",
-      "qc",
-      "pages:core-local-workspace:usfm_qc"
-    ],
-    [
-      "tag",
-      "qa",
-      "pages:core-local-workspace:usfm_qa"
-    ],
-    [
-      "tag",
-      "qm",
-      "pages:core-local-workspace:usfm_qm",
+        "tag",
+        "q",
+        "pages:core-local-workspace:usfm_q",
+        [
+          2,
+          3
+        ]
+      ],
       [
-        2,
-        3
+        "tag",
+        "qr",
+        "pages:core-local-workspace:usfm_qr"
+      ],
+      [
+        "tag",
+        "qc",
+        "pages:core-local-workspace:usfm_qc"
+      ],
+      [
+        "tag",
+        "qa",
+        "pages:core-local-workspace:usfm_qa"
+      ],
+      [
+        "tag",
+        "qm",
+        "pages:core-local-workspace:usfm_qm",
+        [
+          2,
+          3
+        ]
+      ],
+      [
+        "tag",
+        "qd",
+        "pages:core-local-workspace:usfm_qd"
       ]
-    ],
-    [
-      "tag",
-      "qd",
-      "pages:core-local-workspace:usfm_qd"
     ]
   ],
   [
     "submenu",
     "pages:core-local-workspace:special_content",
     [
-      "tag",
-      "pmo",
-      "pages:core-local-workspace:usfm_pmo"
-    ],
-    [
-      "tag",
-      "cls",
-      "pages:core-local-workspace:usfm_cls"
-    ],
-    [
-      "tag",
-      "pm",
-      "pages:core-local-workspace:usfm_pm"
-    ],
-    [
-      "tag",
-      "pmc",
-      "pages:core-local-workspace:usfm_pmc"
-    ],
-    [
-      "tag",
-      "pmr",
-      "pages:core-local-workspace:usfm_pmr"
-    ],
-    [
-      "tag",
-      "po",
-      "pages:core-local-workspace:usfm_po"
+      [
+        "tag",
+        "pmo",
+        "pages:core-local-workspace:usfm_pmo"
+      ],
+      [
+        "tag",
+        "cls",
+        "pages:core-local-workspace:usfm_cls"
+      ],
+      [
+        "tag",
+        "pm",
+        "pages:core-local-workspace:usfm_pm"
+      ],
+      [
+        "tag",
+        "pmc",
+        "pages:core-local-workspace:usfm_pmc"
+      ],
+      [
+        "tag",
+        "pmr",
+        "pages:core-local-workspace:usfm_pmr"
+      ],
+      [
+        "tag",
+        "po",
+        "pages:core-local-workspace:usfm_po"
+      ]
     ]
   ],
   [
     "submenu",
     "pages:core-local-workspace:lists_and_tables",
     [
-      "tag",
-      "lh",
-      "pages:core-local-workspace:usfm_lh"
-    ],
-    [
-      "tag",
-      "li",
-      "pages:core-local-workspace:usfm_li",
       [
-        2,
-        3
-      ]
-    ],
-    [
-      "tag",
-      "lf",
-      "pages:core-local-workspace:usfm_lf"
-    ],
-    [
-      "tag",
-      "lim",
-      "pages:core-local-workspace:usfm_lim",
+        "tag",
+        "lh",
+        "pages:core-local-workspace:usfm_lh"
+      ],
       [
-        2,
-        3
+        "tag",
+        "li",
+        "pages:core-local-workspace:usfm_li",
+        [
+          2,
+          3
+        ]
+      ],
+      [
+        "tag",
+        "lf",
+        "pages:core-local-workspace:usfm_lf"
+      ],
+      [
+        "tag",
+        "lim",
+        "pages:core-local-workspace:usfm_lim",
+        [
+          2,
+          3
+        ]
+      ],
+      [
+        "tag",
+        "tr",
+        "pages:core-local-workspace:usfm_tr"
       ]
-    ],
-    [
-      "tag",
-      "tr",
-      "pages:core-local-workspace:usfm_tr"
     ]
   ]
 ]
