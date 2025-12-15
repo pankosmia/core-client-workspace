@@ -29,7 +29,7 @@ function DraftingEditor({
   const [usfmHeader, setUsfmHeader] = useState("");
   const [savedChecksum, setSavedChecksum] = useState(null);
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
-  const [scriptureJson, setScriptureJson] = useState({headers: {}, blocks: []});
+  const [scriptureJson, setScriptureJson] = useState({ headers: {}, blocks: [] });
   const [chapterJson, setChapterJson] = useState(null);
   const [chapterNumbers, setChapterNumbers] = useState([]);
   const [currentBookCode, setCurrentBookCode] = useState("zzz");
@@ -77,7 +77,6 @@ function DraftingEditor({
     return chapters
   }
 
-  console.log("scriptureJson",scriptureJson);
   useEffect(() => {
     if (systemBcv.bookCode !== currentBookCode) {
       const doChapterNumbers = async () => {
@@ -117,12 +116,12 @@ function DraftingEditor({
 
   // Make chapter content from whole book content
   useEffect(
-      () => {
-        if (scriptureJson) {
-          setChapterJson(filterByChapter(scriptureJson, systemBcv.chapterNum))
-        }
-      },
-      [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]
+    () => {
+      if (scriptureJson) {
+        setChapterJson(filterByChapter(scriptureJson, systemBcv.chapterNum))
+      }
+    },
+    [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]
   );
 
   return (
@@ -184,7 +183,7 @@ function DraftingEditor({
       </Box>
       <Box>
         {chapterJson ? (
-            <EditableBible key={md5sum(JSON.stringify(chapterJson))} chapterJson={chapterJson} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson}/>
+          <EditableBible key={md5sum(JSON.stringify(chapterJson))} chapterJson={chapterJson} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} />
         ) : (<Typography> loading ...</Typography>)}
       </Box>
     </>

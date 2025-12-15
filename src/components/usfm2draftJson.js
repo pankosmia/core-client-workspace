@@ -62,21 +62,24 @@ function processBlocks(blocks, sequenceType, sequences) {
             const graftedSequence = sequences.filter(s => s.id === bg.payload)[0];
             ret = [...ret, ...processBlocks(graftedSequence.blocks, graftedSequence.type, sequences)];
         }
-        const blockOb = 
-            {
-                tag: block.bs.payload.split("/")[1],
-                type: sequenceType,
-            }
-            if(sequenceType === "main"){
-                blockOb.units =  processCvItems(block.items, block.os)
-            } else {
-                blockOb.content = processGraftItems(block.items, block.os)
-            }
-        ret.push (blockOb);
+        const blockOb =
+        {
+            type: sequenceType,
+        }
+        if (sequenceType !== "remark") {
+            blockOb.tag = block.bs.payload.split("/")[1]
+        }
+        if (sequenceType === "main") {
+            blockOb.units = processCvItems(block.items, block.os)
+        } else {
+            blockOb.content = processGraftItems(block.items, block.os)
+        }
+        ret.push(blockOb);
 
     }
     return ret;
 }
+
 
 export default function usfm2draftJson(usfm) {
     const pk = new Proskomma();
@@ -107,9 +110,9 @@ export default function usfm2draftJson(usfm) {
     const mainSequence = document.sequences.filter(s => s.type === "main")[0];
     const blocks = processBlocks(mainSequence.blocks, mainSequence.type, document.sequences);
     return {
-            headers,
-            blocks
-            
-        }
-    
+        headers,
+        blocks
+
+    }
+
 };

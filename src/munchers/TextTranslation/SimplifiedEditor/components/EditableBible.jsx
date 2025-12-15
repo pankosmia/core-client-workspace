@@ -29,10 +29,10 @@ export default function EditableBible({chapterJson, scriptureJson, setScriptureJ
                     (b,n) => {
                         switch (b.type) {
                             case "chapter":
-                                return <EditableChapter key={n} block={b} position={[n]} />
+                                return ""
 
                             case "remark":
-                                return <EditableRemark key={n} block={b} position={[n]}/>
+                                return <EditableRemark key={n} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} position={[b.position]}/>
 
                             case "main":
                                 return <EditableBibleBlock key={n} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} position={[b.position]}/>

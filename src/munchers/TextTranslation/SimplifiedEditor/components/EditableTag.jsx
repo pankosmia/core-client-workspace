@@ -23,7 +23,7 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
     return (
         <>
             <span
-                style={{ fontFamily: "monospace", fontSize: "medium", paddingRight: "1em" }}
+                style={{fontFamily: "monospace", fontSize: "medium", paddingRight: "1em" }}
                 onClick={(event) => { setAnchorEl(event.currentTarget) }}
             >
                 {value}
