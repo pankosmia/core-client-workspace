@@ -77,6 +77,7 @@ function DraftingEditor({
     return chapters
   }
 
+  console.log("scriptureJson",scriptureJson);
   useEffect(() => {
     if (systemBcv.bookCode !== currentBookCode) {
       const doChapterNumbers = async () => {

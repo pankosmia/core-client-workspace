@@ -1,11 +1,21 @@
-import {useState} from 'react';
-import {Menu, MenuItem} from "@mui/material";
-export default function EditableTag({scriptureJson, setScriptureJson, position}) {
+import { useState } from 'react';
+import { Menu, MenuItem } from "@mui/material";
+import { updateBlockTag } from '../Controller';
+export default function EditableTag({ scriptureJson, setScriptureJson, position }) {
     const [anchorEl, setAnchorEl] = useState(null);
-    const [value, setValue] = useState("p");
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
+    const incomingBlock = scriptureJson.blocks[position[0]];
+    const [value, setValue] = useState("");
+
+    if (!incomingBlock) {
+        return "";
+    }
+    const changeValue = (newValue) => {
+        setValue(newValue)
+        setScriptureJson(updateBlockTag(scriptureJson, position, newValue))
     };
+    if (value !== incomingBlock.tag) {
+        setValue(incomingBlock.tag);
+    }
     const handleClose = () => {
         setAnchorEl(null);
     };
@@ -13,8 +23,8 @@ export default function EditableTag({scriptureJson, setScriptureJson, position})
     return (
         <>
             <span
-                style={{fontFamily: "monospace", fontSize: "medium", paddingRight: "1em"}}
-                onClick={handleClick}
+                style={{ fontFamily: "monospace", fontSize: "medium", paddingRight: "1em" }}
+                onClick={(event) => { setAnchorEl(event.currentTarget) }}
             >
                 {value}
             </span>
@@ -26,7 +36,13 @@ export default function EditableTag({scriptureJson, setScriptureJson, position})
                 display="inline"
             >
                 {
-                    ["p", "m", "li", "li2", "li3"].map((t, n) => <MenuItem key={n} onClick={() => {setValue(t); handleClose()}}>{t}</MenuItem>)
+                    ["p", "m", "li", "li2", "li3"].map((t, n) =>
+                        <MenuItem
+                            key={n}
+                            onClick={() => { changeValue(t); handleClose() }}>
+                            {t}
+                        </MenuItem>
+                    )
                 }
 
             </Menu>
