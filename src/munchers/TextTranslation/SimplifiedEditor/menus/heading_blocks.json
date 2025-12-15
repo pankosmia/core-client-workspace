@@ -1,0 +1,45 @@
+[
+  [
+    "tag",
+    "ms",
+    "pages:core-local-workspace:usfm_ms",
+    [2, 3]
+  ],
+  [
+    "tag",
+    "mr",
+    "pages:core-local-workspace:usfm_mr"
+  ],
+  [
+    "tag",
+    "s",
+    "pages:core-local-workspace:usfm_s",
+    [2, 3]
+  ],
+  [
+    "tag",
+    "sr",
+    "pages:core-local-workspace:usfm_sr"
+  ],
+  [
+    "tag",
+    "r",
+    "pages:core-local-workspace:usfm_r"
+  ],
+  [
+    "tag",
+    "d",
+    "pages:core-local-workspace:usfm_d"
+  ],
+  [
+    "tag",
+    "sp",
+    "pages:core-local-workspace:usfm_sp"
+  ],
+  [
+    "tag",
+    "sd",
+    "pages:core-local-workspace:usfm_sd",
+    [2, 3]
+  ]
+]
