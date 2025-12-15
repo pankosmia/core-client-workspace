@@ -25,10 +25,11 @@ export default function EditableGraft({ scriptureJson, setScriptureJson, positio
     }
     if (scriptureJson.blocks[position[0]]) {
         return (
-            <div style={{ flexDirection: "column" }} className={incomingBlock.tag}>
+            <div style={{ flexDirection: "column" }}>
                 <EditableTag scriptureJson={scriptureJson} setScriptureJson={setScriptureJson}
                     position={position} />
                 <span
+                    className={incomingBlock.tag}
                     ref={editorRef}
                     style={{ padding: "5px" }}
                     onBlur={() => updateScriptureJson(scriptureJson, position, value)}
