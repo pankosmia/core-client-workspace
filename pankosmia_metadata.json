@@ -660,6 +660,12 @@
     },
     "lists_and_tables":{
       "en":"Lists and tables"
+    },
+    "intro_indent_and_alignment_tags":{
+      "en":"Intro indent and alignment tags"
+    },
+    "intro_outline_tags":{
+      "en":"Intro outline tags"
     }
   }
 }

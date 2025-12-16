@@ -1,7 +1,12 @@
 import { useContext, useState } from 'react';
-import { ListItemText, Menu, MenuItem, Typography } from "@mui/material";
+import { ListItemText, Menu, MenuItem } from "@mui/material";
 import { updateBlockTag } from '../Controller';
 import mainBlockMenu from '../menus/main_blocks.json';
+import introductionBlockMenu from '../menus/intro_blocks.json';
+import titleBlockMenu from '../menus/title_blocks.json';
+import headingBlockMenu from '../menus/heading_blocks.json';
+import introduction_titleBlockMenu from '../menus/intro_title_blocks.json'
+import introduction_headingBlockMenu from '../menus/intro_heading_blocks.json'
 import I18nContext from 'pithekos-lib/dist/contexts/i18nContext';
 import { doI18n } from 'pithekos-lib';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -11,6 +16,8 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
     const incomingBlock = scriptureJson.blocks[position[0]];
     const [value, setValue] = useState("");
     const [subMenuAnchors, setSubMenuAnchors] = useState({});
+
+    const menuStructures = { "main": mainBlockMenu, "introduction": introductionBlockMenu,"introduction_title":introduction_titleBlockMenu, "introduction_heading":introduction_headingBlockMenu, "title": titleBlockMenu, "heading": headingBlockMenu }
 
     if (!incomingBlock) {
         return "";
@@ -37,16 +44,21 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
             menuSpec.map((t, n) => {
                 if (t[0] === 'submenu') {
                     return (
-                        <MenuItem key={n}>
+                        <MenuItem
+                            key={n}
+                            dense
+                            MenuListProps={{
+                                onmouseenter,
+                                onmouseleave
+                            }}
+                        >
                             <ListItemText
                                 onClick={(e) =>
                                     setSubMenuAnchors({ ...anchors, [n]: e.currentTarget })
                                 }
                             >
-                                {t[1]}
-                                <Typography>
-                                    <ArrowRightIcon />
-                                </Typography>
+                                {doI18n(t[1], i18nRef.current)}
+                                <ArrowRightIcon style={{ marginLeft: "2px" }} />
                             </ListItemText>
                             <Menu
                                 open={Boolean(subMenuAnchors[n])}
@@ -55,6 +67,7 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
                                 }
                             >
                                 {doMenu(t[2], anchors)}
+
                             </Menu>
                         </MenuItem>
                     )
@@ -63,7 +76,8 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
                     return (
                         <MenuItem
                             key={n}
-                            onClick={() => { changeValue(t[1]); handleClose() }}>
+                            onClick={() => { changeValue(t[1]); handleClose() }}
+                            dense>
 
                             {`${t[1]} - ${doI18n(t[2], i18nRef.current)}`}
                         </MenuItem>
@@ -71,6 +85,33 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
                 }
             })
         )
+    }
+    function doSelectedMenu(b) {
+
+        switch (b.type) {
+
+            case "introduction":
+                if(b.tag === "is"){
+                    return doMenu(menuStructures.introduction_heading)
+                } 
+                if (b.tag.startsWith("imt")){
+                    return doMenu(menuStructures.introduction_title)
+                } 
+                return doMenu(menuStructures.introduction)
+
+
+            case "main":
+                return doMenu(menuStructures.main)
+
+            case "heading":
+                return doMenu(menuStructures.heading)
+
+            case "title":
+                return doMenu(menuStructures.title)
+
+            default:
+                return null;
+        }
     }
 
     return (
@@ -88,7 +129,11 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
                 onClose={handleClose}
                 display="inline"
             >
-                {doMenu(mainBlockMenu)}
+
+                {
+                    doSelectedMenu(incomingBlock)
+                }
+
             </Menu>
         </>
     );

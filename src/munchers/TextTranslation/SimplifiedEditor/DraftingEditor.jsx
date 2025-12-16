@@ -123,7 +123,7 @@ function DraftingEditor({
     },
     [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]
   );
-
+  console.log("scriptureJson",scriptureJson)
   return (
     <>
       <Box
