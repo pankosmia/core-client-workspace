@@ -648,6 +648,18 @@
     },
     "usfm_sd":{
       "en":"Semantic division (semantic space)"
+    },
+    "indent_and_alignment_tags":{
+      "en":"Indent and alignment tags"
+    },
+    "poetry":{
+      "en":"Poetry"
+    },
+    "special_content":{
+      "en":"Special content"
+    },
+    "lists_and_tables":{
+      "en":"Lists and tables"
     }
   }
 }
