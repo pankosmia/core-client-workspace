@@ -510,6 +510,144 @@
     "book":{
       "en":"Book",
       "fr":"Livre"
+    },
+    "usfm_p":{
+      "en":"Normal paragraph"
+    },
+    "usfm_m":{
+      "en":"Continuation (margin) paragraph"
+    },
+    "usfm_li":{
+      "en":"List entry"
+    },
+    "usfm_q":{
+      "en":"Poetic line"
+    },
+    "usfm_pi":{
+      "en":"Indented paragraph"
+    },
+    "usfm_mi":{
+      "en":"Indented flush left paragraph"
+    },
+    "usfm_pc":{
+      "en":"Centered paragraph"
+    },
+    "usfm_pr":{
+      "en":"Right-aligned paragraph"
+    },
+    "usfm_qr":{
+      "en":"Right-aligned poetic line"
+    },
+    "usfm_qc":{
+      "en":"Centered poetic line"
+    },
+    "usfm_qa":{
+      "en":"Acrostic heading"
+    },
+    "usfm_qm":{
+      "en":"Embedded text poetic line"
+    },
+    "usfm_qd":{
+      "en":"Hebrew note"
+    },
+    "usfm_pmo":{
+      "en":"Embedded text opening"
+    },
+    "usfm_cls":{
+      "en":"Closure of an epistle/letter"
+    },
+    "usfm_pm":{
+      "en":"Embedded text paragraph"
+    },
+    "usfm_pmc":{
+      "en":"Embedded text closing"
+    },
+    "usfm_pmr":{
+      "en":"Embedded text refrain"
+    },
+    "usfm_po":{
+      "en":"Opening of an epistle/letter"
+    },
+    "usfm_lh":{
+      "en":"List header"
+    },
+    "usfm_lf":{
+      "en":"List footer"
+    },
+    "usfm_lim":{
+      "en":"Embedded list entry"
+    },
+    "usfm_tr":{
+      "en":"Table row start"
+    },
+    "usfm_mt":{
+      "en":"Major title"
+    },
+    "usfm_mte":{
+      "en":"Major title at ending"
+    },
+    "usfm_imt":{
+      "en":"Introduction major title"
+    },
+    "usfm_imte":{
+      "en":"Introduction major title ending"
+    },
+    "usfm_is":{
+      "en":"Introduction section heading"
+    },
+    "usfm_ip":{
+      "en":"Introduction paragraph"
+    },
+    "usfm_im":{
+      "en":"Introduction flush left (margin) paragraph"
+    },
+    "usfm_ipi":{
+      "en":"Indented introduction paragraph"
+    },
+    "usfm_imi":{
+      "en":"Indented introduction flush left (margin) paragraph"
+    },
+    "usfm_ipr":{
+      "en":"Introduction right-aligned paragraph"
+    },
+    "usfm_ipq":{
+      "en":"Introduction quote from text paragraph"
+    },
+    "usfm_ili":{
+      "en":"Introduction list item"
+    },
+    "usfm_iot":{
+      "en":"Introduction outline title"
+    },
+    "usfm_io":{
+      "en":"Introduction outline entry"
+    },
+    "usfm_iex":{
+      "en":"Introduction explanatory or bridge text"
+    },
+    "usfm_ms":{
+      "en":"Major section heading"
+    },
+    "usfm_mr":{
+      "en":"Major section reference range"
+    },
+    "usfm_s":{
+      "en":"Section heading"
+    },
+    "usfm_sr":{
+      "en":"Section reference range"
+    },
+    "usfm_r":{
+      "en":"Parallel passage reference(s)"
+    },
+    "usfm_d":{
+      "en":"Descriptive title (or “Hebrew subtitle”)"
+    },
+    "usfm_sp":{
+      "en":"Speaker Identification (e.g. Job and Song of Songs)"
+    },
+    "usfm_sd":{
+      "en":"Semantic division (semantic space)"
     }
   }
 }
