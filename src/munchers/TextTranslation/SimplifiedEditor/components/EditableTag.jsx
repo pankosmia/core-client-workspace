@@ -17,7 +17,7 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
     const [value, setValue] = useState("");
     const [subMenuAnchors, setSubMenuAnchors] = useState({});
 
-    const menuStructures = { "main": mainBlockMenu, "introduction": introductionBlockMenu,"introduction_title":introduction_titleBlockMenu, "introduction_heading":introduction_headingBlockMenu, "title": titleBlockMenu, "heading": headingBlockMenu }
+    const menuStructures = { "main": mainBlockMenu, "introduction": introductionBlockMenu, "introduction_title": introduction_titleBlockMenu, "introduction_heading": introduction_headingBlockMenu, "title": titleBlockMenu, "heading": headingBlockMenu }
 
     if (!incomingBlock) {
         return "";
@@ -47,10 +47,6 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
                         <MenuItem
                             key={n}
                             dense
-                            MenuListProps={{
-                                onmouseenter,
-                                onmouseleave
-                            }}
                         >
                             <ListItemText
                                 onClick={(e) =>
@@ -74,13 +70,26 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
                 }
                 else {
                     return (
-                        <MenuItem
-                            key={n}
-                            onClick={() => { changeValue(t[1]); handleClose() }}
-                            dense>
+                        <>
+                            <MenuItem
+                                key={n}
+                                onClick={() => { changeValue(t[1]); handleClose() }}
+                                dense>
 
-                            {`${t[1]} - ${doI18n(t[2], i18nRef.current)}`}
-                        </MenuItem>
+                                {`${t[1]} - ${doI18n(t[2], i18nRef.current)}`}
+                            </MenuItem>
+                            {t[3] && t[3].map((tN) =>
+                                <MenuItem
+                                    key={`${n} - ${tN}`}
+                                    onClick={() => { changeValue(`${t[1]}${tN}`); handleClose() }}
+                                    dense>
+
+                                    {`${t[1]}${tN} - ${doI18n(t[2], i18nRef.current)} (${tN})`}
+                                </MenuItem>
+
+                            )}
+                        </>
+
                     )
                 }
             })
@@ -91,12 +100,12 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
         switch (b.type) {
 
             case "introduction":
-                if(b.tag === "is"){
+                if (b.tag === "is") {
                     return doMenu(menuStructures.introduction_heading)
-                } 
-                if (b.tag.startsWith("imt")){
+                }
+                if (b.tag.startsWith("imt")) {
                     return doMenu(menuStructures.introduction_title)
-                } 
+                }
                 return doMenu(menuStructures.introduction)
 
 
