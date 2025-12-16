@@ -13,6 +13,7 @@ import BcvPicker from "../../../pages/Workspace/BcvPicker";
 import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import usfm2draftJson from '../../../components/usfm2draftJson';
+import draftJson2usfm from '../../../components/draftJson2usfm';
 import EditableBible from "./components/EditableBible";
 import md5sum from "md5";
 // import editBlockTag from "./Controller";
@@ -105,7 +106,8 @@ function DraftingEditor({
         debugRef.current
       );
       if (usfmResponse.ok) {
-        const usfmDraftJson = usfm2draftJson(usfmResponse.text)
+        const usfmDraftJson = usfm2draftJson(usfmResponse.text);
+        console.log(usfmDraftJson);
         setScriptureJson(
           usfmDraftJson
         )
@@ -123,6 +125,8 @@ function DraftingEditor({
     },
     [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]
   );
+  console.log("scriptureJson",scriptureJson);
+  console.log("usfm", draftJson2usfm(scriptureJson));
   return (
     <>
       <Box
