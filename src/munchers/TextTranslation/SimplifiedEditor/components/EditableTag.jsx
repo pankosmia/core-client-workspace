@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { Menu, MenuItem } from "@mui/material";
+import { ListItemText, Menu, MenuItem } from "@mui/material";
 import { updateBlockTag } from '../Controller';
 import mainBlockMenu from '../menus/main_blocks.json';
 
 export default function EditableTag({ scriptureJson, setScriptureJson, position }) {
     const [anchorEl, setAnchorEl] = useState(null);
+    console.log("anchorEl",anchorEl);
     const incomingBlock = scriptureJson.blocks[position[0]];
     const [value, setValue] = useState("");
-
+    console.log("value",value);
+    const [subMenuAnchors, setSubMenuAnchors] = useState({});
+    console.log("submenu", subMenuAnchors);
     if (!incomingBlock) {
         return "";
     }
@@ -15,45 +18,56 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
         setValue(newValue)
         setScriptureJson(updateBlockTag(scriptureJson, position, newValue))
     };
+
+    const changeValueAnchor = (anchors, n) => {
+
+        setSubMenuAnchors({ ...anchors, [n]: null })
+    };
+
     if (value !== incomingBlock.tag) {
         setValue(incomingBlock.tag);
     }
     const handleClose = () => {
         setAnchorEl(null);
     };
-    console.log("jsonMain", mainBlockMenu);
-
-    function doMenu(menuSpec) {
+    console.log("jsonMain",mainBlockMenu)
+    function doMenu(menuSpec, anchors = {}) {
         return (
             menuSpec.map((t, n) => {
                 if (t[0] === 'submenu') {
-                    console.log("map 1")
                     return (
-                        <Menu
-                            key={n}
-                            open={true}
-                        >
-                            {doMenu(t[2])}
-                        </Menu>
+                        <MenuItem key={n}>
+                            <ListItemText
+                                onClick={(e) =>
+                                    setSubMenuAnchors({ ...anchors, [n]: e.currentTarget })
+                                }
+                            >
+                                {t[1]}
+                            </ListItemText>
+                            <Menu
+                                anchorEl={subMenuAnchors[2]}
+                                open={Boolean(subMenuAnchors[n])}
+                                onClose={() =>
+                                    changeValueAnchor()
+                                }
+                            >
+                                {doMenu(t[2], anchors)}
+                            </Menu>
+                        </MenuItem>
                     )
                 }
                 else {
-                    console.log("map 2")
                     return (
                         <MenuItem
                             key={n}
                             onClick={() => { changeValue(t); handleClose() }}>
-                            {t[1]}
+                            {`${t[1]} - ${t[2]}`}
                         </MenuItem>
                     )
                 }
-
             })
         )
-
     }
-    //console.log(doMenu())
-
 
     return (
         <>
@@ -61,7 +75,7 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
                 style={{ fontFamily: "monospace", fontSize: "medium", paddingRight: "1em" }}
                 onClick={(event) => { setAnchorEl(event.currentTarget) }}
             >
-                {value}
+                {value} TEST
             </span>
             <Menu
                 id="basic-menu"
@@ -70,11 +84,7 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
                 onClose={handleClose}
                 display="inline"
             >
-                {
-
-                    doMenu(mainBlockMenu)
-                }
-
+                {doMenu(mainBlockMenu)}
             </Menu>
         </>
     );
