@@ -13,10 +13,8 @@ import BcvPicker from "../../../pages/Workspace/BcvPicker";
 import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import usfm2draftJson from '../../../components/usfm2draftJson';
-import draftJson2usfm from '../../../components/draftJson2usfm';
 import EditableBible from "./components/EditableBible";
 import md5sum from "md5";
-// import editBlockTag from "./Controller";
 
 function DraftingEditor({
   metadata,
@@ -27,13 +25,12 @@ function DraftingEditor({
 }) {
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
-  const [usfmHeader, setUsfmHeader] = useState("");
-  const [savedChecksum, setSavedChecksum] = useState(null);
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
   const [scriptureJson, setScriptureJson] = useState({ headers: {}, blocks: [] });
   const [chapterJson, setChapterJson] = useState(null);
   const [chapterNumbers, setChapterNumbers] = useState([]);
   const [currentBookCode, setCurrentBookCode] = useState("zzz");
+  const [md5sumScriptureJson, setMd5sumScriptureJson] = useState([]);
 
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
@@ -110,7 +107,10 @@ function DraftingEditor({
         setScriptureJson(
           usfmDraftJson
         )
+        const hash = md5sum(JSON.stringify(usfmDraftJson));
+        setMd5sumScriptureJson(hash);
       }
+
     }
     doScriptureJson().then();
   }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum]);
@@ -124,7 +124,7 @@ function DraftingEditor({
     },
     [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]
   );
- 
+
   return (
     <>
       <Box
@@ -148,10 +148,10 @@ function DraftingEditor({
             <SaveButton
               metadata={metadata}
               systemBcv={systemBcv}
-              usfmHeader={usfmHeader}
               modified={modified}
               setModified={setModified}
-              setSavedChecksum={setSavedChecksum}
+              md5sumScriptureJson={md5sumScriptureJson}
+              setMd5sumScriptureJson={setMd5sumScriptureJson}
               scriptureJson={scriptureJson}
             />
           </Grid2>

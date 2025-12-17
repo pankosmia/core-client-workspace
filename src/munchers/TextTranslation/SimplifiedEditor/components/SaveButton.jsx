@@ -1,13 +1,13 @@
 import { IconButton } from "@mui/material";
 import SaveIcon from '@mui/icons-material/Save';
-import md5 from "md5";
+import md5sum from "md5";
 import { doI18n, postJson } from "pithekos-lib";
 import { enqueueSnackbar } from "notistack";
 import I18nContext from "pithekos-lib/dist/contexts/i18nContext";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import draftJson2usfm from "../../../../components/draftJson2usfm";
 
-function SaveButton({ metadata, systemBcv,modified, setModified, setSavedChecksum, scriptureJson }) {
+function SaveButton({ metadata, systemBcv,modified, setModified,md5sumScriptureJson, setMd5sumScriptureJson, scriptureJson }) {
     const { i18nRef } = useContext(I18nContext);
 
     // Permet de sauvegarder dans le fichier TSV 
@@ -19,13 +19,12 @@ function SaveButton({ metadata, systemBcv,modified, setModified, setSavedChecksu
             payload,
             debugBool
         );
-        console.log("response",response);
         if (response.ok) {
             enqueueSnackbar(
                 `${doI18n("pages:core-local-workspace:saved", i18nRef.current)}`,
                 { variant: "success" }
             );
-            setSavedChecksum(md5(JSON.stringify(scriptureJson, null, 2)));
+            setMd5sumScriptureJson(md5sum(JSON.stringify(scriptureJson)));
             setModified(false);
         } else {
             enqueueSnackbar(
@@ -39,7 +38,7 @@ function SaveButton({ metadata, systemBcv,modified, setModified, setSavedChecksu
         <IconButton
             variant="contained"
             onClick={() => { handleSaveUsfm().then() }}
-            //disabled={!modified}
+            disabled={md5sum(JSON.stringify(scriptureJson)) === md5sumScriptureJson}
         >
             <SaveIcon
                 size="large"

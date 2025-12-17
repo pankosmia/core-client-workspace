@@ -1,7 +1,5 @@
-import PropTypes from "prop-types";
 import EditableBibleBlock from "./EditableBibleBlock";
 import EditableGraft from "./EditableGraft";
-import EditableChapter from "./EditableChapter";
 import EditableRemark from "./EditableRemark";
 import { useEffect } from "react";
 
