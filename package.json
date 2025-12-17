@@ -25,6 +25,7 @@
     "md5": "^2.3.0",
     "notistack": "^3.0.2",
     "pithekos-lib": "^0.11.20",
+    "prop-types": "^15.8.1",
     "proskomma-core": "^0.11.2",
     "react": "^17.0.0 || ^18.0.0",
     "react-dom": "^17.0.0 || ^18.0.0",
@@ -33,6 +34,7 @@
     "react-router-dom": "^6.27.0",
     "react-tile-pane": "^0.5.1",
     "react-use-measure": "^2.1.1",
+    "use-editable": "^2.3.3",
     "uuid": "^11.1.0",
     "wavesurfer-multitrack": "^0.4.12"
   },

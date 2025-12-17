@@ -13,7 +13,7 @@ import {
 } from "@scriptural/react";
 
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import CustomMarkersToolbar from "../plugins/CustomMarkersToolbar";
+import CustomMarkersToolbar from "./plugins/CustomMarkersToolbar";
 import { TriggerKeyDialog } from "./TriggerKeyDialog";
 import SaveIcon from "@mui/icons-material/Save";
 import SearchIcon from "@mui/icons-material/Search";
@@ -24,8 +24,8 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import WrapTextOutlinedIcon from "@mui/icons-material/WrapTextOutlined";
 import { Divider, ToggleButton, IconButton, Box, Grid2 } from "@mui/material";
 import { i18nContext as I18nContext, doI18n } from "pithekos-lib";
-import SvgParaph from "../plugins/Svg_paraph";
-import CustomEditorMode from "../CustomEditorMode";
+import SvgParaph from "./plugins/Svg_paraph";
+import ChangeEditor from "../ChangeEditor";
 import BcvPicker from "../../../pages/Workspace/BcvPicker";
 
 function SearchButton() {
@@ -252,7 +252,7 @@ export function CustomToolbar({
               <BcvPicker/>
             </Grid2>
             <Grid2 item size={4}>
-              <CustomEditorMode
+              <ChangeEditor
                 editor={editorMode}
                 setEditor={setEditor}
                 modified={modified}

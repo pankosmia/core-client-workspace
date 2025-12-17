@@ -15,8 +15,8 @@ import "@scriptural/react/styles/nodes-menu.css";
 import "./editor.css";
 import { CustomToolbar } from "./CustomToolbar";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { ReferenceSyncPlugin } from "../plugins/ReferenceSyncPlugin";
-import CustomEditorMode from "../CustomEditorMode";
+import { ReferenceSyncPlugin } from "./plugins/ReferenceSyncPlugin";
+import ChangeEditor from "../ChangeEditor";
 
 function onError(error) {
     console.error(error);

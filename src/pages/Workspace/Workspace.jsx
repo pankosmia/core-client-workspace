@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 import { useLocation } from "react-router-dom";
-import { Box, Chip, Stack } from "@mui/material";
+import { Box, Button, Chip, Stack } from "@mui/material";
 import WorkspaceCard from "./WorkspaceCard";
 import GraphiteTest from "./GraphiteTest";
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
@@ -18,7 +18,7 @@ import OBSContext from '../../contexts/obsContext';
 const paneStyle = {
     width: '100%',
     height: '100%',
-    overflow: 'auto'
+    overflow: 'auto',
 }
 
 
@@ -26,6 +26,8 @@ const Workspace = () => {
     const { i18nRef } = useContext(i18nContext);
     const { typographyRef } = useContext(typographyContext);
     const locationState = Object.entries(useLocation().state);
+    //const [flipTiles, setFlipTiles] = useState(0);
+
     const resources = locationState
         .map(kv => {
             return { ...kv[1], local_path: kv[0] }
@@ -61,6 +63,9 @@ const Workspace = () => {
     if (rootPane.children[1].children.length === 0) {
         rootPane.children.pop();
     }
+    // else if (flipTiles % 2 === 1) {
+    //     rootPane.children = [rootPane.children[1], rootPane.children[0]]
+    // }
     const paneList = createTilePanes(tileElements)[0];
 
     const isGraphite = GraphiteTest()
@@ -75,10 +80,10 @@ const Workspace = () => {
             <Stack sx={{ marginLeft: "1rem" }}  >
                 <Chip
                     onClick={() => { setDistractionModeCount(distractionModeCount + 1); }}
-                    icon={(distractionModeCount % 2) === 0 ? <CenterFocusStrongOutlinedIcon/> : <CenterFocusStrongIcon/> }
+                    icon={(distractionModeCount % 2) === 0 ? <CenterFocusStrongOutlinedIcon /> : <CenterFocusStrongIcon />}
                     label={`${doI18n("pages:core-local-workspace:focus_mode", i18nRef.current)}`}
                     color={(distractionModeCount % 2) === 0 ? "appbar-chip-inactive" : "secondary"}
-    
+
                     variant="Filled"
                     disabled={resources.length === 1}
                 />
@@ -96,9 +101,19 @@ const Workspace = () => {
                 <DistractionToggle
                     distractionModeCount={distractionModeCount}
                     setDistractionModeCount={setDistractionModeCount} />
+                {/* <Button
+                    onClick={() => setFlipTiles(flipTiles + 1)}
+                    color={(distractionModeCount % 2) === 0 ? "appbar-chip-inactive" : "secondary"}
+                    variant="Filled"
+                    disabled={resources.length === 1}
+                >
+                    flip
+                </Button> */}
             </span>}
         />
-        <div className={adjSelectedFontClass} id="fontWrapper">
+        <div className={adjSelectedFontClass} id="fontWrapper"
+        //key={flipTiles}
+        >
             <OBSContext.Provider value={{ obs, setObs }}>
                 <TileProvider
                     tilePanes={paneList}

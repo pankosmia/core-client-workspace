@@ -1,23 +1,20 @@
 import { useEffect, useContext, useState } from "react";
-import md5 from "md5";
-import { Proskomma } from "proskomma-core";
 import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
-  getJson,
   getText,
   postEmptyJson,
 } from "pithekos-lib";
-import { Box, Divider, FormControl, Grid2, IconButton, TextField, Typography } from "@mui/material";
-import RequireResources from "../../../components/RequireResources";
-import juxta2Units from "../../../components/juxta2Units";
-import NavBarDrafting from "./components/NavBarDrafting";
-import SaveButtonDrafting from "./components/SaveButtonDrafting";
-import CustomEditorMode from "../CustomEditorMode";
+import { Box, Grid2, IconButton, Typography } from "@mui/material";
+import NavBar from "./components/NavBar";
+import SaveButton from "./components/SaveButton";
+import ChangeEditor from "../ChangeEditor";
 import BcvPicker from "../../../pages/Workspace/BcvPicker";
 import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import usfm2draftJson from '../../../components/usfm2draftJson';
+import EditableBible from "./components/EditableBible";
+import md5sum from "md5";
 
 function DraftingEditor({
   metadata,
@@ -28,22 +25,18 @@ function DraftingEditor({
 }) {
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
-  const [units, setUnits] = useState([]);
-  const [currentChapter, setCurrentChapter] = useState(1);
-  const [pk, setPk] = useState(null);
-  const [unitData, setUnitData] = useState([]);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [currentText, setCurrentText] = useState("");
-  const [selectedReference, setSelectedReference] = useState("");
-  const [usfmHeader, setUsfmHeader] = useState("");
-  const [savedChecksum, setSavedChecksum] = useState(null);
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
-  const [data, setData] = useState(null);
+  const [scriptureJson, setScriptureJson] = useState({ headers: {}, blocks: [] });
+  const [chapterJson, setChapterJson] = useState(null);
+  const [chapterNumbers, setChapterNumbers] = useState([]);
+  const [currentBookCode, setCurrentBookCode] = useState("zzz");
+  const [md5sumScriptureJson, setMd5sumScriptureJson] = useState([]);
 
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
   }
 
+  // Set up 'are you sure you want to leave page' for Electron
   useEffect(() => {
     const isElectron = !!window.electronAPI;
     if (isElectron) {
@@ -51,157 +44,93 @@ function DraftingEditor({
     }
   }, [modified]);
 
-  const updateBcv = (unitN) => {
-    if (unitData[unitN]) {
-      const newCurrentUnitCV = unitData[unitN].reference.split(":");
-      postEmptyJson(
-        `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentUnitCV[0]}/${newCurrentUnitCV[1].split("-")[0]
-        }`,
-        debugRef.current
-      );
-    }
-  };
-
-  useEffect(
-    () => {
-      const getAllData = async () => {
-        const ingredientLink = `/burrito/ingredient/raw/_local_/_local_/stctw-test?ipath=plan.json`;
-        const response = await fetch(ingredientLink);
-
-        if (response.ok) {
-          const json = await response.json();
-          setData(json);
-        } else {
-          setData(null);
-        }
-      };
-      getAllData();
-    },
-    []
-  );
-
-  useEffect(() => {
-    const juxtaJson = async () => {
-      let jsonResponse = await getJson(
-        `/burrito/ingredient/raw/git.door43.org/BurritoTruck/fr_juxta/?ipath=${systemBcv.bookCode}.json`,
-        debugRef.current
-      );
-      if (jsonResponse.ok) {
-        let newUnits = juxta2Units(jsonResponse.json);
-        setUnits(newUnits);
-      } else {
-        // Generate from Proskomma versification
-        const vrsQuery = `{
-                versification(id: "eng") {
-                  cvBook(bookCode: "${systemBcv.bookCode}") {
-                    chapters {
-                      chapter
-                      maxVerse
-                    }
-                  }
-                }
-                }`;
-        const pk = new Proskomma();
-        const result = pk.gqlQuerySync(vrsQuery);
-        const chapters = result.data.versification.cvBook.chapters;
-        setUnits(
-          chapters
-            .map((c) =>
-              [...Array(c.maxVerse + 1).keys()]
-                .map((c2) => `${c.chapter}:${c2}`)
-                .slice(1)
-            )
-            .reduce((a, b) => [...a, ...b], [])
-        );
+  const filterByChapter = (usfmJson, requiredChapter) => {
+    let chapterBlocks = [];
+    let currentChapter = 0;
+    let blockN = 0;
+    for (const block of usfmJson.blocks) {
+      if (block.type === "chapter") {
+        currentChapter = block.chapter
       }
-    };
-    juxtaJson().then();
-  }, [debugRef, systemBcv.bookCode]);
+      if (currentChapter === requiredChapter) {
+        chapterBlocks.push({ ...block, position: blockN })
+      }
+      blockN += 1
+    }
+    return {
+      headers: usfmJson.headers,
+      blocks: chapterBlocks
+    }
+  }
+
+  // Set up chapter numbers when changing book
+
+  const allChapterNumbers = (usfmJson) => {
+    let chapters = []
+    for (const block of usfmJson.blocks) {
+      if (block.type === "chapter") {
+        chapters.push(block.chapter)
+      }
+    }
+    return chapters
+  }
 
   useEffect(() => {
-    const getProskomma = async () => {
-      let usfmResponse = await getText(
-        `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
+    if (systemBcv.bookCode !== currentBookCode) {
+      const doChapterNumbers = async () => {
+        let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
+          debugRef.current
+        );
+        if (usfmResponse.ok) {
+          const usfmDraftJson = usfm2draftJson(usfmResponse.text)
+          const newChapterNumbers = allChapterNumbers(usfmDraftJson)
+          setCurrentBookCode(systemBcv.bookCode)
+          setChapterNumbers(newChapterNumbers)
+          postEmptyJson(
+            `/navigation/bcv/${systemBcv.bookCode}/${newChapterNumbers[0]}/1`,
+            debugRef.current);
+        }
+      }
+      doChapterNumbers().then();
+    }
+
+  }, [debugRef, systemBcv.bookCode, metadata, currentBookCode])
+
+  // Get whole book content
+  useEffect(() => {
+    const doScriptureJson = async () => {
+      let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
         debugRef.current
       );
       if (usfmResponse.ok) {
-        const usfmText = usfmResponse.text;
-        usfm2draftJson(usfmText);
-        setUsfmHeader(usfmText.split("\\c")[0]);
-        const newPk = new Proskomma();
-        newPk.importDocument(
-          {
-            lang: "xxx",
-            abbr: "yyy",
-          },
-          "usfm",
-          usfmText
-        );
-        setPk(newPk);
-      }
-    };
-    getProskomma().then();
-  }, [debugRef, systemBcv.bookCode, metadata.local_path]);
-  const getUnitTexts = async () => {
-    let newUnitData = [];
-    setIsDownloading(true);
-    for (const cv of units) {
-      const query = `{
-                documents {
-                    mainSequence {
-                        blocks(withScriptureCV:"${cv}"){
-                            items(withScriptureCV:"${cv}") {
-                                type subType payload
-                            }
-                        }
-                    }
-
-                }
-            }`;
-      const result = await pk.gqlQuery(query);
-      const cvText = result.data.documents[0].mainSequence.blocks
-        .map((b) =>
-          b.items
-            .filter((i) => i.type === "token")
-            .map((i) => i.payload.replace(/\s+/g, " "))
-            .join("")
+        const usfmDraftJson = usfm2draftJson(usfmResponse.text);
+        setScriptureJson(
+          usfmDraftJson
         )
-        .join("\n\n");
-      newUnitData.push({ reference: cv, text: cvText });
-    }
-    setUnitData(newUnitData);
-    setIsDownloading(false);
-    setModified(false);
-    setSavedChecksum(md5(JSON.stringify(newUnitData, null, 2)));
-  };
-  useEffect(() => {
-    if (pk) {
-      getUnitTexts().then();
-    }
-  }, [units, pk]);
+        const hash = md5sum(JSON.stringify(usfmDraftJson));
+        setMd5sumScriptureJson(hash);
+      }
 
-  const handleCacheUnit = (unitN, newText) => {
-    const newUnit = { ...unitData[unitN], text: newText };
-    let newUnitData = [...unitData];
-    newUnitData[unitN] = newUnit;
-    const newChecksum = md5(JSON.stringify(newUnitData, null, 2));
-    const notSaved = newChecksum !== savedChecksum;
-    if (notSaved !== modified) {
-      setModified(notSaved);
     }
-    setUnitData(newUnitData);
-  };
+    doScriptureJson().then();
+  }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum]);
 
-  if (isDownloading) {
-    return <p>loading...</p>;
-  }
+  // Make chapter content from whole book content
+  useEffect(
+    () => {
+      if (scriptureJson) {
+        setChapterJson(filterByChapter(scriptureJson, systemBcv.chapterNum))
+      }
+    },
+    [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]
+  );
 
   return (
     <>
       <Box
         sx={{
           position: "fixed",
-          top: "48px",
+          top: "40px",
           left: 0,
           right: 0,
           display: "flex",
@@ -210,23 +139,20 @@ function DraftingEditor({
       >
         <Grid2
           container
-          spacing={1}
-          justifyContent="space-around"
-          alignItems="stretch"
+          alignItems="center"
+          justifyContent="space-between"
           width="100%"
         >
-          <Grid2 item size={2}>
-            <SaveButtonDrafting
+          <Grid2 display="flex" gap={1} >
+            <SaveButton
               metadata={metadata}
               systemBcv={systemBcv}
-              usfmHeader={usfmHeader}
-              unitData={unitData}
               modified={modified}
               setModified={setModified}
-              setSavedChecksum={setSavedChecksum}
+              md5sumScriptureJson={md5sumScriptureJson}
+              setMd5sumScriptureJson={setMd5sumScriptureJson}
+              scriptureJson={scriptureJson}
             />
-          </Grid2>
-          <Grid2 item size={2}>
             <IconButton onClick={() => {
               handlePreviewText();
             }}>
@@ -234,19 +160,17 @@ function DraftingEditor({
             </IconButton>
             <PreviewText metadata={metadata} systemBcv={systemBcv} open={openModalPreviewText === true} closeModal={() => setOpenModalPreviewText(false)} />
           </Grid2>
-          <Grid2 item size={4}>
-            <NavBarDrafting
-              currentChapter={currentChapter}
-              setCurrentChapter={setCurrentChapter}
-              units={units}
+
+          <Grid2 display="flex" gap={1}>
+            <BcvPicker />
+            <NavBar
+              chapterNumbers={chapterNumbers}
               metadata={metadata}
+              systemBcv={systemBcv}
             />
           </Grid2>
-          <Grid2 item size={2}>
-            <BcvPicker />
-          </Grid2>
-          <Grid2 item size={2}>
-            <CustomEditorMode
+          <Grid2 display="flex" gap={1}>
+            <ChangeEditor
               editor={editorMode}
               setEditor={setEditor}
               modified={modified}
@@ -256,37 +180,9 @@ function DraftingEditor({
         </Grid2>
       </Box>
       <Box>
-        {unitData.map((u, index) => {
-          if (!u.reference.startsWith(`${currentChapter}:`)) {
-            return;
-          }
-          return (
-            <Box key={index}>
-              <FormControl fullWidth margin="normal">
-
-                <TextField
-                  label={u.reference}
-                  value={
-                    u.reference === selectedReference ? currentText : u.text
-                  }
-                  multiline
-                  minRows={6}
-                  maxRows={9}
-                  autoFocus={u.reference === selectedReference}
-                  onFocus={() => {
-                    setCurrentText(u.text);
-                    setSelectedReference(u.reference);
-                    updateBcv(index);
-                  }}
-                  onChange={(e) => {
-                    setCurrentText(e.target.value);
-                  }}
-                  onBlur={() => handleCacheUnit(index, currentText)}
-                />
-              </FormControl>
-            </Box>
-          );
-        })}
+        {chapterJson ? (
+          <EditableBible key={md5sum(JSON.stringify(chapterJson))} chapterJson={chapterJson} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} />
+        ) : (<Typography> loading ...</Typography>)}
       </Box>
     </>
   );
