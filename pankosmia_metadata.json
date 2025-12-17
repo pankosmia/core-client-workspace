@@ -10,7 +10,8 @@
       "ar": "مساحة العمل المحلية ",
       "en": "Workspace",
       "fr": "Espace de travail",
-      "id": "Ruang Kerja"
+      "id": "Ruang Kerja",
+      "es": "Espacio de trabajo"
     },
     "Select_Resources": {
       "en": "Select Resources",
@@ -18,10 +19,10 @@
       "id": "Pilih Sumber Daya"
     },
     "summary": {
-      "ar": "تسييير و تغيير الموارد المحلية",
-      "en": "Edit your content",
-      "fr": "Editer votre contenu",
-      "id": "Kelola dan edit sumber daya lokal"
+      "ar": "@تسييير و تغيير الموارد المحلية",
+      "en": "Edit your document",
+      "fr": "Éditer votre document",
+      "id": "@Kelola dan edit sumber daya lokal"
     },
     "flavor": {
       "en": "flavor",
@@ -29,23 +30,23 @@
     },
     "editing": {
       "en": "Edit",
-      "fr": "Editer",
+      "fr": "Éditer",
       "id": "Edit"
     },
     "saved": {
-      "en": "Saved!",
-      "fr": "Enregistré !",
-      "id": "Telah disimpan!"
+      "en": "Saved",
+      "fr": "Sauvegardé",
+      "id": "Telah disimpan"
     },
     "save_error": {
-      "en": "Could not save!",
-      "fr": "Enregistrement a échoué !",
-      "id": "Tidak dapat disimpan!"
+      "en": "Could not save",
+      "fr": "La sauvegarde a échoué",
+      "id": "Tidak dapat disimpan"
     },
     "usfm_conversion_error": {
-      "en": "Error while converting USFM to USJ",
-      "fr": "Erreur pendant la conversion d'USFM en USJ",
-      "id": "Kesalahan terjadi saat mengubah USFM ke USJ"
+      "en": "Document could not be converted from USFM to USJ",
+      "fr": "Le document n'a pas pu être converti de USFM à USJ",
+      "id": "@Kesalahan terjadi saat mengubah USFM ke USJ"
     },
     "load_error": {
       "en": "Could not load",
@@ -63,20 +64,20 @@
     },
     "save_your_work": {
       "en": "Save your work before leaving this page!",
-      "fr": "Enregistrez votre travail avant de quitter cette page !",
+      "fr": "Sauvegardez votre travail avant de quitter cette page !",
       "id": "Simpan perubahannya sebelum meninggalkan halaman ini!"
     },
     "change_book": {
-      "en": "Changing Book",
+      "en": "Change Book",
       "fr": "Changer de livre",
       "es": "Cambiar de libro",
       "id": "Beralih Buku"
     },
     "change_book_question": {
-      "en": "You are about to change to a different book. This will discard any unsaved changes you have made to the current book. Do you wish to continue?",
-      "fr": "Vous êtes sur le point de changer de livre. Cette opération annulera toutes les modifications non sauvegardées que vous avez apportées au livre actuel. Souhaitez-vous continuer ?",
-      "es": "Está a punto de cambiar de libro. Esto descartará cualquier cambio no guardado que haya realizado en el libro actual. ¿Desea continuar?",
-      "id": "Akan beralih ke buku lain. Tindakan ini akan menghapus semua perubahan yang belum disimpan yang telah dibuat pada buku saat ini. Ingin melanjutkan?"
+      "en": "Change book will discard unsaved changes on the current book. Continue anyway?",
+      "es": "@Está a punto de cambiar de libro. Esto descartará cualquier cambio no guardado que haya realizado en el libro actual. ¿Desea continuar?",
+      "fr": "Changer de livre supprimera les modifications non sauvegardées dans le livre actuel. Continuer quand même ?",
+      "id": "@Akan beralih ke buku lain. Tindakan ini akan menghapus semua perubahan yang belum disimpan yang telah dibuat pada buku saat ini. Ingin melanjutkan?"
     },
     "accept": {
       "en": "Accept",
@@ -113,12 +114,12 @@
     },
     "save_note": {
       "en": "Save note",
-      "fr": "Enregistrez votre nouvelle note",
+      "fr": "Sauvegarder la note",
       "id": "Simpan catatan"
     },
     "save_tsv": {
       "en": "Save to file",
-      "fr": "Sauvegarder dans le fichier ",
+      "fr": "Sauvegarder dans le fichier",
       "id": "Simpan ke file"
     },
     "new_bcv_note": {
@@ -127,9 +128,9 @@
       "id": "Catatan baru"
     },
     "delete_note_bcv": {
-      "en": "About to delete this content. This operation cannot be undone. Click \"cancel\" unless you are sure you want to delete this content permanently.",
-      "fr": "Vous êtes sur le point de supprimer ce contenu. Cette opération est permanent. Cliquez sur \"Annuler\", sauf si vous voulez vraiment effacer ce contenu de façon irréversible.",
-      "id": "Akan menghapus konten ini. Operasi ini tidak dapat dibalikkan. Klik \"batal\" kecuali yakin ingin menghapus konten ini secara permanen."
+      "en": "Deletion is permanent and irreversible. Continue anyway?",
+      "fr": "La suppression est définitive et irréversible. Continuer quand même ?",
+      "id": "@Akan menghapus konten ini. Operasi ini tidak dapat dibalikkan. Klik \"batal\" kecuali yakin ingin menghapus konten ini secara permanen."
     },
     "do_delete_button": {
       "en": "Delete",
@@ -143,7 +144,7 @@
     },
     "reset": {
       "en": "Reset",
-      "fr": "Annuler",
+      "fr": "Réinitialiser",
       "id": "Atur ulang"
     },
     "row_name": {
@@ -177,10 +178,10 @@
       "id": "Buat"
     },
     "close": {
-      "en": "close",
-      "es": "cerrar",
-      "fr": "fermer",
-      "id": "tutup"
+      "en": "Close",
+      "es": "Cerrar",
+      "fr": "Fermer",
+      "id": "Tutup"
     },
     "undo": {
       "en": "Undo",
@@ -189,27 +190,27 @@
     },
     "redo": {
       "en": "Redo",
-      "fr": "Refaire",
+      "fr": "Rétablir",
       "id": "Buat lagi"
     },
     "toggle_block_view": {
-      "en": "Toggle block view",
-      "fr": "Changer les blocs ",
-      "id": "Alihkan tampilan blok"
+      "en": "Toggle verse-by-verse view",
+      "fr": "(Dés)activer la vue verset par verset",
+      "id": "@Alihkan tampilan blok"
     },
     "toggle_markup": {
-      "en": "Toggle markup",
-      "fr": "Activer/désactiver le balisage",
-      "id": "Alihkan markup"
+      "en": "Toggle formatting marks",
+      "fr": "(Dés)activer les marques de formatage",
+      "id": "@Alihkan markups"
     },
     "search_tool": {
       "en": "Find and replace",
-      "fr": "Chercher et remplace ",
+      "fr": "Chercher et remplacer",
       "id": "Cari dan ganti"
     },
     "key_combination": {
       "en": "Set trigger key combination",
-      "fr": "Définir la combinaison de touches de déclenchement ",
+      "fr": "Définir la combinaison de touches de déclenchement",
       "id": "Atur kombinasi tombol pemicu"
     },
     "usfm_button_c": {
@@ -252,7 +253,7 @@
     },
     "usfm_button_v": {
       "en": "A verse number",
-      "fr": "Le numéro de verset",
+      "fr": "Un numéro de verset",
       "id": "Nomor ayat"
     },
     "usfm_button_p": {
@@ -260,17 +261,18 @@
       "id": "Teks paragraf, dengan indentasi di baris pertama"
     },
     "choose_resources_workspace": {
-      "en": "Choose what resources to open in the Workspace, alongside your editable Content.",
-      "id": "Pilih sumber daya yg akan dibuka di Ruang Kerja, dipertunjukkan di samping koten yg dapat diedit"
+      "en": "Choose resources to display in the workspace alongside your editable document.",
+      "fr": "Choisissez les ressources à afficher dans l'espace de travail à côté de votre document éditable.",
+      "id": "@Pilih sumber daya yg akan dibuka di Ruang Kerja, dipertunjukkan di samping koten yg dapat diedit"
     },
     "type_to_search": {
       "en": "Type to search",
-      "fr": "Taper pour rechercher",
+      "fr": "Tapez pour rechercher",
       "id": "Ketik buat cari"
     },
     "no_result": {
       "en": "No results",
-      "fr": "Pas de résultat",
+      "fr": "Pas de résultats",
       "id": "Tidak ada hasil"
     },
     "current": {
@@ -303,7 +305,7 @@
       "id": "ganti"
     },
     "find_replace": {
-      "en": "Find & replace",
+      "en": "Find and replace",
       "fr": "Chercher et remplacer",
       "id": "Cari dan ganti"
     },
@@ -313,7 +315,7 @@
       "id": "Cari"
     },
     "replace_with": {
-      "en": "Replace with ",
+      "en": "Replace with",
       "fr": "Remplacer avec",
       "id": "Ganti dgn"
     },
@@ -323,6 +325,7 @@
     },
     "record_key_combination": {
       "en": "Record key combination",
+      "fr": "Enregistrer la combinaison de touches",
       "id": "Rekam kombinasi tombol"
     },
     "click_record_below": {
@@ -331,7 +334,7 @@
     },
     "listening": {
       "en": "Listening...",
-      "fr": "Ecoute...",
+      "fr": "Écoute...",
       "id": "Mendengarkan..."
     },
     "press_keys_now": {
@@ -341,7 +344,7 @@
     },
     "required_field": {
       "en": "* Required fields",
-      "fr": "* Champ obligatoire",
+      "fr": "* Champs obligatoires",
       "id": "* Data yg diperlukan"
     },
     "main_track": {
@@ -370,9 +373,9 @@
       "id": "atau tekan R buat merekam"
     },
     "supplementary_tracks": {
-      "en": "SUPPLEMENTARY TRACKS",
+      "en": "Supplementary tracks",
       "fr": "Pistes supplémentaires",
-      "id": "TREK-TREK TAMBAHAN"
+      "id": "Trek-trek tambahan"
     },
     "delete_track": {
       "en": "Delete track",
@@ -396,7 +399,7 @@
     },
     "tooltip_play_pause": {
       "en": "Play/Pause",
-      "fr": "Lire/Pause",
+      "fr": "Lecture/Pause",
       "id": "Putar/Jeda"
     },
     "tooltip_restore": {
@@ -431,7 +434,7 @@
     },
     "tooltip_switch_with_maintrack": {
       "en": "Switch with maintrack",
-      "fr": "Changer avec la piste principale",
+      "fr": "Échanger avec la piste principale",
       "id": "Beralih dengan trek utama"
     },
     "tooltip_rename_track": {
@@ -451,6 +454,7 @@
     },
     "editor_mode": {
       "en": "Editor mode",
+      "fr": "Mode d'éditeur",
       "id": "Mode editor",
       "es": "Modo del editor"
     },
@@ -460,48 +464,49 @@
       "id": "Tampilan normal"
     },
     "no_distraction_mode": {
-      "en": "Edit-only view",
+      "en": "Editor-only view",
       "fr": "Vue éditeur seul",
-      "id": "Tampilan edit saja"
+      "id": "@Tampilan edit saja"
     },
     "focus_mode":{
-      "en": "Focus mode"
+      "en": "Focus mode",
+      "fr": "Mode focalisé"
     },
     
     "change_editor_title": {
-      "en": "Changing editor",
-      "fr": "Changement d'éditeur",
-      "id": "Sedang mengganti editor",
-      "es": "Cambiando el editor"
+      "en": "Change editor mode",
+      "es": "@Cambiando el editor",
+      "fr": "Changer le mode d'éditeur",
+      "id": "@Sedang mengganti editor"
     },
     "change_editor_without_saving": {
-      "en": "You have unsaved edits. If you change editor now you will lose those changes. If that is not what you want, hit 'cancel'",
-      "fr": "Il existe des modifications non-enregistrées. Si vous changez tout de suite d'éditeur vous perdrez ces modifications. Si ce n'est pas votre souhait, cliquez sur 'annuler'.",
-      "id": "Ada suntingan yang belum disimpan. Jika mengganti editor sekarang, perubahan tersebut akan hilang. Tekan 'batal' jika tidak sesuai keinginan.",
-      "es": "Tienes cambios sin guardar. Si cambias de editor ahora, perderás esos cambios. Si no es lo que deseas, pulsa 'cancelar'."
+      "en": "Change editor will discard unsaved changes on the current editor. Continue anyway?",
+      "es": "@Tienes cambios sin guardar. Si cambias de editor ahora, perderás esos cambios. Si no es lo que deseas, pulsa 'cancelar'.",
+      "fr": "Changer d'éditeur supprimera les modifications non sauvegardées dans l'éditeur actuel. Continuer quand même ?",
+      "id": "@Ada suntingan yang belum disimpan. Jika mengganti editor sekarang, perubahan tersebut akan hilang. Tekan 'batal' jika tidak sesuai keinginan."
     },
     "do_change_editor": {
-      "en": "Change editor anyway",
-      "fr": "Changer néanmoins d'editeur",
-      "id": "Ganti saja editornya",
-      "es": "Cambiar el editor de todas formas"
+      "en": "Change editor mode",
+      "es": "@Cambiar el editor de todas formas",
+      "fr": "Changer le mode d'éditeur",
+      "id": "@Ganti saja editornya"
     },
     "editor_warning": {
       "en": "The unit editor retains biblical text, chapters and verses. Anything else, such as heading or footnotes will be lost.",
       "id": "Ganti saja editornya"
     },
     "_local_": {
-      "en": "editable on this machine",
-      "fr": "peut editer sur cette machine",
-      "id": "dapat diedit"
+      "en": "editable",
+      "fr": "éditable",
+      "id": "@dapat diedit"
     },
     "_sideloaded_": {
-      "en": "imported manually",
-      "fr": "importé manuellement"
+      "en": "imported from computer",
+      "fr": "importé depuis l'ordinateur"
     },
     "choose_document":{
-      "en":"Choose your document",
-      "fr":"Choix de sa ressource"
+      "en":"Bible",
+      "fr":"Bible"
     },
     "no_verse":{
       "en":"No notes found for this verse",
@@ -666,6 +671,8 @@
     },
     "intro_outline_tags":{
       "en":"Intro outline tags"
+      "en":"No notes for this verse",
+      "fr": "Pas de notes pour ce verset"
     }
   }
 }
