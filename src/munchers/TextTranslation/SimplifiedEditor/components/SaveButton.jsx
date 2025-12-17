@@ -5,39 +5,27 @@ import { doI18n, postJson } from "pithekos-lib";
 import { enqueueSnackbar } from "notistack";
 import I18nContext from "pithekos-lib/dist/contexts/i18nContext";
 import { useContext, useState } from "react";
+import draftJson2usfm from "../../../../components/draftJson2usfm";
 
-function SaveButton({ metadata, systemBcv, usfmHeader, unitData, modified, setModified, setSavedChecksum }) {
+function SaveButton({ metadata, systemBcv,modified, setModified, setSavedChecksum, scriptureJson }) {
     const { i18nRef } = useContext(I18nContext);
 
     // Permet de sauvegarder dans le fichier TSV 
     const handleSaveUsfm = async (debugBool) => {
-        let contentBits = [usfmHeader]
-        let chapterN = "0";
-        for (const unit of unitData) {
-            const chapter = unit.reference.split(":")[0]
-            if (chapterN !== chapter) {
-                contentBits.push(`\\c ${chapter}`)
-                chapterN = chapter
-            }
-            contentBits.push("\\p")
-            contentBits.push(`\\v ${unit.reference.split(":")[1]}`)
-            contentBits.push(unit.text.split(/\n{2,}/).join("\n\\p"))
-        }
-        const payload = JSON.stringify({ payload: contentBits.join("\n") });
+        let usfm = draftJson2usfm(scriptureJson)
+        const payload = JSON.stringify({ payload: usfm });
         const response = await postJson(
             `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
             payload,
             debugBool
         );
-
-        //setMd5Ingredient(md5(JSON.stringify()))
-        //uploadUsfmIngredient([...])
+        console.log("response",response);
         if (response.ok) {
             enqueueSnackbar(
                 `${doI18n("pages:core-local-workspace:saved", i18nRef.current)}`,
                 { variant: "success" }
             );
-            setSavedChecksum(md5(JSON.stringify(unitData,null, 2)));
+            setSavedChecksum(md5(JSON.stringify(scriptureJson, null, 2)));
             setModified(false);
         } else {
             enqueueSnackbar(
@@ -51,7 +39,7 @@ function SaveButton({ metadata, systemBcv, usfmHeader, unitData, modified, setMo
         <IconButton
             variant="contained"
             onClick={() => { handleSaveUsfm().then() }}
-            disabled={!modified}
+            //disabled={!modified}
         >
             <SaveIcon
                 size="large"

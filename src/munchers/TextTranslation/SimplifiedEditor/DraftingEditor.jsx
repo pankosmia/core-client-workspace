@@ -107,7 +107,6 @@ function DraftingEditor({
       );
       if (usfmResponse.ok) {
         const usfmDraftJson = usfm2draftJson(usfmResponse.text);
-        console.log(usfmDraftJson);
         setScriptureJson(
           usfmDraftJson
         )
@@ -125,8 +124,7 @@ function DraftingEditor({
     },
     [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]
   );
-  console.log("scriptureJson",scriptureJson);
-  console.log("usfm", draftJson2usfm(scriptureJson));
+ 
   return (
     <>
       <Box
@@ -154,6 +152,7 @@ function DraftingEditor({
               modified={modified}
               setModified={setModified}
               setSavedChecksum={setSavedChecksum}
+              scriptureJson={scriptureJson}
             />
           </Grid2>
           <Grid2 item size={2}>
