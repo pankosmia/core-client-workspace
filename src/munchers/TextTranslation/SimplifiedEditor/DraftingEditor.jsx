@@ -139,12 +139,11 @@ function DraftingEditor({
       >
         <Grid2
           container
-          spacing={1}
-          justifyContent="space-around"
-          alignItems="stretch"
+          alignItems="center"
+          justifyContent="space-between"
           width="100%"
         >
-          <Grid2 item size={2}>
+          <Grid2 display="flex" gap={1} >
             <SaveButton
               metadata={metadata}
               systemBcv={systemBcv}
@@ -154,8 +153,6 @@ function DraftingEditor({
               setMd5sumScriptureJson={setMd5sumScriptureJson}
               scriptureJson={scriptureJson}
             />
-          </Grid2>
-          <Grid2 item size={2}>
             <IconButton onClick={() => {
               handlePreviewText();
             }}>
@@ -163,17 +160,16 @@ function DraftingEditor({
             </IconButton>
             <PreviewText metadata={metadata} systemBcv={systemBcv} open={openModalPreviewText === true} closeModal={() => setOpenModalPreviewText(false)} />
           </Grid2>
-          <Grid2 item size={2}>
+
+          <Grid2 display="flex" gap={1}>
             <BcvPicker />
-          </Grid2>
-          <Grid2 item size={4}>
             <NavBar
               chapterNumbers={chapterNumbers}
               metadata={metadata}
               systemBcv={systemBcv}
             />
           </Grid2>
-          <Grid2 item size={2}>
+          <Grid2 display="flex" gap={1}>
             <ChangeEditor
               editor={editorMode}
               setEditor={setEditor}

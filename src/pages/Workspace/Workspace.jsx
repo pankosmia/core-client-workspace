@@ -26,7 +26,7 @@ const Workspace = () => {
     const { i18nRef } = useContext(i18nContext);
     const { typographyRef } = useContext(typographyContext);
     const locationState = Object.entries(useLocation().state);
-    const [flipTiles, setFlipTiles] = useState(0);
+    //const [flipTiles, setFlipTiles] = useState(0);
 
     const resources = locationState
         .map(kv => {
@@ -62,9 +62,10 @@ const Workspace = () => {
     }
     if (rootPane.children[1].children.length === 0) {
         rootPane.children.pop();
-    } else if (flipTiles % 2 === 1) {
-        rootPane.children = [rootPane.children[1], rootPane.children[0]]
     }
+    // else if (flipTiles % 2 === 1) {
+    //     rootPane.children = [rootPane.children[1], rootPane.children[0]]
+    // }
     const paneList = createTilePanes(tileElements)[0];
 
     const isGraphite = GraphiteTest()
@@ -100,17 +101,19 @@ const Workspace = () => {
                 <DistractionToggle
                     distractionModeCount={distractionModeCount}
                     setDistractionModeCount={setDistractionModeCount} />
-                <Button
+                {/* <Button
                     onClick={() => setFlipTiles(flipTiles + 1)}
                     color={(distractionModeCount % 2) === 0 ? "appbar-chip-inactive" : "secondary"}
                     variant="Filled"
                     disabled={resources.length === 1}
                 >
                     flip
-                </Button>
+                </Button> */}
             </span>}
         />
-        <div className={adjSelectedFontClass} id="fontWrapper" key={flipTiles}>
+        <div className={adjSelectedFontClass} id="fontWrapper"
+        //key={flipTiles}
+        >
             <OBSContext.Provider value={{ obs, setObs }}>
                 <TileProvider
                     tilePanes={paneList}
