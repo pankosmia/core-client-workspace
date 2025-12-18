@@ -28,7 +28,8 @@ export default function draftJson2usfm(json) {
                 retBits.push(`\\${block.tag}`);
                 for (const unit of block.units) {
                     retBits.push(`\\v ${unit.verses}`);
-                    retBits.push(unit.content[0].trim());
+                    const trimmedContent = unit.content[0].trim();
+                    retBits.push(trimmedContent.length === 0 ? "___" : trimmedContent);
                 }
                 break;
             default:

@@ -35,9 +35,9 @@ function processCvItems(items, os, chapterNo) {
             );
         } else if (item.type === "token") {
             ret[ret.length - 1].content[0] += item.payload.replace(/\s+/g," ");
-            // if (ret[ret.length - 1].content[0] === '___') {
-            //     ret[ret.length - 1].content[0] = ""
-            // }
+            if (ret[ret.length - 1].content[0].trim() === '___') {
+                ret[ret.length - 1].content[0] = ""
+            }
         }
     }
     return ret;

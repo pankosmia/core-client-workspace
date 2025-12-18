@@ -21,14 +21,12 @@ export default function EditableSpan({scriptureJson, setScriptureJson, position,
             },
             100);
 
-    const updateBcv = async (b, c, v) =>
-        setTimeout(() => {
+    const updateBcv = (b, c, v) => {
                 postEmptyJson(
                     `/navigation/bcv/${b}/${c}/${v}`,
                     debugRef.current
                 );
-            },
-            200);
+            }
 
     if (incomingContent === null) {
         return "";
@@ -41,14 +39,25 @@ export default function EditableSpan({scriptureJson, setScriptureJson, position,
     return <span
         ref={editorRef}
         className="span_edit_verses"
-        style={{minWidth: "1em", border: value.trim() === "" ? "solid black 1px" : "none"}}
+        style={
+            {
+                fontSize: value.trim() === "" ? "smaller": "inherit",
+                paddingRight: value.trim() === "" ? "20px" : "0",
+                backgroundColor: value.trim() === "" ? "#CCC" : "#FFF"
+
+            }
+        }
         onBlur={
             (e) => {
+                // console.log("BLUR", position)
                 updateScriptureJson(scriptureJson, position, value);
+                return false;
             }
         }
         onFocus={() => {
-            updateBcv(systemBcv.bookCode, chapter, verse)
+            // console.log("FOCUS", position)
+            updateBcv(systemBcv.bookCode, chapter, verse);
+            return false;
         }}
     >
         {value}
