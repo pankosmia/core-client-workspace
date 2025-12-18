@@ -1,9 +1,9 @@
-import { useRef, useState } from "react";
-import { useEditable } from "use-editable";
-import { updateGraftContent } from "../Controller";
+import {useRef, useState} from "react";
+import {useEditable} from "use-editable";
+import {updateGraftContent} from "../Controller";
 import EditableTag from "./EditableTag";
 
-export default function EditableGraft({ scriptureJson, setScriptureJson, position }) {
+export default function EditableGraft({scriptureJson, setScriptureJson, position}) {
     const [value, setValue] = useState("");
     const [firstTime, setFirstTime] = useState(true);
     const incomingBlock = scriptureJson.blocks[position[0]];
@@ -16,8 +16,10 @@ export default function EditableGraft({ scriptureJson, setScriptureJson, positio
 
     const updateScriptureJson = async (scriptureJson, position, value) =>
         setTimeout(() => {
-            setScriptureJson(updateGraftContent(scriptureJson, position, value))
-        }, "200");
+                setScriptureJson(updateGraftContent(scriptureJson, position, value))
+            },
+            200
+        );
 
     if (firstTime && value !== incomingContent) {
         setValue(incomingContent);
@@ -25,13 +27,13 @@ export default function EditableGraft({ scriptureJson, setScriptureJson, positio
     }
     if (scriptureJson.blocks[position[0]]) {
         return (
-            <div style={{ flexDirection: "column" }}>
+            <div style={{flexDirection: "column"}}>
                 <EditableTag scriptureJson={scriptureJson} setScriptureJson={setScriptureJson}
-                    position={position} />
+                             position={position}/>
                 <span
                     className={incomingBlock.tag}
                     ref={editorRef}
-                    style={{ padding: "5px" }}
+                    style={{padding: "5px"}}
                     onBlur={() => updateScriptureJson(scriptureJson, position, value)}
                 >
                     {value}
