@@ -17,7 +17,7 @@ export default function EditableGraft({ scriptureJson, setScriptureJson, positio
     const updateScriptureJson = async (scriptureJson, position, value) =>
         setTimeout(() => {
             setScriptureJson(updateGraftContent(scriptureJson, position, value))
-        }, "50");
+        }, "200");
 
     if (firstTime && value !== incomingContent) {
         setValue(incomingContent);
