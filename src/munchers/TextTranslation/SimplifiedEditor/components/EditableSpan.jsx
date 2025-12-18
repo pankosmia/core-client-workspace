@@ -25,7 +25,7 @@ export default function EditableSpan({scriptureJson, setScriptureJson, position}
 
     return <span
         ref={editorRef}
-        //style={{padding: "5px"}}
+       className="span_edit_verses"
         onBlur={
             (e) => {
                 updateScriptureJson(scriptureJson, position, value);
