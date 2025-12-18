@@ -5,12 +5,17 @@ import {
     Box,
     Typography,
     Fab,
-    IconButton,
+    IconButton
 } from "@mui/material";
+
 import { DataGrid } from '@mui/x-data-grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SvgViewEditorBottom from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_bottom";
-import SvgViewEditorRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_row";
+import SvgViewEditorLeftColumn from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_column";
+import SvgViewEditorRightColumn from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_column";
+import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_row";
+import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_row";
+import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_top";
 
 function ConfigureWorkspace() {
 
@@ -144,12 +149,25 @@ function ConfigureWorkspace() {
             </Box>
             <Box
                 style={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'auto', width: '100%' }}>
-                <IconButton>
+                {/* <IconButton>
                     <SvgViewEditorBottom />
                 </IconButton>
-                 <IconButton>
-                    <SvgViewEditorRow />
+                <IconButton>
+                    <SvgViewEditorLeftColumn />
                 </IconButton>
+                 <IconButton>
+                    <SvgViewEditorRightColumn />
+                </IconButton>
+                 <IconButton>
+                    <SvgViewEditorLeftRow />
+                </IconButton>
+                 <IconButton>
+                    <SvgViewEditorRightRow />
+                </IconButton>
+                 <IconButton>
+                    <SvgViewEditorTop />
+                </IconButton> */}
+
                 <Typography
                     sx={{ ml: 2 }}
                 > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)} </Typography>

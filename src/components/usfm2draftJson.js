@@ -28,12 +28,16 @@ function processCvItems(items, os, chapterNo) {
         if (item.subType === "start" && item.payload.startsWith("verses")) {
             ret.push(
                 {
+                    chapter: chapterNo,
                     verses: item.payload.split("/")[1],
                     content: [""]
                 }
             );
         } else if (item.type === "token") {
-            ret[ret.length - 1].content[0] += item.payload;
+            ret[ret.length - 1].content[0] += item.payload.replace(/\s+/g," ");
+            // if (ret[ret.length - 1].content[0] === '___') {
+            //     ret[ret.length - 1].content[0] = ""
+            // }
         }
     }
     return ret;
