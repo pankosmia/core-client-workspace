@@ -74,7 +74,7 @@ const Workspace = () => {
 
     const [obs, setObs] = useState([1, 0]);
 
-    const DistractionToggle = ({ distractionModeCount, setDistractionModeCount, resource }) => {
+    const DistractionToggle = ({ distractionModeCount, setDistractionModeCount}) => {
         const { i18nRef } = useContext(i18nContext);
         return (
             <Stack sx={{ marginLeft: "1rem" }}  >

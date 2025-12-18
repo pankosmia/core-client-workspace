@@ -5,9 +5,17 @@ import {
     Box,
     Typography,
     Fab,
+    IconButton
 } from "@mui/material";
+
 import { DataGrid } from '@mui/x-data-grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SvgViewEditorBottom from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_bottom";
+import SvgViewEditorLeftColumn from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_column";
+import SvgViewEditorRightColumn from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_column";
+import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_row";
+import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_row";
+import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_top";
 
 function ConfigureWorkspace() {
 
@@ -38,17 +46,17 @@ function ConfigureWorkspace() {
     );
 
     useEffect(() => {
-      fetch('/app-resources/lookups/iso639-1-to-3.json') // ISO_639-1 codes mapped to ISO_639-3 codes
-        .then(r => r.json())
-        .then(data => setIsoOneToThreeLookup(data));
+        fetch('/app-resources/lookups/iso639-1-to-3.json') // ISO_639-1 codes mapped to ISO_639-3 codes
+            .then(r => r.json())
+            .then(data => setIsoOneToThreeLookup(data));
     }, []);
 
     useEffect(() => {
         fetch('/app-resources/lookups/iso639-3.json') // ISO_639-3 2025-02-21 from https://hisregistries.org/rol/ plus zht, zhs, nep
 
-          .then(r => r.json())
-          .then(data => setIsoThreeLookup(data));
-      }, []);
+            .then(r => r.json())
+            .then(data => setIsoThreeLookup(data));
+    }, []);
 
     const projectFlavors = {
         "textTranslation": "myBcvList",
@@ -68,7 +76,7 @@ function ConfigureWorkspace() {
         "x-obsarticles": "myObsList",
         "x-obsquestions": "myObsList",
         "x-obsnotes": "myObsList",
-        "x-translationplan":"myBcvList"
+        "x-translationplan": "myBcvList"
     };
 
     const flavorTypes = {
@@ -124,8 +132,8 @@ function ConfigureWorkspace() {
                 name: `${rep.name} (${rep.abbreviation})`,
                 description: rep.description !== rep.name ? rep.description : "",
                 type: rep.flavor,
-                language: isoThreeLookup?.[ isoOneToThreeLookup[rep.language_code] ?? rep.language_code ]?.en ??
-                          rep.language_code
+                language: isoThreeLookup?.[isoOneToThreeLookup[rep.language_code] ?? rep.language_code]?.en ??
+                    rep.language_code
             }
         });
 
@@ -141,6 +149,25 @@ function ConfigureWorkspace() {
             </Box>
             <Box
                 style={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'auto', width: '100%' }}>
+                {/* <IconButton>
+                    <SvgViewEditorBottom />
+                </IconButton>
+                <IconButton>
+                    <SvgViewEditorLeftColumn />
+                </IconButton>
+                 <IconButton>
+                    <SvgViewEditorRightColumn />
+                </IconButton>
+                 <IconButton>
+                    <SvgViewEditorLeftRow />
+                </IconButton>
+                 <IconButton>
+                    <SvgViewEditorRightRow />
+                </IconButton>
+                 <IconButton>
+                    <SvgViewEditorTop />
+                </IconButton> */}
+
                 <Typography
                     sx={{ ml: 2 }}
                 > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)} </Typography>

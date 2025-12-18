@@ -30,6 +30,7 @@ function DraftingEditor({
   const [chapterJson, setChapterJson] = useState(null);
   const [chapterNumbers, setChapterNumbers] = useState([]);
   const [currentBookCode, setCurrentBookCode] = useState("zzz");
+  const [currentChapter, setCurrentChapter] = useState("zzz");
   const [md5sumScriptureJson, setMd5sumScriptureJson] = useState([]);
 
   const handlePreviewText = () => {
@@ -98,22 +99,25 @@ function DraftingEditor({
 
   // Get whole book content
   useEffect(() => {
-    const doScriptureJson = async () => {
-      let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
-        debugRef.current
-      );
-      if (usfmResponse.ok) {
-        const usfmDraftJson = usfm2draftJson(usfmResponse.text);
-        setScriptureJson(
-          usfmDraftJson
-        )
-        const hash = md5sum(JSON.stringify(usfmDraftJson));
-        setMd5sumScriptureJson(hash);
+    if (systemBcv.chapterNum !== currentChapter && systemBcv.bookCode !== currentBookCode) {
+      const doScriptureJson = async () => {
+        let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
+          debugRef.current
+        );
+        if (usfmResponse.ok) {
+          const usfmDraftJson = usfm2draftJson(usfmResponse.text);
+          setScriptureJson(
+            usfmDraftJson
+          )
+          console.log("scriptureJson", usfmDraftJson)
+          const hash = md5sum(JSON.stringify(usfmDraftJson));
+          setMd5sumScriptureJson(hash);
+        }
       }
-
+      doScriptureJson().then();
     }
-    doScriptureJson().then();
-  }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum]);
+
+  }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum,currentBookCode,currentChapter]);
 
   // Make chapter content from whole book content
   useEffect(
