@@ -1,6 +1,6 @@
 import { Proskomma } from 'proskomma-core';
 
-function processGraftItems(items, os) {
+function processGraftItems(items) {
     let ret = [""];
     for (const item of items) {
         if (item.type === "token") {
@@ -10,13 +10,14 @@ function processGraftItems(items, os) {
     return ret;
 }
 
-function processCvItems(items, os) {
+function processCvItems(items, os, chapterNo) {
     let ret = [];
     // start empty verse if open
     const openVerse = os.filter(s => s.payload.startsWith("verses"))[0];
     if (openVerse) {
         ret.push(
             {
+                chapter: chapterNo,
                 verses: openVerse.payload.split("/")[1],
                 content: [""]
             }
@@ -70,9 +71,9 @@ function processBlocks(blocks, sequenceType, sequences) {
             blockOb.tag = block.bs.payload.split("/")[1]
         }
         if (sequenceType === "main") {
-            blockOb.units = processCvItems(block.items, block.os)
+            blockOb.units = processCvItems(block.items, block.os, chapterNo)
         } else {
-            blockOb.content = processGraftItems(block.items, block.os)
+            blockOb.content = processGraftItems(block.items)
         }
         ret.push(blockOb);
 
