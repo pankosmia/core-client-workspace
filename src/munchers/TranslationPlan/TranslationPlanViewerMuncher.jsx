@@ -1,8 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, Dialog, FormControl, IconButton, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Box, Dialog, DialogContent, DialogContentText, FormControl, IconButton, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n } from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
 import { Proskomma } from "proskomma-core";
+import { PanDialog } from 'pankosmia-rcl';
 
 function TranslationPlanViewerMuncher({ metadata }) {
     const [planIngredient, setPlanIngredient] = useState();
@@ -165,7 +166,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const section = planIngredient.sections
         .filter(section => isInInterval(section, systemBcv))
         .find(section => section.bookCode === systemBcv.bookCode)
-
+    console.log('plansection', planIngredient);
     return (
         <Box
             sx={{
@@ -210,7 +211,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
                                         section.fieldInitialValues[field.name] ??
                                         planIngredient.fieldInitialValues[field.name] ??
                                         "";
-                                        
+
                                     // affichage du texte
                                     if (Object.keys(verseText).length > 0 && field.type === "scripture") {
                                         let chapterN = "0"
@@ -279,25 +280,26 @@ function TranslationPlanViewerMuncher({ metadata }) {
             </Box>
 
             {/* Dialog d'information */}
-            <Dialog
-                open={openDialogAbout}
-                onClose={handleCloseDialogAbout}
+            <PanDialog
+                titleLabel="About"
+                isOpen={openDialogAbout}
+                closeFn={() => handleCloseDialogAbout()}
             >
-                <Box sx={{
-                    margin: 1,
-                    padding: 1
-                }}>
-                    <Typography>About </Typography>
+                <DialogContent>
                     {Object.entries(planIngredient).map(([key, value]) => {
                         if (key === "sectionStructure" || key === "sections" || key === "fieldInitialValues") return null;
                         return (
-                            <Box key={key} mb={2}>
-                                <Typography fullWidth size="small" value={value || ''}> {value}</Typography>
-                            </Box>
+                            <DialogContentText key={key} mb={2}>
+                                {key === "short_name" || key === "versification" ? null : (
+                                    <Typography fullWidth size="small">
+                                        {value}
+                                    </Typography>
+                                )}
+                            </DialogContentText>
                         );
                     })}
-                </Box>
-            </Dialog>
+                </DialogContent>
+            </PanDialog>
         </Box>
     );
 }
