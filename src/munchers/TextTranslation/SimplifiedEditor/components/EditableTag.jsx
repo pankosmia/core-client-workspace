@@ -113,6 +113,9 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
                 return doMenu(menuStructures.main)
 
             case "heading":
+                if (b.tag.startsWith("is")) {
+                    return doMenu(menuStructures.introduction_heading)
+                }
                 return doMenu(menuStructures.heading)
 
             case "title":
