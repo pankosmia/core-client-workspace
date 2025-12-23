@@ -7,7 +7,7 @@ import ConfigureWorkspace from "./pages/ConfigureWorkspace/ConfigureWorkspace";
 import Workspace from "./pages/Workspace/Workspace";
 
 function App() {
-const [layout, setLayout] = useState("top");
+const [layout, setLayout] = useState("bottom");
 
 const router = createHashRouter([
     {
