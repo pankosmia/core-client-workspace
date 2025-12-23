@@ -287,14 +287,13 @@ function TranslationPlanViewerMuncher({ metadata }) {
             >
                 <DialogContent>
                     {Object.entries(planIngredient).map(([key, value]) => {
-                        if (key === "sectionStructure" || key === "sections" || key === "fieldInitialValues") return null;
+                        const hiddenKeys = ["sectionStructure", "sections", "fieldInitialValues", "short_name", "versification"]
+                        if (hiddenKeys.includes(key)) return null;
                         return (
                             <DialogContentText key={key} mb={2}>
-                                {key === "short_name" || key === "versification" ? null : (
-                                    <Typography fullWidth size="small">
-                                        {value}
-                                    </Typography>
-                                )}
+                                <Typography fullWidth size="small">
+                                    {value}
+                                </Typography>
                             </DialogContentText>
                         );
                     })}
