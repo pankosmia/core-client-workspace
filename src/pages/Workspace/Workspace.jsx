@@ -14,7 +14,7 @@ import {
 import { i18nContext, doI18n, Header } from "pithekos-lib";
 import { typographyContext } from "pithekos-lib";
 import OBSContext from '../../contexts/obsContext';
-import layouts from './layouts';
+import layoutJson from './layouts';
 
 const Workspace = ({layout, setLayout}) => {
     const { i18nRef } = useContext(i18nContext);
@@ -27,7 +27,7 @@ const Workspace = ({layout, setLayout}) => {
         });
     const [distractionModeCount, setDistractionModeCount] = useState(0);
                     
-    const [rootPane, tileElements] = layouts[layout](resources, i18nRef, distractionModeCount);
+    const [rootPane, tileElements] = layoutJson(resources, layout, i18nRef, distractionModeCount);
     const paneList = createTilePanes(tileElements)[0];
 
     const isGraphite = GraphiteTest()
