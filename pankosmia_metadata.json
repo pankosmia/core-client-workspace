@@ -671,6 +671,16 @@
     },
     "intro_outline_tags": {
       "en": "Intro outline tags"
+    },
+    "print": {
+      "en": "Print",
+      "fr": "Imprimer",
+      "id": "Cetak"
+    },
+    "pdf_preview": {
+      "en": "PDF Preview",
+      "fr": "Prévisualisation PDF",
+      "id": "Pratinjau PDF"
     }
   }
 }

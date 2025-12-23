@@ -162,7 +162,7 @@ function DraftingEditor({
             }}>
               <VisibilityIcon />
             </IconButton>
-            <PreviewText metadata={metadata} systemBcv={systemBcv} open={openModalPreviewText === true} closeModal={() => setOpenModalPreviewText(false)} />
+            <PreviewText metadata={metadata} systemBcv={systemBcv} open={openModalPreviewText === true} setOpenModalPreviewText={setOpenModalPreviewText} />
           </Grid2>
 
           <Grid2 display="flex" gap={1}>
