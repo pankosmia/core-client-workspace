@@ -5,7 +5,8 @@ import {
     Box,
     Typography,
     Fab,
-    IconButton
+    ToggleButtonGroup,
+    ToggleButton
 } from "@mui/material";
 
 import { DataGrid } from '@mui/x-data-grid';
@@ -16,8 +17,9 @@ import SvgViewEditorRightColumn from "../../munchers/TextTranslation/SimplifiedE
 import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_row";
 import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_row";
 import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_top";
+import { Height } from "@mui/icons-material";
 
-function ConfigureWorkspace({layout, setLayout}) {
+function ConfigureWorkspace({ layout, setLayout }) {
 
     const { debugRef } = useContext(debugContext);
     const { i18nRef } = useContext(i18nContext);
@@ -30,6 +32,7 @@ function ConfigureWorkspace({layout, setLayout}) {
 
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
+    const [alignment, setAlignment] = useState('top');
 
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
@@ -37,6 +40,9 @@ function ConfigureWorkspace({layout, setLayout}) {
             setProjectSummaries(summariesResponse.json);
         }
     }
+    const handleAlignment = (event, newAlignment) => {
+        setAlignment(newAlignment);
+    };
 
     useEffect(
         () => {
@@ -148,25 +154,39 @@ function ConfigureWorkspace({layout, setLayout}) {
                 />
             </Box>
             <Box
-                style={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'auto', width: '100%' }}>
-                 <IconButton onClick={()=>setLayout("top")}>
-                    <SvgViewEditorTop/>
-                </IconButton>
-                <IconButton onClick={()=>setLayout("bottom")}>
-                    <SvgViewEditorBottom />
-                </IconButton>
-                <IconButton onClick={()=>setLayout("leftV")}>
-                    <SvgViewEditorLeftColumn />
-                </IconButton>
-                 <IconButton onClick={()=>setLayout("rightV")}>
-                    <SvgViewEditorRightColumn/>
-                </IconButton>
-                 <IconButton onClick={()=>setLayout("leftH")}>
-                    <SvgViewEditorLeftRow/>
-                </IconButton>
-                 <IconButton onClick={()=>setLayout("rightH")}>
-                    <SvgViewEditorRightRow/>
-                </IconButton>
+                style={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'auto', width: '100%' 
+                    
+                }}>
+                <ToggleButtonGroup
+                    value={alignment}
+                    exclusive
+                    onChange={handleAlignment}
+                >
+                    <ToggleButton value="top" onClick={() => setLayout("top")}>
+                        <SvgViewEditorTop />
+                    </ToggleButton>
+
+                    <ToggleButton value="bottom" onClick={() => setLayout("bottom")}>
+                        <SvgViewEditorBottom />
+                    </ToggleButton>
+
+                    <ToggleButton value="leftV" onClick={() => setLayout("leftV")}>
+                        <SvgViewEditorLeftColumn />
+                    </ToggleButton>
+
+                    <ToggleButton value="rightV" onClick={() => setLayout("rightV")}>
+                        <SvgViewEditorRightColumn />
+                    </ToggleButton>
+
+                    <ToggleButton value="leftH" onClick={() => setLayout("leftH")}>
+                        <SvgViewEditorLeftRow />
+                    </ToggleButton>
+
+                    <ToggleButton value="rightH" onClick={() => setLayout("rightH")}>
+                        <SvgViewEditorRightRow />
+                    </ToggleButton>
+                </ToggleButtonGroup>
+
                 <Typography
                     sx={{ ml: 2 }}
                 > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)} </Typography>
