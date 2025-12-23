@@ -17,7 +17,7 @@ import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEdito
 import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_row";
 import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_top";
 
-function ConfigureWorkspace() {
+function ConfigureWorkspace({layout, setLayout}) {
 
     const { debugRef } = useContext(debugContext);
     const { i18nRef } = useContext(i18nContext);

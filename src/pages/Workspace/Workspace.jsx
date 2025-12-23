@@ -22,7 +22,7 @@ const paneStyle = {
 }
 
 
-const Workspace = () => {
+const Workspace = ({layout, setLayout}) => {
     const { i18nRef } = useContext(i18nContext);
     const { typographyRef } = useContext(typographyContext);
     const locationState = Object.entries(useLocation().state);
@@ -34,7 +34,8 @@ const Workspace = () => {
         });
     const [distractionModeCount, setDistractionModeCount] = useState(0);
     const tileElements = {};
-    const rootPane = {
+    const top_layout = resources => {
+    const rp = {
         children: [
             null,
             {
@@ -55,17 +56,20 @@ const Workspace = () => {
             distractionModeCount={distractionModeCount}
         />;
         if (resource.primary) {
-            rootPane.children[0] = { children: title };
+            rp.children[0] = { children: title };
         } else {
-            rootPane.children[1].children.push({ children: title });
+            rp.children[1].children.push({ children: title });
         }
     }
-    if (rootPane.children[1].children.length === 0) {
-        rootPane.children.pop();
+    if (rp.children[1].children.length === 0) {
+        rp.children.pop();
     }
     // else if (flipTiles % 2 === 1) {
     //     rootPane.children = [rootPane.children[1], rootPane.children[0]]
     // }
+    return rp;
+    }
+    const rootPane = top_layout(resources);
     const paneList = createTilePanes(tileElements)[0];
 
     const isGraphite = GraphiteTest()
