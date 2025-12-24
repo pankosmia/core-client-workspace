@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, Dialog, FormControl, IconButton, MenuItem, Select, TextField, Typography } from "@mui/material";
-import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n } from "pithekos-lib";
+import { Box, Button, Dialog, Fade, FormControl, IconButton, Menu, MenuItem, TextField, Typography } from "@mui/material";
+import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, postEmptyJson } from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
 import { Proskomma } from "proskomma-core";
 
 function TranslationPlanViewerMuncher({ metadata }) {
     const [planIngredient, setPlanIngredient] = useState();
+    console.log("planIngredient", planIngredient);
     const { i18nRef } = useContext(i18nContext);
     const { systemBcv } = useContext(BcvContext);
     const [openDialogAbout, setOpenDialogAbout] = useState(false);
@@ -13,7 +14,18 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const [verseText, setVerseText] = useState({});
     const [burritos, setBurritos] = useState([]);
     const [selectedBurrito, setSelectedBurrito] = useState(null);
+    const [selectedStory, setSelectedStory] = useState();
 
+    console.log("systembcv", systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum)
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
     const handleOpenDialogAbout = () => {
         setOpenDialogAbout(true);
     }
@@ -121,6 +133,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
         if (response.ok) {
             const data = await response.json();
             setPlanIngredient(data);
+
         } else {
             setPlanIngredient([]);
         }
@@ -161,11 +174,19 @@ function TranslationPlanViewerMuncher({ metadata }) {
         );
     };
 
+    const section = planIngredient.sections.find(
+        section =>
+            section.bookCode === systemBcv.bookCode &&
+            isInInterval(section, systemBcv)
+    );
 
-    const section = planIngredient.sections
-        .filter(section => isInInterval(section, systemBcv))
-        .find(section => section.bookCode === systemBcv.bookCode)
 
+    const updateBcv = (b, c, v) => {
+        postEmptyJson(
+            `/navigation/bcv/${b}/${c}/${v}`,
+            debugRef.current
+        );
+    }
     return (
         <Box
             sx={{
@@ -175,10 +196,52 @@ function TranslationPlanViewerMuncher({ metadata }) {
         >
             <Box
                 sx={{ marginLeft: "auto" }}>
-                <IconButton onClick={() => handleOpenDialogAbout()}>
-                    <InfoIcon />
-                </IconButton>
+                <Button
+                    id="fade-button"
+                    aria-controls={open ? 'fade-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? 'true' : undefined}
+                    onClick={handleClick}
+                >
+                    Jump to story
+                </Button>
+                <Menu
+                    id="fade-menu"
+                    slotProps={{
+                        list: {
+                            'aria-labelledby': 'fade-button',
+                        },
+                    }}
+                    slots={{ transition: Fade }}
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                >
+                    {
+                        planIngredient.sections
+                            .map((c, i) =>
+
+                                <MenuItem
+                                    onClick={() => {
+                                        setSelectedStory(c.fieldInitialValues.sectionNumber);
+                                        handleClose();
+                                        updateBcv(c.bookCode, c.cv[0].split(":")[0], c.cv[0].split(":")[1])
+                                    }
+                                    }
+                                    value={c.fieldInitialValues.sectionNumber}
+                                    selected={selectedStory === c.fieldInitialValues.sectionNumber}
+                                    key={i}
+                                >
+                                    {c.fieldInitialValues.sectionNumber}
+                                </MenuItem>
+
+                            ).flat()
+                    }
+                </Menu>
             </Box>
+            <IconButton onClick={() => handleOpenDialogAbout()}>
+                <InfoIcon />
+            </IconButton>
             <Box>
                 {/* choose your resources */}
                 <FormControl fullWidth
@@ -210,7 +273,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
                                         section.fieldInitialValues[field.name] ??
                                         planIngredient.fieldInitialValues[field.name] ??
                                         "";
-                                        
+
                                     // affichage du texte
                                     if (Object.keys(verseText).length > 0 && field.type === "scripture") {
                                         let chapterN = "0"
