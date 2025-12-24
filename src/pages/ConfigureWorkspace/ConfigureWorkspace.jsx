@@ -31,7 +31,6 @@ function ConfigureWorkspace({ layout, setLayout }) {
     const { currentProjectRef } = useContext(currentProjectContext);
 
     const [selectedResources, setSelectedResources] = useState([]);
-    console.log('selectedRessources', selectedResources)
     const navigate = useNavigate();
 
     const [projectSummaries, setProjectSummaries] = useState({});

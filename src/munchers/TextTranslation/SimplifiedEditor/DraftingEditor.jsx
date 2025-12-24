@@ -26,6 +26,7 @@ function DraftingEditor({
 }) {
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
+  const navigate = useNavigate();
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
   const [scriptureJson, setScriptureJson] = useState({ headers: {}, blocks: [] });
   const [chapterJson, setChapterJson] = useState(null);
@@ -37,13 +38,6 @@ function DraftingEditor({
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
   }
-const navigate = useNavigate();
-
-const handleBack = () => {
-  if (window.history.length > 1) {
-    navigate(-1);
-  }
-};
   // Set up 'are you sure you want to leave page' for Electron
   useEffect(() => {
     const isElectron = !!window.electronAPI;
@@ -191,7 +185,7 @@ const handleBack = () => {
           <Grid2 display="flex" gap={1}>
             <Button
               disabled={md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson}
-              onClick={()=>handleBack()}
+              onClick={()=>navigate(-1)}
             >
               Retour
             </Button>
