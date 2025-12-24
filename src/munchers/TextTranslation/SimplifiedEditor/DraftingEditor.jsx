@@ -5,7 +5,7 @@ import {
   getText,
   postEmptyJson,
 } from "pithekos-lib";
-import { Box, Grid2, IconButton, Typography } from "@mui/material";
+import { Box, Button, Grid2, IconButton, Typography } from "@mui/material";
 import NavBar from "./components/NavBar";
 import SaveButton from "./components/SaveButton";
 import ChangeEditor from "../ChangeEditor";
@@ -15,6 +15,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import usfm2draftJson from '../../../components/usfm2draftJson';
 import EditableBible from "./components/EditableBible";
 import md5sum from "md5";
+import { useNavigate } from "react-router-dom";
 
 function DraftingEditor({
   metadata,
@@ -36,7 +37,13 @@ function DraftingEditor({
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
   }
+const navigate = useNavigate();
 
+const handleBack = () => {
+  if (window.history.length > 1) {
+    navigate(-1);
+  }
+};
   // Set up 'are you sure you want to leave page' for Electron
   useEffect(() => {
     const isElectron = !!window.electronAPI;
@@ -117,7 +124,7 @@ function DraftingEditor({
       doScriptureJson().then();
     }
 
-  }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum,currentBookCode,currentChapter]);
+  }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum, currentBookCode, currentChapter]);
 
   // Make chapter content from whole book content
   useEffect(
@@ -173,13 +180,21 @@ function DraftingEditor({
               systemBcv={systemBcv}
             />
           </Grid2>
-          <Grid2 display="flex" gap={1}>
+          {/* <Grid2 display="flex" gap={1}>
             <ChangeEditor
               editor={editorMode}
               setEditor={setEditor}
               modified={modified}
               setModified={setModified}
             />
+          </Grid2> */}
+          <Grid2 display="flex" gap={1}>
+            <Button
+              disabled={md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson}
+              onClick={()=>handleBack()}
+            >
+              Retour
+            </Button>
           </Grid2>
         </Grid2>
       </Box>

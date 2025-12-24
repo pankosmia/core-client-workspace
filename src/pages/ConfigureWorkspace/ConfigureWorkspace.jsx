@@ -17,7 +17,12 @@ import SvgViewEditorRightColumn from "../../munchers/TextTranslation/SimplifiedE
 import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_row";
 import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_row";
 import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_top";
-import { Height } from "@mui/icons-material";
+import SvgViewEditorTopDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_top_disabled";
+import SvgViewEditorBottomDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_bottom_disabled";
+import SvgViewEditorLeftColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_column_disabled";
+import SvgViewEditorLeftRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_row_disabled";
+import SvgViewEditorRightRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_row_disabled";
+import SvgViewEditorRightColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_column_disabled";
 
 function ConfigureWorkspace({ layout, setLayout }) {
 
@@ -26,13 +31,14 @@ function ConfigureWorkspace({ layout, setLayout }) {
     const { currentProjectRef } = useContext(currentProjectContext);
 
     const [selectedResources, setSelectedResources] = useState([]);
+    console.log('selectedRessources', selectedResources)
     const navigate = useNavigate();
 
     const [projectSummaries, setProjectSummaries] = useState({});
 
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
-    const [alignment, setAlignment] = useState('top');
+    const [alignment, setAlignment] = useState();
 
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
@@ -154,42 +160,76 @@ function ConfigureWorkspace({ layout, setLayout }) {
                 />
             </Box>
             <Box
-                style={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'auto', width: '100%' 
-                    
+                style={{
+                    mb: 2, position: 'fixed', top: '50px', bottom: 0, right: 0, overflow: 'auto', width: '100%'
+
                 }}>
+                <Typography
+                    sx={{ ml: 2 }}
+                > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)}
+                </Typography>
                 <ToggleButtonGroup
                     value={alignment}
                     exclusive
                     onChange={handleAlignment}
                 >
-                    <ToggleButton value="top" onClick={() => setLayout("top")}>
-                        <SvgViewEditorTop />
+                    <ToggleButton value="top" onClick={() => setLayout("top")} disabled={selectedResources.length === 0}
+                    >
+                        {selectedResources.length === 0 ?
+                            (
+                                <SvgViewEditorTopDisabled />
+                            ) :
+                            <SvgViewEditorTop />
+                        }
                     </ToggleButton>
 
-                    <ToggleButton value="bottom" onClick={() => setLayout("bottom")}>
-                        <SvgViewEditorBottom />
+                    <ToggleButton value="bottom" onClick={() => setLayout("bottom")} disabled={selectedResources.length === 0}>
+                        {selectedResources.length === 0 ?
+                            (
+                                <SvgViewEditorBottomDisabled />
+                            ) :
+                            <SvgViewEditorBottom />
+                        }
                     </ToggleButton>
 
-                    <ToggleButton value="leftV" onClick={() => setLayout("leftV")}>
-                        <SvgViewEditorLeftColumn />
+                    <ToggleButton value="leftV" onClick={() => setLayout("leftV")} disabled={selectedResources.length === 0}>
+                        {selectedResources.length === 0 ?
+                            (
+                                <SvgViewEditorLeftColumnDisabled />
+                            ) :
+                            <SvgViewEditorLeftColumn />
+                        }
                     </ToggleButton>
 
-                    <ToggleButton value="rightV" onClick={() => setLayout("rightV")}>
-                        <SvgViewEditorRightColumn />
+                    <ToggleButton value="rightV" onClick={() => setLayout("rightV")} disabled={selectedResources.length === 0}>
+                         {selectedResources.length === 0 ?
+                            (
+                                <SvgViewEditorRightColumnDisabled/>
+                            ) :
+                            <SvgViewEditorRightColumn />
+                        }
                     </ToggleButton>
 
-                    <ToggleButton value="leftH" onClick={() => setLayout("leftH")}>
-                        <SvgViewEditorLeftRow />
+                    <ToggleButton value="leftH" onClick={() => setLayout("leftH")} disabled={selectedResources.length === 0}>
+
+                        {selectedResources.length === 0 ?
+                            (
+                                <SvgViewEditorLeftRowDisabled/>
+                            ) :
+                            <SvgViewEditorLeftRow />
+                        }
                     </ToggleButton>
 
-                    <ToggleButton value="rightH" onClick={() => setLayout("rightH")}>
-                        <SvgViewEditorRightRow />
+                    <ToggleButton value="rightH" onClick={() => setLayout("rightH")} disabled={selectedResources.length === 0}>
+                        {selectedResources.length === 0 ?
+                            (
+                                <SvgViewEditorRightRowDisabled />
+                            ) :
+                            <SvgViewEditorRightRow />
+                        }
                     </ToggleButton>
+
                 </ToggleButtonGroup>
-
-                <Typography
-                    sx={{ ml: 2 }}
-                > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)} </Typography>
                 <Fab
                     variant="extended"
                     color="primary"
@@ -233,7 +273,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
             </Box>
             <Box style={{
                 position: 'fixed',
-                top: '105px',
+                top: '130px',
                 bottom: 0,
                 overflow: 'auto',
                 marginBottom: "16px",
