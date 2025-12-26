@@ -100,19 +100,24 @@ export default function EditableTag({ scriptureJson, setScriptureJson, position 
         switch (b.type) {
 
             case "introduction":
-                if (b.tag === "is") {
-                    return doMenu(menuStructures.introduction_heading)
-                }
                 if (b.tag.startsWith("imt")) {
                     return doMenu(menuStructures.introduction_title)
                 }
                 return doMenu(menuStructures.introduction)
 
-
             case "main":
+                if (b.tag.startsWith("is")) {
+                    return doMenu(menuStructures.introduction_heading)
+                }
+                if (b.tag.startsWith("im") || b.tag.startsWith("ip")) {
+                    return doMenu(menuStructures.introduction)
+                }
                 return doMenu(menuStructures.main)
 
             case "heading":
+                if (b.tag.startsWith("is")) {
+                    return doMenu(menuStructures.introduction_heading)
+                }
                 return doMenu(menuStructures.heading)
 
             case "title":
