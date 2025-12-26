@@ -17,7 +17,7 @@ import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEdito
 import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_row";
 import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_top";
 
-function ConfigureWorkspace() {
+function ConfigureWorkspace({layout, setLayout}) {
 
     const { debugRef } = useContext(debugContext);
     const { i18nRef } = useContext(i18nContext);
@@ -149,25 +149,24 @@ function ConfigureWorkspace() {
             </Box>
             <Box
                 style={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'auto', width: '100%' }}>
-                {/* <IconButton>
+                 <IconButton onClick={()=>setLayout("top")}>
+                    <SvgViewEditorTop/>
+                </IconButton>
+                <IconButton onClick={()=>setLayout("bottom")}>
                     <SvgViewEditorBottom />
                 </IconButton>
-                <IconButton>
+                <IconButton onClick={()=>setLayout("leftV")}>
                     <SvgViewEditorLeftColumn />
                 </IconButton>
-                 <IconButton>
-                    <SvgViewEditorRightColumn />
+                 <IconButton onClick={()=>setLayout("rightV")}>
+                    <SvgViewEditorRightColumn/>
                 </IconButton>
-                 <IconButton>
-                    <SvgViewEditorLeftRow />
+                 <IconButton onClick={()=>setLayout("leftH")}>
+                    <SvgViewEditorLeftRow/>
                 </IconButton>
-                 <IconButton>
-                    <SvgViewEditorRightRow />
+                 <IconButton onClick={()=>setLayout("rightH")}>
+                    <SvgViewEditorRightRow/>
                 </IconButton>
-                 <IconButton>
-                    <SvgViewEditorTop />
-                </IconButton> */}
-
                 <Typography
                     sx={{ ml: 2 }}
                 > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)} </Typography>

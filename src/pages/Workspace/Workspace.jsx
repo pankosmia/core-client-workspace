@@ -14,58 +14,20 @@ import {
 import { i18nContext, doI18n, Header } from "pithekos-lib";
 import { typographyContext } from "pithekos-lib";
 import OBSContext from '../../contexts/obsContext';
+import layoutJson from './layouts';
 
-const paneStyle = {
-    width: '100%',
-    height: '100%',
-    overflow: 'auto',
-}
-
-
-const Workspace = () => {
+const Workspace = ({layout, setLayout}) => {
     const { i18nRef } = useContext(i18nContext);
     const { typographyRef } = useContext(typographyContext);
     const locationState = Object.entries(useLocation().state);
-    //const [flipTiles, setFlipTiles] = useState(0);
 
     const resources = locationState
         .map(kv => {
             return { ...kv[1], local_path: kv[0] }
         });
     const [distractionModeCount, setDistractionModeCount] = useState(0);
-    const tileElements = {};
-    const rootPane = {
-        children: [
-            null,
-            {
-                children: [],
-                isRow: true
-            }
-        ],
-    }
-    for (const resource of resources) {
-        let location = `${resource.local_path.split('/').slice(0, 2).reverse().join(" - ")}`;
-        if (resource.local_path.split('/')[1].startsWith("_")) {
-            location = doI18n(`pages:core-local-workspace:${resource.local_path.split('/')[1]}`, i18nRef.current);
-        }
-        const title = `${resource.name} (${location})`;
-        tileElements[title] = <WorkspaceCard
-            metadata={resource}
-            style={paneStyle}
-            distractionModeCount={distractionModeCount}
-        />;
-        if (resource.primary) {
-            rootPane.children[0] = { children: title };
-        } else {
-            rootPane.children[1].children.push({ children: title });
-        }
-    }
-    if (rootPane.children[1].children.length === 0) {
-        rootPane.children.pop();
-    }
-    // else if (flipTiles % 2 === 1) {
-    //     rootPane.children = [rootPane.children[1], rootPane.children[0]]
-    // }
+                    
+    const [rootPane, tileElements] = layoutJson(resources, layout, i18nRef, distractionModeCount);
     const paneList = createTilePanes(tileElements)[0];
 
     const isGraphite = GraphiteTest()
@@ -75,7 +37,6 @@ const Workspace = () => {
     const [obs, setObs] = useState([1, 0]);
 
     const DistractionToggle = ({ distractionModeCount, setDistractionModeCount}) => {
-        const { i18nRef } = useContext(i18nContext);
         return (
             <Stack sx={{ marginLeft: "1rem" }}  >
                 <Chip
