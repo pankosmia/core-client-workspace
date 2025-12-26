@@ -7,7 +7,7 @@ import { useTheme } from "@mui/material";
 import GraphiteTest from './components/GraphiteTest';
 import TextDir from '../../helpers/TextDir';
 
-function PreviewText({ open, closeModal, metadata, systemBcv }) {
+function PreviewText({ open,setOpenModalPreviewText, metadata, systemBcv }) {
     const { i18nRef } = useContext(i18nContext);
     const { debugRef } = useContext(debugContext);
     const fileExport = useRef();
@@ -293,7 +293,7 @@ function PreviewText({ open, closeModal, metadata, systemBcv }) {
             return; // window currently inaccessible (e.g., not yet initialized or cross‑origin)
           }
           // Pass values to previewWin
-          previewWin.__printButtonText = doI18n("pages:content:print", i18nRef.current);
+          previewWin.__printButtonText = doI18n("pages:core-local-workspace:print", i18nRef.current);
           previewWin.__printButtonBackgroundColor = theme.palette.primary.main;
           previewWin.__printButtonColor = theme.palette.primary.contrastText;
 
@@ -309,7 +309,7 @@ function PreviewText({ open, closeModal, metadata, systemBcv }) {
           }
 
           // Set the page title.
-          previewWin.document.title = doI18n("pages:content:pdf_preview", i18nRef.current);
+          previewWin.document.title = doI18n("pages:core-local-workspace:pdf_preview", i18nRef.current);
 
           // Wait until document.body is present, retrying until body exists or timeout.
           const waitForBody = (win, timeout = 3000) => {
@@ -348,7 +348,7 @@ function PreviewText({ open, closeModal, metadata, systemBcv }) {
         };
 
         openPagedPreviewForPdf();
-
+        setOpenModalPreviewText(false);
         return true;
     }
 }
