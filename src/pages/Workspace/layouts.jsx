@@ -78,7 +78,7 @@ const layoutJson = (resources, layoutId, i18nRef, distractionModeCount) => {
         }
     }
     if (rp.children[1 - layoutSpec.editorPos].children.length === 0) {
-        layoutSpec.editorPos ? rp.children.shift : rp.children.pop();
+        layoutSpec.editorPos ? rp.children.shift() : rp.children.pop();
     }
     return [rp, te];
 }

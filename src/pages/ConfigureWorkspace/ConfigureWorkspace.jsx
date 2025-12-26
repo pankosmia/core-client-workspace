@@ -6,7 +6,8 @@ import {
     Typography,
     Fab,
     ToggleButtonGroup,
-    ToggleButton
+    ToggleButton,
+    Grid2
 } from "@mui/material";
 
 import { DataGrid } from '@mui/x-data-grid';
@@ -37,7 +38,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
 
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
-    const [alignment, setAlignment] = useState();
+    const [alignment, setAlignment] = useState("rightH");
 
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
@@ -159,117 +160,140 @@ function ConfigureWorkspace({ layout, setLayout }) {
                 />
             </Box>
             <Box
-                style={{
-                    mb: 2, position: 'fixed', top: '50px', bottom: 0, right: 0, overflow: 'auto', width: '100%'
-
+                sx={{
+                    position: "fixed",
+                    top: "40px",
+                    left: 0,
+                    right: 0,
+                    display: "flex",
+                    padding: 2,
                 }}>
-                <Typography
-                    sx={{ ml: 2 }}
-                > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)}
-                </Typography>
-                <ToggleButtonGroup
-                    value={alignment}
-                    exclusive
-                    onChange={handleAlignment}
+                <Grid2
+                    container
+                    alignItems="center"
+                    justifyContent="space-between"
+                    width="100%"
                 >
-                    <ToggleButton value="top" onClick={() => setLayout("top")} disabled={selectedResources.length === 0}
-                    >
-                        {selectedResources.length === 0 ?
-                            (
-                                <SvgViewEditorTopDisabled />
-                            ) :
-                            <SvgViewEditorTop />
-                        }
-                    </ToggleButton>
+                    <Grid2 display="flex" gap={1}>
+                        <Typography
+                        > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)}
+                        </Typography>
 
-                    <ToggleButton value="bottom" onClick={() => setLayout("bottom")} disabled={selectedResources.length === 0}>
-                        {selectedResources.length === 0 ?
-                            (
-                                <SvgViewEditorBottomDisabled />
-                            ) :
-                            <SvgViewEditorBottom />
-                        }
-                    </ToggleButton>
-
-                    <ToggleButton value="leftV" onClick={() => setLayout("leftV")} disabled={selectedResources.length === 0}>
-                        {selectedResources.length === 0 ?
-                            (
-                                <SvgViewEditorLeftColumnDisabled />
-                            ) :
-                            <SvgViewEditorLeftColumn />
-                        }
-                    </ToggleButton>
-
-                    <ToggleButton value="rightV" onClick={() => setLayout("rightV")} disabled={selectedResources.length === 0}>
-                         {selectedResources.length === 0 ?
-                            (
-                                <SvgViewEditorRightColumnDisabled/>
-                            ) :
-                            <SvgViewEditorRightColumn />
-                        }
-                    </ToggleButton>
-
-                    <ToggleButton value="leftH" onClick={() => setLayout("leftH")} disabled={selectedResources.length === 0}>
-
-                        {selectedResources.length === 0 ?
-                            (
-                                <SvgViewEditorLeftRowDisabled/>
-                            ) :
-                            <SvgViewEditorLeftRow />
-                        }
-                    </ToggleButton>
-
-                    <ToggleButton value="rightH" onClick={() => setLayout("rightH")} disabled={selectedResources.length === 0}>
-                        {selectedResources.length === 0 ?
-                            (
-                                <SvgViewEditorRightRowDisabled />
-                            ) :
-                            <SvgViewEditorRightRow />
-                        }
-                    </ToggleButton>
-
-                </ToggleButtonGroup>
-                <Fab
-                    variant="extended"
-                    color="primary"
-                    size="small"
-                    aria-label={doI18n("pages:content:add", i18nRef.current)}
-                    sx={{
-                        margin: 0,
-                        top: 64,
-                        right: 16,
-                        bottom: "auto",
-                        left: "auto",
-                        position: 'fixed'
-                    }}
-                    onClick={
-                        (e) => {
-                            let stateEntries = Object.entries(projectSummaries)
-                                .map(e => {
-                                    return { ...e[1], path: e[0] }
-                                })
-                                .map(r => [r.path, r])
-                                .filter(re => selectedResources.includes(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
-                                .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
-                                    ...re[1],
-                                    primary: true
-                                }] : re)
-                            navigate(
-                                "/workspace",
-                                {
-                                    state: Object.fromEntries(stateEntries)
+                    </Grid2>
+                    <Grid2 display="flex" gap={1}>
+                        <ToggleButtonGroup
+                            value={alignment}
+                            exclusive
+                            onChange={handleAlignment}
+                        >
+                            <ToggleButton value="top" onClick={() => setLayout("top")} disabled={selectedResources.length === 0}
+                            >
+                                {selectedResources.length === 0 ?
+                                    (
+                                        <SvgViewEditorTopDisabled />
+                                    ) :
+                                    <SvgViewEditorTop />
                                 }
-                            );
-                            e.stopPropagation();
-                        }
-                    }
-                >
-                    <Typography variant="body2">
-                        {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
-                    </Typography>
-                    <PlayArrowIcon />
-                </Fab>
+                            </ToggleButton>
+
+                            <ToggleButton value="bottom" onClick={() => setLayout("bottom")} disabled={selectedResources.length === 0}>
+                                {selectedResources.length === 0 ?
+                                    (
+                                        <SvgViewEditorBottomDisabled />
+                                    ) :
+                                    <SvgViewEditorBottom />
+                                }
+                            </ToggleButton>
+
+                            <ToggleButton value="leftV" onClick={() => setLayout("leftV")} disabled={selectedResources.length === 0}>
+                                {selectedResources.length === 0 ?
+                                    (
+                                        <SvgViewEditorLeftColumnDisabled />
+                                    ) :
+                                    <SvgViewEditorLeftColumn />
+                                }
+                            </ToggleButton>
+
+                            <ToggleButton value="rightV" onClick={() => setLayout("rightV")} disabled={selectedResources.length === 0}>
+                                {selectedResources.length === 0 ?
+                                    (
+                                        <SvgViewEditorRightColumnDisabled />
+                                    ) :
+                                    <SvgViewEditorRightColumn />
+                                }
+                            </ToggleButton>
+
+                            <ToggleButton value="leftH" onClick={() => setLayout("leftH")} disabled={selectedResources.length === 0}>
+
+                                {selectedResources.length === 0 ?
+                                    (
+                                        <SvgViewEditorLeftRowDisabled />
+                                    ) :
+                                    <SvgViewEditorLeftRow />
+                                }
+                            </ToggleButton>
+
+                            <ToggleButton value="rightH" onClick={() => setLayout("rightH")} disabled={selectedResources.length === 0}>
+                                {selectedResources.length === 0 ?
+                                    (
+                                        <SvgViewEditorRightRowDisabled />
+                                    ) :
+                                    <SvgViewEditorRightRow />
+                                }
+                            </ToggleButton>
+
+                        </ToggleButtonGroup>
+                    </Grid2>
+                    <Grid2
+                        display="flex"
+                        gap={1}
+                    >
+                        <Fab
+                            variant="extended"
+                            color="primary"
+                            size="small"
+                            aria-label={doI18n("pages:content:add", i18nRef.current)}
+                            // sx={{
+                            //     margin: 0,
+                            //     top: 64,
+                            //     right: 16,
+                            //     bottom: "auto",
+                            //     left: "auto",
+                            //     position: 'fixed'
+                            // }}
+                            onClick={
+                                (e) => {
+                                    let stateEntries = Object.entries(projectSummaries)
+                                        .map(e => {
+                                            return { ...e[1], path: e[0] }
+                                        })
+                                        .map(r => [r.path, r])
+                                        .filter(re => selectedResources.includes(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
+                                        .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
+                                            ...re[1],
+                                            primary: true
+                                        }] : re)
+                                    navigate(
+                                        "/workspace",
+                                        {
+                                            state: Object.fromEntries(stateEntries)
+                                        }
+                                    );
+                                    e.stopPropagation();
+                                }
+                            }
+                        >
+                            <Typography variant="body2">
+                                {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
+                            </Typography>
+                            <PlayArrowIcon />
+                        </Fab>
+                    </Grid2>
+
+                </Grid2>
+
             </Box>
+
             <Box style={{
                 position: 'fixed',
                 top: '130px',
