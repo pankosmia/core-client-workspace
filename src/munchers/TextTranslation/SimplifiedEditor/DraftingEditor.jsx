@@ -110,7 +110,6 @@ function DraftingEditor({
           setScriptureJson(
             usfmDraftJson
           )
-          console.log("scriptureJson", usfmDraftJson)
           const hash = md5sum(JSON.stringify(usfmDraftJson));
           setMd5sumScriptureJson(hash);
         }

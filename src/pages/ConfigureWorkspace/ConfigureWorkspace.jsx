@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n } from "pithekos-lib";
 import {
     Box,
@@ -31,14 +31,15 @@ function ConfigureWorkspace({ layout, setLayout }) {
     const { i18nRef } = useContext(i18nContext);
     const { currentProjectRef } = useContext(currentProjectContext);
 
-    const [selectedResources, setSelectedResources] = useState([]);
     const navigate = useNavigate();
+    const location = useLocation();
 
+    const [selectedResources, setSelectedResources] = useState([]);
+    const localisationState = location.state;
     const [projectSummaries, setProjectSummaries] = useState({});
-
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
-    const [alignment, setAlignment] = useState("rightH");
+    const [alignment, setAlignment] = useState(layout);
 
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
@@ -148,6 +149,13 @@ function ConfigureWorkspace({ layout, setLayout }) {
                     rep.language_code
             }
         });
+
+    useEffect(() => {
+        if (localisationState) {
+            const restoredSelection = localisationState.map(item => item[0]);
+            setSelectedResources(restoredSelection);
+        }
+    }, [localisationState]);
 
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
@@ -276,7 +284,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                     navigate(
                                         "/workspace",
                                         {
-                                            state: Object.fromEntries(stateEntries)
+                                            state: Object.fromEntries(stateEntries),
                                         }
                                     );
                                     e.stopPropagation();
@@ -289,7 +297,6 @@ function ConfigureWorkspace({ layout, setLayout }) {
                             <PlayArrowIcon />
                         </Fab>
                     </Grid2>
-
                 </Grid2>
 
             </Box>
@@ -323,6 +330,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
                         rows={rows}
                         columns={columns}
                         sx={{ fontSize: "1rem" }}
+
                     />
                 </Box>
             </Box>

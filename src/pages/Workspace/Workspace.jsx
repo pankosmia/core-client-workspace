@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Button, Chip, Stack } from "@mui/material";
 import WorkspaceCard from "./WorkspaceCard";
 import GraphiteTest from "./GraphiteTest";
@@ -16,17 +16,19 @@ import { typographyContext } from "pithekos-lib";
 import OBSContext from '../../contexts/obsContext';
 import layoutJson from './layouts';
 
-const Workspace = ({layout, setLayout}) => {
+const Workspace = ({ layout, setLayout }) => {
     const { i18nRef } = useContext(i18nContext);
     const { typographyRef } = useContext(typographyContext);
-    const locationState = Object.entries(useLocation().state);
+    const localisation = useLocation();
+    const locationState = Object.entries(localisation.state ?? {});
+    const navigate = useNavigate();
 
     const resources = locationState
         .map(kv => {
             return { ...kv[1], local_path: kv[0] }
         });
     const [distractionModeCount, setDistractionModeCount] = useState(0);
-                    
+
     const [rootPane, tileElements] = layoutJson(resources, layout, i18nRef, distractionModeCount);
     const paneList = createTilePanes(tileElements)[0];
 
@@ -36,7 +38,7 @@ const Workspace = ({layout, setLayout}) => {
 
     const [obs, setObs] = useState([1, 0]);
 
-    const DistractionToggle = ({ distractionModeCount, setDistractionModeCount}) => {
+    const DistractionToggle = ({ distractionModeCount, setDistractionModeCount }) => {
         return (
             <Stack sx={{ marginLeft: "1rem" }}  >
                 <Chip
@@ -62,14 +64,15 @@ const Workspace = ({layout, setLayout}) => {
                 <DistractionToggle
                     distractionModeCount={distractionModeCount}
                     setDistractionModeCount={setDistractionModeCount} />
-                {/* <Button
-                    onClick={() => setFlipTiles(flipTiles + 1)}
-                    color={(distractionModeCount % 2) === 0 ? "appbar-chip-inactive" : "secondary"}
+                <Button
+                    onClick={() =>
+                        navigate("/", { state: locationState })
+                    }
                     variant="Filled"
                     disabled={resources.length === 1}
                 >
-                    flip
-                </Button> */}
+                   Retour
+                </Button>
             </span>}
         />
         <div className={adjSelectedFontClass} id="fontWrapper"
