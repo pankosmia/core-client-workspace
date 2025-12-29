@@ -1,5 +1,5 @@
 import {useEffect, useState, useContext} from "react";
-import "./TextTranslationEditorMuncher.css";
+import "./TextTranslationViewerMuncher.css";
 import {Proskomma} from 'proskomma-core';
 
 import {getText, debugContext, bcvContext} from "pithekos-lib";
@@ -49,8 +49,8 @@ function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
     return <div className={adjSelectedFontClass}>
         {
             verseText.length > 0 ?
-                verseText.map(b => <p style={{marginBottom: "1em"}}>{b.items.map(i => renderItem(i))}</p>) :
-                <p>No text found</p>
+                verseText.map(b => <p style={{marginBottom: "1em",padding:"1rem"}}>{b.items.map(i => renderItem(i))}</p>) :
+                <p style={{marginBottom: "1em",padding:"1rem"}}>No text found</p>
         }
     </div>
 }
