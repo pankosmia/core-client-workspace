@@ -40,6 +40,17 @@ function processCvItems(items, os, chapterNo) {
             }
         }
     }
+    ret = ret.map((vo => {
+        let content = vo.content[0].trim() 
+        if(content.length === 0){
+            content = "_"
+        }
+        return {
+            ...vo,
+            content: [content]
+        }
+    }
+    ))
     return ret;
 }
 
