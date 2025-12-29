@@ -33,9 +33,8 @@ function ConfigureWorkspace({ layout, setLayout }) {
 
     const navigate = useNavigate();
     const location = useLocation();
-
-    const [selectedResources, setSelectedResources] = useState([]);
     const localisationState = location.state;
+    const [selectedResources, setSelectedResources] = useState(new Set(localisationState ? localisationState.map(item => item[0]) : [] ));
     const [projectSummaries, setProjectSummaries] = useState({});
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
@@ -150,13 +149,13 @@ function ConfigureWorkspace({ layout, setLayout }) {
             }
         });
 
-    useEffect(() => {
-        if (localisationState) {
-            const restoredSelection = localisationState.map(item => item[0]);
-            setSelectedResources(restoredSelection);
-        }
-    }, [localisationState]);
-
+    // useEffect(() => {
+    //     if (localisationState) {
+    //         const restoredSelection = localisationState.map(item => item[0]);
+    //         setSelectedResources(new Set(restoredSelection));
+    //     }
+    // }, [localisationState]);
+    
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
         <Box>
@@ -194,9 +193,9 @@ function ConfigureWorkspace({ layout, setLayout }) {
                             exclusive
                             onChange={handleAlignment}
                         >
-                            <ToggleButton value="top" onClick={() => setLayout("top")} disabled={selectedResources.length === 0}
+                            <ToggleButton value="top" onClick={() => setLayout("top")} disabled={selectedResources.size === 0}
                             >
-                                {selectedResources.length === 0 ?
+                                {selectedResources.size === 0 ?
                                     (
                                         <SvgViewEditorTopDisabled />
                                     ) :
@@ -204,8 +203,8 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                 }
                             </ToggleButton>
 
-                            <ToggleButton value="bottom" onClick={() => setLayout("bottom")} disabled={selectedResources.length === 0}>
-                                {selectedResources.length === 0 ?
+                            <ToggleButton value="bottom" onClick={() => setLayout("bottom")} disabled={selectedResources.size === 0}>
+                                {selectedResources.size === 0 ?
                                     (
                                         <SvgViewEditorBottomDisabled />
                                     ) :
@@ -213,8 +212,8 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                 }
                             </ToggleButton>
 
-                            <ToggleButton value="leftV" onClick={() => setLayout("leftV")} disabled={selectedResources.length === 0}>
-                                {selectedResources.length === 0 ?
+                            <ToggleButton value="leftV" onClick={() => setLayout("leftV")} disabled={selectedResources.size === 0}>
+                                {selectedResources.size === 0 ?
                                     (
                                         <SvgViewEditorLeftColumnDisabled />
                                     ) :
@@ -222,8 +221,8 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                 }
                             </ToggleButton>
 
-                            <ToggleButton value="rightV" onClick={() => setLayout("rightV")} disabled={selectedResources.length === 0}>
-                                {selectedResources.length === 0 ?
+                            <ToggleButton value="rightV" onClick={() => setLayout("rightV")} disabled={selectedResources.size === 0}>
+                                {selectedResources.size === 0 ?
                                     (
                                         <SvgViewEditorRightColumnDisabled />
                                     ) :
@@ -231,9 +230,9 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                 }
                             </ToggleButton>
 
-                            <ToggleButton value="leftH" onClick={() => setLayout("leftH")} disabled={selectedResources.length === 0}>
+                            <ToggleButton value="leftH" onClick={() => setLayout("leftH")} disabled={selectedResources.size === 0}>
 
-                                {selectedResources.length === 0 ?
+                                {selectedResources.size === 0 ?
                                     (
                                         <SvgViewEditorLeftRowDisabled />
                                     ) :
@@ -241,8 +240,8 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                 }
                             </ToggleButton>
 
-                            <ToggleButton value="rightH" onClick={() => setLayout("rightH")} disabled={selectedResources.length === 0}>
-                                {selectedResources.length === 0 ?
+                            <ToggleButton value="rightH" onClick={() => setLayout("rightH")} disabled={selectedResources.size === 0}>
+                                {selectedResources.size === 0 ?
                                     (
                                         <SvgViewEditorRightRowDisabled />
                                     ) :
@@ -259,7 +258,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
                         <Fab
                             variant="extended"
                             color="primary"
-                            size="small"
+                            length="small"
                             aria-label={doI18n("pages:content:add", i18nRef.current)}
                             // sx={{
                             //     margin: 0,
@@ -271,12 +270,13 @@ function ConfigureWorkspace({ layout, setLayout }) {
                             // }}
                             onClick={
                                 (e) => {
+                                    console.log("selected resources onclick",selectedResources)
                                     let stateEntries = Object.entries(projectSummaries)
                                         .map(e => {
                                             return { ...e[1], path: e[0] }
                                         })
                                         .map(r => [r.path, r])
-                                        .filter(re => selectedResources.includes(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
+                                        .filter(re => selectedResources.has(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
                                         .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
                                             ...re[1],
                                             primary: true
@@ -311,6 +311,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
             }}>
                 <Box sx={{ ml: 2 }}>
                     <DataGrid
+                        getRowId={r => r.path}
                         initialState={{
                             columns: {
                                 columnVisibilityModel: {
@@ -322,11 +323,13 @@ function ConfigureWorkspace({ layout, setLayout }) {
                             }
                         }}
                         checkboxSelection
-                        onRowSelectionModelChange={(selected) => {
-                            const selectedRowData = rows.filter((row) => selected.ids.has(row.id));
-                            const selectedPaths = selectedRowData.map((data) => data["path"]);
-                            setSelectedResources(selectedPaths);
-                        }}
+                        rowSelectionModel={{ids : selectedResources, type:"include"}}
+                        onRowSelectionModelChange={nv => setSelectedResources(nv.ids)}
+                        // onRowSelectionModelChange={(selected) => {
+                        //     const selectedRowData = rows.filter((row) => selected.ids.has(row.id));
+                        //     const selectedPaths = selectedRowData.map((data) => data["path"]);
+                        //     setSelectedResources(selectedPaths);
+                        // }}
                         rows={rows}
                         columns={columns}
                         sx={{ fontSize: "1rem" }}

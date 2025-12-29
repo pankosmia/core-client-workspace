@@ -1,7 +1,6 @@
 import { useContext, useState } from 'react';
-import { useLocation, useNavigate } from "react-router-dom";
-import { Box, Button, Chip, Stack } from "@mui/material";
-import WorkspaceCard from "./WorkspaceCard";
+import { useLocation} from "react-router-dom";
+import { Box, Chip, Stack } from "@mui/material";
 import GraphiteTest from "./GraphiteTest";
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
