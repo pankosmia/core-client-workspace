@@ -16,7 +16,6 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const [selectedBurrito, setSelectedBurrito] = useState(null);
     const [selectedStory, setSelectedStory] = useState();
 
-    console.log("systembcv", systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum)
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
@@ -203,7 +202,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
                     aria-expanded={open ? 'true' : undefined}
                     onClick={handleClick}
                 >
-                    Jump to story
+                {doI18n(`pages:core-local-workspace:jump_to_story`, i18nRef.current)}
                 </Button>
                 <Menu
                     id="fade-menu"
@@ -238,10 +237,10 @@ function TranslationPlanViewerMuncher({ metadata }) {
                             ).flat()
                     }
                 </Menu>
+                <IconButton onClick={() => handleOpenDialogAbout()}>
+                    <InfoIcon />
+                </IconButton>
             </Box>
-            <IconButton onClick={() => handleOpenDialogAbout()}>
-                <InfoIcon />
-            </IconButton>
             <Box>
                 {/* choose your resources */}
                 <FormControl fullWidth
