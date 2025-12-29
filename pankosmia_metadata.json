@@ -696,6 +696,15 @@
     },
     "jump_to_story": {
       "en":"Jump to story"
+    "print": {
+      "en": "Print",
+      "fr": "Imprimer",
+      "id": "Cetak"
+    },
+    "pdf_preview": {
+      "en": "PDF Preview",
+      "fr": "Prévisualisation PDF",
+      "id": "Pratinjau PDF"
     }
   }
 }

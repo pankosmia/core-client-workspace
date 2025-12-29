@@ -1,8 +1,14 @@
 import { useContext, useEffect, useState } from "react";
+<<<<<<< HEAD
 import { Box, Button, Dialog, Fade, FormControl, IconButton, Menu, MenuItem, TextField, Typography } from "@mui/material";
 import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, postEmptyJson } from "pithekos-lib";
+=======
+import { Box, Dialog, DialogContent, DialogContentText, FormControl, IconButton, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n } from "pithekos-lib";
+>>>>>>> main
 import InfoIcon from '@mui/icons-material/Info';
 import { Proskomma } from "proskomma-core";
+import { PanDialog } from 'pankosmia-rcl';
 
 function TranslationPlanViewerMuncher({ metadata }) {
     const [planIngredient, setPlanIngredient] = useState();
@@ -179,13 +185,13 @@ function TranslationPlanViewerMuncher({ metadata }) {
             isInInterval(section, systemBcv)
     );
 
-
     const updateBcv = (b, c, v) => {
         postEmptyJson(
             `/navigation/bcv/${b}/${c}/${v}`,
             debugRef.current
         );
     }
+
     return (
         <Box
             sx={{
@@ -341,25 +347,25 @@ function TranslationPlanViewerMuncher({ metadata }) {
             </Box>
 
             {/* Dialog d'information */}
-            <Dialog
-                open={openDialogAbout}
-                onClose={handleCloseDialogAbout}
+            <PanDialog
+                titleLabel="About"
+                isOpen={openDialogAbout}
+                closeFn={() => handleCloseDialogAbout()}
             >
-                <Box sx={{
-                    margin: 1,
-                    padding: 1
-                }}>
-                    <Typography>About </Typography>
+                <DialogContent>
                     {Object.entries(planIngredient).map(([key, value]) => {
-                        if (key === "sectionStructure" || key === "sections" || key === "fieldInitialValues") return null;
+                        const hiddenKeys = ["sectionStructure", "sections", "fieldInitialValues", "short_name", "versification"]
+                        if (hiddenKeys.includes(key)) return null;
                         return (
-                            <Box key={key} mb={2}>
-                                <Typography fullWidth size="small" value={value || ''}> {value}</Typography>
-                            </Box>
+                            <DialogContentText key={key} mb={2}>
+                                <Typography fullWidth size="small">
+                                    {value}
+                                </Typography>
+                            </DialogContentText>
                         );
                     })}
-                </Box>
-            </Dialog>
+                </DialogContent>
+            </PanDialog>
         </Box>
     );
 }
