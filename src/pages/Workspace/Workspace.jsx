@@ -21,7 +21,6 @@ const Workspace = ({ layout, setLayout }) => {
     const { typographyRef } = useContext(typographyContext);
     const localisation = useLocation();
     const locationState = Object.entries(localisation.state ?? {});
-    const navigate = useNavigate();
 
     const resources = locationState
         .map(kv => {
@@ -29,7 +28,7 @@ const Workspace = ({ layout, setLayout }) => {
         });
     const [distractionModeCount, setDistractionModeCount] = useState(0);
 
-    const [rootPane, tileElements] = layoutJson(resources, layout, i18nRef, distractionModeCount);
+    const [rootPane, tileElements] = layoutJson(resources, layout, i18nRef, distractionModeCount,locationState);
     const paneList = createTilePanes(tileElements)[0];
 
     const isGraphite = GraphiteTest()
@@ -64,15 +63,6 @@ const Workspace = ({ layout, setLayout }) => {
                 <DistractionToggle
                     distractionModeCount={distractionModeCount}
                     setDistractionModeCount={setDistractionModeCount} />
-                <Button
-                    onClick={() =>
-                        navigate("/", { state: locationState })
-                    }
-                    variant="Filled"
-                    disabled={resources.length === 1}
-                >
-                   Retour
-                </Button>
             </span>}
         />
         <div className={adjSelectedFontClass} id="fontWrapper"

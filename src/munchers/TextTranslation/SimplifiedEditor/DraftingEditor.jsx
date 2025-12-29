@@ -23,6 +23,7 @@ function DraftingEditor({
   setModified,
   editorMode,
   setEditor,
+  locationState
 }) {
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
@@ -184,7 +185,9 @@ function DraftingEditor({
           <Grid2 display="flex" gap={1}>
             <Button
               disabled={md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson}
-              onClick={()=>navigate(-1)}
+              onClick={() =>
+                navigate("/", { state: locationState })
+              }            
             >
               Retour
             </Button>

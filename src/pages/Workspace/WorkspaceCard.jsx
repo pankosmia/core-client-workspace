@@ -20,7 +20,7 @@ import OBSArticlesViewerMuncher from '../../munchers/OBSArticles/OBSArticlesView
 import JuxtalinearViewerMuncher from "../../munchers/Juxtalinear/JuxtalinearViewer";
 import TranslationPlanViewerMuncher from '../../munchers/TranslationPlan/TranslationPlanViewerMuncher';
 
-function WorkspaceCard({metadata, style, distractionModeCount}) {
+function WorkspaceCard({metadata, style, distractionModeCount,locationState}) {
     const scriptDirectionString =  metadata.script_direction === 'rtl' ? 'rtl' : 'ltr';
     if (!metadata.primary && (distractionModeCount % 2) > 0) {
         return <div style={{...style, backgroundImage:'url("/app-resources/pages/workspace/tile_blur.png")', filter: "blur(1px)"}} dir={scriptDirectionString}>
@@ -30,6 +30,7 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
         return <div style={style} dir={scriptDirectionString}>
           <TextTranslationEditorMuncher
             metadata={metadata}
+            locationState={locationState}
           />
         </div>
     }

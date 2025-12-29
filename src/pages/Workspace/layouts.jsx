@@ -40,7 +40,7 @@ const layoutSpecs = {
     }
 };
 
-const layoutJson = (resources, layoutId, i18nRef, distractionModeCount) => {
+const layoutJson = (resources, layoutId, i18nRef, distractionModeCount, locationState) => {
     const te = {};
     let layoutSpec = layoutSpecs[layoutId];
     if (!layoutSpec) {
@@ -70,6 +70,7 @@ const layoutJson = (resources, layoutId, i18nRef, distractionModeCount) => {
             metadata={resource}
             style={paneStyle}
             distractionModeCount={distractionModeCount}
+            locationState={locationState}
         />;
         if (resource.primary) {
             rp.children[layoutSpec.editorPos] = { children: title };
