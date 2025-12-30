@@ -7,7 +7,9 @@ import {
     Fab,
     ToggleButtonGroup,
     ToggleButton,
-    Grid2
+    Grid2,
+    Dialog,
+    Button
 } from "@mui/material";
 
 import { DataGrid } from '@mui/x-data-grid';
@@ -30,16 +32,17 @@ function ConfigureWorkspace({ layout, setLayout }) {
     const { debugRef } = useContext(debugContext);
     const { i18nRef } = useContext(i18nContext);
     const { currentProjectRef } = useContext(currentProjectContext);
-
+    const [open, setOpen] = useState(true);
     const navigate = useNavigate();
     const location = useLocation();
     const localisationState = location.state;
-    const [selectedResources, setSelectedResources] = useState(new Set(localisationState ? localisationState.map(item => item[0]) : [] ));
+    const [selectedResources, setSelectedResources] = useState(new Set(localisationState ? localisationState.map(item => item[0]) : []));
     const [projectSummaries, setProjectSummaries] = useState({});
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
     const [alignment, setAlignment] = useState(layout);
-
+    const [fullWidth, setFullWidth] = useState(true);
+    const [maxWidth, setMaxWidth] = useState('lg');
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
         if (summariesResponse.ok) {
@@ -130,7 +133,12 @@ function ConfigureWorkspace({ layout, setLayout }) {
             flex: 1
         }
     ]
-
+    const handleClose = async () => {
+        setOpen(false);
+        setTimeout(() => {
+            window.location.href = '/clients/content';
+        }, 500);
+    };
     const rows = Object.entries(projectSummaries)
         .map(e => {
             return { ...e[1], path: e[0] }
@@ -149,167 +157,166 @@ function ConfigureWorkspace({ layout, setLayout }) {
             }
         });
 
-    // useEffect(() => {
-    //     if (localisationState) {
-    //         const restoredSelection = localisationState.map(item => item[0]);
-    //         setSelectedResources(new Set(restoredSelection));
-    //     }
-    // }, [localisationState]);
-    
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
-        <Box>
-            <Box style={{ position: 'fixed', width: '100%' }}>
-                <Header
-                    titleKey="pages:core-local-workspace:Select_Resources"
-                    requireNet={false}
-                    currentId="core-local-workspace"
-                />
-            </Box>
-            <Box
-                sx={{
-                    position: "fixed",
-                    top: "40px",
-                    left: 0,
-                    right: 0,
-                    display: "flex",
-                    padding: 2,
-                }}>
-                <Grid2
-                    container
-                    alignItems="center"
-                    justifyContent="space-between"
-                    width="100%"
-                >
-                    <Grid2 display="flex" gap={1}>
-                        <Typography
-                        > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)}
-                        </Typography>
-
-                    </Grid2>
-                    <Grid2 display="flex" gap={1}>
-                        <ToggleButtonGroup
-                            value={alignment}
-                            exclusive
-                            onChange={handleAlignment}
-                        >
-                            <ToggleButton value="top" onClick={() => setLayout("top")} disabled={selectedResources.size === 0}
-                            >
-                                {selectedResources.size === 0 ?
-                                    (
-                                        <SvgViewEditorTopDisabled />
-                                    ) :
-                                    <SvgViewEditorTop />
-                                }
-                            </ToggleButton>
-
-                            <ToggleButton value="bottom" onClick={() => setLayout("bottom")} disabled={selectedResources.size === 0}>
-                                {selectedResources.size === 0 ?
-                                    (
-                                        <SvgViewEditorBottomDisabled />
-                                    ) :
-                                    <SvgViewEditorBottom />
-                                }
-                            </ToggleButton>
-
-                            <ToggleButton value="leftV" onClick={() => setLayout("leftV")} disabled={selectedResources.size === 0}>
-                                {selectedResources.size === 0 ?
-                                    (
-                                        <SvgViewEditorLeftColumnDisabled />
-                                    ) :
-                                    <SvgViewEditorLeftColumn />
-                                }
-                            </ToggleButton>
-
-                            <ToggleButton value="rightV" onClick={() => setLayout("rightV")} disabled={selectedResources.size === 0}>
-                                {selectedResources.size === 0 ?
-                                    (
-                                        <SvgViewEditorRightColumnDisabled />
-                                    ) :
-                                    <SvgViewEditorRightColumn />
-                                }
-                            </ToggleButton>
-
-                            <ToggleButton value="leftH" onClick={() => setLayout("leftH")} disabled={selectedResources.size === 0}>
-
-                                {selectedResources.size === 0 ?
-                                    (
-                                        <SvgViewEditorLeftRowDisabled />
-                                    ) :
-                                    <SvgViewEditorLeftRow />
-                                }
-                            </ToggleButton>
-
-                            <ToggleButton value="rightH" onClick={() => setLayout("rightH")} disabled={selectedResources.size === 0}>
-                                {selectedResources.size === 0 ?
-                                    (
-                                        <SvgViewEditorRightRowDisabled />
-                                    ) :
-                                    <SvgViewEditorRightRow />
-                                }
-                            </ToggleButton>
-
-                        </ToggleButtonGroup>
-                    </Grid2>
-                    <Grid2
-                        display="flex"
-                        gap={1}
-                    >
-                        <Fab
-                            variant="extended"
-                            color="primary"
-                            length="small"
-                            aria-label={doI18n("pages:content:add", i18nRef.current)}
-                            // sx={{
-                            //     margin: 0,
-                            //     top: 64,
-                            //     right: 16,
-                            //     bottom: "auto",
-                            //     left: "auto",
-                            //     position: 'fixed'
-                            // }}
-                            onClick={
-                                (e) => {
-                                    console.log("selected resources onclick",selectedResources)
-                                    let stateEntries = Object.entries(projectSummaries)
-                                        .map(e => {
-                                            return { ...e[1], path: e[0] }
-                                        })
-                                        .map(r => [r.path, r])
-                                        .filter(re => selectedResources.has(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
-                                        .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
-                                            ...re[1],
-                                            primary: true
-                                        }] : re)
-                                    navigate(
-                                        "/workspace",
-                                        {
-                                            state: Object.fromEntries(stateEntries),
-                                        }
-                                    );
-                                    e.stopPropagation();
-                                }
-                            }
-                        >
-                            <Typography variant="body2">
-                                {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
-                            </Typography>
-                            <PlayArrowIcon />
-                        </Fab>
-                    </Grid2>
-                </Grid2>
-
-            </Box>
-
-            <Box style={{
-                position: 'fixed',
-                top: '130px',
-                bottom: 0,
-                overflow: 'auto',
-                marginBottom: "16px",
-                width: '100%'
+        <Box
+            sx={{
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                zIndex: -1,
+                backgroundImage:
+                    'url("/app-resources/pages/content/background_blur.png")',
+                backgroundRepeat: "no-repeat",
+                backdropFilter: "blur(3px)",
             }}>
-                <Box sx={{ ml: 2 }}>
+            <Dialog
+                fullWidth={fullWidth}
+                maxWidth={maxWidth}
+                open={open}
+                onClose={handleClose}
+            >
+                <Box style={{ position: 'static' }}>
+                    <Header
+                        titleKey="pages:core-local-workspace:Select_Resources"
+                        requireNet={false}
+                        currentId="core-local-workspace"
+                    />
+                </Box>
+                <Box
+                    sx={{
+                        mt:2,
+                        ml:2,
+                        mr:2
+                    }}
+                >
+                    <Grid2
+                        container
+                        alignItems="center"
+                        justifyContent="space-between"
+                        width="100%"
+                    >
+                        <Grid2 display="flex" gap={1}>
+                            <Typography
+                            > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)}
+                            </Typography>
+
+                        </Grid2>
+                        <Grid2 display="flex" gap={1}>
+                            <ToggleButtonGroup
+                                value={alignment}
+                                exclusive
+                                onChange={handleAlignment}
+                            >
+                                <ToggleButton value="top" onClick={() => setLayout("top")} disabled={selectedResources.size === 0}
+                                >
+                                    {selectedResources.size === 0 ?
+                                        (
+                                            <SvgViewEditorTopDisabled />
+                                        ) :
+                                        <SvgViewEditorTop />
+                                    }
+                                </ToggleButton>
+
+                                <ToggleButton value="bottom" onClick={() => setLayout("bottom")} disabled={selectedResources.size === 0}>
+                                    {selectedResources.size === 0 ?
+                                        (
+                                            <SvgViewEditorBottomDisabled />
+                                        ) :
+                                        <SvgViewEditorBottom />
+                                    }
+                                </ToggleButton>
+
+                                <ToggleButton value="leftV" onClick={() => setLayout("leftV")} disabled={selectedResources.size === 0}>
+                                    {selectedResources.size === 0 ?
+                                        (
+                                            <SvgViewEditorLeftColumnDisabled />
+                                        ) :
+                                        <SvgViewEditorLeftColumn />
+                                    }
+                                </ToggleButton>
+
+                                <ToggleButton value="rightV" onClick={() => setLayout("rightV")} disabled={selectedResources.size === 0}>
+                                    {selectedResources.size === 0 ?
+                                        (
+                                            <SvgViewEditorRightColumnDisabled />
+                                        ) :
+                                        <SvgViewEditorRightColumn />
+                                    }
+                                </ToggleButton>
+
+                                <ToggleButton value="leftH" onClick={() => setLayout("leftH")} disabled={selectedResources.size === 0}>
+
+                                    {selectedResources.size === 0 ?
+                                        (
+                                            <SvgViewEditorLeftRowDisabled />
+                                        ) :
+                                        <SvgViewEditorLeftRow />
+                                    }
+                                </ToggleButton>
+
+                                <ToggleButton value="rightH" onClick={() => setLayout("rightH")} disabled={selectedResources.size === 0}>
+                                    {selectedResources.size === 0 ?
+                                        (
+                                            <SvgViewEditorRightRowDisabled />
+                                        ) :
+                                        <SvgViewEditorRightRow />
+                                    }
+                                </ToggleButton>
+
+                            </ToggleButtonGroup>
+                        </Grid2>
+                        <Grid2
+                            display="flex"
+                            gap={1}
+                        >
+                            <Fab
+                                variant="extended"
+                                color="primary"
+                                length="small"
+                                aria-label={doI18n("pages:content:add", i18nRef.current)}
+                                // sx={{
+                                //     margin: 0,
+                                //     top: 64,
+                                //     right: 16,
+                                //     bottom: "auto",
+                                //     left: "auto",
+                                //     position: 'fixed'
+                                // }}
+                                onClick={
+                                    (e) => {
+                                        console.log("selected resources onclick", selectedResources)
+                                        let stateEntries = Object.entries(projectSummaries)
+                                            .map(e => {
+                                                return { ...e[1], path: e[0] }
+                                            })
+                                            .map(r => [r.path, r])
+                                            .filter(re => selectedResources.has(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
+                                            .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
+                                                ...re[1],
+                                                primary: true
+                                            }] : re)
+                                        navigate(
+                                            "/workspace",
+                                            {
+                                                state: Object.fromEntries(stateEntries),
+                                            }
+                                        );
+                                        e.stopPropagation();
+                                    }
+                                }
+                            >
+                                <Typography variant="body2">
+                                    {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
+                                </Typography>
+                                <PlayArrowIcon />
+                            </Fab>
+                        </Grid2>
+                    </Grid2>
+                </Box>
+                <Box sx={{ m: 2 }}>
                     <DataGrid
                         getRowId={r => r.path}
                         initialState={{
@@ -323,7 +330,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
                             }
                         }}
                         checkboxSelection
-                        rowSelectionModel={{ids : selectedResources, type:"include"}}
+                        rowSelectionModel={{ ids: selectedResources, type: "include" }}
                         onRowSelectionModelChange={nv => setSelectedResources(nv.ids)}
                         // onRowSelectionModelChange={(selected) => {
                         //     const selectedRowData = rows.filter((row) => selected.ids.has(row.id));
@@ -336,7 +343,8 @@ function ConfigureWorkspace({ layout, setLayout }) {
 
                     />
                 </Box>
-            </Box>
+
+            </Dialog>
         </Box>
 }
 
