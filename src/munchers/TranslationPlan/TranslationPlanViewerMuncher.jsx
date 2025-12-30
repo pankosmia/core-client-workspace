@@ -16,6 +16,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const [burritos, setBurritos] = useState([]);
     const [selectedBurrito, setSelectedBurrito] = useState(null);
     const [selectedStory, setSelectedStory] = useState();
+    const [search, setSearch] = useState("");
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -203,7 +204,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
                     aria-expanded={open ? 'true' : undefined}
                     onClick={handleClick}
                 >
-                {doI18n(`pages:core-local-workspace:jump_to_story`, i18nRef.current)}
+                    {doI18n(`pages:core-local-workspace:jump_to_story`, i18nRef.current)}
                 </Button>
                 <Menu
                     id="fade-menu"
@@ -217,27 +218,43 @@ function TranslationPlanViewerMuncher({ metadata }) {
                     open={open}
                     onClose={handleClose}
                 >
-                    {
-                        planIngredient.sections
-                            .map((c, i) =>
+                    <MenuItem disableRipple disableTouchRipple>
+                        <TextField
+                            placeholder="Search ..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            size="small"
+                            fullWidth
+                        />
+                    </MenuItem>
+                    {planIngredient.sections
+                        .filter(c => {
+                            const label = `${c.fieldInitialValues.reference} ${c.fieldInitialValues.sectionTitle}`
+                                .toLowerCase();
 
-                                <MenuItem
-                                    onClick={() => {
-                                        setSelectedStory(c.fieldInitialValues.sectionNumber);
-                                        handleClose();
-                                        updateBcv(c.bookCode, c.cv[0].split(":")[0], c.cv[0].split(":")[1])
-                                    }
-                                    }
-                                    value={c.fieldInitialValues.sectionNumber}
-                                    selected={selectedStory === c.fieldInitialValues.sectionNumber}
-                                    key={i}
-                                >
-                                    {c.fieldInitialValues.sectionNumber}
-                                </MenuItem>
-
-                            ).flat()
+                            return label.includes(search.toLowerCase());
+                        })
+                        .map((c, i) => (
+                            <MenuItem
+                                key={i}
+                                onClick={() => {
+                                    setSelectedStory(c.fieldInitialValues.sectionNumber);
+                                    handleClose();
+                                    updateBcv(
+                                        c.bookCode,
+                                        c.cv[0].split(":")[0],
+                                        c.cv[0].split(":")[1]
+                                    );
+                                }}
+                                value={c.fieldInitialValues.sectionNumber}
+                                selected={selectedStory === c.fieldInitialValues.sectionNumber}
+                            >
+                                {c.fieldInitialValues.sectionNumber} - {c.fieldInitialValues.reference} - {c.fieldInitialValues.sectionTitle}
+                            </MenuItem>
+                        ))
                     }
                 </Menu>
+
                 <IconButton onClick={() => handleOpenDialogAbout()}>
                     <InfoIcon />
                 </IconButton>
@@ -274,7 +291,6 @@ function TranslationPlanViewerMuncher({ metadata }) {
                                         planIngredient.fieldInitialValues[field.name] ??
                                         "";
 
-                                    // affichage du texte
                                     if (Object.keys(verseText).length > 0 && field.type === "scripture") {
                                         let chapterN = "0"
                                         return (
@@ -321,7 +337,6 @@ function TranslationPlanViewerMuncher({ metadata }) {
                                     } else {
                                         <Typography> loading ...</Typography>
                                     }
-                                    // reste du texte
                                     return (
                                         <Typography
                                             key={i}
