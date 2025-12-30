@@ -8,6 +8,7 @@ import {
     getJson,
     doI18n,
     postEmptyJson,
+    getText,
     debugContext,
 } from "pithekos-lib";
 
@@ -17,12 +18,13 @@ function BcvPicker() {
     const { i18nRef } = useContext(I18nContext);
     const { currentProjectRef } = useContext(CurrentProjectContext);
     const [contentBooks, setContentBooks] = useState([]);
-
+    const [projectPathCurrent,setProjectPathCurrent] = useState();
     useEffect(
         () => {
             const getProjectBooks = async () => {
                 if (currentProjectRef.current) {
                     const projectPath = `${currentProjectRef.current.source}/${currentProjectRef.current.organization}/${currentProjectRef.current.project}`;
+                    setProjectPathCurrent(projectPath);
                     const fullMetadataResponse = await getJson(`/burrito/metadata/raw/${projectPath}`, debugRef.current);
                     if (fullMetadataResponse.ok) {
                         setContentBooks(
@@ -51,6 +53,37 @@ function BcvPicker() {
         setDialogIsOpen(false);
         setBook('');
     };
+
+
+
+    const doChapterNumbers = async (b) => {
+        if (!b) return;
+        const usfmResponse = await getText(
+            `/burrito/ingredient/raw/${projectPathCurrent}?ipath=${b}.usfm`,
+            debugRef.current
+        );
+        if (!usfmResponse.ok) return;
+        const usfmString = usfmResponse.text;
+        const re = /\\c\s+(\d+)/;
+        const match = usfmString.match(re);
+        if (!match) {
+            console.warn(`Aucun chapitre trouvé pour ${b}`);
+            return;
+        }
+        const chapter = match[1];
+        postEmptyJson(
+            `/navigation/bcv/${b}/${chapter}/1`,
+            debugRef.current
+        );
+    };
+
+  useEffect(() => {
+    if (contentBooks?.length) {
+        doChapterNumbers(contentBooks[0]);
+    }
+}, [contentBooks,debugRef]);
+
+
     const handleChangeBook = (b) => {
         postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current).then();
         handleDialogClose();
@@ -73,7 +106,7 @@ function BcvPicker() {
                             value={b}
                             key={n}
                             onClick={
-                                () => handleChangeBook(b)
+                                () => doChapterNumbers(b) 
                             }
                         >
                             {doI18n(`scripture:books:${b}`, i18nRef.current)}

@@ -33,6 +33,7 @@ function DraftingEditor({
   const [currentChapter, setCurrentChapter] = useState("zzz");
   const [md5sumScriptureJson, setMd5sumScriptureJson] = useState([]);
 
+  console.log("systembcv chapter",systemBcv.chapterNum)
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
   }
@@ -109,7 +110,6 @@ function DraftingEditor({
           setScriptureJson(
             usfmDraftJson
           )
-          console.log("scriptureJson", usfmDraftJson)
           const hash = md5sum(JSON.stringify(usfmDraftJson));
           setMd5sumScriptureJson(hash);
         }
@@ -166,7 +166,7 @@ function DraftingEditor({
           </Grid2>
 
           <Grid2 display="flex" gap={1}>
-            <BcvPicker />
+            <BcvPicker/>
             <NavBar
               chapterNumbers={chapterNumbers}
               metadata={metadata}
