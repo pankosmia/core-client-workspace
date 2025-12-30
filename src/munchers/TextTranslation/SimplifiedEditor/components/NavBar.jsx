@@ -30,9 +30,6 @@ function NavBar({ metadata, chapterNumbers, systemBcv }) {
 
     useEffect(() => {
         if (chapterNumbers.length > 0 && currentBookCode !== bcvRef.current.bookCode) {
-            // postEmptyJson(
-            //     `/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[0]}/1`,
-            //     debugRef.current);
             setCurrentBookCode(bcvRef.current.bookCode);
             setCurrentPosition(0)
 

@@ -32,8 +32,6 @@ function DraftingEditor({
   const [currentBookCode, setCurrentBookCode] = useState("zzz");
   const [currentChapter, setCurrentChapter] = useState("zzz");
   const [md5sumScriptureJson, setMd5sumScriptureJson] = useState([]);
-
-  console.log("systembcv chapter",systemBcv.chapterNum)
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
   }

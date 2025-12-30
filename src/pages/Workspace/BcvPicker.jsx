@@ -18,7 +18,7 @@ function BcvPicker() {
     const { i18nRef } = useContext(I18nContext);
     const { currentProjectRef } = useContext(CurrentProjectContext);
     const [contentBooks, setContentBooks] = useState([]);
-    const [projectPathCurrent,setProjectPathCurrent] = useState();
+    const [projectPathCurrent, setProjectPathCurrent] = useState();
     useEffect(
         () => {
             const getProjectBooks = async () => {
@@ -54,34 +54,28 @@ function BcvPicker() {
         setBook('');
     };
 
-
-
     const doChapterNumbers = async (b) => {
-        if (!b) return;
         const usfmResponse = await getText(
             `/burrito/ingredient/raw/${projectPathCurrent}?ipath=${b}.usfm`,
             debugRef.current
         );
-        if (!usfmResponse.ok) return;
-        const usfmString = usfmResponse.text;
-        const re = /\\c\s+(\d+)/;
-        const match = usfmString.match(re);
-        if (!match) {
-            console.warn(`Aucun chapitre trouvé pour ${b}`);
-            return;
+        if (usfmResponse.ok) {
+            const usfmString = usfmResponse.text;
+            const re = /\\c\s+(\d+)/;
+            const match = usfmString.match(re);
+            const chapter = match[1];
+            postEmptyJson(
+                `/navigation/bcv/${b}/${chapter}/1`,
+                debugRef.current
+            );
         }
-        const chapter = match[1];
-        postEmptyJson(
-            `/navigation/bcv/${b}/${chapter}/1`,
-            debugRef.current
-        );
     };
 
-  useEffect(() => {
-    if (contentBooks?.length) {
-        doChapterNumbers(contentBooks[0]);
-    }
-}, [contentBooks,debugRef]);
+    useEffect(() => {
+        if (contentBooks?.length) {
+            doChapterNumbers(contentBooks[0]);
+        }
+    }, [contentBooks, debugRef]);
 
 
     const handleChangeBook = (b) => {
@@ -106,7 +100,7 @@ function BcvPicker() {
                             value={b}
                             key={n}
                             onClick={
-                                () => doChapterNumbers(b) 
+                                () => doChapterNumbers(b)
                             }
                         >
                             {doI18n(`scripture:books:${b}`, i18nRef.current)}
