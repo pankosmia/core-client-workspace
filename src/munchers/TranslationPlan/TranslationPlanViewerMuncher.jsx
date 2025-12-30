@@ -1,11 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-<<<<<<< HEAD
-import { Box, Button, Dialog, Fade, FormControl, IconButton, Menu, MenuItem, TextField, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogContent, DialogContentText, Fade, FormControl, IconButton, Menu, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, postEmptyJson } from "pithekos-lib";
-=======
-import { Box, Dialog, DialogContent, DialogContentText, FormControl, IconButton, MenuItem, Select, TextField, Typography } from "@mui/material";
-import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n } from "pithekos-lib";
->>>>>>> main
 import InfoIcon from '@mui/icons-material/Info';
 import { Proskomma } from "proskomma-core";
 import { PanDialog } from 'pankosmia-rcl';
