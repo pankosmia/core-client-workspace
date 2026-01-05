@@ -8,32 +8,32 @@ const paneStyle = {
 }
 
 const layoutSpecs = {
-    top: {
+    ViewEditorTop: {
         editorPos: 0,
         parentIsRow: false,
         childrenAreRow: true
     },
-    bottom: {
+    ViewEditorBottom: {
         editorPos: 1,
         parentIsRow: false,
         childrenAreRow: true
     },
-    leftV: {
+    ViewEditorLeftColumn: {
         editorPos: 0,
         parentIsRow: true,
         childrenAreRow: true
     },
-    leftH: {
+    ViewEditorLeftRow: {
         editorPos: 0,
         parentIsRow: true,
         childrenAreRow: false
     },
-    rightV: {
+    ViewEditorRightColumn: {
         editorPos: 1,
         parentIsRow: true,
         childrenAreRow: true
     },
-    rightH: {
+    ViewEditorRightRow: {
         editorPos: 1,
         parentIsRow: true,
         childrenAreRow: false

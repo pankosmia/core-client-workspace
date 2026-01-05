@@ -9,7 +9,6 @@ import {
     ToggleButton,
     Grid2,
     Dialog,
-    Button
 } from "@mui/material";
 
 import { DataGrid } from '@mui/x-data-grid';
@@ -40,7 +39,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
     const [projectSummaries, setProjectSummaries] = useState({});
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
-    const [alignment, setAlignment] = useState(layout);
+    const [alignment, setAlignment] = useState(selectedResources.size === 0 ? "" : layout );
     const [fullWidth, setFullWidth] = useState(true);
     const [maxWidth, setMaxWidth] = useState('lg');
     const getProjectSummaries = async () => {
@@ -58,6 +57,16 @@ function ConfigureWorkspace({ layout, setLayout }) {
             getProjectSummaries().then();
         },
         []
+    );
+
+      useEffect(
+        () => {
+            if(selectedResources.size === 0) {
+                setAlignment("")
+            } else
+                setAlignment(layout)
+        },
+        [selectedResources,layout]
     );
 
     useEffect(() => {
@@ -210,7 +219,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                 exclusive
                                 onChange={handleAlignment}
                             >
-                                <ToggleButton value="top" onClick={() => setLayout("top")} disabled={selectedResources.size === 0}
+                                <ToggleButton value="ViewEditorTop" onClick={() => setLayout("ViewEditorTop")} disabled={selectedResources.size === 0}
                                 >
                                     {selectedResources.size === 0 ?
                                         (
@@ -220,7 +229,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                     }
                                 </ToggleButton>
 
-                                <ToggleButton value="bottom" onClick={() => setLayout("bottom")} disabled={selectedResources.size === 0}>
+                                <ToggleButton value="ViewEditorBottom" onClick={() => setLayout("ViewEditorBottom")} disabled={selectedResources.size === 0}>
                                     {selectedResources.size === 0 ?
                                         (
                                             <SvgViewEditorBottomDisabled />
@@ -229,7 +238,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                     }
                                 </ToggleButton>
 
-                                <ToggleButton value="leftV" onClick={() => setLayout("leftV")} disabled={selectedResources.size === 0}>
+                                <ToggleButton value="ViewEditorLeftColumn" onClick={() => setLayout("ViewEditorLeftColumn")} disabled={selectedResources.size === 0}>
                                     {selectedResources.size === 0 ?
                                         (
                                             <SvgViewEditorLeftColumnDisabled />
@@ -238,7 +247,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                     }
                                 </ToggleButton>
 
-                                <ToggleButton value="rightV" onClick={() => setLayout("rightV")} disabled={selectedResources.size === 0}>
+                                <ToggleButton value="ViewEditorRightColumn" onClick={() => setLayout("ViewEditorRightColumn")} disabled={selectedResources.size === 0}>
                                     {selectedResources.size === 0 ?
                                         (
                                             <SvgViewEditorRightColumnDisabled />
@@ -247,7 +256,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                     }
                                 </ToggleButton>
 
-                                <ToggleButton value="leftH" onClick={() => setLayout("leftH")} disabled={selectedResources.size === 0}>
+                                <ToggleButton value="ViewEditorLeftRow" onClick={() => setLayout("ViewEditorLeftRow")} disabled={selectedResources.size === 0}>
 
                                     {selectedResources.size === 0 ?
                                         (
@@ -257,7 +266,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                     }
                                 </ToggleButton>
 
-                                <ToggleButton value="rightH" onClick={() => setLayout("rightH")} disabled={selectedResources.size === 0}>
+                                <ToggleButton value="ViewEditorRightRow" onClick={() => setLayout("ViewEditorRightRow")} disabled={selectedResources.size === 0}>
                                     {selectedResources.size === 0 ?
                                         (
                                             <SvgViewEditorRightRowDisabled />

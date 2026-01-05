@@ -174,14 +174,14 @@ function DraftingEditor({
               systemBcv={systemBcv}
             />
           </Grid2>
-          {/* <Grid2 display="flex" gap={1}>
+          <Grid2 display="flex" gap={1}>
             <ChangeEditor
               editor={editorMode}
               setEditor={setEditor}
               modified={modified}
               setModified={setModified}
             />
-          </Grid2> */}
+          </Grid2>
           <Grid2 display="flex" gap={1}>
             <Button
               disabled={md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson}
