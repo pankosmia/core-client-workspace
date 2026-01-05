@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n } from "pithekos-lib";
+import { debugContext, i18nContext, currentProjectContext, getJson, doI18n, Header } from "pithekos-lib";
 import {
     Box,
     Typography,
@@ -8,9 +8,9 @@ import {
     ToggleButtonGroup,
     ToggleButton,
     Grid2,
-    Dialog,
+    DialogContent,
 } from "@mui/material";
-
+import { PanDialog } from 'pankosmia-rcl';
 import { DataGrid } from '@mui/x-data-grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SvgViewEditorBottom from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_bottom";
@@ -36,19 +36,19 @@ function ConfigureWorkspace({ layout, setLayout }) {
     const location = useLocation();
     const localisationState = location.state;
     const [selectedResources, setSelectedResources] = useState(new Set(localisationState ? localisationState.map(item => item[0]) : []));
+    console.log("selected resources", selectedResources)
     const [projectSummaries, setProjectSummaries] = useState({});
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
-    const [alignment, setAlignment] = useState(selectedResources.size === 0 ? "" : layout );
-    const [fullWidth, setFullWidth] = useState(true);
-    const [maxWidth, setMaxWidth] = useState('lg');
+    const [alignment, setAlignment] = useState(selectedResources.size === 0 ? "" : layout);
+
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
         if (summariesResponse.ok) {
             setProjectSummaries(summariesResponse.json);
         }
     }
-    const handleAlignment = (event, newAlignment) => {
+    const handleAlignment = (newAlignment) => {
         setAlignment(newAlignment);
     };
 
@@ -58,15 +58,34 @@ function ConfigureWorkspace({ layout, setLayout }) {
         },
         []
     );
+    const handleClose = async () => {
+        setOpen(false);
+        let stateEntries = Object.entries(projectSummaries)
+            .map(e => {
+                return { ...e[1], path: e[0] }
+            })
+            .map(r => [r.path, r])
+            .filter(re => selectedResources.has(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
+            .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
+                ...re[1],
+                primary: true
+            }] : re)
+        navigate(
+            "/workspace",
+            {
+                state: Object.fromEntries(stateEntries),
+            }
+        );
+    };
 
-      useEffect(
+    useEffect(
         () => {
-            if(selectedResources.size === 0) {
+            if (selectedResources.size === 0) {
                 setAlignment("")
             } else
                 setAlignment(layout)
         },
-        [selectedResources,layout]
+        [selectedResources, layout]
     );
 
     useEffect(() => {
@@ -142,12 +161,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
             flex: 1
         }
     ]
-    const handleClose = async () => {
-        setOpen(false);
-        setTimeout(() => {
-            window.location.href = '/clients/content';
-        }, 500);
-    };
+
     const rows = Object.entries(projectSummaries)
         .map(e => {
             return { ...e[1], path: e[0] }
@@ -180,27 +194,21 @@ function ConfigureWorkspace({ layout, setLayout }) {
                     'url("/app-resources/pages/content/background_blur.png")',
                 backgroundRepeat: "no-repeat",
                 backdropFilter: "blur(3px)",
-            }}>
-            <Dialog
-                fullWidth={fullWidth}
-                maxWidth={maxWidth}
-                open={open}
-                onClose={handleClose}
+            }}
+        >
+            <Box style={{ position: 'static' }}>
+                <Header
+                    titleKey="pages:content:title"
+                    requireNet={false}
+                    currentId="core-local-workspace"
+                />
+            </Box>
+            <PanDialog
+                titleLabel={`${doI18n("pages:core-local-workspace:Select_Resources", i18nRef.current, debugRef.current)}`}
+                isOpen={open}
+                closeFn={() => handleClose()}
             >
-                <Box style={{ position: 'static' }}>
-                    <Header
-                        titleKey="pages:core-local-workspace:Select_Resources"
-                        requireNet={false}
-                        currentId="core-local-workspace"
-                    />
-                </Box>
-                <Box
-                    sx={{
-                        mt:2,
-                        ml:2,
-                        mr:2
-                    }}
-                >
+                <DialogContent>
                     <Grid2
                         container
                         alignItems="center"
@@ -286,17 +294,8 @@ function ConfigureWorkspace({ layout, setLayout }) {
                                 color="primary"
                                 length="small"
                                 aria-label={doI18n("pages:content:add", i18nRef.current)}
-                                // sx={{
-                                //     margin: 0,
-                                //     top: 64,
-                                //     right: 16,
-                                //     bottom: "auto",
-                                //     left: "auto",
-                                //     position: 'fixed'
-                                // }}
                                 onClick={
                                     (e) => {
-                                        console.log("selected resources onclick", selectedResources)
                                         let stateEntries = Object.entries(projectSummaries)
                                             .map(e => {
                                                 return { ...e[1], path: e[0] }
@@ -324,36 +323,30 @@ function ConfigureWorkspace({ layout, setLayout }) {
                             </Fab>
                         </Grid2>
                     </Grid2>
-                </Box>
-                <Box sx={{ m: 2 }}>
-                    <DataGrid
-                        getRowId={r => r.path}
-                        initialState={{
-                            columns: {
-                                columnVisibilityModel: {
-                                    description: false
+                    <Box sx={{ m: 2 }}>
+                        <DataGrid
+                            getRowId={r => r.path}
+                            initialState={{
+                                columns: {
+                                    columnVisibilityModel: {
+                                        description: false
+                                    }
+                                },
+                                sorting: {
+                                    sortModel: [{ field: 'name', sort: 'asc' }],
                                 }
-                            },
-                            sorting: {
-                                sortModel: [{ field: 'name', sort: 'asc' }],
-                            }
-                        }}
-                        checkboxSelection
-                        rowSelectionModel={{ ids: selectedResources, type: "include" }}
-                        onRowSelectionModelChange={nv => setSelectedResources(nv.ids)}
-                        // onRowSelectionModelChange={(selected) => {
-                        //     const selectedRowData = rows.filter((row) => selected.ids.has(row.id));
-                        //     const selectedPaths = selectedRowData.map((data) => data["path"]);
-                        //     setSelectedResources(selectedPaths);
-                        // }}
-                        rows={rows}
-                        columns={columns}
-                        sx={{ fontSize: "1rem" }}
+                            }}
+                            checkboxSelection
+                            rowSelectionModel={{ ids: selectedResources, type: "include" }}
+                            onRowSelectionModelChange={nv => setSelectedResources(nv.ids)}
+                            rows={rows}
+                            columns={columns}
+                            sx={{ fontSize: "1rem" }}
 
-                    />
-                </Box>
-
-            </Dialog>
+                        />
+                    </Box>
+                </DialogContent>
+            </PanDialog>
         </Box>
 }
 
