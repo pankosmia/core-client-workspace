@@ -36,7 +36,6 @@ function ConfigureWorkspace({ layout, setLayout }) {
     const location = useLocation();
     const localisationState = location.state;
     const [selectedResources, setSelectedResources] = useState(new Set(localisationState ? localisationState.map(item => item[0]) : []));
-    console.log("selected resources", selectedResources)
     const [projectSummaries, setProjectSummaries] = useState({});
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
@@ -58,24 +57,32 @@ function ConfigureWorkspace({ layout, setLayout }) {
         },
         []
     );
+
     const handleClose = async () => {
         setOpen(false);
-        let stateEntries = Object.entries(projectSummaries)
-            .map(e => {
-                return { ...e[1], path: e[0] }
-            })
-            .map(r => [r.path, r])
-            .filter(re => selectedResources.has(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
-            .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
-                ...re[1],
-                primary: true
-            }] : re)
-        navigate(
-            "/workspace",
-            {
-                state: Object.fromEntries(stateEntries),
-            }
-        );
+        const params = new URLSearchParams(location.search);
+        const returnPage = params.get("return-page");
+        if (returnPage === "workspace") {
+            let stateEntries = Object.entries(projectSummaries)
+                .map(e => {
+                    return { ...e[1], path: e[0] }
+                })
+                .map(r => [r.path, r])
+                .filter(re => selectedResources.has(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
+                .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
+                    ...re[1],
+                    primary: true
+                }] : re)
+            navigate(
+                "/workspace",
+                {
+                    state: Object.fromEntries(stateEntries),
+                }
+            );
+        } else {
+            window.location.replace("/clients/content");
+            return;
+        }
     };
 
     useEffect(
@@ -198,7 +205,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
         >
             <Box style={{ position: 'static' }}>
                 <Header
-                    titleKey="pages:content:title"
+                    titleKey="pages:core-local-workspace:title"
                     requireNet={false}
                     currentId="core-local-workspace"
                 />

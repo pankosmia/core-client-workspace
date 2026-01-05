@@ -16,6 +16,7 @@ import usfm2draftJson from '../../../components/usfm2draftJson';
 import EditableBible from "./components/EditableBible";
 import md5sum from "md5";
 import { useNavigate } from "react-router-dom";
+import SettingsIcon from '@mui/icons-material/Settings';
 
 function DraftingEditor({
   metadata,
@@ -183,14 +184,20 @@ function DraftingEditor({
             />
           </Grid2>
           <Grid2 display="flex" gap={1}>
-            <Button
+            <IconButton
               disabled={md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson}
               onClick={() =>
-                navigate("/", { state: locationState })
-              }            
+                navigate(
+                  {
+                    pathname: "/",
+                    search: "return-page=workspace"
+                  },
+                  { state: locationState }
+                )
+              }
             >
-              Retour
-            </Button>
+              <SettingsIcon />
+            </IconButton>
           </Grid2>
         </Grid2>
       </Box>
