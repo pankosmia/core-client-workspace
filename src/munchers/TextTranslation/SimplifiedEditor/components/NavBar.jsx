@@ -5,9 +5,9 @@ import { ButtonGroup } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { bcvContext, debugContext, getJson, postEmptyJson } from 'pithekos-lib';
 
-function NavBar({ metadata, chapterNumbers, systemBcv }) {
+function NavBar({ metadata, chapterNumbers }) {
     const [scriptDirection, setScriptDirection] = useState([]);
-    const { bcvRef } = useContext(bcvContext);
+    const { bcvRef,systemBcv } = useContext(bcvContext);
     const [currentBookCode, setCurrentBookCode] = useState("zzz")
     const [currentPosition, setCurrentPosition] = useState(0);
     const { debugRef } = useContext(debugContext);
@@ -28,14 +28,14 @@ function NavBar({ metadata, chapterNumbers, systemBcv }) {
         ProjectScriptDirection();
     }, []);
 
-    useEffect(() => {
-        if (chapterNumbers.length > 0 && currentBookCode !== bcvRef.current.bookCode) {
-            setCurrentBookCode(bcvRef.current.bookCode);
-            setCurrentPosition(0)
+    // useEffect(() => {
+    //     if (chapterNumbers.length > 0 && currentBookCode !== bcvRef.current.bookCode) {
+    //         setCurrentBookCode(bcvRef.current.bookCode);
+    //         setCurrentPosition(0)
 
-        }
+    //     }
 
-    }, [chapterNumbers, systemBcv, currentBookCode, bcvRef, debugRef]);
+    // }, [chapterNumbers, systemBcv, currentBookCode, bcvRef, debugRef]);
 
     // changer de page -1 
     const previousChapter = () => {
@@ -87,7 +87,7 @@ function NavBar({ metadata, chapterNumbers, systemBcv }) {
                 label={`Ch`}
                 select
                 size="small"
-                value={currentPosition}
+                value={systemBcv.chapterNum}
             >
                 {chapterNumbers.map((chapter, index) => (
                     <MenuItem 

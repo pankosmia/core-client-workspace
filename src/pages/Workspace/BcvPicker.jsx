@@ -13,18 +13,17 @@ import {
 } from "pithekos-lib";
 
 function BcvPicker() {
-    const { bcvRef } = useContext(BcvContext);
+    const { bcvRef, systemBcv } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const { i18nRef } = useContext(I18nContext);
     const { currentProjectRef } = useContext(CurrentProjectContext);
     const [contentBooks, setContentBooks] = useState([]);
-    const [projectPathCurrent, setProjectPathCurrent] = useState();
+
     useEffect(
         () => {
             const getProjectBooks = async () => {
                 if (currentProjectRef.current) {
                     const projectPath = `${currentProjectRef.current.source}/${currentProjectRef.current.organization}/${currentProjectRef.current.project}`;
-                    setProjectPathCurrent(projectPath);
                     const fullMetadataResponse = await getJson(`/burrito/metadata/raw/${projectPath}`, debugRef.current);
                     if (fullMetadataResponse.ok) {
                         setContentBooks(
@@ -55,8 +54,9 @@ function BcvPicker() {
     };
 
     const doChapterNumbers = async (b) => {
+        const projectPath = `${currentProjectRef.current.source}/${currentProjectRef.current.organization}/${currentProjectRef.current.project}`;
         const usfmResponse = await getText(
-            `/burrito/ingredient/raw/${projectPathCurrent}?ipath=${b}.usfm`,
+            `/burrito/ingredient/raw/${projectPath}?ipath=${b}.usfm`,
             debugRef.current
         );
         if (usfmResponse.ok) {
@@ -72,10 +72,8 @@ function BcvPicker() {
     };
 
     useEffect(() => {
-        if (contentBooks?.length) {
-            doChapterNumbers(contentBooks[0]);
-        }
-    }, [contentBooks, debugRef]);
+        doChapterNumbers(systemBcv.bookCode);
+    }, [systemBcv.bookCode]);
 
 
     const handleChangeBook = (b) => {
@@ -110,7 +108,7 @@ function BcvPicker() {
             </TextField>
         </div>
 
-        <Dialog
+        {/* <Dialog
             open={dialogIsOpen}
             onClose={handleDialogClose}
             slotProps={{
@@ -133,7 +131,7 @@ function BcvPicker() {
                     handleChangeBook(book);
                 }}>{doI18n("pages:core-local-workspace:accept", i18nRef.current)}</Button>
             </DialogActions>
-        </Dialog>
+        </Dialog> */}
     </Box>
 }
 
