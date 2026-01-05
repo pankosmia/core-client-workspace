@@ -10,6 +10,7 @@
   text-align: center;
   cursor: grab; /* W3C standards syntax, all modern browser */
   align-items:flex-end ;
+  padding-left: 1rem;
 }
 
 .react-tile-pane-tabBar {
