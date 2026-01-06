@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, Button, Dialog, DialogContent, DialogContentText, Fade, FormControl, IconButton, Menu, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Box, Button, DialogContent, DialogContentText, FormControl, IconButton, InputAdornment, Menu, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
 import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, postEmptyJson } from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
+import SearchIcon from '@mui/icons-material/Search';
 import { Proskomma } from "proskomma-core";
 import { PanDialog } from 'pankosmia-rcl';
 
-function TranslationPlanViewerMuncher({ metadata }) {
+function TranslationPlanViewerMuncher() {
     const [planIngredient, setPlanIngredient] = useState();
     const { i18nRef } = useContext(i18nContext);
     const { systemBcv } = useContext(BcvContext);
@@ -180,12 +181,20 @@ function TranslationPlanViewerMuncher({ metadata }) {
             isInInterval(section, systemBcv)
     );
 
+    const filteredStories = planIngredient.sections.filter(c => {
+        const label = `${c.fieldInitialValues.reference} ${c.fieldInitialValues.sectionTitle}`
+            .toLowerCase();
+
+        return label.includes(search.toLowerCase());
+    });
+
     const updateBcv = (b, c, v) => {
         postEmptyJson(
             `/navigation/bcv/${b}/${c}/${v}`,
             debugRef.current
         );
     }
+    const ITEM_HEIGHT = 48;
 
     return (
         <Box
@@ -207,17 +216,23 @@ function TranslationPlanViewerMuncher({ metadata }) {
                 </Button>
                 <Menu
                     id="fade-menu"
-                    slotProps={{
-                        list: {
-                            'aria-labelledby': 'fade-button',
-                        },
-                    }}
-                    slots={{ transition: Fade }}
                     anchorEl={anchorEl}
                     open={open}
                     onClose={handleClose}
+                    slotProps={{
+                        paper: {
+                            style: {
+                                maxHeight: ITEM_HEIGHT * 4.5,
+                                width: 'auto',
+                                overflow: "auto"
+                            },
+                        },
+                        list: {
+                            'aria-labelledby': 'fab-menu',
+                        },
+                    }}
                 >
-                    <MenuItem disableRipple disableTouchRipple>
+                    <MenuItem>
                         <TextField
                             placeholder="Search ..."
                             value={search}
@@ -225,36 +240,44 @@ function TranslationPlanViewerMuncher({ metadata }) {
                             onKeyDown={(e) => e.stopPropagation()}
                             size="small"
                             fullWidth
+                            slotProps={{
+                                input: {
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon />
+                                        </InputAdornment>
+                                    )
+                                }
+                            }}
                         />
                     </MenuItem>
-                    {planIngredient.sections
-                        .filter(c => {
-                            const label = `${c.fieldInitialValues.reference} ${c.fieldInitialValues.sectionTitle}`
-                                .toLowerCase();
-
-                            return label.includes(search.toLowerCase());
-                        })
-                        .map((c, i) => (
-                            <MenuItem
-                                key={i}
-                                onClick={() => {
-                                    setSelectedStory(c.fieldInitialValues.sectionNumber);
-                                    handleClose();
-                                    updateBcv(
-                                        c.bookCode,
-                                        c.cv[0].split(":")[0],
-                                        c.cv[0].split(":")[1]
-                                    );
-                                }}
-                                value={c.fieldInitialValues.sectionNumber}
-                                selected={selectedStory === c.fieldInitialValues.sectionNumber}
-                            >
-                                {c.fieldInitialValues.sectionNumber} - {c.fieldInitialValues.reference} - {c.fieldInitialValues.sectionTitle}
-                            </MenuItem>
+                    {filteredStories.length === 0 ? (
+                        <MenuItem disabled>
+                            {`${doI18n("pages:core-local-workspace:no_result", i18nRef.current, debugRef.current)}`}
+                        </MenuItem>
+                    ) : (
+                        filteredStories.map((c, i) => (
+                            <Tooltip key={i} title={c.fieldInitialValues.reference}>
+                                <MenuItem
+                                    onClick={() => {
+                                        setSelectedStory(c.fieldInitialValues.sectionNumber);
+                                        handleClose();
+                                        updateBcv(
+                                            c.bookCode,
+                                            c.cv[0].split(":")[0],
+                                            c.cv[0].split(":")[1]
+                                        );
+                                    }}
+                                    value={c.fieldInitialValues.sectionNumber}
+                                    selected={selectedStory === c.fieldInitialValues.sectionNumber}
+                                >
+                                    {c.fieldInitialValues.sectionNumber} - {c.fieldInitialValues.sectionTitle}
+                                </MenuItem>
+                            </Tooltip>
                         ))
-                    }
-                </Menu>
+                    )}
 
+                </Menu>
                 <IconButton onClick={() => handleOpenDialogAbout()}>
                     <InfoIcon />
                 </IconButton>
