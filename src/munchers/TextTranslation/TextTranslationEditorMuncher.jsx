@@ -7,7 +7,7 @@ import DraftingEditor from "./SimplifiedEditor/DraftingEditor";
 import { useState, useContext } from "react";
 import {debugContext} from "pithekos-lib";
 
-function TextTranslationEditorMuncher({metadata}) {
+function TextTranslationEditorMuncher({metadata,locationState}) {
     const {debugRef} = useContext(debugContext);
     const [editor, setEditor] = useState(debugRef.current ? "chapter" : "units");
     const [modified, setModified] = useState(false);
@@ -31,6 +31,7 @@ function TextTranslationEditorMuncher({metadata}) {
                     setModified={setModified}
                     editorMode={editor}
                     setEditor={setEditor}
+                    locationState={locationState}
                 />
                 )}
             </Box>

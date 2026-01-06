@@ -5,7 +5,7 @@ import {
   getText,
   postEmptyJson,
 } from "pithekos-lib";
-import { Box, Grid2, IconButton, Typography } from "@mui/material";
+import { Box, Button, Grid2, IconButton, Typography } from "@mui/material";
 import NavBar from "./components/NavBar";
 import SaveButton from "./components/SaveButton";
 import ChangeEditor from "../ChangeEditor";
@@ -15,6 +15,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import usfm2draftJson from '../../../components/usfm2draftJson';
 import EditableBible from "./components/EditableBible";
 import md5sum from "md5";
+import { useNavigate } from "react-router-dom";
+import SettingsIcon from '@mui/icons-material/Settings';
 
 function DraftingEditor({
   metadata,
@@ -22,9 +24,11 @@ function DraftingEditor({
   setModified,
   editorMode,
   setEditor,
+  locationState
 }) {
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
+  const navigate = useNavigate();
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false)
   const [scriptureJson, setScriptureJson] = useState({ headers: {}, blocks: [] });
   const [chapterJson, setChapterJson] = useState(null);
@@ -36,7 +40,6 @@ function DraftingEditor({
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
   }
-
   // Set up 'are you sure you want to leave page' for Electron
   useEffect(() => {
     const isElectron = !!window.electronAPI;
@@ -109,7 +112,6 @@ function DraftingEditor({
           setScriptureJson(
             usfmDraftJson
           )
-          console.log("scriptureJson", usfmDraftJson)
           const hash = md5sum(JSON.stringify(usfmDraftJson));
           setMd5sumScriptureJson(hash);
         }
@@ -117,7 +119,7 @@ function DraftingEditor({
       doScriptureJson().then();
     }
 
-  }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum,currentBookCode,currentChapter]);
+  }, [debugRef, systemBcv.bookCode, metadata, systemBcv.chapterNum, currentBookCode, currentChapter]);
 
   // Make chapter content from whole book content
   useEffect(
@@ -180,6 +182,22 @@ function DraftingEditor({
               modified={modified}
               setModified={setModified}
             />
+          </Grid2>
+          <Grid2 display="flex" gap={1}>
+            <IconButton
+              disabled={md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson}
+              onClick={() =>
+                navigate(
+                  {
+                    pathname: "/",
+                    search: "return-page=workspace"
+                  },
+                  { state: locationState }
+                )
+              }
+            >
+              <SettingsIcon />
+            </IconButton>
           </Grid2>
         </Grid2>
       </Box>

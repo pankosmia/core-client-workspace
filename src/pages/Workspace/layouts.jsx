@@ -1,5 +1,5 @@
 import WorkspaceCard from "./WorkspaceCard";
-import {doI18n} from "pithekos-lib";
+import { doI18n } from "pithekos-lib";
 
 const paneStyle = {
     width: '100%',
@@ -8,43 +8,43 @@ const paneStyle = {
 }
 
 const layoutSpecs = {
-    top: {
-	editorPos: 0,
-	parentIsRow: false,
-	childrenAreRow: true
+    ViewEditorTop: {
+        editorPos: 0,
+        parentIsRow: false,
+        childrenAreRow: true
     },
-    bottom: {
-	editorPos: 1,
-	parentIsRow: false,
-	childrenAreRow: true
+    ViewEditorBottom: {
+        editorPos: 1,
+        parentIsRow: false,
+        childrenAreRow: true
     },
-    leftV: {
-	editorPos: 0,
-	parentIsRow: true,
-	childrenAreRow: true
-    },    
-    leftH: {
-	editorPos: 0,
-	parentIsRow: true,
-	childrenAreRow: false
+    ViewEditorLeftColumn: {
+        editorPos: 0,
+        parentIsRow: true,
+        childrenAreRow: true
     },
-    rightV: {
-	editorPos: 1,
-	parentIsRow: true,
-	childrenAreRow: true
-    },   
-    rightH: {
-	editorPos: 1,
-	parentIsRow: true,
-	childrenAreRow: false
+    ViewEditorLeftRow: {
+        editorPos: 0,
+        parentIsRow: true,
+        childrenAreRow: false
+    },
+    ViewEditorRightColumn: {
+        editorPos: 1,
+        parentIsRow: true,
+        childrenAreRow: true
+    },
+    ViewEditorRightRow: {
+        editorPos: 1,
+        parentIsRow: true,
+        childrenAreRow: false
     }
 };
 
-const layoutJson = (resources, layoutId, i18nRef, distractionModeCount) => {
+const layoutJson = (resources, layoutId, i18nRef, distractionModeCount, locationState) => {
     const te = {};
     let layoutSpec = layoutSpecs[layoutId];
     if (!layoutSpec) {
-	throw new Error(`No layout spec for '${layoutId}'`);
+        throw new Error(`No layout spec for '${layoutId}'`);
     }
     let rp = {
         children: [
@@ -53,12 +53,12 @@ const layoutJson = (resources, layoutId, i18nRef, distractionModeCount) => {
                 isRow: layoutSpec.childrenAreRow
             }
         ],
-	isRow: layoutSpec.parentIsRow
+        isRow: layoutSpec.parentIsRow
     }
     if (layoutSpec.editorPos === 0) {
-	rp.children = [null, rp.children[0]];
+        rp.children = [null, rp.children[0]];
     } else {
-	rp.children = [rp.children[0], null];
+        rp.children = [rp.children[0], null];
     }
     for (const resource of resources) {
         let location = `${resource.local_path.split('/').slice(0, 2).reverse().join(" - ")}`;
@@ -70,6 +70,7 @@ const layoutJson = (resources, layoutId, i18nRef, distractionModeCount) => {
             metadata={resource}
             style={paneStyle}
             distractionModeCount={distractionModeCount}
+            locationState={locationState}
         />;
         if (resource.primary) {
             rp.children[layoutSpec.editorPos] = { children: title };
@@ -78,9 +79,9 @@ const layoutJson = (resources, layoutId, i18nRef, distractionModeCount) => {
         }
     }
     if (rp.children[1 - layoutSpec.editorPos].children.length === 0) {
-        layoutSpec.editorPos ? rp.children.shift : rp.children.pop();
+        layoutSpec.editorPos ? rp.children.shift() : rp.children.pop();
     }
     return [rp, te];
-    }
+}
 
 export default layoutJson;
