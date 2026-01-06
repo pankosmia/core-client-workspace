@@ -55,7 +55,7 @@ export default function EditableSpan({scriptureJson, setScriptureJson, position,
             }
         }
         onFocus={() => {
-            // console.log("FOCUS", position)
+            //console.log("FOCUS", position)
             updateBcv(systemBcv.bookCode, chapter, verse);
             return false;
         }}

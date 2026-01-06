@@ -5,13 +5,12 @@ import { ButtonGroup } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { bcvContext, debugContext, getJson, postEmptyJson } from 'pithekos-lib';
 
-function NavBar({ metadata, chapterNumbers, systemBcv }) {
+function NavBar({ metadata, chapterNumbers }) {
     const [scriptDirection, setScriptDirection] = useState([]);
-    const { bcvRef } = useContext(bcvContext);
+    const { bcvRef, systemBcv } = useContext(bcvContext);
     const [currentBookCode, setCurrentBookCode] = useState("zzz")
-    const [currentPosition, setCurrentPosition] = useState(0);
+    const [currentPosition, setCurrentPosition] = useState(chapterNumbers.indexOf(bcvRef.current.chapterNum));
     const { debugRef } = useContext(debugContext);
-
     const ProjectScriptDirection = async () => {
         const summariesResponse = await getJson(`/burrito/metadata/summary/${metadata.local_path}`);
         if (summariesResponse.ok) {
@@ -27,18 +26,6 @@ function NavBar({ metadata, chapterNumbers, systemBcv }) {
     useEffect(() => {
         ProjectScriptDirection();
     }, []);
-
-    useEffect(() => {
-        if (chapterNumbers.length > 0 && currentBookCode !== bcvRef.current.bookCode) {
-            // postEmptyJson(
-            //     `/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[0]}/1`,
-            //     debugRef.current);
-            setCurrentBookCode(bcvRef.current.bookCode);
-            setCurrentPosition(0)
-
-        }
-
-    }, [chapterNumbers, systemBcv, currentBookCode, bcvRef, debugRef]);
 
     // changer de page -1 
     const previousChapter = () => {
@@ -64,12 +51,12 @@ function NavBar({ metadata, chapterNumbers, systemBcv }) {
 
     const handleClickMenuChapter = (i) => {
         setCurrentPosition(i);
-            postEmptyJson(
-                `/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[i]}/1`,
-                debugRef.current
-            );
+        postEmptyJson(
+            `/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[i]}/1`,
+            debugRef.current
+        );
     }
-   
+
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             {scriptDirection === "ltr" ? (
@@ -90,15 +77,15 @@ function NavBar({ metadata, chapterNumbers, systemBcv }) {
                 label={`Ch`}
                 select
                 size="small"
-                value={currentPosition}
+                value={bcvRef.current.chapterNum}
             >
                 {chapterNumbers.map((chapter, index) => (
-                    <MenuItem 
-                        onClick={() => handleClickMenuChapter(index)} 
-                        key={index} 
-                        value={index}
-                        sx={{maxHeight:"3rem", height:"2rem"}}
-                        >
+                    <MenuItem
+                        onClick={() => handleClickMenuChapter(index)}
+                        key={index}
+                        value={chapter}
+                        sx={{ maxHeight: "3rem", height: "2rem" }}
+                    >
                         {chapter}
                     </MenuItem>
                 ))}

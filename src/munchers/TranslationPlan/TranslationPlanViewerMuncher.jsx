@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, Dialog, DialogContent, DialogContentText, FormControl, IconButton, MenuItem, Select, TextField, Typography } from "@mui/material";
-import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n } from "pithekos-lib";
+import { Box, Button, DialogContent, DialogContentText, FormControl, IconButton, InputAdornment, Menu, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
+import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, postEmptyJson } from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
+import SearchIcon from '@mui/icons-material/Search';
 import { Proskomma } from "proskomma-core";
 import { PanDialog } from 'pankosmia-rcl';
 
-function TranslationPlanViewerMuncher({ metadata }) {
+function TranslationPlanViewerMuncher() {
     const [planIngredient, setPlanIngredient] = useState();
     const { i18nRef } = useContext(i18nContext);
     const { systemBcv } = useContext(BcvContext);
@@ -14,7 +15,18 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const [verseText, setVerseText] = useState({});
     const [burritos, setBurritos] = useState([]);
     const [selectedBurrito, setSelectedBurrito] = useState(null);
+    const [selectedStory, setSelectedStory] = useState();
+    const [search, setSearch] = useState("");
 
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
     const handleOpenDialogAbout = () => {
         setOpenDialogAbout(true);
     }
@@ -122,6 +134,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
         if (response.ok) {
             const data = await response.json();
             setPlanIngredient(data);
+
         } else {
             setPlanIngredient([]);
         }
@@ -162,11 +175,27 @@ function TranslationPlanViewerMuncher({ metadata }) {
         );
     };
 
+    const section = planIngredient.sections.find(
+        section =>
+            section.bookCode === systemBcv.bookCode &&
+            isInInterval(section, systemBcv)
+    );
 
-    const section = planIngredient.sections
-        .filter(section => isInInterval(section, systemBcv))
-        .find(section => section.bookCode === systemBcv.bookCode)
-    console.log('plansection', planIngredient);
+    const filteredStories = planIngredient.sections.filter(c => {
+        const label = `${c.fieldInitialValues.reference} ${c.fieldInitialValues.sectionTitle}`
+            .toLowerCase();
+
+        return label.includes(search.toLowerCase());
+    });
+
+    const updateBcv = (b, c, v) => {
+        postEmptyJson(
+            `/navigation/bcv/${b}/${c}/${v}`,
+            debugRef.current
+        );
+    }
+    const ITEM_HEIGHT = 48;
+
     return (
         <Box
             sx={{
@@ -176,6 +205,79 @@ function TranslationPlanViewerMuncher({ metadata }) {
         >
             <Box
                 sx={{ marginLeft: "auto" }}>
+                <Button
+                    id="fade-button"
+                    aria-controls={open ? 'fade-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? 'true' : undefined}
+                    onClick={handleClick}
+                >
+                    {doI18n(`pages:core-local-workspace:jump_to_story`, i18nRef.current)}
+                </Button>
+                <Menu
+                    id="fade-menu"
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                    slotProps={{
+                        paper: {
+                            style: {
+                                maxHeight: ITEM_HEIGHT * 4.5,
+                                width: 'auto',
+                                overflow: "auto"
+                            },
+                        },
+                        list: {
+                            'aria-labelledby': 'fab-menu',
+                        },
+                    }}
+                >
+                    <MenuItem>
+                        <TextField
+                            placeholder="Search ..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            size="small"
+                            fullWidth
+                            slotProps={{
+                                input: {
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon />
+                                        </InputAdornment>
+                                    )
+                                }
+                            }}
+                        />
+                    </MenuItem>
+                    {filteredStories.length === 0 ? (
+                        <MenuItem disabled>
+                            {`${doI18n("pages:core-local-workspace:no_result", i18nRef.current, debugRef.current)}`}
+                        </MenuItem>
+                    ) : (
+                        filteredStories.map((c, i) => (
+                            <Tooltip key={i} title={c.fieldInitialValues.reference}>
+                                <MenuItem
+                                    onClick={() => {
+                                        setSelectedStory(c.fieldInitialValues.sectionNumber);
+                                        handleClose();
+                                        updateBcv(
+                                            c.bookCode,
+                                            c.cv[0].split(":")[0],
+                                            c.cv[0].split(":")[1]
+                                        );
+                                    }}
+                                    value={c.fieldInitialValues.sectionNumber}
+                                    selected={selectedStory === c.fieldInitialValues.sectionNumber}
+                                >
+                                    {c.fieldInitialValues.sectionNumber} - {c.fieldInitialValues.sectionTitle}
+                                </MenuItem>
+                            </Tooltip>
+                        ))
+                    )}
+
+                </Menu>
                 <IconButton onClick={() => handleOpenDialogAbout()}>
                     <InfoIcon />
                 </IconButton>
@@ -212,7 +314,6 @@ function TranslationPlanViewerMuncher({ metadata }) {
                                         planIngredient.fieldInitialValues[field.name] ??
                                         "";
 
-                                    // affichage du texte
                                     if (Object.keys(verseText).length > 0 && field.type === "scripture") {
                                         let chapterN = "0"
                                         return (
@@ -259,7 +360,6 @@ function TranslationPlanViewerMuncher({ metadata }) {
                                     } else {
                                         <Typography> loading ...</Typography>
                                     }
-                                    // reste du texte
                                     return (
                                         <Typography
                                             key={i}

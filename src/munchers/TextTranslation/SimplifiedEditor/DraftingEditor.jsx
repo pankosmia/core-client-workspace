@@ -36,7 +36,6 @@ function DraftingEditor({
   const [currentBookCode, setCurrentBookCode] = useState("zzz");
   const [currentChapter, setCurrentChapter] = useState("zzz");
   const [md5sumScriptureJson, setMd5sumScriptureJson] = useState([]);
-
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
   }
@@ -90,9 +89,6 @@ function DraftingEditor({
           const newChapterNumbers = allChapterNumbers(usfmDraftJson)
           setCurrentBookCode(systemBcv.bookCode)
           setChapterNumbers(newChapterNumbers)
-          postEmptyJson(
-            `/navigation/bcv/${systemBcv.bookCode}/${newChapterNumbers[0]}/1`,
-            debugRef.current);
         }
       }
       doChapterNumbers().then();
@@ -168,11 +164,10 @@ function DraftingEditor({
           </Grid2>
 
           <Grid2 display="flex" gap={1}>
-            <BcvPicker />
+            <BcvPicker/>
             <NavBar
               chapterNumbers={chapterNumbers}
               metadata={metadata}
-              systemBcv={systemBcv}
             />
           </Grid2>
           <Grid2 display="flex" gap={1}>

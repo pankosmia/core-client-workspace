@@ -694,6 +694,9 @@
     "intro_outline_tags": {
       "en": "Intro outline tags"
     },
+    "jump_to_story": {
+      "en":"Jump"
+    },
     "print": {
       "en": "Print",
       "fr": "Imprimer",
