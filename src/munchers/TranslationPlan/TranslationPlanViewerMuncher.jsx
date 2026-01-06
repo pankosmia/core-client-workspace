@@ -222,6 +222,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
                             placeholder="Search ..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
+                            onKeyDown={(e) => e.stopPropagation()}
                             size="small"
                             fullWidth
                         />

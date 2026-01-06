@@ -7,11 +7,10 @@ import { bcvContext, debugContext, getJson, postEmptyJson } from 'pithekos-lib';
 
 function NavBar({ metadata, chapterNumbers }) {
     const [scriptDirection, setScriptDirection] = useState([]);
-    const { bcvRef,systemBcv } = useContext(bcvContext);
+    const { bcvRef, systemBcv } = useContext(bcvContext);
     const [currentBookCode, setCurrentBookCode] = useState("zzz")
-    const [currentPosition, setCurrentPosition] = useState(0);
+    const [currentPosition, setCurrentPosition] = useState(chapterNumbers.indexOf(bcvRef.current.chapterNum));
     const { debugRef } = useContext(debugContext);
-
     const ProjectScriptDirection = async () => {
         const summariesResponse = await getJson(`/burrito/metadata/summary/${metadata.local_path}`);
         if (summariesResponse.ok) {
@@ -61,12 +60,12 @@ function NavBar({ metadata, chapterNumbers }) {
 
     const handleClickMenuChapter = (i) => {
         setCurrentPosition(i);
-            postEmptyJson(
-                `/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[i]}/1`,
-                debugRef.current
-            );
+        postEmptyJson(
+            `/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[i]}/1`,
+            debugRef.current
+        );
     }
-   
+
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             {scriptDirection === "ltr" ? (
@@ -87,15 +86,15 @@ function NavBar({ metadata, chapterNumbers }) {
                 label={`Ch`}
                 select
                 size="small"
-                value={systemBcv.chapterNum}
+                value={bcvRef.current.chapterNum}
             >
                 {chapterNumbers.map((chapter, index) => (
-                    <MenuItem 
-                        onClick={() => handleClickMenuChapter(index)} 
-                        key={index} 
-                        value={index}
-                        sx={{maxHeight:"3rem", height:"2rem"}}
-                        >
+                    <MenuItem
+                        onClick={() => handleClickMenuChapter(index)}
+                        key={index}
+                        value={chapter}
+                        sx={{ maxHeight: "3rem", height: "2rem" }}
+                    >
                         {chapter}
                     </MenuItem>
                 ))}

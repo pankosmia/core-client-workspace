@@ -13,11 +13,12 @@ import {
 } from "pithekos-lib";
 
 function BcvPicker() {
-    const { bcvRef, systemBcv } = useContext(BcvContext);
+    const { bcvRef} = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const { i18nRef } = useContext(I18nContext);
     const { currentProjectRef } = useContext(CurrentProjectContext);
     const [contentBooks, setContentBooks] = useState([]);
+    const [currentBook,setCurrentBook]= useState(bcvRef.current.bookCode);
 
     useEffect(
         () => {
@@ -45,20 +46,13 @@ function BcvPicker() {
         [currentProjectRef]
     )
 
-    const [book, setBook] = useState('');
-    const [dialogIsOpen, setDialogIsOpen] = useState(false);
-
-    const handleDialogClose = () => {
-        setDialogIsOpen(false);
-        setBook('');
-    };
-
     const doChapterNumbers = async (b) => {
         const projectPath = `${currentProjectRef.current.source}/${currentProjectRef.current.organization}/${currentProjectRef.current.project}`;
         const usfmResponse = await getText(
             `/burrito/ingredient/raw/${projectPath}?ipath=${b}.usfm`,
             debugRef.current
         );
+        setCurrentBook(b);
         if (usfmResponse.ok) {
             const usfmString = usfmResponse.text;
             const re = /\\c\s+(\d+)/;
@@ -72,14 +66,9 @@ function BcvPicker() {
     };
 
     useEffect(() => {
-        doChapterNumbers(systemBcv.bookCode);
-    }, [systemBcv.bookCode]);
+        doChapterNumbers(currentBook);
+    }, [currentBook]);
 
-
-    const handleChangeBook = (b) => {
-        postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current).then();
-        handleDialogClose();
-    };
 
     return <Box sx={{ justifyContent: "space-between" }}>
         <div>
@@ -107,31 +96,6 @@ function BcvPicker() {
                 }
             </TextField>
         </div>
-
-        {/* <Dialog
-            open={dialogIsOpen}
-            onClose={handleDialogClose}
-            slotProps={{
-                paper: {
-                    component: 'form',
-                },
-            }}
-        >
-            <DialogTitle><b>{doI18n("pages:core-local-workspace:change_book", i18nRef.current)}</b></DialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                    <Typography>
-                        {doI18n("pages:core-local-workspace:change_book_question", i18nRef.current)}
-                    </Typography>
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleDialogClose}>{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
-                <Button onClick={() => {
-                    handleChangeBook(book);
-                }}>{doI18n("pages:core-local-workspace:accept", i18nRef.current)}</Button>
-            </DialogActions>
-        </Dialog> */}
     </Box>
 }
 

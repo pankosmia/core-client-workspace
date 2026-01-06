@@ -168,7 +168,6 @@ function DraftingEditor({
             <NavBar
               chapterNumbers={chapterNumbers}
               metadata={metadata}
-              systemBcv={systemBcv}
             />
           </Grid2>
           <Grid2 display="flex" gap={1}>
