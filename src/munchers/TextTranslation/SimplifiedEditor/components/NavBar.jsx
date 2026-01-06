@@ -27,15 +27,6 @@ function NavBar({ metadata, chapterNumbers }) {
         ProjectScriptDirection();
     }, []);
 
-    // useEffect(() => {
-    //     if (chapterNumbers.length > 0 && currentBookCode !== bcvRef.current.bookCode) {
-    //         setCurrentBookCode(bcvRef.current.bookCode);
-    //         setCurrentPosition(0)
-
-    //     }
-
-    // }, [chapterNumbers, systemBcv, currentBookCode, bcvRef, debugRef]);
-
     // changer de page -1 
     const previousChapter = () => {
         if (currentPosition > 0) {

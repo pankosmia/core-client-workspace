@@ -86,9 +86,6 @@ function DraftingEditor({
           const newChapterNumbers = allChapterNumbers(usfmDraftJson)
           setCurrentBookCode(systemBcv.bookCode)
           setChapterNumbers(newChapterNumbers)
-          // postEmptyJson(
-          //   `/navigation/bcv/${systemBcv.bookCode}/${newChapterNumbers[0]}/1`,
-          //   debugRef.current);
         }
       }
       doChapterNumbers().then();
