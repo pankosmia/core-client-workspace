@@ -15,7 +15,6 @@ function NavBar({ metadata, chapterNumbers }) {
         const summariesResponse = await getJson(`/burrito/metadata/summary/${metadata.local_path}`);
         if (summariesResponse.ok) {
             const data = summariesResponse.json;
-            console.log('data',data)
             const bookCode = data.script_direction;
             setScriptDirection(bookCode);
         } else {
