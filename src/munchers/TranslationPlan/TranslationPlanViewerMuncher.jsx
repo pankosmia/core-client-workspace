@@ -8,6 +8,7 @@ import { PanDialog } from 'pankosmia-rcl';
 
 function TranslationPlanViewerMuncher() {
     const [planIngredient, setPlanIngredient] = useState();
+    console.log("planIngredient", planIngredient)
     const { i18nRef } = useContext(i18nContext);
     const { systemBcv } = useContext(BcvContext);
     const [openDialogAbout, setOpenDialogAbout] = useState(false);
@@ -307,13 +308,69 @@ function TranslationPlanViewerMuncher() {
                     <>
                         {section ? (
                             <Box sx={{ padding: 1 }}>
-                                {planIngredient.sectionStructure.map((field, i) => {
-                                    const className = field.paraTag || "";
-                                    const value =
-                                        section.fieldInitialValues[field.name] ??
-                                        planIngredient.fieldInitialValues[field.name] ??
-                                        "";
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        flexDirection: "row",
+                                        fontFamily: "monospace",
+                                        fontSize: "medium",
+                                    }}>
+                                    <Typography
+                                        sx={{
+                                            padding: "5px",
+                                            background: "lightgray",
+                                            borderRadius: "4px 0px 0px 4px",
+                                            alignSelf: "center"
+                                        }}>
+                                        //
+                                    </Typography>
+                                    <Typography
+                                        sx={{
+                                            padding: "5px",
+                                            background: "lightgray",
+                                            borderRadius: "0px 4px 4px 0px"
+                                        }}
+                                    >
+                                        {section.cv.join('-')}
+                                    </Typography>
+                                </div>
 
+
+                                {planIngredient.sectionStructure.map((field, i) => {
+                                    if (field.type !== "scripture") {
+                                        const styleParaTag = field.paraTag || "";
+                                        const value =
+                                            section.fieldInitialValues[field.name] ||
+                                            planIngredient.fieldInitialValues[field.name] ||
+                                            "";
+                                        return (
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                    textAlign: "left",
+                                                }}
+                                            >
+                                                <Typography
+                                                    sx={{
+                                                        fontFamily: "monospace",
+                                                        fontSize: "medium",
+                                                        paddingRight: "1em",
+                                                    }}
+                                                >
+                                                    {styleParaTag}
+                                                </Typography>
+
+                                                <Typography
+                                                    className={styleParaTag}
+                                                    size="small"
+                                                >
+                                                    {value}
+                                                </Typography>
+                                            </div>
+                                        );
+                                    }
                                     if (Object.keys(verseText).length > 0 && field.type === "scripture") {
                                         let chapterN = "0"
                                         return (
@@ -360,16 +417,7 @@ function TranslationPlanViewerMuncher() {
                                     } else {
                                         <Typography> loading ...</Typography>
                                     }
-                                    return (
-                                        <Typography
-                                            key={i}
-                                            className={className}
-                                            fullWidth
-                                            size="small"
-                                        >
-                                            {value}
-                                        </Typography>
-                                    );
+                                    return null;
                                 })}
                             </Box>
                         ) : (
