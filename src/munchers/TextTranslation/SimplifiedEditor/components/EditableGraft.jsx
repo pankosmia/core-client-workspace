@@ -27,7 +27,7 @@ export default function EditableGraft({scriptureJson, setScriptureJson, position
     }
     if (scriptureJson.blocks[position[0]]) {
         return (
-            <div style={{flexDirection: "column"}}>
+            <div>
                 <EditableTag scriptureJson={scriptureJson} setScriptureJson={setScriptureJson}
                              position={position}/>
                 <span

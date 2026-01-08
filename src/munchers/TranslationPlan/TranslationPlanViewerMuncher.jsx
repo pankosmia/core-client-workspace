@@ -315,15 +315,31 @@ function TranslationPlanViewerMuncher() {
                                             planIngredient.fieldInitialValues[field.name] ??
                                             "";
                                         return (
-                                            <Box sx={{display:"flex", alignItems:"center", textAlign:"left"}}>
-                                                <Typography sx={{ fontFamily: "monospace", fontSize:"medium",paddingRight:"1em"}}>
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                    textAlign: "left"
+                                                }}
+                                            >
+                                                <Typography
+                                                    sx={{
+                                                        fontFamily: "monospace",
+                                                        fontSize: "medium",
+                                                        paddingRight: "1em"
+                                                    }}
+                                                >
                                                     {styleParaTag}
                                                 </Typography>
-                                                <Typography size="small" className={styleParaTag}>
+
+                                                <Typography
+                                                    className={styleParaTag}
+                                                    size="small"
+                                                >
                                                     {value}
                                                 </Typography>
-                                            </Box>
-
+                                            </div>
                                         );
                                     }
                                     if (Object.keys(verseText).length > 0 && field.type === "scripture") {
