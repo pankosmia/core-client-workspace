@@ -308,12 +308,24 @@ function TranslationPlanViewerMuncher() {
                         {section ? (
                             <Box sx={{ padding: 1 }}>
                                 {planIngredient.sectionStructure.map((field, i) => {
-                                    const className = field.paraTag || "";
-                                    const value =
-                                        section.fieldInitialValues[field.name] ??
-                                        planIngredient.fieldInitialValues[field.name] ??
-                                        "";
+                                    if (field.type !== "scripture") {
+                                        const styleParaTag = field.paraTag || "";
+                                        const value =
+                                            section.fieldInitialValues[field.name] ??
+                                            planIngredient.fieldInitialValues[field.name] ??
+                                            "";
+                                        return (
+                                            <Box display="flex" alignItems="center" textAlign="left">
+                                                <Typography sx={{ fontFamily: "monospace", fontSize:"medium",paddingRight:"1em"}}>
+                                                    {styleParaTag}
+                                                </Typography>
+                                                <Typography size="small" className={styleParaTag}>
+                                                    {value}
+                                                </Typography>
+                                            </Box>
 
+                                        );
+                                    }
                                     if (Object.keys(verseText).length > 0 && field.type === "scripture") {
                                         let chapterN = "0"
                                         return (
@@ -360,16 +372,7 @@ function TranslationPlanViewerMuncher() {
                                     } else {
                                         <Typography> loading ...</Typography>
                                     }
-                                    return (
-                                        <Typography
-                                            key={i}
-                                            className={className}
-                                            fullWidth
-                                            size="small"
-                                        >
-                                            {value}
-                                        </Typography>
-                                    );
+                                    return null;
                                 })}
                             </Box>
                         ) : (
