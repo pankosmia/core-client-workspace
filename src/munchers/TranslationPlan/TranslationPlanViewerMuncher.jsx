@@ -315,7 +315,7 @@ function TranslationPlanViewerMuncher() {
                                             planIngredient.fieldInitialValues[field.name] ??
                                             "";
                                         return (
-                                            <Box display="flex" alignItems="center" textAlign="left">
+                                            <Box sx={{display:"flex", alignItems:"center", textAlign:"left"}}>
                                                 <Typography sx={{ fontFamily: "monospace", fontSize:"medium",paddingRight:"1em"}}>
                                                     {styleParaTag}
                                                 </Typography>
