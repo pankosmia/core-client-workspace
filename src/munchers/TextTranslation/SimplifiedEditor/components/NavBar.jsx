@@ -59,16 +59,16 @@ function NavBar({ metadata, chapterNumbers }) {
 
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            {scriptDirection === "ltr" ? (
+            {scriptDirection === "rtr" ? (
                 <ButtonGroup>
-                    <IconButton disabled={currentPosition < 1} onClick={() => { previousChapter() }}>
-                        <KeyboardArrowLeftIcon fontSize="small" />
+                    <IconButton onClick={() => { previousChapter() }}>
+                        <KeyboardArrowRightIcon fontSize="small" />
                     </IconButton>
                 </ButtonGroup>
             ) :
                 <ButtonGroup>
-                    <IconButton onClick={() => { previousChapter() }}>
-                        <KeyboardArrowRightIcon fontSize="small" />
+                    <IconButton disabled={currentPosition < 1} onClick={() => { previousChapter() }}>
+                        <KeyboardArrowLeftIcon fontSize="small" />
                     </IconButton>
                 </ButtonGroup>
             }
@@ -92,16 +92,16 @@ function NavBar({ metadata, chapterNumbers }) {
             </TextField>
 
 
-            {scriptDirection === "ltr" ? (
+            {scriptDirection === "rtr" ? (
                 <ButtonGroup>
-                    <IconButton disabled={currentPosition >= (chapterNumbers.length - 1)} onClick={() => { nextChapter() }}>
-                        <KeyboardArrowRightIcon fontSize="small" />
+                    <IconButton onClick={() => { nextChapter() }}>
+                        <KeyboardArrowLeftIcon fontSize="small" />
                     </IconButton>
                 </ButtonGroup>
             ) :
                 <ButtonGroup>
-                    <IconButton onClick={() => { nextChapter() }}>
-                        <KeyboardArrowLeftIcon fontSize="small" />
+                    <IconButton disabled={currentPosition >= (chapterNumbers.length - 1)} onClick={() => { nextChapter() }}>
+                        <KeyboardArrowRightIcon fontSize="small" />
                     </IconButton>
                 </ButtonGroup>
             }
