@@ -1,5 +1,6 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Box, Button, MenuItem, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Typography, TextField } from "@mui/material";
+import { useState, useContext, useEffect } from "react";
+import { Box, MenuItem, TextField, Tooltip } from "@mui/material";
+import md5sum from "md5";
 import {
     bcvContext as BcvContext,
     i18nContext as I18nContext,
@@ -9,16 +10,16 @@ import {
     doI18n,
     postEmptyJson,
     getText,
-    debugContext,
 } from "pithekos-lib";
 
-function BcvPicker() {
-    const { bcvRef} = useContext(BcvContext);
+function BcvPicker({ md5sumScriptureJson, scriptureJson }) {
+    const { bcvRef } = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const { i18nRef } = useContext(I18nContext);
     const { currentProjectRef } = useContext(CurrentProjectContext);
     const [contentBooks, setContentBooks] = useState([]);
-    const [currentBook,setCurrentBook]= useState(bcvRef.current.bookCode);
+    const [currentBook, setCurrentBook] = useState(bcvRef.current.bookCode);
+    const isDisabled = md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson
 
     useEffect(
         () => {
@@ -62,6 +63,7 @@ function BcvPicker() {
                 `/navigation/bcv/${b}/${chapter}/1`,
                 debugRef.current
             );
+
         }
     };
 
@@ -69,34 +71,38 @@ function BcvPicker() {
         doChapterNumbers(currentBook);
     }, [currentBook]);
 
-
-    return <Box sx={{ justifyContent: "space-between" }}>
-        <div>
-            <TextField
-                label={`${doI18n("pages:core-local-workspace:book", i18nRef.current)}`}
-                fullWidth
-                id="book-button"
-                size="small"
-                select
-                value={bcvRef.current.bookCode}
-            >
-                {
-                    contentBooks.map((b, n) =>
-                        <MenuItem
-                            sx={{ maxHeight: "3rem", height: "2rem" }}
-                            value={b}
-                            key={n}
-                            onClick={
-                                () => doChapterNumbers(b)
-                            }
-                        >
-                            {doI18n(`scripture:books:${b}`, i18nRef.current)}
-                        </MenuItem>
-                    )
-                }
-            </TextField>
-        </div>
-    </Box>
+    return (
+        <Box sx={{ justifyContent: "space-between" }}>
+            <div>
+                <Tooltip title={isDisabled ? `${doI18n("pages:core-local-workspace:disabled_bcvPicker", i18nRef.current)}` : ""}>
+                    <TextField
+                        label={`${doI18n("pages:core-local-workspace:book", i18nRef.current)}`}
+                        fullWidth
+                        id="book-button"
+                        size="small"
+                        select
+                        value={bcvRef.current.bookCode}
+                        disabled={isDisabled}
+                    >
+                        {
+                            contentBooks.map((b, n) =>
+                                <MenuItem
+                                    sx={{ maxHeight: "3rem", height: "2rem" }}
+                                    value={b}
+                                    key={n}
+                                    onClick={
+                                        () => { doChapterNumbers(b) }
+                                    }
+                                >
+                                    {doI18n(`scripture:books:${b}`, i18nRef.current)}
+                                </MenuItem>
+                            )
+                        }
+                    </TextField>
+                </Tooltip>
+            </div>
+        </Box>
+    )
 }
 
 export default BcvPicker;

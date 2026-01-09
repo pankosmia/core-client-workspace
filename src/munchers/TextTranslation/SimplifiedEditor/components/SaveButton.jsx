@@ -7,7 +7,7 @@ import I18nContext from "pithekos-lib/dist/contexts/i18nContext";
 import { useContext } from "react";
 import draftJson2usfm from "../../../../components/draftJson2usfm";
 
-function SaveButton({ metadata, systemBcv,modified, setModified,md5sumScriptureJson, setMd5sumScriptureJson, scriptureJson }) {
+function SaveButton({ metadata, systemBcv, setModified,md5sumScriptureJson, setMd5sumScriptureJson, scriptureJson }) {
     const { i18nRef } = useContext(I18nContext);
 
     // Permet de sauvegarder dans le fichier TSV 

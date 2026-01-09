@@ -3,9 +3,8 @@ import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
   getText,
-  postEmptyJson,
 } from "pithekos-lib";
-import { Box, Button, Grid2, IconButton, Typography } from "@mui/material";
+import { Box, Grid2, IconButton, Typography } from "@mui/material";
 import NavBar from "./components/NavBar";
 import SaveButton from "./components/SaveButton";
 import ChangeEditor from "../ChangeEditor";
@@ -36,6 +35,7 @@ function DraftingEditor({
   const [currentBookCode, setCurrentBookCode] = useState("zzz");
   const [currentChapter, setCurrentChapter] = useState("zzz");
   const [md5sumScriptureJson, setMd5sumScriptureJson] = useState([]);
+  
   const handlePreviewText = () => {
     setOpenModalPreviewText(true)
   }
@@ -149,7 +149,6 @@ function DraftingEditor({
             <SaveButton
               metadata={metadata}
               systemBcv={systemBcv}
-              modified={modified}
               setModified={setModified}
               md5sumScriptureJson={md5sumScriptureJson}
               setMd5sumScriptureJson={setMd5sumScriptureJson}
@@ -164,7 +163,11 @@ function DraftingEditor({
           </Grid2>
 
           <Grid2 display="flex" gap={1}>
-            <BcvPicker/>
+            <BcvPicker
+              md5sumScriptureJson={md5sumScriptureJson}
+              setMd5sumScriptureJson={setMd5sumScriptureJson}
+               scriptureJson={scriptureJson}
+            />
             <NavBar
               chapterNumbers={chapterNumbers}
               metadata={metadata}

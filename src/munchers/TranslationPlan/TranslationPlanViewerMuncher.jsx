@@ -379,7 +379,7 @@ function TranslationPlanViewerMuncher() {
                 )}
             </Box>
 
-            {/* Dialog d'information */}
+            {/* info dialog */}
             <PanDialog
                 titleLabel="About"
                 isOpen={openDialogAbout}
@@ -391,9 +391,7 @@ function TranslationPlanViewerMuncher() {
                         if (hiddenKeys.includes(key)) return null;
                         return (
                             <DialogContentText key={key} mb={2}>
-                                <Typography fullWidth size="small">
-                                    {value}
-                                </Typography>
+                                {value}
                             </DialogContentText>
                         );
                     })}

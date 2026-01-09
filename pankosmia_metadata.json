@@ -706,6 +706,9 @@
       "en": "PDF Preview",
       "fr": "Prévisualisation PDF",
       "id": "Pratinjau PDF"
+    },
+    "disabled_bcvPicker":{
+      "en": "Save your work and you can change book"
     }
   }
 }
