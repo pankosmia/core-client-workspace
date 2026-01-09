@@ -21,7 +21,6 @@ function BcvNotesEditorMuncher({metadata}) {
     const [currentRowN, setCurrentRowN] = useState(1);
     const [md5Ingredient, setMd5Ingredient] = useState([]);
     const [cellValueChanged, setCellValueChanged] = useState(false);
-
     // Récupération des données du tsv
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -50,7 +49,7 @@ function BcvNotesEditorMuncher({metadata}) {
     const updateBcv = rowN => {
         const newCurrentRow = ingredient[rowN][0];
         if (newCurrentRow[0]) {
-            const newCurrentRowCV = newCurrentRow[0].split(":");
+            const newCurrentRowCV = newCurrentRow.split(":");
             if (newCurrentRowCV.length === 2) {
                 postEmptyJson(
                     `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1].split("-")[0]}`,

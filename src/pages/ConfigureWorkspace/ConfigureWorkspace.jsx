@@ -1,13 +1,16 @@
 import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import { Header, debugContext, i18nContext, currentProjectContext, getJson, doI18n } from "pithekos-lib";
+import { useLocation, useNavigate } from "react-router-dom";
+import { debugContext, i18nContext, currentProjectContext, getJson, doI18n, Header } from "pithekos-lib";
 import {
     Box,
     Typography,
     Fab,
-    IconButton
+    ToggleButtonGroup,
+    ToggleButton,
+    Grid2,
+    DialogContent,
 } from "@mui/material";
-
+import { PanDialog } from 'pankosmia-rcl';
 import { DataGrid } from '@mui/x-data-grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SvgViewEditorBottom from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_bottom";
@@ -16,20 +19,27 @@ import SvgViewEditorRightColumn from "../../munchers/TextTranslation/SimplifiedE
 import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_row";
 import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_row";
 import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_top";
+import SvgViewEditorTopDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_top_disabled";
+import SvgViewEditorBottomDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_bottom_disabled";
+import SvgViewEditorLeftColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_column_disabled";
+import SvgViewEditorLeftRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_row_disabled";
+import SvgViewEditorRightRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_row_disabled";
+import SvgViewEditorRightColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_column_disabled";
 
-function ConfigureWorkspace({layout, setLayout}) {
+function ConfigureWorkspace({ layout, setLayout }) {
 
     const { debugRef } = useContext(debugContext);
     const { i18nRef } = useContext(i18nContext);
     const { currentProjectRef } = useContext(currentProjectContext);
-
-    const [selectedResources, setSelectedResources] = useState([]);
+    const [open, setOpen] = useState(true);
     const navigate = useNavigate();
-
+    const location = useLocation();
+    const localisationState = location.state;
+    const [selectedResources, setSelectedResources] = useState(new Set(localisationState ? localisationState.map(item => item[0]) : []));
     const [projectSummaries, setProjectSummaries] = useState({});
-
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
+    const [alignment, setAlignment] = useState(selectedResources.size === 0 ? "" : layout);
 
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
@@ -37,12 +47,52 @@ function ConfigureWorkspace({layout, setLayout}) {
             setProjectSummaries(summariesResponse.json);
         }
     }
+    const handleAlignment = (newAlignment) => {
+        setAlignment(newAlignment);
+    };
 
     useEffect(
         () => {
             getProjectSummaries().then();
         },
         []
+    );
+
+    const handleClose = async () => {
+        setOpen(false);
+        const params = new URLSearchParams(location.search);
+        const returnPage = params.get("return-page");
+        if (returnPage === "workspace") {
+            let stateEntries = Object.entries(projectSummaries)
+                .map(e => {
+                    return { ...e[1], path: e[0] }
+                })
+                .map(r => [r.path, r])
+                .filter(re => selectedResources.has(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
+                .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
+                    ...re[1],
+                    primary: true
+                }] : re)
+            navigate(
+                "/workspace",
+                {
+                    state: Object.fromEntries(stateEntries),
+                }
+            );
+        } else {
+            window.location.replace("/clients/content");
+            return;
+        }
+    };
+
+    useEffect(
+        () => {
+            if (selectedResources.size === 0) {
+                setAlignment("")
+            } else
+                setAlignment(layout)
+        },
+        [selectedResources, layout]
     );
 
     useEffect(() => {
@@ -139,110 +189,171 @@ function ConfigureWorkspace({layout, setLayout}) {
 
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
-        <Box>
-            <Box style={{ position: 'fixed', width: '100%' }}>
+        <Box
+            sx={{
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                zIndex: -1,
+                backgroundImage:
+                    'url("/app-resources/pages/content/background_blur.png")',
+                backgroundRepeat: "no-repeat",
+                backdropFilter: "blur(3px)",
+            }}
+        >
+            <Box style={{ position: 'static' }}>
                 <Header
-                    titleKey="pages:core-local-workspace:Select_Resources"
+                    titleKey="pages:core-local-workspace:title"
                     requireNet={false}
                     currentId="core-local-workspace"
                 />
             </Box>
-            <Box
-                style={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'auto', width: '100%' }}>
-                 <IconButton onClick={()=>setLayout("top")}>
-                    <SvgViewEditorTop/>
-                </IconButton>
-                <IconButton onClick={()=>setLayout("bottom")}>
-                    <SvgViewEditorBottom />
-                </IconButton>
-                <IconButton onClick={()=>setLayout("leftV")}>
-                    <SvgViewEditorLeftColumn />
-                </IconButton>
-                 <IconButton onClick={()=>setLayout("rightV")}>
-                    <SvgViewEditorRightColumn/>
-                </IconButton>
-                 <IconButton onClick={()=>setLayout("leftH")}>
-                    <SvgViewEditorLeftRow/>
-                </IconButton>
-                 <IconButton onClick={()=>setLayout("rightH")}>
-                    <SvgViewEditorRightRow/>
-                </IconButton>
-                <Typography
-                    sx={{ ml: 2 }}
-                > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)} </Typography>
-                <Fab
-                    variant="extended"
-                    color="primary"
-                    size="small"
-                    aria-label={doI18n("pages:content:add", i18nRef.current)}
-                    sx={{
-                        margin: 0,
-                        top: 64,
-                        right: 16,
-                        bottom: "auto",
-                        left: "auto",
-                        position: 'fixed'
-                    }}
-                    onClick={
-                        (e) => {
-                            let stateEntries = Object.entries(projectSummaries)
-                                .map(e => {
-                                    return { ...e[1], path: e[0] }
-                                })
-                                .map(r => [r.path, r])
-                                .filter(re => selectedResources.includes(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
-                                .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
-                                    ...re[1],
-                                    primary: true
-                                }] : re)
-                            navigate(
-                                "/workspace",
-                                {
-                                    state: Object.fromEntries(stateEntries)
+            <PanDialog
+                titleLabel={`${doI18n("pages:core-local-workspace:Select_Resources", i18nRef.current, debugRef.current)}`}
+                isOpen={open}
+                closeFn={() => handleClose()}
+            >
+                <DialogContent>
+                    <Grid2
+                        container
+                        alignItems="center"
+                        justifyContent="space-between"
+                        width="100%"
+                    >
+                        <Grid2 display="flex" gap={1}>
+                            <Typography
+                            > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)}
+                            </Typography>
+
+                        </Grid2>
+                        <Grid2 display="flex" gap={1}>
+                            <ToggleButtonGroup
+                                value={alignment}
+                                exclusive
+                                onChange={handleAlignment}
+                            >
+                                <ToggleButton value="ViewEditorTop" onClick={() => setLayout("ViewEditorTop")} disabled={selectedResources.size === 0}
+                                >
+                                    {selectedResources.size === 0 ?
+                                        (
+                                            <SvgViewEditorTopDisabled />
+                                        ) :
+                                        <SvgViewEditorTop />
+                                    }
+                                </ToggleButton>
+
+                                <ToggleButton value="ViewEditorBottom" onClick={() => setLayout("ViewEditorBottom")} disabled={selectedResources.size === 0}>
+                                    {selectedResources.size === 0 ?
+                                        (
+                                            <SvgViewEditorBottomDisabled />
+                                        ) :
+                                        <SvgViewEditorBottom />
+                                    }
+                                </ToggleButton>
+
+                                <ToggleButton value="ViewEditorLeftColumn" onClick={() => setLayout("ViewEditorLeftColumn")} disabled={selectedResources.size === 0}>
+                                    {selectedResources.size === 0 ?
+                                        (
+                                            <SvgViewEditorLeftColumnDisabled />
+                                        ) :
+                                        <SvgViewEditorLeftColumn />
+                                    }
+                                </ToggleButton>
+
+                                <ToggleButton value="ViewEditorRightColumn" onClick={() => setLayout("ViewEditorRightColumn")} disabled={selectedResources.size === 0}>
+                                    {selectedResources.size === 0 ?
+                                        (
+                                            <SvgViewEditorRightColumnDisabled />
+                                        ) :
+                                        <SvgViewEditorRightColumn />
+                                    }
+                                </ToggleButton>
+
+                                <ToggleButton value="ViewEditorLeftRow" onClick={() => setLayout("ViewEditorLeftRow")} disabled={selectedResources.size === 0}>
+
+                                    {selectedResources.size === 0 ?
+                                        (
+                                            <SvgViewEditorLeftRowDisabled />
+                                        ) :
+                                        <SvgViewEditorLeftRow />
+                                    }
+                                </ToggleButton>
+
+                                <ToggleButton value="ViewEditorRightRow" onClick={() => setLayout("ViewEditorRightRow")} disabled={selectedResources.size === 0}>
+                                    {selectedResources.size === 0 ?
+                                        (
+                                            <SvgViewEditorRightRowDisabled />
+                                        ) :
+                                        <SvgViewEditorRightRow />
+                                    }
+                                </ToggleButton>
+
+                            </ToggleButtonGroup>
+                        </Grid2>
+                        <Grid2
+                            display="flex"
+                            gap={1}
+                        >
+                            <Fab
+                                variant="extended"
+                                color="primary"
+                                length="small"
+                                aria-label={doI18n("pages:content:add", i18nRef.current)}
+                                onClick={
+                                    (e) => {
+                                        let stateEntries = Object.entries(projectSummaries)
+                                            .map(e => {
+                                                return { ...e[1], path: e[0] }
+                                            })
+                                            .map(r => [r.path, r])
+                                            .filter(re => selectedResources.has(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
+                                            .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
+                                                ...re[1],
+                                                primary: true
+                                            }] : re)
+                                        navigate(
+                                            "/workspace",
+                                            {
+                                                state: Object.fromEntries(stateEntries),
+                                            }
+                                        );
+                                        e.stopPropagation();
+                                    }
                                 }
-                            );
-                            e.stopPropagation();
-                        }
-                    }
-                >
-                    <Typography variant="body2">
-                        {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
-                    </Typography>
-                    <PlayArrowIcon />
-                </Fab>
-            </Box>
-            <Box style={{
-                position: 'fixed',
-                top: '105px',
-                bottom: 0,
-                overflow: 'auto',
-                marginBottom: "16px",
-                width: '100%'
-            }}>
-                <Box sx={{ ml: 2 }}>
-                    <DataGrid
-                        initialState={{
-                            columns: {
-                                columnVisibilityModel: {
-                                    description: false
+                            >
+                                <Typography variant="body2">
+                                    {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
+                                </Typography>
+                                <PlayArrowIcon />
+                            </Fab>
+                        </Grid2>
+                    </Grid2>
+                    <Box sx={{ m: 2 }}>
+                        <DataGrid
+                            getRowId={r => r.path}
+                            initialState={{
+                                columns: {
+                                    columnVisibilityModel: {
+                                        description: false
+                                    }
+                                },
+                                sorting: {
+                                    sortModel: [{ field: 'name', sort: 'asc' }],
                                 }
-                            },
-                            sorting: {
-                                sortModel: [{ field: 'name', sort: 'asc' }],
-                            }
-                        }}
-                        checkboxSelection
-                        onRowSelectionModelChange={(selected) => {
-                            const selectedRowData = rows.filter((row) => selected.ids.has(row.id));
-                            const selectedPaths = selectedRowData.map((data) => data["path"]);
-                            setSelectedResources(selectedPaths);
-                        }}
-                        rows={rows}
-                        columns={columns}
-                        sx={{ fontSize: "1rem" }}
-                    />
-                </Box>
-            </Box>
+                            }}
+                            checkboxSelection
+                            rowSelectionModel={{ ids: selectedResources, type: "include" }}
+                            onRowSelectionModelChange={nv => setSelectedResources(nv.ids)}
+                            rows={rows}
+                            columns={columns}
+                            sx={{ fontSize: "1rem" }}
+
+                        />
+                    </Box>
+                </DialogContent>
+            </PanDialog>
         </Box>
 }
 

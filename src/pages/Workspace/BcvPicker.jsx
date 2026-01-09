@@ -8,15 +8,17 @@ import {
     getJson,
     doI18n,
     postEmptyJson,
+    getText,
     debugContext,
 } from "pithekos-lib";
 
 function BcvPicker() {
-    const { bcvRef } = useContext(BcvContext);
+    const { bcvRef} = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const { i18nRef } = useContext(I18nContext);
     const { currentProjectRef } = useContext(CurrentProjectContext);
     const [contentBooks, setContentBooks] = useState([]);
+    const [currentBook,setCurrentBook]= useState(bcvRef.current.bookCode);
 
     useEffect(
         () => {
@@ -44,17 +46,29 @@ function BcvPicker() {
         [currentProjectRef]
     )
 
-    const [book, setBook] = useState('');
-    const [dialogIsOpen, setDialogIsOpen] = useState(false);
+    const doChapterNumbers = async (b) => {
+        const projectPath = `${currentProjectRef.current.source}/${currentProjectRef.current.organization}/${currentProjectRef.current.project}`;
+        const usfmResponse = await getText(
+            `/burrito/ingredient/raw/${projectPath}?ipath=${b}.usfm`,
+            debugRef.current
+        );
+        setCurrentBook(b);
+        if (usfmResponse.ok) {
+            const usfmString = usfmResponse.text;
+            const re = /\\c\s+(\d+)/;
+            const match = usfmString.match(re);
+            const chapter = match[1];
+            postEmptyJson(
+                `/navigation/bcv/${b}/${chapter}/1`,
+                debugRef.current
+            );
+        }
+    };
 
-    const handleDialogClose = () => {
-        setDialogIsOpen(false);
-        setBook('');
-    };
-    const handleChangeBook = (b) => {
-        postEmptyJson(`/navigation/bcv/${b}/1/1`, debugContext.current).then();
-        handleDialogClose();
-    };
+    useEffect(() => {
+        doChapterNumbers(currentBook);
+    }, [currentBook]);
+
 
     return <Box sx={{ justifyContent: "space-between" }}>
         <div>
@@ -73,7 +87,7 @@ function BcvPicker() {
                             value={b}
                             key={n}
                             onClick={
-                                () => handleChangeBook(b)
+                                () => doChapterNumbers(b)
                             }
                         >
                             {doI18n(`scripture:books:${b}`, i18nRef.current)}
@@ -82,31 +96,6 @@ function BcvPicker() {
                 }
             </TextField>
         </div>
-
-        <Dialog
-            open={dialogIsOpen}
-            onClose={handleDialogClose}
-            slotProps={{
-                paper: {
-                    component: 'form',
-                },
-            }}
-        >
-            <DialogTitle><b>{doI18n("pages:core-local-workspace:change_book", i18nRef.current)}</b></DialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                    <Typography>
-                        {doI18n("pages:core-local-workspace:change_book_question", i18nRef.current)}
-                    </Typography>
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleDialogClose}>{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
-                <Button onClick={() => {
-                    handleChangeBook(book);
-                }}>{doI18n("pages:core-local-workspace:accept", i18nRef.current)}</Button>
-            </DialogActions>
-        </Dialog>
     </Box>
 }
 
