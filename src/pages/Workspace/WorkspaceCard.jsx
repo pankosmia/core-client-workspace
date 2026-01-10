@@ -154,8 +154,9 @@ function WorkspaceCard({metadata, style, distractionModeCount,locationState}) {
             />
         </div>
     }
+     // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
      if (metadata.flavor.toLowerCase() === "x-translationplan") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={{...style, lineHeight: 'normal'}} dir={scriptDirectionString}>
             <TranslationPlanViewerMuncher
                 metadata={metadata}
             />
