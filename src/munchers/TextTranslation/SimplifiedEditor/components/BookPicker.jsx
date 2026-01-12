@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Box, Button, MenuItem, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Typography, TextField } from "@mui/material";
+import { Box, MenuItem, TextField } from "@mui/material";
 import {
     bcvContext as BcvContext,
     i18nContext as I18nContext,
@@ -8,36 +8,25 @@ import {
     getJson,
     doI18n,
     postEmptyJson,
-    getText,
-    debugContext,
+    getText
 } from "pithekos-lib";
 
-function BcvPicker() {
+function BookPicker() {
     const { bcvRef} = useContext(BcvContext);
     const { debugRef } = useContext(DebugContext);
     const { i18nRef } = useContext(I18nContext);
     const { currentProjectRef } = useContext(CurrentProjectContext);
     const [contentBooks, setContentBooks] = useState([]);
-    const [currentBook,setCurrentBook]= useState(bcvRef.current.bookCode);
+    const [currentBook, setCurrentBook]= useState(bcvRef.current.bookCode);
 
     useEffect(
         () => {
             const getProjectBooks = async () => {
                 if (currentProjectRef.current) {
                     const projectPath = `${currentProjectRef.current.source}/${currentProjectRef.current.organization}/${currentProjectRef.current.project}`;
-                    const fullMetadataResponse = await getJson(`/burrito/metadata/raw/${projectPath}`, debugRef.current);
+                    const fullMetadataResponse = await getJson(`/burrito/metadata/summary/${projectPath}`, debugRef.current);
                     if (fullMetadataResponse.ok) {
-                        setContentBooks(
-                            Object.entries(fullMetadataResponse.json.ingredients)
-                                .map(
-                                    i =>
-                                        Object.keys(i[1].scope || {})
-                                )
-                                .reduce(
-                                    (a, b) => [...a, ...b],
-                                    []
-                                )
-                        );
+                        setContentBooks(fullMetadataResponse.json.book_codes);
                     }
                 }
             };
@@ -46,29 +35,30 @@ function BcvPicker() {
         [currentProjectRef]
     )
 
-    const doChapterNumbers = async (b) => {
+    const setFirstChapter = async (b) => {
         const projectPath = `${currentProjectRef.current.source}/${currentProjectRef.current.organization}/${currentProjectRef.current.project}`;
         const usfmResponse = await getText(
             `/burrito/ingredient/raw/${projectPath}?ipath=${b}.usfm`,
             debugRef.current
         );
-        setCurrentBook(b);
         if (usfmResponse.ok) {
+            setCurrentBook(b);
             const usfmString = usfmResponse.text;
             const re = /\\c\s+(\d+)/;
             const match = usfmString.match(re);
+            if (match) {
             const chapter = match[1];
             postEmptyJson(
                 `/navigation/bcv/${b}/${chapter}/1`,
                 debugRef.current
             );
         }
+            }
     };
 
     useEffect(() => {
-        doChapterNumbers(currentBook);
+        setFirstChapter(currentBook);
     }, [currentBook]);
-
 
     return <Box sx={{ justifyContent: "space-between" }}>
         <div>
@@ -87,7 +77,7 @@ function BcvPicker() {
                             value={b}
                             key={n}
                             onClick={
-                                () => doChapterNumbers(b)
+                                () => setFirstChapter(b)
                             }
                         >
                             {doI18n(`scripture:books:${b}`, i18nRef.current)}
@@ -99,4 +89,4 @@ function BcvPicker() {
     </Box>
 }
 
-export default BcvPicker;
+export default BookPicker;

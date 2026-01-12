@@ -1,18 +1,30 @@
-import { useContext, useEffect, useState } from "react";
-import { Box, Button, DialogContent, DialogContentText, FormControl, IconButton, InputAdornment, Menu, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
-import { bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, postEmptyJson } from "pithekos-lib";
+import {useContext, useEffect, useState} from "react";
+import {
+    Box,
+    Button,
+    DialogContent,
+    DialogContentText,
+    FormControl,
+    IconButton,
+    InputAdornment,
+    Menu,
+    MenuItem,
+    TextField,
+    Tooltip,
+    Typography
+} from "@mui/material";
+import {bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, postEmptyJson} from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
 import SearchIcon from '@mui/icons-material/Search';
-import { Proskomma } from "proskomma-core";
-import { PanDialog } from 'pankosmia-rcl';
+import {Proskomma} from "proskomma-core";
+import {PanDialog} from 'pankosmia-rcl';
 
 function TranslationPlanViewerMuncher() {
     const [planIngredient, setPlanIngredient] = useState();
-    console.log("planIngredient", planIngredient)
-    const { i18nRef } = useContext(i18nContext);
-    const { systemBcv } = useContext(BcvContext);
+    const {i18nRef} = useContext(i18nContext);
+    const {systemBcv} = useContext(BcvContext);
     const [openDialogAbout, setOpenDialogAbout] = useState(false);
-    const { debugRef } = useContext(debugContext);
+    const {debugRef} = useContext(debugContext);
     const [verseText, setVerseText] = useState({});
     const [burritos, setBurritos] = useState([]);
     const [selectedBurrito, setSelectedBurrito] = useState(null);
@@ -45,9 +57,9 @@ function TranslationPlanViewerMuncher() {
                     if (usfmResponse.ok) {
                         const pk = new Proskomma();
                         pk.importDocument({
-                            lang: "xxx",
-                            abbr: "yyy"
-                        },
+                                lang: "xxx",
+                                abbr: "yyy"
+                            },
                             "usfm",
                             usfmResponse.text
                         );
@@ -74,12 +86,14 @@ function TranslationPlanViewerMuncher() {
                                         i.chapter,
                                         Object.fromEntries(
                                             i.verses
-                                                .map((v, n) => [
-                                                    `${n}`,
-                                                    v.verse.length > 0 ?
-                                                        v.verse[0].text :
-                                                        []
-                                                ])
+                                                .map(
+                                                    (v, n) => [
+                                                        `${n}`,
+                                                        v.verse.length > 0 ?
+                                                            v.verse[0].text :
+                                                            []
+                                                    ]
+                                                )
                                                 .filter(kv => typeof kv[1] === "string")
                                         )
                                     ]
@@ -104,10 +118,14 @@ function TranslationPlanViewerMuncher() {
                 if (!response.ok) throw new Error(`HTTP error ${response.status}`);
                 const data = await response.json();
                 // Filter only those with flavor_type = scripture
-                const burritoArray = Object.entries(data).map(([key, value]) => ({
-                    path: key,
-                    ...value,
-                }));
+                const burritoArray = Object.entries(data).map(
+                    ([key, value]) => (
+                        {
+                            path: key,
+                            ...value,
+                        }
+                    )
+                );
 
                 // Filter only scripture burritos
                 const scriptures = burritoArray.filter(
@@ -116,15 +134,15 @@ function TranslationPlanViewerMuncher() {
                 setBurritos(scriptures);
             } catch (err) {
                 console.error("Error fetching summaries:", err);
-            } finally {
             }
         }
+
         fetchSummaries();
     }, [selectedBurrito]);
 
     const handleSelectBurrito = (event) => {
         const name = event.target.value;
-        const burrito = burritos.find((b) => b.name === name);
+        const burrito = burritos.find(b => b.name === name);
         setSelectedBurrito(burrito);
     };
 
@@ -162,7 +180,9 @@ function TranslationPlanViewerMuncher() {
         []
     );
 
-    if (!planIngredient) { return <Typography> loading...</Typography> }
+    if (!planIngredient) {
+        return <Typography> loading...</Typography>
+    }
 
     const isInInterval = (section, systemBcv) => {
 
@@ -182,12 +202,14 @@ function TranslationPlanViewerMuncher() {
             isInInterval(section, systemBcv)
     );
 
-    const filteredStories = planIngredient.sections.filter(c => {
-        const label = `${c.fieldInitialValues.reference} ${c.fieldInitialValues.sectionTitle}`
-            .toLowerCase();
+    const filteredStories = planIngredient.sections.filter(
+        c => {
+            const label = `${c.fieldInitialValues.reference} ${c.fieldInitialValues.sectionTitle}`
+                .toLowerCase();
 
-        return label.includes(search.toLowerCase());
-    });
+            return label.includes(search.toLowerCase());
+        }
+    );
 
     const updateBcv = (b, c, v) => {
         postEmptyJson(
@@ -205,7 +227,7 @@ function TranslationPlanViewerMuncher() {
             }}
         >
             <Box
-                sx={{ marginLeft: "auto" }}>
+                sx={{marginLeft: "auto"}}>
                 <Button
                     id="fade-button"
                     aria-controls={open ? 'fade-menu' : undefined}
@@ -245,7 +267,7 @@ function TranslationPlanViewerMuncher() {
                                 input: {
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <SearchIcon />
+                                            <SearchIcon/>
                                         </InputAdornment>
                                     )
                                 }
@@ -257,36 +279,41 @@ function TranslationPlanViewerMuncher() {
                             {`${doI18n("pages:core-local-workspace:no_result", i18nRef.current, debugRef.current)}`}
                         </MenuItem>
                     ) : (
-                        filteredStories.map((c, i) => (
-                            <Tooltip key={i} title={c.fieldInitialValues.reference}>
-                                <MenuItem
-                                    onClick={() => {
-                                        setSelectedStory(c.fieldInitialValues.sectionNumber);
-                                        handleClose();
-                                        updateBcv(
-                                            c.bookCode,
-                                            c.cv[0].split(":")[0],
-                                            c.cv[0].split(":")[1]
-                                        );
-                                    }}
-                                    value={c.fieldInitialValues.sectionNumber}
-                                    selected={selectedStory === c.fieldInitialValues.sectionNumber}
-                                >
-                                    {c.fieldInitialValues.sectionNumber} - {c.fieldInitialValues.sectionTitle}
-                                </MenuItem>
-                            </Tooltip>
-                        ))
-                    )}
+                        filteredStories.map(
+                            (c, i) => (
+                                <Tooltip key={i} title={c.fieldInitialValues.reference}>
+                                    <MenuItem
+                                        onClick={
+                                            () => {
+                                                setSelectedStory(c.fieldInitialValues.sectionNumber);
+                                                handleClose();
+                                                updateBcv(
+                                                    c.bookCode,
+                                                    c.cv[0].split(":")[0],
+                                                    c.cv[0].split(":")[1]
+                                                );
+                                            }
+                                        }
+                                        value={c.fieldInitialValues.sectionNumber}
+                                        selected={selectedStory === c.fieldInitialValues.sectionNumber}
+                                    >
+                                        {c.fieldInitialValues.sectionNumber} - {c.fieldInitialValues.sectionTitle}
+                                    </MenuItem>
+                                </Tooltip>
+                            )
+                        )
+                    )
+                    }
 
                 </Menu>
                 <IconButton onClick={() => handleOpenDialogAbout()}>
-                    <InfoIcon />
+                    <InfoIcon/>
                 </IconButton>
             </Box>
             <Box>
                 {/* choose your resources */}
                 <FormControl fullWidth
-                    sx={{ paddingLeft: "1rem", paddingRight: "1rem" }}>
+                             sx={{paddingLeft: "1rem", paddingRight: "1rem"}}>
                     <TextField
                         required
                         id="burrito-select-label"
@@ -296,18 +323,23 @@ function TranslationPlanViewerMuncher() {
                         label={doI18n(`pages:core-local-workspace:choose_document`, i18nRef.current)}
 
                     >
-                        {burritos.map((burrito) => (
-                            <MenuItem key={burrito.name} value={burrito.name}>
-                                {burrito.name}
-                            </MenuItem>
-                        ))}
+                        {
+                            burritos.map(
+                                (burrito) => (
+                                    <MenuItem key={burrito.name} value={burrito.name}>
+                                        {burrito.name}
+                                    </MenuItem>
+                                )
+                            )
+                        }
+
                     </TextField>
                 </FormControl>
 
                 {planIngredient && selectedBurrito && (
                     <>
                         {section ? (
-                            <Box sx={{ padding: 1 }}>
+                            <Box sx={{padding: 1}}>
                                 <div
                                     style={{
                                         display: "flex",
@@ -322,7 +354,7 @@ function TranslationPlanViewerMuncher() {
                                             borderRadius: "4px 0px 0px 4px",
                                             alignSelf: "center"
                                         }}>
-                                        //
+                                        {"//"}
                                     </Typography>
                                     <Typography
                                         sx={{
@@ -336,95 +368,100 @@ function TranslationPlanViewerMuncher() {
                                 </div>
 
 
-                                {planIngredient.sectionStructure.map((field, i) => {
-                                    if (field.type !== "scripture") {
-                                        const styleParaTag = field.paraTag || "";
-                                        const value =
-                                            section.fieldInitialValues[field.name] ||
-                                            planIngredient.fieldInitialValues[field.name] ||
-                                            "";
-                                        return (
-                                            <div
-                                                style={{
-                                                    display: "flex",
-                                                    flexDirection: "row",
-                                                    alignItems: "center",
-                                                    textAlign: "left",
-                                                }}
-                                            >
-                                                <Typography
-                                                    sx={{
-                                                        fontFamily: "monospace",
-                                                        fontSize: "medium",
-                                                        paddingRight: "1em",
+                                {planIngredient.sectionStructure.map(
+                                    (field, i) => {
+                                        if (field.type !== "scripture") {
+                                            const styleParaTag = field.paraTag || "";
+                                            const value =
+                                                section.fieldInitialValues[field.name] ||
+                                                planIngredient.fieldInitialValues[field.name] ||
+                                                "";
+                                            return (
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        flexDirection: "row",
+                                                        alignItems: "center",
+                                                        textAlign: "left",
                                                     }}
                                                 >
-                                                    {styleParaTag}
-                                                </Typography>
+                                                    <Typography
+                                                        sx={{
+                                                            fontFamily: "monospace",
+                                                            fontSize: "medium",
+                                                            paddingRight: "1em",
+                                                        }}
+                                                    >
+                                                        {styleParaTag}
+                                                    </Typography>
 
-                                                <Typography
-                                                    className={styleParaTag}
-                                                    size="small"
-                                                >
-                                                    {value}
-                                                </Typography>
-                                            </div>
-                                        );
-                                    }
-                                    if (Object.keys(verseText).length > 0 && field.type === "scripture") {
-                                        let chapterN = "0"
-                                        return (
-                                            <div>
-                                                {
-                                                    section.paragraphs
-                                                        .map(
-                                                            p => {
-                                                                if (p.units) {
-                                                                    const [c, v] = p.units[0].split(":")
-                                                                    const newChapter = c !== chapterN
-                                                                    if (newChapter) {
-                                                                        chapterN = c
-                                                                    }
-                                                                    return (
-                                                                        <>
-                                                                            {newChapter && <div className="marks_chapter_label">{c}</div>}
-                                                                            <div className={p.paraTag}>
-                                                                                {
-                                                                                    p.units.map(
-                                                                                        cv => <span>
-                                                                                            <span className="marks_verses_label">{cv.split(":")[1]} </span>
+                                                    <Typography
+                                                        className={styleParaTag}
+                                                        size="small"
+                                                    >
+                                                        {value}
+                                                    </Typography>
+                                                </div>
+                                            );
+                                        }
+                                        if (Object.keys(verseText).length > 0 && field.type === "scripture") {
+                                            let chapterN = "0"
+                                            return (
+                                                <div>
+                                                    {
+                                                        section.paragraphs
+                                                            .map(
+                                                                p => {
+                                                                    if (p.units) {
+                                                                        const c = p.units[0].split(":")[0]
+                                                                        const newChapter = c !== chapterN
+                                                                        if (newChapter) {
+                                                                            chapterN = c
+                                                                        }
+                                                                        return (
+                                                                            <>
+                                                                                {newChapter && <div
+                                                                                    className="marks_chapter_label">{c}</div>}
+                                                                                <div className={p.paraTag}>
+                                                                                    {
+                                                                                        p.units.map(
+                                                                                            cv => <span>
+                                                                                            <span
+                                                                                                className="marks_verses_label">{cv.split(":")[1]} </span>
                                                                                             <span>{verseText[cv.split(":")[0]][cv.split(":")[1]]} </span>
                                                                                         </span>
-                                                                                    )
-                                                                                }
-                                                                            </div>
-                                                                        </>
-                                                                    )
-                                                                } else {
-                                                                    return <div className={p.paraTag}>
-                                                                        {section.fieldInitialValues[p.name]}
-                                                                        {" "}
-                                                                        ({p.cv.join(" - ")})
-                                                                    </div>
+                                                                                        )
+                                                                                    }
+                                                                                </div>
+                                                                            </>
+                                                                        )
+                                                                    } else {
+                                                                        return <div className={p.paraTag}>
+                                                                            {section.fieldInitialValues[p.name]}
+                                                                            {" "}
+                                                                            ({p.cv.join(" - ")})
+                                                                        </div>
+                                                                    }
                                                                 }
-
-                                                            }
-
-                                                        )
-                                                }
-                                            </div>
-                                        );
-                                    } else {
-                                        <Typography> loading ...</Typography>
+                                                            )
+                                                    }
+                                                </div>
+                                            );
+                                        } else {
+                                            <Typography> loading ...</Typography>
+                                        }
+                                        return null;
                                     }
-                                    return null;
-                                })}
+                                )
+                                }
                             </Box>
                         ) : (
                             <Typography> no book found </Typography>
-                        )}
+                        )
+                        }
                     </>
-                )}
+                )
+                }
             </Box>
 
             {/* Dialog d'information */}
@@ -435,19 +472,24 @@ function TranslationPlanViewerMuncher() {
             >
                 <DialogContent>
                     {Object.entries(planIngredient).map(([key, value]) => {
-                        const hiddenKeys = ["sectionStructure", "sections", "fieldInitialValues", "short_name", "versification"]
-                        if (hiddenKeys.includes(key)) return null;
-                        return (
-                            <DialogContentText key={key} mb={2}>
-                                <Typography fullWidth size="small">
-                                    {value}
-                                </Typography>
-                            </DialogContentText>
-                        );
-                    })}
+                            const hiddenKeys = ["sectionStructure", "sections", "fieldInitialValues", "short_name", "versification"]
+                            if (hiddenKeys.includes(key)) {
+                                return null;
+                            }
+                            return (
+                                <DialogContentText key={key} mb={2}>
+                                    <Typography fullWidth size="small">
+                                        {value}
+                                    </Typography>
+                                </DialogContentText>
+                            );
+                        }
+                    )
+                    }
                 </DialogContent>
             </PanDialog>
         </Box>
     );
 }
+
 export default TranslationPlanViewerMuncher;

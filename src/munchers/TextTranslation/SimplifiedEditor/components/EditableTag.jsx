@@ -1,12 +1,12 @@
 import { useContext, useState } from 'react';
 import { ListItemText, Menu, MenuItem } from "@mui/material";
 import { updateBlockTag } from '../Controller';
-import mainBlockMenu from '../menus/main_blocks.json';
-import introductionBlockMenu from '../menus/intro_blocks.json';
-import titleBlockMenu from '../menus/title_blocks.json';
-import headingBlockMenu from '../menus/heading_blocks.json';
-import introduction_titleBlockMenu from '../menus/intro_title_blocks.json'
-import introduction_headingBlockMenu from '../menus/intro_heading_blocks.json'
+import mainBlockMenu from '../menuSpecs/main_blocks.json';
+import introductionBlockMenu from '../menuSpecs/intro_blocks.json';
+import titleBlockMenu from '../menuSpecs/title_blocks.json';
+import headingBlockMenu from '../menuSpecs/heading_blocks.json';
+import introduction_titleBlockMenu from '../menuSpecs/intro_title_blocks.json'
+import introduction_headingBlockMenu from '../menuSpecs/intro_heading_blocks.json'
 import I18nContext from 'pithekos-lib/dist/contexts/i18nContext';
 import { doI18n } from 'pithekos-lib';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';

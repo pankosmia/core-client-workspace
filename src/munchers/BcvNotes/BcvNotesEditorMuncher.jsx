@@ -12,7 +12,7 @@ import Editor from "./components/Editor"
 import AddFab from "./components/AddFab";
 import SaveTsvButton from "./components/SaveTsvButton";
 import md5 from "md5";
-import BcvPicker from "../../pages/Workspace/BcvPicker";
+import BookPicker from "../TextTranslation/SimplifiedEditor/components/BookPicker";
 
 function BcvNotesEditorMuncher({metadata}) {
     const [ingredient, setIngredient] = useState([]);
@@ -113,7 +113,7 @@ function BcvNotesEditorMuncher({metadata}) {
                     md5Ingredient={md5Ingredient}
                     setMd5Ingredient={setMd5Ingredient}
                 />
-                <BcvPicker/>
+                <BookPicker/>
             </Box>
 
             <Box sx={{display: 'flex', gap: 2, flexGrow: 1, padding: 2}}>

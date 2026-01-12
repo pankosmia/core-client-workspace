@@ -5,18 +5,16 @@ import { ButtonGroup } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { bcvContext, debugContext, getJson, postEmptyJson } from 'pithekos-lib';
 
-function NavBar({ metadata, chapterNumbers }) {
+function ChapterPicker({ repoMetadata, chapterNumbers }) {
     const [scriptDirection, setScriptDirection] = useState([]);
     const { bcvRef, systemBcv } = useContext(bcvContext);
-    const [currentBookCode, setCurrentBookCode] = useState("zzz")
     const [currentPosition, setCurrentPosition] = useState(chapterNumbers.indexOf(bcvRef.current.chapterNum));
     const { debugRef } = useContext(debugContext);
-    const ProjectScriptDirection = async () => {
-        const summariesResponse = await getJson(`/burrito/metadata/summary/${metadata.local_path}`);
+    const projectScriptDirection = async () => {
+        const summariesResponse = await getJson(`/burrito/metadata/summary/${repoMetadata.local_path}`);
         if (summariesResponse.ok) {
             const data = summariesResponse.json;
-            const bookCode = data.script_direction;
-            setScriptDirection(bookCode);
+            setScriptDirection(data.script_direction);
         } else {
             console.error(" Erreur lors de la récupération des données.");
         }
@@ -24,7 +22,7 @@ function NavBar({ metadata, chapterNumbers }) {
     };
 
     useEffect(() => {
-        ProjectScriptDirection();
+        projectScriptDirection().then();
     }, []);
 
     // changer de page -1 
@@ -109,4 +107,4 @@ function NavBar({ metadata, chapterNumbers }) {
     )
 }
 
-export default NavBar;
+export default ChapterPicker;
