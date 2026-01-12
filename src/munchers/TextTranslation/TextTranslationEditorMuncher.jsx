@@ -2,41 +2,22 @@ import "./TextTranslationEditorMuncher.css";
 import {
     Box,
 } from "@mui/material";
-import SharedEditorWrapper from "./SharedEditor/SharedEditorWrapper";
 import DraftingEditor from "./SimplifiedEditor/DraftingEditor";
-import { useState, useContext } from "react";
-import {debugContext} from "pithekos-lib";
+import {useState, useContext} from "react";
 
-function TextTranslationEditorMuncher({metadata,locationState}) {
-    const {debugRef} = useContext(debugContext);
-    const [editor, setEditor] = useState(debugRef.current ? "chapter" : "units");
+function TextTranslationEditorMuncher({metadata, locationState}) {
     const [modified, setModified] = useState(false);
 
     return (
         <Box sx={{p: 2}}>
-            <Box>
-                {editor === "chapter" ? (
-                <SharedEditorWrapper
-                    metadata={metadata}
-                    modified={modified}
-                    setModified={setModified}
-                    editorMode={editor}
-                    setEditor={setEditor}
-
-                />
-                ) : (
-                <DraftingEditor
-                    metadata={metadata}
-                    modified={modified}
-                    setModified={setModified}
-                    editorMode={editor}
-                    setEditor={setEditor}
-                    locationState={locationState}
-                />
-                )}
-            </Box>
+            <DraftingEditor
+                metadata={metadata}
+                modified={modified}
+                setModified={setModified}
+                locationState={locationState}
+            />
         </Box>
-        
+
     );
 }
 

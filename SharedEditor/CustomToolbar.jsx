@@ -26,7 +26,7 @@ import { Divider, ToggleButton, IconButton, Box, Grid2 } from "@mui/material";
 import { i18nContext as I18nContext, doI18n } from "pithekos-lib";
 import SvgParaph from "./plugins/Svg_paraph";
 import ChangeEditor from "../ChangeEditor";
-import BcvPicker from "../../../pages/Workspace/BcvPicker";
+import BookPicker from "../../../pages/Workspace/BookPicker";
 
 function SearchButton() {
   const { isVisible, setIsVisible } = useFindReplace();
@@ -249,7 +249,7 @@ export function CustomToolbar({
               </ToggleButtonGroup>
             </Grid2>
             <Grid2 item size={4}>
-              <BcvPicker/>
+              <BookPicker/>
             </Grid2>
             <Grid2 item size={4}>
               <ChangeEditor

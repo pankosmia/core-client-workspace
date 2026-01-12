@@ -2,14 +2,12 @@ import { useEffect, useContext, useState } from "react";
 import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
-  getText,
-  postEmptyJson,
+  getText
 } from "pithekos-lib";
-import { Box, Button, Grid2, IconButton, Typography } from "@mui/material";
+import { Box, Grid2, IconButton, Typography } from "@mui/material";
 import NavBar from "./components/NavBar";
 import SaveButton from "./components/SaveButton";
-import ChangeEditor from "../ChangeEditor";
-import BcvPicker from "../../../pages/Workspace/BcvPicker";
+import BookPicker from "../../../pages/Workspace/BookPicker";
 import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import usfm2draftJson from '../../../components/usfm2draftJson';
@@ -22,8 +20,6 @@ function DraftingEditor({
   metadata,
   modified,
   setModified,
-  editorMode,
-  setEditor,
   locationState
 }) {
   const { systemBcv } = useContext(BcvContext);
@@ -164,18 +160,10 @@ function DraftingEditor({
           </Grid2>
 
           <Grid2 display="flex" gap={1}>
-            <BcvPicker/>
+            <BookPicker/>
             <NavBar
               chapterNumbers={chapterNumbers}
               metadata={metadata}
-            />
-          </Grid2>
-          <Grid2 display="flex" gap={1}>
-            <ChangeEditor
-              editor={editorMode}
-              setEditor={setEditor}
-              modified={modified}
-              setModified={setModified}
             />
           </Grid2>
           <Grid2 display="flex" gap={1}>
