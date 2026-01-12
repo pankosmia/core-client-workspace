@@ -21,13 +21,16 @@ import JuxtalinearViewerMuncher from "../../munchers/Juxtalinear/JuxtalinearView
 import TranslationPlanViewerMuncher from '../../munchers/TranslationPlan/TranslationPlanViewerMuncher';
 
 function WorkspaceCard({metadata, style, distractionModeCount,locationState}) {
-    const scriptDirectionString =  metadata.script_direction === 'rtl' ? 'rtl' : 'ltr';
+
+  const sbScriptDir = metadata.script_direction.toLowerCase();
+  const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
+
     if (!metadata.primary && (distractionModeCount % 2) > 0) {
-        return <div style={{...style, backgroundImage:'url("/app-resources/pages/workspace/tile_blur.png")', filter: "blur(1px)"}} dir={scriptDirectionString}>
+        return <div style={{...style, backgroundImage:'url("/app-resources/pages/workspace/tile_blur.png")', filter: "blur(1px)"}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
         </div>
     }
     if (metadata.primary && metadata.flavor === "textTranslation") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
           <TextTranslationEditorMuncher
             metadata={metadata}
             locationState={locationState}
@@ -36,126 +39,126 @@ function WorkspaceCard({metadata, style, distractionModeCount,locationState}) {
     }
     // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
     if (metadata.flavor === "textTranslation") {
-        return <div style={{...style, lineHeight: 'normal'}} dir={scriptDirectionString}>
+        return <div style={{...style, lineHeight: 'normal'}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <TextTranslationViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.flavor === "audioTranslation") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BcvAudioTranslationViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvnotes") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
            <BcvNotesEditorMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.flavor.toLowerCase() === "x-bcvnotes") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BcvNotesViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.flavor.toLowerCase() === "x-bnotes") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BNotesViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.flavor.toLowerCase() === "x-juxtalinear") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <JuxtalinearViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvquestions") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
            <BcvNotesEditorMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.flavor.toLowerCase() === "x-bcvquestions") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BcvQuestionsViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.flavor.toLowerCase() === "x-bcvarticles") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BcvArticlesViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.flavor.toLowerCase() === "x-bcvimages") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BcvImagesViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.flavor === "x-videolinks") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
           <VideoLinksViewerMuncher
               metadata={metadata}
           />
         </div>
     } 
     if (metadata.primary && metadata.flavor === "textStories") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
           <OBSEditorMuncher
               metadata={metadata}
           />
         </div>
     } 
     if (metadata.flavor === "textStories") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
           <OBSViewerMuncher
               metadata={metadata}
           />
         </div>
     } 
     if (metadata.flavor.toLowerCase() === "x-obsquestions") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <OBSQuestionsViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.flavor.toLowerCase() === "x-obsnotes") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <OBSNotesViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.flavor.toLowerCase() === "x-obsarticles") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <OBSArticlesViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
     if (metadata.flavor.toLowerCase() === "x-bcvvideo") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BcvVideosViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
      if (metadata.flavor.toLowerCase() === "x-translationplan") {
-        return <div style={style} dir={scriptDirectionString}>
+        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <TranslationPlanViewerMuncher
                 metadata={metadata}
             />
@@ -163,7 +166,7 @@ function WorkspaceCard({metadata, style, distractionModeCount,locationState}) {
     }
 
     // DO NOT REMOVE! Fallback so that an element is always returned
-    return <div style={style} dir={scriptDirectionString}>
+    return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
       <TastelessMuncher
           metadata={metadata}
       />
