@@ -21,7 +21,6 @@ import {PanDialog} from 'pankosmia-rcl';
 
 function TranslationPlanViewerMuncher() {
     const [planIngredient, setPlanIngredient] = useState();
-    console.log("planIngredient", planIngredient)
     const {i18nRef} = useContext(i18nContext);
     const {systemBcv} = useContext(BcvContext);
     const [openDialogAbout, setOpenDialogAbout] = useState(false);

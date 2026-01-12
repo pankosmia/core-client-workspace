@@ -13,18 +13,18 @@ import {
 import { PanDialog } from 'pankosmia-rcl';
 import { DataGrid } from '@mui/x-data-grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import SvgViewEditorBottom from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_bottom";
-import SvgViewEditorLeftColumn from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_column";
-import SvgViewEditorRightColumn from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_column";
-import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_row";
-import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_row";
-import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_top";
-import SvgViewEditorTopDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_top_disabled";
-import SvgViewEditorBottomDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_bottom_disabled";
-import SvgViewEditorLeftColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_column_disabled";
-import SvgViewEditorLeftRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_left_row_disabled";
-import SvgViewEditorRightRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_row_disabled";
-import SvgViewEditorRightColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/plugings/view_editor_right_column_disabled";
+import SvgViewEditorBottom from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_bottom";
+import SvgViewEditorLeftColumn from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_column";
+import SvgViewEditorRightColumn from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_column";
+import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_row";
+import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row";
+import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_top";
+import SvgViewEditorTopDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_top_disabled";
+import SvgViewEditorBottomDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_bottom_disabled";
+import SvgViewEditorLeftColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_column_disabled";
+import SvgViewEditorLeftRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_row_disabled";
+import SvgViewEditorRightRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row_disabled";
+import SvgViewEditorRightColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_column_disabled";
 
 function ConfigureWorkspace({ layout, setLayout }) {
 

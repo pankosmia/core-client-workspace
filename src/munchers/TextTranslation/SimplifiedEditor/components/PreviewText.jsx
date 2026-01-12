@@ -4,8 +4,8 @@ import { getText, debugContext, i18nContext, doI18n, getJson, typographyContext 
 import { enqueueSnackbar } from "notistack";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useTheme } from "@mui/material";
-import GraphiteTest from './components/GraphiteTest';
-import TextDir from '../../helpers/TextDir';
+import GraphiteTest from './GraphiteTest';
+import TextDir from '../../../helpers/TextDir';
 
 function PreviewText({ open,setOpenModalPreviewText, metadata, systemBcv }) {
     const { i18nRef } = useContext(i18nContext);

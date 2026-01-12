@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Box, Button, MenuItem, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Typography, TextField } from "@mui/material";
+import { Box, MenuItem, TextField } from "@mui/material";
 import {
     bcvContext as BcvContext,
     i18nContext as I18nContext,
@@ -77,7 +77,7 @@ function BookPicker() {
                             value={b}
                             key={n}
                             onClick={
-                                () => doChapterNumbers(b)
+                                () => setFirstChapter(b)
                             }
                         >
                             {doI18n(`scripture:books:${b}`, i18nRef.current)}

@@ -12,7 +12,7 @@ import Editor from "./components/Editor"
 import AddFab from "./components/AddFab";
 import SaveTsvButton from "./components/SaveTsvButton";
 import md5 from "md5";
-import BookPicker from "../../pages/Workspace/BookPicker";
+import BookPicker from "../TextTranslation/SimplifiedEditor/components/BookPicker";
 
 function BcvNotesEditorMuncher({metadata}) {
     const [ingredient, setIngredient] = useState([]);
