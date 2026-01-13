@@ -1,5 +1,6 @@
 import {useEffect, useState, useContext} from "react";
 import "./TextTranslationViewerMuncher.css";
+import TextDir from '../helpers/TextDir';
 import {Proskomma} from 'proskomma-core';
 
 import {getText, debugContext, bcvContext} from "pithekos-lib";
@@ -8,6 +9,11 @@ function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
     const {systemBcv} = useContext(bcvContext);
     const {debugRef} = useContext(debugContext);
     const [verseText, setVerseText] = useState([]);
+    const [textDir, setTextDir] = useState(metadata.script_direction.toLowerCase());
+
+    const sbScriptDir = metadata.script_direction.toLowerCase();
+    const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
+
 
     useEffect(
         () => {
@@ -24,6 +30,7 @@ function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
                         "usfm",
                         usfmResponse.text
                     );
+                    !sbScriptDirSet && await setTextDir(TextDir(usfmResponse.text, 'usfm'));
                     const query = `{docSets { documents { mainSequence { blocks(withScriptureCV: "${systemBcv.chapterNum}:${systemBcv.verseNum}") {text items {type subType payload}}}}}}`;
                     const result = pk.gqlQuerySync(query);
                     setVerseText(result.data.docSets[0].documents[0].mainSequence.blocks);
@@ -33,7 +40,7 @@ function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
             };
             getVerseText().then();
         },
-        [debugRef, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum, metadata.local_path]
+        [debugRef, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum, metadata.local_path, sbScriptDirSet, textDir]
     );
 
     const renderItem = item => {
@@ -46,7 +53,8 @@ function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
         }
     }
 
-    return <div className={adjSelectedFontClass}>
+    // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
+    return <div className={adjSelectedFontClass} dir={!sbScriptDirSet ? textDir : undefined}>
         {
             verseText.length > 0 ?
                 verseText.map(b => <p style={{marginBottom: "1em",padding:"1rem"}}>{b.items.map(i => renderItem(i))}</p>) :

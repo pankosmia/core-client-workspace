@@ -95,7 +95,7 @@ function PreviewText({ open,setOpenModalPreviewText, metadata, systemBcv }) {
             pdfHtml = pdfTemplate.replace("%%BODY%%", output.paras);
 
         }
-        const textDir = await TextDir(pdfHtml);
+        const textDir = await TextDir(pdfHtml, 'html');
 
         const pdfType = 'para';
         const cssFile = () => {
