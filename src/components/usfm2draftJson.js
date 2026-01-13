@@ -5,7 +5,13 @@ function processGraftItems(items) {
     for (const item of items) {
         if (item.type === "token") {
             ret[0] += item.payload;
+            if (ret[0] === "___") {
+                ret[0] = "";
+            }
         }
+    }
+    if (ret[0].trim().length === 0) {
+        ret[0] = "_";
     }
     return ret;
 }

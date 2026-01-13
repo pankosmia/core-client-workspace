@@ -31,9 +31,15 @@ export default function EditableGraft({scriptureJson, setScriptureJson, position
                 <EditableTag scriptureJson={scriptureJson} setScriptureJson={setScriptureJson}
                              position={position}/>
                 <span
-                    className={incomingBlock.tag}
+                    contentEditable="plaintext-only"
+                    className={`span_edit_graft ${incomingBlock.tag}`}
                     ref={editorRef}
-                    style={{padding: "5px"}}
+                    style={
+                        {
+                            paddingRight: value.trim() === "" ? "20px" : "0",
+                            backgroundColor: value.trim() === "" ? "#CCC" : "#FFF",
+                        }
+                    }
                     onBlur={() => updateScriptureJson(scriptureJson, position, value)}
                 >
                     {value}

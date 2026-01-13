@@ -33,7 +33,7 @@ export default function draftJson2usfm(json) {
                 }
                 break;
             default:
-                retBits.push(`\\${block.tag} ${block.content[0]}`);
+                retBits.push(`\\${block.tag} ${block.content[0].length === 0 ? "___": block.content[0]}`);
         }
     }
     return retBits.join("\n");

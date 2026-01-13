@@ -5,7 +5,7 @@ import {postEmptyJson} from "pithekos-lib";
 import DebugContext from "pithekos-lib/dist/contexts/debugContext";
 import BcvContext from "pithekos-lib/dist/contexts/bcvContext";
 
-export default function EditableSpan({scriptureJson, setScriptureJson, position, chapter, verse}) {
+export default function EditableSpan({key, scriptureJson, setScriptureJson, position, chapter, verse}) {
     const incomingBlock = scriptureJson.blocks[position[0]];
     const incomingContent = incomingBlock.units[position[1]].content ? incomingBlock.units[position[1]].content[0] : null;
     const [firstTime, setFirstTime] = useState(true);
@@ -37,31 +37,28 @@ export default function EditableSpan({scriptureJson, setScriptureJson, position,
         setFirstTime(false);
     }
     return <span
+        key={`${key}-editable`}
         ref={editorRef}
         className="span_edit_verses"
+        contentEditable="plaintext-only"
         style={
             {
-                fontSize: value.trim() === "" ? "smaller": "inherit",
                 paddingRight: value.trim() === "" ? "20px" : "0",
-                backgroundColor: value.trim() === "" ? "#CCC" : "#FFF"
+                backgroundColor: value.trim() === "" ? "#CCC" : "#FFF",
 
             }
         }
         onBlur={
-            (e) => {
+            e => {
                 // console.log("BLUR", position)
-                e.stopPropagation();
                 updateScriptureJson(scriptureJson, position, value).then();
                 return false;
             }
         }
-        onFocus={() => {
+        onFocus={e => {
             //console.log("FOCUS", position)
-            e.stopPropagation();
             updateBcv(systemBcv.bookCode, chapter, verse);
             return false;
         }}
-    >
-        {value}
-    </span>
+    >{value}</span>
 }

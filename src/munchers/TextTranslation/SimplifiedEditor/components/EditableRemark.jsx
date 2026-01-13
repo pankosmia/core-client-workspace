@@ -29,6 +29,7 @@ export default function EditableRemark({ scriptureJson, setScriptureJson, positi
             <div style={{ flexDirection: "column", fontFamily: "monospace", fontSize: "medium" }}>
                 <span style={{ padding: "5px", backgroundColor: "lightgray", borderRadius: "4px 0px 0px 4px" }} > // </span>
                 <span
+                    contentEditable="plaintext-only"
                     ref={editorRef}
                     style={{ padding: "5px", backgroundColor: "lightgray", borderRadius: "0px 4px 4px 0px" }}
                     onBlur={() => updateScriptureJson(scriptureJson, position, value)}
