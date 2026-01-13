@@ -4,6 +4,7 @@ import EditableRemark from "./EditableRemark";
 import { useEffect } from "react";
 
 export default function EditableBible({chapterJson, scriptureJson, setScriptureJson }) {
+
     useEffect(() => {
         async function loadCSS() {
             const url = "/app-resources/usfm/bible_page_styles.css";
@@ -24,7 +25,7 @@ export default function EditableBible({chapterJson, scriptureJson, setScriptureJ
         <div>
             {chapterJson.blocks
                 .map(
-                    (b,n) => {
+                    (b, n) => {
                         switch (b.type) {
                             case "chapter":
                                 return ""

@@ -50,12 +50,14 @@ export default function EditableSpan({scriptureJson, setScriptureJson, position,
         onBlur={
             (e) => {
                 // console.log("BLUR", position)
-                updateScriptureJson(scriptureJson, position, value);
+                e.stopPropagation();
+                updateScriptureJson(scriptureJson, position, value).then();
                 return false;
             }
         }
         onFocus={() => {
             //console.log("FOCUS", position)
+            e.stopPropagation();
             updateBcv(systemBcv.bookCode, chapter, verse);
             return false;
         }}
