@@ -16,5 +16,5 @@ export default defineConfig({
     emptyOutDir: true,
     
   },
-  base: '/clients/local-projects/'
+  base: '/clients/core-local-workspace/'
 })
