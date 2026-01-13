@@ -214,6 +214,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
                 titleLabel={`${doI18n("pages:core-local-workspace:Select_Resources", i18nRef.current, debugRef.current)}`}
                 isOpen={open}
                 closeFn={() => handleClose()}
+                size="xl"
             >
                 <DialogContent>
                     <Grid2
