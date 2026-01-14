@@ -1,9 +1,12 @@
 import EditableBibleBlock from "./EditableBibleBlock";
 import EditableGraft from "./EditableGraft";
 import EditableRemark from "./EditableRemark";
-import { useEffect } from "react";
+import {useContext, useEffect} from "react";
+import {bcvContext} from "pithekos-lib";
 
 export default function EditableBible({chapterJson, scriptureJson, setScriptureJson }) {
+
+    const {systemBcv} = useContext(bcvContext);
 
     useEffect(() => {
         async function loadCSS() {
@@ -20,7 +23,6 @@ export default function EditableBible({chapterJson, scriptureJson, setScriptureJ
         }
         loadCSS();
     }, []);
-
     return (
         <div>
             {chapterJson.blocks
@@ -31,13 +33,13 @@ export default function EditableBible({chapterJson, scriptureJson, setScriptureJ
                                 return ""
 
                             case "remark":
-                                return <EditableRemark key={n} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} position={[b.position]}/>
+                                return <EditableRemark key={`${systemBcv.bookCode}-${systemBcv.chapterNum}-${n}`} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} position={[b.position]}/>
 
                             case "main":
-                                return <EditableBibleBlock key={n} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} position={[b.position]}/>
+                                return <EditableBibleBlock key={`${systemBcv.bookCode}-${systemBcv.chapterNum}-${n}`} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} position={[b.position]}/>
 
                             default:
-                                return <EditableGraft key={n} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} position={[b.position]}/>
+                                return <EditableGraft key={`${systemBcv.bookCode}-${systemBcv.chapterNum}-${n}`} scriptureJson={scriptureJson} setScriptureJson={setScriptureJson} position={[b.position]}/>
                         }
 
                     }

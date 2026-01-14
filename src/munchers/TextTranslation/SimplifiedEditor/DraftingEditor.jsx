@@ -84,7 +84,6 @@ function DraftingEditor(
         },
         [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]
     );
-//                         key={md5sum(JSON.stringify(chapterJson))}
     return <>
         <EditorTools
             metadata={metadata}
