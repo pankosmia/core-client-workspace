@@ -192,11 +192,12 @@ function ConfigureWorkspace({ layout, setLayout }) {
        *              The grid height plus all other elements in the dialog fit inside the PanDialog height.
        *                 This prevents PanDialog from getting an extra, unwanted scrollbar.
        *                    Scrolling is inside the DataGrid with a sticky header.
+       *      Wrap beyond the 48px height of the "display options row" is also prevented to avoid unwanted PanDialog scrolling.
        * Reduce inner hight as follows to get the correct DataGrid height:
        * - 64px Less PanDialog's default is `max-height: calc(100% - 64px);` (which corresponds to its surrounding 32px margins default)
        * - 64px Less PanDialog's header
        * - 20px Less Top Padding
-       * - 48px Less Resources display options row
+       * - 48px Less Display options row
        * - 16px Less Margin
        *      -> Grid is here. In this case the Pagination row is included in the grid height
        * - 20px Less Bottom Padding
@@ -250,6 +251,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
             >
                 <DialogContent>
                     <Grid2
+                        sx={{ display: 'flex', flexFlow: 'row nowrap' }}
                         container
                         alignItems="center"
                         justifyContent="space-between"
@@ -257,7 +259,12 @@ function ConfigureWorkspace({ layout, setLayout }) {
                     >
                         <Grid2 display="flex" gap={1}>
                             <Typography
-                            > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)}
+                              sx={{
+                                overflow: 'hide',
+                                maxHeight: 48,
+                              }}
+                            >
+                              {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)}
                             </Typography>
 
                         </Grid2>
