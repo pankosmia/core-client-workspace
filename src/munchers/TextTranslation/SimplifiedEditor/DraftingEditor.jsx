@@ -24,6 +24,7 @@ function DraftingEditor(
     const [chapterJson, setChapterJson] = useState(null);
     const [md5sumScriptureJson, setMd5sumScriptureJson] = useState([]);
     const [currentBookCode, setCurrentBookCode] = useState("zzz");
+    const [bookChangeCount, setBookChangeCount] = useState(0);
 
     // Set up 'are you sure you want to leave page' for Electron
     useEffect(() => {
@@ -77,7 +78,8 @@ function DraftingEditor(
     useEffect(
         () => {
             if (scriptureJson) {
-                setChapterJson(filterByChapter(scriptureJson, systemBcv.chapterNum))
+                setChapterJson(filterByChapter(scriptureJson, systemBcv.chapterNum));
+                setBookChangeCount(bookChangeCount + 1);
             }
         },
         [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]
@@ -101,6 +103,7 @@ function DraftingEditor(
                         chapterJson={chapterJson}
                         scriptureJson={scriptureJson}
                         setScriptureJson={setScriptureJson}
+                        key={bookChangeCount}
                     /> :
                     <Typography> loading ...</Typography>
             }
