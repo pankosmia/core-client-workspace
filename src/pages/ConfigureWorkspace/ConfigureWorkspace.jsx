@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { debugContext, i18nContext, currentProjectContext, getJson, doI18n, Header } from "pithekos-lib";
 import {
@@ -187,6 +187,39 @@ function ConfigureWorkspace({ layout, setLayout }) {
             }
         });
 
+      /**
+       * Important: These are precise calculations given the state of this component at the time this was set up.
+       *              The grid height plus all other elements in the dialog fit inside the PanDialog height.
+       *                 This prevents PanDialog from getting an extra, unwanted scrollbar.
+       *                    Scrolling is inside the DataGrid with a sticky header.
+       *      Wrap beyond the 48px height of the "display options row" is also prevented to avoid unwanted PanDialog scrolling.
+       * Reduce inner hight as follows to get the correct DataGrid height:
+       * - 64px Less PanDialog's default is `max-height: calc(100% - 64px);` (which corresponds to its surrounding 32px margins default)
+       * - 64px Less PanDialog's header
+       * - 20px Less Top Padding
+       * - 48px Less Display options row
+       * - 16px Less Margin
+       *      -> Grid is here. In this case the Pagination row is included in the grid height
+       * - 20px Less Bottom Padding
+       * - 16px Less Bottom Margin
+       *  ------
+       *   248px This is the minimum amount by which to reduce the innerHeight (const adjustment)
+       */
+      const adjustment = 248;
+
+      const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - adjustment);
+
+      const handleWindowResize = useCallback(() => {
+          setMaxWindowHeight(window.innerHeight - adjustment);
+      }, []);
+
+      useEffect(() => {
+          window.addEventListener('resize', handleWindowResize);
+          return () => {
+              window.removeEventListener('resize', handleWindowResize);
+          };
+      }, [handleWindowResize]);
+
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :
         <Box
@@ -218,6 +251,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
             >
                 <DialogContent>
                     <Grid2
+                        sx={{ display: 'flex', flexFlow: 'row nowrap' }}
                         container
                         alignItems="center"
                         justifyContent="space-between"
@@ -225,7 +259,12 @@ function ConfigureWorkspace({ layout, setLayout }) {
                     >
                         <Grid2 display="flex" gap={1}>
                             <Typography
-                            > {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)}
+                              sx={{
+                                overflow: 'hide',
+                                maxHeight: 48,
+                              }}
+                            >
+                              {doI18n("pages:core-local-workspace:choose_resources_workspace", i18nRef.current)}
                             </Typography>
 
                         </Grid2>
@@ -332,26 +371,48 @@ function ConfigureWorkspace({ layout, setLayout }) {
                         </Grid2>
                     </Grid2>
                     <Box sx={{ m: 2 }}>
-                        <DataGrid
-                            getRowId={r => r.path}
-                            initialState={{
-                                columns: {
-                                    columnVisibilityModel: {
-                                        description: false
+                      <Grid2 item size={12}>
+                        <Box
+                          sx={{
+                            height: `${maxWindowHeight}px`,
+                            display: "flex",
+                            flexDirection: "column",
+                            width: "100%",
+                          }}
+                        >
+                          <Box sx={{ flex: 1, minHeight: 0 }}>
+                            <DataGrid
+                                getRowId={r => r.path}
+                                initialState={{
+                                    columns: {
+                                        columnVisibilityModel: {
+                                            description: false
+                                        }
+                                    },
+                                    sorting: {
+                                        sortModel: [{ field: 'name', sort: 'asc' }],
                                     }
-                                },
-                                sorting: {
-                                    sortModel: [{ field: 'name', sort: 'asc' }],
-                                }
-                            }}
-                            checkboxSelection
-                            rowSelectionModel={{ ids: selectedResources, type: "include" }}
-                            onRowSelectionModelChange={nv => setSelectedResources(nv.ids)}
-                            rows={rows}
-                            columns={columns}
-                            sx={{ fontSize: "1rem" }}
-
-                        />
+                                }}
+                                checkboxSelection
+                                rowSelectionModel={{ ids: selectedResources, type: "include" }}
+                                onRowSelectionModelChange={nv => setSelectedResources(nv.ids)}
+                                rows={rows}
+                                columns={columns}
+                                sx={{
+                                  fontSize: "1rem",
+                                  height: "100%",
+                                  "& .MuiDataGrid-root": { height: "100%" },
+                                  "& .MuiDataGrid-columnHeaders": {
+                                    position: "sticky",
+                                    top: 0,
+                                    zIndex: 2,
+                                    backgroundColor: "background.paper",
+                                  },
+                                }}
+                            />
+                          </Box>
+                        </Box>
+                      </Grid2>
                     </Box>
                 </DialogContent>
             </PanDialog>
