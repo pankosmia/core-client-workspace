@@ -40,7 +40,7 @@ const layoutSpecs = {
     }
 };
 
-const layoutJson = (resources, layoutId, i18nRef, distractionModeCount, locationState) => {
+const layoutJson = (resources, layoutId, i18nRef, distractionModeCount) => {
     const te = {};
     let layoutSpec = layoutSpecs[layoutId];
     if (!layoutSpec) {
@@ -60,7 +60,7 @@ const layoutJson = (resources, layoutId, i18nRef, distractionModeCount, location
     } else {
         rp.children = [rp.children[0], null];
     }
-    for (const resource of resources) {
+    for (const resource of Object.values(resources)) {
         let location = `${resource.local_path.split('/').slice(0, 2).reverse().join(" - ")}`;
         if (resource.local_path.split('/')[1].startsWith("_")) {
             location = doI18n(`pages:core-local-workspace:${resource.local_path.split('/')[1]}`, i18nRef.current);
@@ -70,7 +70,6 @@ const layoutJson = (resources, layoutId, i18nRef, distractionModeCount, location
             metadata={resource}
             style={paneStyle}
             distractionModeCount={distractionModeCount}
-            locationState={locationState}
         />;
         if (resource.primary) {
             rp.children[layoutSpec.editorPos] = { children: title };

@@ -7,16 +7,19 @@ import ConfigureWorkspace from "./pages/ConfigureWorkspace/ConfigureWorkspace";
 import Workspace from "./pages/Workspace/Workspace";
 
 function App() {
-const [layout, setLayout] = useState("ViewEditorRightRow");
+    const [layout, setLayout] = useState("ViewEditorRightRow");
+    const [selectedResources, setSelectedResources] = useState(new Set([]));
+
+    console.log("router");
 
 const router = createHashRouter([
     {
         path: "/",
-        element: <ConfigureWorkspace layout={layout} setLayout={setLayout}/>
+        element: <ConfigureWorkspace layout={layout} setLayout={setLayout} selectedResources={selectedResources} setSelectedResources={setSelectedResources} />
     },
     {
         path: "/workspace/*",
-        element: <Workspace layout={layout} setLayout={setLayout}/>,
+        element: <Workspace layout={layout} setLayout={setLayout} selectedResources={selectedResources}/>,
     }
 ]);
 

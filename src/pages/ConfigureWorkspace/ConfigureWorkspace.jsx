@@ -26,7 +26,7 @@ import SvgViewEditorLeftRowDisabled from "../../munchers/TextTranslation/Simplif
 import SvgViewEditorRightRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row_disabled";
 import SvgViewEditorRightColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_column_disabled";
 
-function ConfigureWorkspace({ layout, setLayout }) {
+function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedResources }) {
 
     const { debugRef } = useContext(debugContext);
     const { i18nRef } = useContext(i18nContext);
@@ -34,8 +34,6 @@ function ConfigureWorkspace({ layout, setLayout }) {
     const [open, setOpen] = useState(true);
     const navigate = useNavigate();
     const location = useLocation();
-    const localisationState = location.state;
-    const [selectedResources, setSelectedResources] = useState(new Set(localisationState ? localisationState.map(item => item[0]) : []));
     const [projectSummaries, setProjectSummaries] = useState({});
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
@@ -58,30 +56,14 @@ function ConfigureWorkspace({ layout, setLayout }) {
         []
     );
 
-    const handleClose = async () => {
+    const handleNext = async () => {
         setOpen(false);
         const params = new URLSearchParams(location.search);
         const returnPage = params.get("return-page");
         if (returnPage === "workspace") {
-            let stateEntries = Object.entries(projectSummaries)
-                .map(e => {
-                    return { ...e[1], path: e[0] }
-                })
-                .map(r => [r.path, r])
-                .filter(re => selectedResources.has(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
-                .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
-                    ...re[1],
-                    primary: true
-                }] : re)
-            navigate(
-                "/workspace",
-                {
-                    state: Object.fromEntries(stateEntries),
-                }
-            );
+            navigate("/workspace");
         } else {
             window.location.replace("/clients/content");
-            return;
         }
     };
 
@@ -246,7 +228,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
             <PanDialog
                 titleLabel={`${doI18n("pages:core-local-workspace:Select_Resources", i18nRef.current, debugRef.current)}`}
                 isOpen={open}
-                closeFn={() => handleClose()}
+                closeFn={() => handleNext()}
                 size="xl"
             >
                 <DialogContent>
