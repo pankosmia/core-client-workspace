@@ -147,7 +147,6 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
             headerName: doI18n("pages:core-local-workspace:row_type", i18nRef.current),
             // minWidth: 80,
             flex: 0.4
-            //valueGetter: v => doI18n(`flavors:names:${flavorTypes[v.toLowerCase()]}/${v}`, i18nRef.current)
         },
         {
             field: 'language',
