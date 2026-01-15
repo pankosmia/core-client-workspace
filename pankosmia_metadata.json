@@ -183,6 +183,12 @@
       "es": "Descripción",
       "id": "Deskripsi"
     },
+    "row_source": {
+      "en": "Source",
+      "fr": "Source",
+      "es": "Fuente",
+      "id": "Sumber"
+    },
     "row_type": {
       "en": "Type",
       "fr": "Type",

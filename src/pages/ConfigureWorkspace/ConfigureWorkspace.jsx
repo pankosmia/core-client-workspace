@@ -127,27 +127,33 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
         {
             field: 'name',
             headerName: doI18n("pages:core-local-workspace:row_name", i18nRef.current),
-            minWidth: 110,
+            // minWidth: 110,
             flex: 1
         },
         {
             field: 'description',
             headerName: doI18n("pages:core-local-workspace:row_description", i18nRef.current),
-            minWidth: 130,
+            // minWidth: 130,
             flex: 1
+        },
+        {
+            field: 'source',
+            headerName: doI18n('pages:core-local-workspace:row_source', i18nRef.current),
+            // minWidth: 110,
+            flex: 0.5,
         },
         {
             field: 'type',
             headerName: doI18n("pages:core-local-workspace:row_type", i18nRef.current),
-            minWidth: 80,
-            flex: 0.75
+            // minWidth: 80,
+            flex: 0.4
             //valueGetter: v => doI18n(`flavors:names:${flavorTypes[v.toLowerCase()]}/${v}`, i18nRef.current)
         },
         {
             field: 'language',
             headerName: doI18n("pages:core-local-workspace:row_language", i18nRef.current),
-            minWidth: 120,
-            flex: 1
+            // minWidth: 100,
+            flex: 0.5
         }
     ]
 
@@ -163,6 +169,11 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
                 id: n.toString(),
                 name: `${rep.name} (${rep.abbreviation})`,
                 description: rep.description !== rep.name ? rep.description : "",
+                source: rep.path.startsWith('_local_')
+                    ? rep.path.startsWith('_local_/_sideloaded_')
+                        ? doI18n('pages:content:local_resource', i18nRef.current)
+                        : doI18n('pages:content:local_project', i18nRef.current)
+                    : `${rep.path.split('/')[1]} (${rep.path.split('/')[0]})`,
                 type: rep.flavor,
                 language: isoThreeLookup?.[isoOneToThreeLookup[rep.language_code] ?? rep.language_code]?.en ??
                     rep.language_code
