@@ -9,9 +9,7 @@ import Workspace from "./pages/Workspace/Workspace";
 function App() {
     const [layout, setLayout] = useState("ViewEditorRightRow");
     const [selectedResources, setSelectedResources] = useState(new Set([]));
-
-    console.log("router");
-
+    
 const router = createHashRouter([
     {
         path: "/",
