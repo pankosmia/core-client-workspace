@@ -26,7 +26,7 @@ import SvgViewEditorLeftRowDisabled from "../../munchers/TextTranslation/Simplif
 import SvgViewEditorRightRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row_disabled";
 import SvgViewEditorRightColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_column_disabled";
 
-function ConfigureWorkspace({ layout, setLayout }) {
+function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedResources }) {
 
     const { debugRef } = useContext(debugContext);
     const { i18nRef } = useContext(i18nContext);
@@ -34,8 +34,6 @@ function ConfigureWorkspace({ layout, setLayout }) {
     const [open, setOpen] = useState(true);
     const navigate = useNavigate();
     const location = useLocation();
-    const localisationState = location.state;
-    const [selectedResources, setSelectedResources] = useState(new Set(localisationState ? localisationState.map(item => item[0]) : []));
     const [projectSummaries, setProjectSummaries] = useState({});
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
@@ -58,30 +56,14 @@ function ConfigureWorkspace({ layout, setLayout }) {
         []
     );
 
-    const handleClose = async () => {
+    const handleNext = async () => {
         setOpen(false);
         const params = new URLSearchParams(location.search);
         const returnPage = params.get("return-page");
         if (returnPage === "workspace") {
-            let stateEntries = Object.entries(projectSummaries)
-                .map(e => {
-                    return { ...e[1], path: e[0] }
-                })
-                .map(r => [r.path, r])
-                .filter(re => selectedResources.has(re[0]) || (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")))
-                .map(re => (currentProjectRef.current && re[0] === Object.values(currentProjectRef.current).join("/")) ? [re[0], {
-                    ...re[1],
-                    primary: true
-                }] : re)
-            navigate(
-                "/workspace",
-                {
-                    state: Object.fromEntries(stateEntries),
-                }
-            );
+            navigate("/workspace");
         } else {
             window.location.replace("/clients/content");
-            return;
         }
     };
 
@@ -145,27 +127,33 @@ function ConfigureWorkspace({ layout, setLayout }) {
         {
             field: 'name',
             headerName: doI18n("pages:core-local-workspace:row_name", i18nRef.current),
-            minWidth: 110,
+            // minWidth: 110,
             flex: 1
         },
         {
             field: 'description',
             headerName: doI18n("pages:core-local-workspace:row_description", i18nRef.current),
-            minWidth: 130,
+            // minWidth: 130,
             flex: 1
+        },
+        {
+            field: 'source',
+            headerName: doI18n('pages:core-local-workspace:row_source', i18nRef.current),
+            // minWidth: 110,
+            flex: 0.5,
         },
         {
             field: 'type',
             headerName: doI18n("pages:core-local-workspace:row_type", i18nRef.current),
-            minWidth: 80,
-            flex: 0.75
+            // minWidth: 80,
+            flex: 0.4
             //valueGetter: v => doI18n(`flavors:names:${flavorTypes[v.toLowerCase()]}/${v}`, i18nRef.current)
         },
         {
             field: 'language',
             headerName: doI18n("pages:core-local-workspace:row_language", i18nRef.current),
-            minWidth: 120,
-            flex: 1
+            // minWidth: 100,
+            flex: 0.5
         }
     ]
 
@@ -181,6 +169,11 @@ function ConfigureWorkspace({ layout, setLayout }) {
                 id: n.toString(),
                 name: `${rep.name} (${rep.abbreviation})`,
                 description: rep.description !== rep.name ? rep.description : "",
+                source: rep.path.startsWith('_local_')
+                    ? rep.path.startsWith('_local_/_sideloaded_')
+                        ? doI18n('pages:content:local_resource', i18nRef.current)
+                        : doI18n('pages:content:local_project', i18nRef.current)
+                    : `${rep.path.split('/')[1]} (${rep.path.split('/')[0]})`,
                 type: rep.flavor,
                 language: isoThreeLookup?.[isoOneToThreeLookup[rep.language_code] ?? rep.language_code]?.en ??
                     rep.language_code
@@ -246,7 +239,7 @@ function ConfigureWorkspace({ layout, setLayout }) {
             <PanDialog
                 titleLabel={`${doI18n("pages:core-local-workspace:Select_Resources", i18nRef.current, debugRef.current)}`}
                 isOpen={open}
-                closeFn={() => handleClose()}
+                closeFn={() => handleNext()}
                 size="xl"
             >
                 <DialogContent>
