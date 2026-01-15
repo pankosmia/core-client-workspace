@@ -20,8 +20,7 @@ function EditorTools(
         setMd5sumScriptureJson,
         scriptureJson,
         currentBookCode,
-        setCurrentBookCode,
-        locationState
+        setCurrentBookCode
     }
 ) {
 
