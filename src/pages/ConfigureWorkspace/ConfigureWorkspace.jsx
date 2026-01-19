@@ -5,26 +5,14 @@ import {
     Box,
     Typography,
     Fab,
-    ToggleButtonGroup,
-    ToggleButton,
     Grid2,
     DialogContent,
 } from "@mui/material";
 import { PanDialog } from 'pankosmia-rcl';
 import { DataGrid } from '@mui/x-data-grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import SvgViewEditorBottom from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_bottom";
-import SvgViewEditorLeftColumn from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_column";
-import SvgViewEditorRightColumn from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_column";
-import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_row";
-import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row";
-import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_top";
-import SvgViewEditorTopDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_top_disabled";
-import SvgViewEditorBottomDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_bottom_disabled";
-import SvgViewEditorLeftColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_column_disabled";
-import SvgViewEditorLeftRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_row_disabled";
-import SvgViewEditorRightRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row_disabled";
-import SvgViewEditorRightColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_column_disabled";
+
+import LayoutPicker from "./WorkspaceLayoutButton";
 
 function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedResources }) {
 
@@ -37,7 +25,6 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
     const [projectSummaries, setProjectSummaries] = useState({});
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
-    const [alignment, setAlignment] = useState(selectedResources.size === 0 ? "" : layout);
 
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
@@ -45,9 +32,6 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
             setProjectSummaries(summariesResponse.json);
         }
     }
-    const handleAlignment = (newAlignment) => {
-        setAlignment(newAlignment);
-    };
 
     useEffect(
         () => {
@@ -67,15 +51,6 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
         }
     };
 
-    useEffect(
-        () => {
-            if (selectedResources.size === 0) {
-                setAlignment("")
-            } else
-                setAlignment(layout)
-        },
-        [selectedResources, layout]
-    );
 
     useEffect(() => {
         fetch('/app-resources/lookups/iso639-1-to-3.json') // ISO_639-1 codes mapped to ISO_639-3 codes
@@ -260,70 +235,7 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
                             </Typography>
 
                         </Grid2>
-                        <Grid2 display="flex" gap={1}>
-                            <ToggleButtonGroup
-                                value={alignment}
-                                exclusive
-                                onChange={handleAlignment}
-                            >
-                                <ToggleButton value="ViewEditorTop" onClick={() => setLayout("ViewEditorTop")} disabled={selectedResources.size === 0}
-                                >
-                                    {selectedResources.size === 0 ?
-                                        (
-                                            <SvgViewEditorTopDisabled />
-                                        ) :
-                                        <SvgViewEditorTop />
-                                    }
-                                </ToggleButton>
-
-                                <ToggleButton value="ViewEditorBottom" onClick={() => setLayout("ViewEditorBottom")} disabled={selectedResources.size === 0}>
-                                    {selectedResources.size === 0 ?
-                                        (
-                                            <SvgViewEditorBottomDisabled />
-                                        ) :
-                                        <SvgViewEditorBottom />
-                                    }
-                                </ToggleButton>
-
-                                <ToggleButton value="ViewEditorLeftColumn" onClick={() => setLayout("ViewEditorLeftColumn")} disabled={selectedResources.size === 0}>
-                                    {selectedResources.size === 0 ?
-                                        (
-                                            <SvgViewEditorLeftColumnDisabled />
-                                        ) :
-                                        <SvgViewEditorLeftColumn />
-                                    }
-                                </ToggleButton>
-
-                                <ToggleButton value="ViewEditorRightColumn" onClick={() => setLayout("ViewEditorRightColumn")} disabled={selectedResources.size === 0}>
-                                    {selectedResources.size === 0 ?
-                                        (
-                                            <SvgViewEditorRightColumnDisabled />
-                                        ) :
-                                        <SvgViewEditorRightColumn />
-                                    }
-                                </ToggleButton>
-
-                                <ToggleButton value="ViewEditorLeftRow" onClick={() => setLayout("ViewEditorLeftRow")} disabled={selectedResources.size === 0}>
-
-                                    {selectedResources.size === 0 ?
-                                        (
-                                            <SvgViewEditorLeftRowDisabled />
-                                        ) :
-                                        <SvgViewEditorLeftRow />
-                                    }
-                                </ToggleButton>
-
-                                <ToggleButton value="ViewEditorRightRow" onClick={() => setLayout("ViewEditorRightRow")} disabled={selectedResources.size === 0}>
-                                    {selectedResources.size === 0 ?
-                                        (
-                                            <SvgViewEditorRightRowDisabled />
-                                        ) :
-                                        <SvgViewEditorRightRow />
-                                    }
-                                </ToggleButton>
-
-                            </ToggleButtonGroup>
-                        </Grid2>
+                       <LayoutPicker layout={layout} setLayout={setLayout} selectedResources={selectedResources}/>
                         <Grid2
                             display="flex"
                             gap={1}
