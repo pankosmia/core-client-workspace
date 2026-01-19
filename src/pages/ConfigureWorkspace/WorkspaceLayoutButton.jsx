@@ -13,7 +13,7 @@ import SvgViewEditorRightRowDisabled from "../../munchers/TextTranslation/Simpli
 import SvgViewEditorRightColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_column_disabled";
 import { useEffect, useState } from "react";
 
-export default function LayoutPicker({ selectedResources,layout, setLayout }) {
+export default function LayoutPicker({ selectedResources, layout, setLayout }) {
     const [alignment, setAlignment] = useState(selectedResources.size === 0 ? "" : layout);
 
     const handleAlignment = (newAlignment) => {
@@ -28,6 +28,44 @@ export default function LayoutPicker({ selectedResources,layout, setLayout }) {
         },
         [selectedResources, layout]
     );
+    const layouts = [
+        {
+            value: "ViewEditorTop",
+            layout: "ViewEditorTop",
+            Icon: SvgViewEditorTop,
+            IconDisabled: SvgViewEditorTopDisabled,
+        },
+        {
+            value: "ViewEditorBottom",
+            layout: "ViewEditorBottom",
+            Icon: SvgViewEditorBottom,
+            IconDisabled: SvgViewEditorBottomDisabled,
+        },
+        {
+            value: "ViewEditorLeftColumn",
+            layout: "ViewEditorLeftColumn",
+            Icon: SvgViewEditorLeftColumn,
+            IconDisabled: SvgViewEditorLeftColumnDisabled,
+        },
+        {
+            value: "ViewEditorRightColumn",
+            layout: "ViewEditorRightColumn",
+            Icon: SvgViewEditorRightColumn,
+            IconDisabled: SvgViewEditorRightColumnDisabled,
+        },
+        {
+            value: "ViewEditorLeftRow",
+            layout: "ViewEditorLeftRow",
+            Icon: SvgViewEditorLeftRow,
+            IconDisabled: SvgViewEditorLeftRowDisabled,
+        },
+        {
+            value: "ViewEditorRightRow",
+            layout: "ViewEditorRightRow",
+            Icon: SvgViewEditorRightRow,
+            IconDisabled: SvgViewEditorRightRowDisabled,
+        },
+    ];
 
     return (
         <Grid2 display="flex" gap={1}>
@@ -36,63 +74,22 @@ export default function LayoutPicker({ selectedResources,layout, setLayout }) {
                 exclusive
                 onChange={handleAlignment}
             >
-                <ToggleButton value="ViewEditorTop" onClick={() => setLayout("ViewEditorTop")} disabled={selectedResources.size === 0}
-                >
-                    {selectedResources.size === 0 ?
-                        (
-                            <SvgViewEditorTopDisabled />
-                        ) :
-                        <SvgViewEditorTop />
-                    }
-                </ToggleButton>
-
-                <ToggleButton value="ViewEditorBottom" onClick={() => setLayout("ViewEditorBottom")} disabled={selectedResources.size === 0}>
-                    {selectedResources.size === 0 ?
-                        (
-                            <SvgViewEditorBottomDisabled />
-                        ) :
-                        <SvgViewEditorBottom />
-                    }
-                </ToggleButton>
-
-                <ToggleButton value="ViewEditorLeftColumn" onClick={() => setLayout("ViewEditorLeftColumn")} disabled={selectedResources.size === 0}>
-                    {selectedResources.size === 0 ?
-                        (
-                            <SvgViewEditorLeftColumnDisabled />
-                        ) :
-                        <SvgViewEditorLeftColumn />
-                    }
-                </ToggleButton>
-
-                <ToggleButton value="ViewEditorRightColumn" onClick={() => setLayout("ViewEditorRightColumn")} disabled={selectedResources.size === 0}>
-                    {selectedResources.size === 0 ?
-                        (
-                            <SvgViewEditorRightColumnDisabled />
-                        ) :
-                        <SvgViewEditorRightColumn />
-                    }
-                </ToggleButton>
-
-                <ToggleButton value="ViewEditorLeftRow" onClick={() => setLayout("ViewEditorLeftRow")} disabled={selectedResources.size === 0}>
-
-                    {selectedResources.size === 0 ?
-                        (
-                            <SvgViewEditorLeftRowDisabled />
-                        ) :
-                        <SvgViewEditorLeftRow />
-                    }
-                </ToggleButton>
-
-                <ToggleButton value="ViewEditorRightRow" onClick={() => setLayout("ViewEditorRightRow")} disabled={selectedResources.size === 0}>
-                    {selectedResources.size === 0 ?
-                        (
-                            <SvgViewEditorRightRowDisabled />
-                        ) :
-                        <SvgViewEditorRightRow />
-                    }
-                </ToggleButton>
-
+                {layouts.map(({ value, layout, Icon, IconDisabled }) => (
+                    <ToggleButton
+                        key={value}
+                        value={value}
+                        onClick={() => setLayout(layout)}
+                        disabled={selectedResources.size === 0}
+                    >
+                        {selectedResources.size === 0 ? (
+                            <IconDisabled />
+                        ) : (
+                            <Icon />
+                        )}
+                    </ToggleButton>
+                ))}
             </ToggleButtonGroup>
         </Grid2>
+
     );
 }
