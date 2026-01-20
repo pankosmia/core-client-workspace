@@ -443,8 +443,7 @@ function TranslationPlanViewerMuncher({metadata}) {
                                         if (Object.keys(verseText).length > 0 && field.type === "scripture") {
                                             let chapterN = "0"
                                             return (
-                                              <Box dir={selectedBurritoTextDir}>
-                                                <div>
+                                                <Box dir={selectedBurritoTextDir}>
                                                     {
                                                         section.paragraphs
                                                             .map(
@@ -482,8 +481,7 @@ function TranslationPlanViewerMuncher({metadata}) {
                                                                 }
                                                             )
                                                     }
-                                                </div>
-                                              </Box>
+                                                </Box>
                                             );
                                         } else {
                                             <Typography> loading ...</Typography>
@@ -492,7 +490,6 @@ function TranslationPlanViewerMuncher({metadata}) {
                                     }
                                 )
                                 }
-{/** </Box> */}
                             </Box>
                         ) : (
                             <Typography> no book found </Typography>
