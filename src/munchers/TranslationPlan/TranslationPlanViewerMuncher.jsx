@@ -19,7 +19,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import {Proskomma} from "proskomma-core";
 import {PanDialog} from 'pankosmia-rcl';
 
-function TranslationPlanViewerMuncher() {
+import TextDir from '../helpers/TextDir';
+import ExtractJsonValues from "../helpers/ExtractJsonValues";
+
+function TranslationPlanViewerMuncher({metadata}) {
     const [planIngredient, setPlanIngredient] = useState();
     const {i18nRef} = useContext(i18nContext);
     const {systemBcv} = useContext(BcvContext);
@@ -30,6 +33,12 @@ function TranslationPlanViewerMuncher() {
     const [selectedBurrito, setSelectedBurrito] = useState(null);
     const [selectedStory, setSelectedStory] = useState();
     const [search, setSearch] = useState("");
+    const [textDir, setTextDir] = useState(metadata.script_direction.toLowerCase());
+    const [selectedBurritoSbTextDir, setSelectedBurritoSbTextDir] = useState(undefined);
+    const [selectedBurritoTextDir, setSelectedBurritoTextDir] = useState(undefined);
+
+    const sbScriptDir = metadata.script_direction.toLowerCase();
+    const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -63,6 +72,11 @@ function TranslationPlanViewerMuncher() {
                             "usfm",
                             usfmResponse.text
                         );
+                        const sbSelectedScriptDirSet = selectedBurritoSbTextDir === 'ltr' || selectedBurritoSbTextDir === 'rtl';
+                        if (!sbSelectedScriptDirSet) {
+                          const dir = await TextDir(usfmResponse.text, 'usfm');
+                          setSelectedBurritoTextDir(dir);
+                        }
                         const query = `{
                                             documents {
                                                 header(id: "bookCode")
@@ -109,6 +123,7 @@ function TranslationPlanViewerMuncher() {
 
             getVerseText().then();
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [debugRef, systemBcv.bookCode, selectedBurrito]
     );
     useEffect(() => {
@@ -140,6 +155,13 @@ function TranslationPlanViewerMuncher() {
         fetchSummaries();
     }, [selectedBurrito]);
 
+    useEffect(() => {
+        if (selectedBurrito !== null) {
+            setSelectedBurritoSbTextDir(selectedBurrito.script_direction.toLowerCase());
+            setSelectedBurritoTextDir(selectedBurrito.script_direction.toLowerCase());
+        }
+    },[selectedBurrito])
+
     const handleSelectBurrito = (event) => {
         const name = event.target.value;
         const burrito = burritos.find(b => b.name === name);
@@ -147,12 +169,17 @@ function TranslationPlanViewerMuncher() {
     };
 
     const getAllData = async () => {
-        const ingredientLink = `/burrito/ingredient/raw/_local_/_local_/stctw-test?ipath=plan.json`;
+        const ingredientLink = `/burrito/ingredient/raw/_local_/_sideloaded_/stctw-test?ipath=plan.json`;
         const response = await fetch(ingredientLink);
 
         if (response.ok) {
             const data = await response.json();
             setPlanIngredient(data);
+            const planText = ExtractJsonValues(data, ['name', 'description', 'sectionTitle', 'themeBody', 'principle', 'principleMore']);
+            if (!sbScriptDirSet) {
+              const dir = await TextDir(planText.toString(), 'text');
+              setTextDir(dir);
+            }
 
         } else {
             setPlanIngredient([]);
@@ -160,7 +187,7 @@ function TranslationPlanViewerMuncher() {
     };
 
     async function loadCSS() {
-        const url = "/app-resources/usfm/bible_page_styles.css";
+        const url = selectedBurritoTextDir === "ltr" ? "/app-resources/usfm/bible_page_styles.css" : "/app-resources/usfm/bible_page_styles_rtl.css";
         const response = await fetch(url);
         if (!response.ok) {
             console.error("Erreur de chargement du CSS :", response.status);
@@ -174,9 +201,17 @@ function TranslationPlanViewerMuncher() {
 
     useEffect(
         () => {
-            getAllData().then();
             loadCSS();
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [selectedBurritoTextDir]
+    );
+
+    useEffect(
+        () => {
+            getAllData().then();
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         []
     );
 
@@ -219,12 +254,14 @@ function TranslationPlanViewerMuncher() {
     }
     const ITEM_HEIGHT = 48;
 
+    // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
     return (
         <Box
             sx={{
                 display: "flex",
                 flexDirection: "column",
             }}
+            dir={!sbScriptDirSet ? textDir : undefined}
         >
             <Box
                 sx={{marginLeft: "auto"}}>
@@ -367,7 +404,6 @@ function TranslationPlanViewerMuncher() {
                                     </Typography>
                                 </div>
 
-
                                 {planIngredient.sectionStructure.map(
                                     (field, i) => {
                                         if (field.type !== "scripture") {
@@ -403,10 +439,11 @@ function TranslationPlanViewerMuncher() {
                                                     </Typography>
                                                 </div>
                                             );
-                                        }
+                                        } 
                                         if (Object.keys(verseText).length > 0 && field.type === "scripture") {
                                             let chapterN = "0"
                                             return (
+                                              <Box dir={selectedBurritoTextDir}>
                                                 <div>
                                                     {
                                                         section.paragraphs
@@ -446,6 +483,7 @@ function TranslationPlanViewerMuncher() {
                                                             )
                                                     }
                                                 </div>
+                                              </Box>
                                             );
                                         } else {
                                             <Typography> loading ...</Typography>
@@ -454,6 +492,7 @@ function TranslationPlanViewerMuncher() {
                                     }
                                 )
                                 }
+{/** </Box> */}
                             </Box>
                         ) : (
                             <Typography> no book found </Typography>
