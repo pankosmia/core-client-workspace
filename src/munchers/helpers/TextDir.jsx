@@ -23,7 +23,7 @@ import { useDetectDir } from "font-detect-rhl";
 */
 function TextDir(content, type) {
     
-  const htmlMarkupScope = {
+    const htmlMarkupScope = {
       regex: [/<[^>]+>/gm], // Remove all html code
     };
     
