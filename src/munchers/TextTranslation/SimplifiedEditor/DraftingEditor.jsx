@@ -75,7 +75,6 @@ function DraftingEditor(
             scriptureJson={scriptureJson}
             currentBookCode={currentBookCode}
             setCurrentBookCode={setCurrentBookCode}
-            locationState={locationState}
         />
         <Box>
             {

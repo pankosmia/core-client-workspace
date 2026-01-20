@@ -6,17 +6,38 @@
     "net": false
   },
   "endpoints": {
-    "workspace": {
-      "workspace": {
+    "textTranslation": {
+      "edit": {
         "doc": "main page for workspace",
         "label": "pages:core-client-workspace:main",
         "url": ""
-      },
-      "workspaceMainPage": {
-        "doc": "actual workspace page",
-        "label": "pages:core-client-workspace:main-page",
-        "url": "/workspace"
       }
+    },
+    "x-bcvnotes": {
+      "edit": {
+        "doc": "main page for workspace",
+        "label": "pages:core-client-workspace:main",
+        "url": ""
+      }
+    },
+    "x-bcvquestions": {
+      "edit": {
+        "doc": "main page for workspace",
+        "label": "pages:core-client-workspace:main",
+        "url": ""
+      }
+    },
+    "textStories": {
+      "edit": {
+        "doc": "main page for workspace",
+        "label": "pages:core-client-workspace:main",
+        "url": ""
+      }
+    },
+    "workspaceMainPage": {
+      "doc": "actual workspace page",
+      "label": "pages:core-client-workspace:main-page",
+      "url": "/workspace"
     }
   },
   "exclude_from_menu": true,
@@ -182,6 +203,12 @@
       "fr": "Description",
       "es": "Descripción",
       "id": "Deskripsi"
+    },
+    "row_source": {
+      "en": "Source",
+      "fr": "Source",
+      "es": "Fuente",
+      "id": "Sumber"
     },
     "row_type": {
       "en": "Type",
