@@ -20,8 +20,7 @@ function EditorTools(
         setMd5sumScriptureJson,
         scriptureJson,
         currentBookCode,
-        setCurrentBookCode,
-        locationState
+        setCurrentBookCode
     }
 ) {
 
@@ -107,13 +106,7 @@ function EditorTools(
                 <IconButton
                     disabled={md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson}
                     onClick={() =>
-                        navigate(
-                            {
-                                pathname: "/",
-                                search: "return-page=workspace"
-                            },
-                            {state: locationState}
-                        )
+                        navigate("/")
                     }
                 >
                     <SettingsIcon/>
