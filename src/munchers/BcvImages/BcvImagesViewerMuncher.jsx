@@ -128,7 +128,7 @@ function BcvImagesViewerMuncher({metadata}) {
         <Box className="h-full w-full flex flex-col overflow-hidden" dir={!sbScriptDirSet ? textDir : undefined}>
             <div className="flex flex-col items-center justify-center p-2">
                 <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
-                <h6>{doI18n("munchers:bcv_notes_viewer:title", i18nRef.current)}</h6>
+                <h6>{doI18n("munchers:bcv_images_viewer:title", i18nRef.current)}</h6>
             </div>
             <div className="flex-1 min-h-0 min-w-0 overflow-hidden p-2">
                 {ingredient &&
@@ -194,7 +194,7 @@ function BcvImagesViewerMuncher({metadata}) {
                             {`${verseCaptions[current]} (${current + 1} of ${verseNotes.length})`}
                         </div>
                     </div> :
-                    "No notes found for this verse"
+                    doI18n("munchers:bcv_images_viewer:no_images_found", i18nRef.current)
                 }
             </div>
         </Box>
