@@ -96,13 +96,15 @@ function DraftingEditor(
     );
 
 useEffect(() => {
-  const contentText = ExtractJsonValues(scriptureJson, ['content']).toString().replace(/,/g, "");
-  const dir = TextDir(contentText, 'text');
-  if (textDir !== dir) {
-    setTextDir(dir);
+  if (!sbScriptDirSet) {
+      const contentText = ExtractJsonValues(scriptureJson, ['content']).toString().replace(/,/g, "");
+      const dir = TextDir(contentText, 'text');
+      if (textDir !== dir) {
+          setTextDir(dir);
+      }
   }
 // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [scriptureJson])
+}, [scriptureJson, sbScriptDirSet])
 
     return <>
         <EditorTools
