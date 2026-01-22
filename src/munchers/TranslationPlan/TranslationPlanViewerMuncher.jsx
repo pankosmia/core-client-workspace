@@ -175,7 +175,7 @@ function TranslationPlanViewerMuncher({metadata}) {
         if (response.ok) {
             const data = await response.json();
             setPlanIngredient(data);
-            const planText = ExtractJsonValues(data, ['name', 'description', 'sectionTitle', 'themeBody', 'principle', 'principleMore']);
+            const planText = ExtractJsonValues(data, ['name', 'description', 'sectionTitle', 'themeBody', 'principle', 'principleMore']).toString().replace(/,/g, "");
             if (!sbScriptDirSet) {
               const dir = await TextDir(planText.toString(), 'text');
               setTextDir(dir);
