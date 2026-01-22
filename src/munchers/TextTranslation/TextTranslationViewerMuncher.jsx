@@ -1,11 +1,13 @@
 import {useEffect, useState, useContext} from "react";
-import "./TextTranslationViewerMuncher.css";
-import TextDir from '../helpers/TextDir';
+import {Box} from "@mui/material";
 import {Proskomma} from 'proskomma-core';
 
 import {getText, debugContext, bcvContext} from "pithekos-lib";
 
-function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
+import "./TextTranslationViewerMuncher.css";
+import TextDir from '../helpers/TextDir';
+
+function TextTranslationViewerMuncher({metadata}) {
     const {systemBcv} = useContext(bcvContext);
     const {debugRef} = useContext(debugContext);
     const [verseText, setVerseText] = useState([]);
@@ -13,7 +15,6 @@ function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
 
     const sbScriptDir = metadata.script_direction.toLowerCase();
     const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
-
 
     useEffect(
         () => {
@@ -30,7 +31,10 @@ function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
                         "usfm",
                         usfmResponse.text
                     );
-                    !sbScriptDirSet && await setTextDir(TextDir(usfmResponse.text, 'usfm'));
+                    if (!sbScriptDirSet) {
+                      const dir = await TextDir(usfmResponse.text, 'usfm');
+                      setTextDir(dir);
+                    }
                     const query = `{docSets { documents { mainSequence { blocks(withScriptureCV: "${systemBcv.chapterNum}:${systemBcv.verseNum}") {text items {type subType payload}}}}}}`;
                     const result = pk.gqlQuerySync(query);
                     setVerseText(result.data.docSets[0].documents[0].mainSequence.blocks);
@@ -38,7 +42,7 @@ function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
                     setVerseText([]);
                 }
             };
-            getVerseText().then();
+            getVerseText();
         },
         [debugRef, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum, metadata.local_path, sbScriptDirSet, textDir]
     );
@@ -54,12 +58,12 @@ function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
     }
 
     // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
-    return <div className={adjSelectedFontClass} dir={!sbScriptDirSet ? textDir : undefined}>
+    return <Box dir={!sbScriptDirSet ? textDir : undefined}>
         {
             verseText.length > 0 ?
                 verseText.map(b => <p style={{marginBottom: "1em",padding:"1rem"}}>{b.items.map(i => renderItem(i))}</p>) :
                 <p style={{marginBottom: "1em",padding:"1rem"}}>No text found</p>
         }
-    </div>
+    </Box>
 }
 export default TextTranslationViewerMuncher;

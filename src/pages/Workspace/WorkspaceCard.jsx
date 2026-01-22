@@ -29,8 +29,9 @@ function WorkspaceCard({metadata, style, distractionModeCount,locationState}) {
         return <div style={{...style, backgroundImage:'url("/app-resources/pages/workspace/tile_blur.png")', filter: "blur(1px)"}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
         </div>
     }
+    // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
     if (metadata.primary && metadata.flavor === "textTranslation") {
-        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
+        return <div style={{...style, lineHeight: 'normal'}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
           <TextTranslationEditorMuncher
             metadata={metadata}
             locationState={locationState}

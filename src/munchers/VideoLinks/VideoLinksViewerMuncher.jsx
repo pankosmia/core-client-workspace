@@ -1,5 +1,5 @@
 import {useEffect, useState, useContext} from "react";
-import {Box, Grid, Typography} from "@mui/material";
+import {Box, Grid2, Typography} from "@mui/material";
 
 import {
     i18nContext as I18nContext,
@@ -54,24 +54,24 @@ function VideoLinksViewerMuncher({metadata}) {
                 {`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}
             </Typography>
             <Typography variant="h6">{doI18n("munchers:video_links_viewer:title", i18nRef.current)}</Typography>
-            <Grid container spacing={2}>
+            <Grid2 container spacing={2}>
               {verseNotes.length === 0 && doI18n("munchers:video_links_viewer:no_content", i18nRef.current)}
               {
                   verseNotes.length > 0 && enableNet &&
                       verseNotes.map(
                           note =>
-                              <Grid size={6}>
+                              <Grid2 size={6}>
                                   <video width="320" height="240" controls>
                                       <source src={note} type="video/mp4"/>
                                       {doI18n("munchers:video_links_viewer:offline_mode", i18nRef.current)}
                                   </video>
-                              </Grid>
+                              </Grid2>
                       ) 
               }
               {
                   verseNotes.length > 0 && !enableNet && <b>Offline Mode</b>
               }
-            </Grid>
+            </Grid2>
         </Box>
     );
 }
