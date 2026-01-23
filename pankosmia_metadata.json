@@ -264,6 +264,14 @@
       "fr": "Définir la combinaison de touches de déclenchement",
       "id": "Atur kombinasi tombol pemicu"
     },
+    "usfm_button_b": {
+      "en": "Blank line",
+      "fr": "Ligne vide"
+    },
+    "usfm_button_ib": {
+      "en": "Blank line (intro)",
+      "fr": "Ligne vide (intro)"
+    },
     "usfm_button_c": {
       "en": "Chapter number",
       "fr": "Numéro du chapitre",
