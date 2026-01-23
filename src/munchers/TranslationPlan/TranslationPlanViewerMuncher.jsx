@@ -11,7 +11,8 @@ import {
     MenuItem,
     TextField,
     Tooltip,
-    Typography
+    Typography,
+    useTheme
 } from "@mui/material";
 import {bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, postEmptyJson} from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
@@ -44,7 +45,7 @@ function TranslationPlanViewerMuncher({metadata}) {
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
-
+    const theme = useTheme();
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -511,6 +512,7 @@ function TranslationPlanViewerMuncher({metadata}) {
                 titleLabel="About"
                 isOpen={openDialogAbout}
                 closeFn={() => handleCloseDialogAbout()}
+                theme={theme}
             >
                 <DialogContent>
                     {Object.entries(planIngredient).map(([key, value]) => {

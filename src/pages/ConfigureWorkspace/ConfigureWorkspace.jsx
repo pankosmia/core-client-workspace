@@ -9,6 +9,7 @@ import {
     ToggleButton,
     Grid2,
     DialogContent,
+    useTheme,
 } from "@mui/material";
 import { PanDialog } from 'pankosmia-rcl';
 import { DataGrid } from '@mui/x-data-grid';
@@ -38,7 +39,7 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
     const [alignment, setAlignment] = useState(selectedResources.size === 0 ? "" : layout);
-
+    const theme=useTheme();
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
         if (summariesResponse.ok) {
@@ -240,6 +241,7 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
                 isOpen={open}
                 closeFn={() => handleNext()}
                 size="xl"
+                theme={theme}
             >
                 <DialogContent>
                     <Grid2
