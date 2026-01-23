@@ -11,12 +11,21 @@ import {
     getText, getJson
 } from "pithekos-lib";
 
+import TextDir from '../helpers/TextDir';
+
 function BcvArticlesViewerMuncher({metadata}) {
     const [ingredient, setIngredient] = useState([]);
     const [verseNotes, setVerseNotes] = useState([]);
+    const [textDir, setTextDir] = useState(
+      metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+    );
+
     const {systemBcv} = useContext(BcvContext);
     const {debugRef} = useContext(DebugContext);
     const {i18nRef} = useContext(I18nContext);
+
+    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+    const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
 
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -36,6 +45,7 @@ function BcvArticlesViewerMuncher({metadata}) {
         () => {
             getAllData().then();
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [systemBcv]
     );
 
@@ -52,13 +62,20 @@ function BcvArticlesViewerMuncher({metadata}) {
                     }
                 }
                 setVerseNotes(ret);
+                if (!sbScriptDirSet) {
+                    const dir = await TextDir(ret.toString(), 'md');
+                    setTextDir(dir);
+                }
             }
             doVerseNotes().then();
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [ingredient]
     );
+
+    // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
     return (
-        <Box sx={{ flexGrow: 1 }}>
+        <Box sx={{ flexGrow: 1 }} dir={!sbScriptDirSet ? textDir : undefined}>
             <Grid2 
                 container
                 direction="row"

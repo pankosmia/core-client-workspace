@@ -11,6 +11,8 @@ import {
     getText
 } from "pithekos-lib";
 
+import TextDir from '../helpers/TextDir';
+
 function ImageViewer({metadata, reference}) {
     return <Stack>
         <img
@@ -22,9 +24,16 @@ function ImageViewer({metadata, reference}) {
 function BcvImagesViewerMuncher({metadata}) {
     const [ingredient, setIngredient] = useState([]);
     const [verseNotes, setVerseNotes] = useState([]);
+    const [textDir, setTextDir] = useState(
+      metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+    );
+
     const {systemBcv} = useContext(BcvContext);
     const {debugRef} = useContext(DebugContext);
     const {i18nRef} = useContext(I18nContext);
+
+    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+    const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
     
     let [current, setCurrent] = useState(0);
 
@@ -54,6 +63,7 @@ function BcvImagesViewerMuncher({metadata}) {
         () => {
             getAllData().then();
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [systemBcv]
     );
 
@@ -71,6 +81,7 @@ function BcvImagesViewerMuncher({metadata}) {
             }
             doVerseNotes().then();
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [ingredient]
     );
 
@@ -90,10 +101,15 @@ function BcvImagesViewerMuncher({metadata}) {
                     }
                 }
                 setVerseCaptions(captions);
+                if (!sbScriptDirSet) {
+                    const dir = await TextDir(captions.toString(), 'text');
+                    setTextDir(dir);
+                }
             }
                 doVerseCaptions().then();
             }
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [verseNotes]
     );
 
@@ -108,12 +124,13 @@ function BcvImagesViewerMuncher({metadata}) {
             );
         }
     };
-    
+
+    // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
     return (
-        <Box className="h-full w-full flex flex-col overflow-hidden">
+        <Box className="h-full w-full flex flex-col overflow-hidden" dir={!sbScriptDirSet ? textDir : undefined}>
             <div className="flex flex-col items-center justify-center p-2">
                 <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
-                <h6>{doI18n("munchers:bcv_notes_viewer:title", i18nRef.current)}</h6>
+                <h6>{doI18n("munchers:bcv_images_viewer:title", i18nRef.current)}</h6>
             </div>
             <div className="flex-1 min-h-0 min-w-0 overflow-hidden p-2">
                 {ingredient &&
@@ -179,7 +196,7 @@ function BcvImagesViewerMuncher({metadata}) {
                             {`${verseCaptions[current]} (${current + 1} of ${verseNotes.length})`}
                         </div>
                     </div> :
-                    "No notes found for this verse"
+                    doI18n("munchers:bcv_images_viewer:no_images_found", i18nRef.current)
                 }
             </div>
         </Box>
