@@ -69,5 +69,10 @@
     "tag",
     "iex",
     "pages:core-local-workspace:usfm_iex"
+  ],
+  [
+    "tag",
+    "ib",
+    "pages:core-local-workspace:usfm_ib"
   ]
 ]

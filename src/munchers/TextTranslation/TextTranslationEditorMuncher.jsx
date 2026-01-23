@@ -1,24 +1,22 @@
 import "./TextTranslationEditorMuncher.css";
-import {
-    Box,
-} from "@mui/material";
+import { Box } from "@mui/material";
 import DraftingEditor from "./SimplifiedEditor/DraftingEditor";
-import {useState} from "react";
+import { useState, useEffect } from "react";
 
-function TextTranslationEditorMuncher({metadata, locationState}) {
-    const [modified, setModified] = useState(false);
+function TextTranslationEditorMuncher({ metadata, locationState }) {
+  const [modified, setModified] = useState(false);
 
-    return (
-        <Box sx={{p: 2}}>
-            <DraftingEditor
-                metadata={metadata}
-                modified={modified}
-                setModified={setModified}
-                locationState={locationState}
-            />
-        </Box>
 
-    );
+  return (
+    <Box sx={{ p: 2 }}>
+      <DraftingEditor
+        metadata={metadata}
+        modified={modified}
+        setModified={setModified}
+        locationState={locationState}
+      />
+    </Box>
+  );
 }
 
 export default TextTranslationEditorMuncher;
