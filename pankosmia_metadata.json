@@ -696,6 +696,10 @@
       "en": "PDF Preview",
       "fr": "Prévisualisation PDF",
       "id": "Pratinjau PDF"
+    },
+    "no_scripture_for_story": {
+      "en": "No Scripture found for this story in this translation",
+      "fr": "Aucun texte biblique trouvé dans cette traduction pour cette histoire"
     }
   }
 }
