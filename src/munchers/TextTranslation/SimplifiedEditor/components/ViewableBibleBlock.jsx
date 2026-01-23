@@ -4,10 +4,10 @@ export default function ViewableBibleBlock({ blockJson, systemBcv, lastPrintedVe
     const versesRefs = useRef({});
 
     useEffect(() => {
-        const verseToScroll = systemBcv.verseNum;
+        const verseToScroll = String(systemBcv.verseNum);
         if (verseToScroll && versesRefs.current[verseToScroll]) {
             versesRefs.current[verseToScroll].scrollIntoView({
-                behavior: "auto",
+                behavior: "smooth",
                 block: "center",
             });
         }
@@ -32,7 +32,7 @@ export default function ViewableBibleBlock({ blockJson, systemBcv, lastPrintedVe
                 const systemVerseNum = Number(systemBcv.verseNum);
                 const isSelected = verseRange.length === 1 
                     ? systemVerseNum === verseRange[0] 
-                    : (systemVerseNum >= verseRange[0] && systemVerseNum <= verseRange[1]);
+                    : (systemVerseNum >= verseRange[0] && systemVerseNum <= verseRange[verseRange.length - 1]);
 
                 return (
                     <span 
@@ -40,7 +40,11 @@ export default function ViewableBibleBlock({ blockJson, systemBcv, lastPrintedVe
                         ref={(el) => {
                             if (!isDuplicate) {
                                 versesRefs.current[currentVerse] = el;
-                                if (verseRange.length > 1) versesRefs.current[verseRange] = el;
+                                if (verseRange.length > 1) {
+                                    for (let n = verseRange[0]; n <= verseRange[verseRange.length - 1]; n++) {
+                                        versesRefs.current[String(n)] = el;
+                                    }
+                                }
                             }
                         }}
                         style={{
