@@ -1,39 +1,63 @@
-import {useContext, useEffect, useRef} from "react";
-import {bcvContext} from "pithekos-lib";
+import {useEffect, useRef} from "react";
 
-export default function ViewableBibleBlock({ blockJson }) {
-    const { systemBcv } = useContext(bcvContext);
-
+export default function ViewableBibleBlock({ blockJson, systemBcv, lastPrintedVerseRef }) {
     const versesRefs = useRef({});
 
     useEffect(() => {
-        const verseToScroll = systemBcv.verseNum;  
+        const verseToScroll = systemBcv.verseNum;
         if (verseToScroll && versesRefs.current[verseToScroll]) {
             versesRefs.current[verseToScroll].scrollIntoView({
                 behavior: "auto",
                 block: "center",
             });
         }
-    }, [systemBcv.verseNum]); 
+    }, [systemBcv.verseNum]);
 
     return (
-        <div 
+        <span
             className={blockJson.tag} 
-            style={{ padding: "2px 12px",  width: "100%", boxSizing: "border-box" }}
+            style={{ display: "contents" }}
         >
             {blockJson?.units?.map((u, i) => {
-                const isSelected = Number(systemBcv.verseNum) === Number(u.verses);
+                const rawContent = u.content || "";
+                const contentToDisplay = rawContent === "_" ? " " : rawContent;
+                const currentVerse = String(u.verses);
+                const isDuplicate = currentVerse === lastPrintedVerseRef.current;
+                lastPrintedVerseRef.current = currentVerse;
+                const verseRange = currentVerse.split('-').map(Number);
+                const systemVerseNum = Number(systemBcv.verseNum);
+                const isSelected = verseRange.length === 1 
+                    ? systemVerseNum === verseRange[0] 
+                    : (systemVerseNum >= verseRange[0] && systemVerseNum <= verseRange[1]);
+
                 return (
                     <span 
-                        key={`${u.verses}-${i}`}
-                        ref={(el) => (versesRefs.current[u.verses] = el)}
-                        style={isSelected ? { backgroundColor: "#CCC" } : {}}
+                        key={`${currentVerse}-${i}`}
+                        ref={(el) => {
+                            if (!isDuplicate) {
+                                versesRefs.current[currentVerse] = el;
+                                if (verseRange.length > 1) versesRefs.current[verseRange] = el;
+                            }
+                        }}
+                        style={{
+                            backgroundColor: isSelected ? "#CCC" : "transparent",
+                            display: "inline",
+                            padding: "0", 
+                            boxDecorationBreak: "clone",
+                            WebkitBoxDecorationBreak: "clone",
+                        }}
                     >
-                        <span className="marks_verses_label">{u.verses}</span>
-                        <span style={{ paddingRight: "2pt" }}>{u.content[0]}</span>
+                        {!isDuplicate && (
+                            <span className="marks_verses_label" style={{ marginRight: "4px" }}>
+                                {currentVerse}
+                            </span>
+                        )}
+                        <span style={{ whiteSpace: "normal", paddingRight: "2pt" }}>
+                            {isDuplicate ? ` ${contentToDisplay}` : contentToDisplay}
+                        </span>
                     </span>
                 );
             })}
-        </div>
+        </span>
     );
 }

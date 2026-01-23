@@ -1,10 +1,11 @@
-import {useContext, useEffect} from "react";
-/* import {bcvContext} from "pithekos-lib"; */
+import React, { useRef, useContext, useEffect } from 'react';
 import ViewableBibleBlock from "./ViewableBibleBlock";
+import {bcvContext} from "pithekos-lib";
 
 export default function ViewableBible({chapterJson }) {
 
-/*     const {systemBcv} = useContext(bcvContext);*/
+    const {systemBcv} = useContext(bcvContext);
+    const lastPrintedVerseRef = useRef(null);
 
     useEffect(() => {
         async function loadCSS() {
@@ -22,29 +23,32 @@ export default function ViewableBible({chapterJson }) {
         loadCSS();
     }, []);
 
-    console.log("ELIAS DEBUG: chapterJson", chapterJson);
-
     return (
-        <div>
+        <div 
+            style={{ 
+                textAlign: "justify",
+                padding: "2px 12px",
+                wordBreak: "break-word"
+            }}
+        >
             {chapterJson.blocks
+                .filter(b => b.tag !== 'b')
                 .map(
                     (b, n) => {
                         switch (b.type) {
-                            case "chapter":
-                                console.log("debug chapter");
+                            case "chapter": 
                                 return ""
-
                             case "remark":
-                                console.log("debug remark");
-                                return <ViewableBibleBlock blockJson={b} />
-
                             case "main":
-                                console.log("debug main");
-                                return <ViewableBibleBlock blockJson={b} />
-
                             default:
-                                console.log("debug default");
-                                return <ViewableBibleBlock blockJson={b} />
+                                return (
+                                    <ViewableBibleBlock
+                                        key={n}
+                                        blockJson={b}
+                                        systemBcv={systemBcv}
+                                        lastPrintedVerseRef={lastPrintedVerseRef}
+                                    />
+                                );
                         }
                     }
                 )}
