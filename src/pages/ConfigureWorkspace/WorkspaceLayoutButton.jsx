@@ -5,12 +5,6 @@ import SvgViewEditorRightColumn from "../../munchers/TextTranslation/SimplifiedE
 import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_row";
 import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row";
 import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_top";
-import SvgViewEditorTopDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_top_disabled";
-import SvgViewEditorBottomDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_bottom_disabled";
-import SvgViewEditorLeftColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_column_disabled";
-import SvgViewEditorLeftRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_row_disabled";
-import SvgViewEditorRightRowDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row_disabled";
-import SvgViewEditorRightColumnDisabled from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_column_disabled";
 import { useEffect, useState } from "react";
 
 export default function LayoutPicker({ selectedResources, layout, setLayout }) {
@@ -32,38 +26,32 @@ export default function LayoutPicker({ selectedResources, layout, setLayout }) {
         {
             value: "ViewEditorTop",
             layout: "ViewEditorTop",
-            Icon: SvgViewEditorTop,
-            IconDisabled: SvgViewEditorTopDisabled,
+            icon: SvgViewEditorTop,
         },
         {
             value: "ViewEditorBottom",
             layout: "ViewEditorBottom",
-            Icon: SvgViewEditorBottom,
-            IconDisabled: SvgViewEditorBottomDisabled,
+            icon: SvgViewEditorBottom,
         },
         {
             value: "ViewEditorLeftColumn",
             layout: "ViewEditorLeftColumn",
-            Icon: SvgViewEditorLeftColumn,
-            IconDisabled: SvgViewEditorLeftColumnDisabled,
+            icon: SvgViewEditorLeftColumn,
         },
         {
             value: "ViewEditorRightColumn",
             layout: "ViewEditorRightColumn",
-            Icon: SvgViewEditorRightColumn,
-            IconDisabled: SvgViewEditorRightColumnDisabled,
+            icon: SvgViewEditorRightColumn,
         },
         {
             value: "ViewEditorLeftRow",
             layout: "ViewEditorLeftRow",
-            Icon: SvgViewEditorLeftRow,
-            IconDisabled: SvgViewEditorLeftRowDisabled,
+            icon: SvgViewEditorLeftRow,
         },
         {
             value: "ViewEditorRightRow",
             layout: "ViewEditorRightRow",
-            Icon: SvgViewEditorRightRow,
-            IconDisabled: SvgViewEditorRightRowDisabled,
+            icon: SvgViewEditorRightRow,
         },
     ];
 
@@ -74,20 +62,19 @@ export default function LayoutPicker({ selectedResources, layout, setLayout }) {
                 exclusive
                 onChange={handleAlignment}
             >
-                {layouts.map(({ value, layout, Icon, IconDisabled }) => (
-                    <ToggleButton
-                        key={value}
-                        value={value}
-                        onClick={() => setLayout(layout)}
-                        disabled={selectedResources.size === 0}
-                    >
-                        {selectedResources.size === 0 ? (
-                            <IconDisabled />
-                        ) : (
-                            <Icon />
-                        )}
-                    </ToggleButton>
-                ))}
+                {layouts.map((item) => {
+                    return (
+                        <ToggleButton
+                            key={item.value}
+                            value={item.value}
+                            onClick={() => setLayout(item.layout)}
+                            disabled={selectedResources.size === 0}
+                        >
+                            <item.icon />
+                        </ToggleButton>
+                    );
+                })}
+
             </ToggleButtonGroup>
         </Grid2>
 
