@@ -27,9 +27,11 @@ function DraftingEditor(
     const [md5sumScriptureJson, setMd5sumScriptureJson] = useState([]);
     const [currentBookCode, setCurrentBookCode] = useState("zzz");
     const [bookChangeCount, setBookChangeCount] = useState(0);
-    const [textDir, setTextDir] = useState(metadata.script_direction.toLowerCase());
+    const [textDir, setTextDir] = useState(
+      metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+    );
 
-    const sbScriptDir = metadata.script_direction.toLowerCase();
+    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
 
     // Set up 'are you sure you want to leave page' for Electron
