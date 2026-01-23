@@ -25,6 +25,7 @@ import ExtractJsonValues from "../helpers/ExtractJsonValues";
 
 function TranslationPlanViewerMuncher({metadata}) {
     const [planIngredient, setPlanIngredient] = useState();
+    console.log("planIngredient",planIngredient)
     const {i18nRef} = useContext(i18nContext);
     const {systemBcv} = useContext(BcvContext);
     const [openDialogAbout, setOpenDialogAbout] = useState(false);
@@ -176,7 +177,8 @@ function TranslationPlanViewerMuncher({metadata}) {
     };
 
     const getAllData = async () => {
-        const ingredientLink = `/burrito/ingredient/raw/_local_/_sideloaded_/stctw-test?ipath=plan.json`;
+        const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=plan.json`;
+
         const response = await fetch(ingredientLink);
 
         if (response.ok) {
@@ -189,7 +191,7 @@ function TranslationPlanViewerMuncher({metadata}) {
             }
 
         } else {
-            setPlanIngredient([]);
+            setPlanIngredient({});
         }
     };
 
