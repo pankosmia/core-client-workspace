@@ -1,6 +1,5 @@
 import {useEffect, useState, useContext} from "react";
-import "./TextTranslationViewerMuncher.css";
-import TextDir from '../helpers/TextDir';
+import {Box} from "@mui/material";
 import {Proskomma} from 'proskomma-core';
 import usfm2draftJson from "../../components/usfm2draftJson";
 import filterByChapter from "../../components/filterByChapter";
@@ -8,15 +7,17 @@ import ViewableBible from "./SimplifiedEditor/components/ViewableBible";
 
 import {getText, debugContext, bcvContext} from "pithekos-lib";
 
-function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
+import "./TextTranslationViewerMuncher.css";
+import TextDir from '../helpers/TextDir';
+
+function TextTranslationViewerMuncher({metadata}) {
     const {systemBcv} = useContext(bcvContext);
     const {debugRef} = useContext(debugContext);
     const [bookData, setBookData] = useState([]);
     const [textDir, setTextDir] = useState(metadata.script_direction.toLowerCase());
 
-    const sbScriptDir = metadata.script_direction.toLowerCase();
+    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
-
 
     useEffect(
         () => {
@@ -44,8 +45,6 @@ function TextTranslationViewerMuncher({metadata, adjSelectedFontClass}) {
             return ""
         }
     }
-
-   /*  console.log("ELIAS DEBUG: bookUsfm",bookData); */
 
     /* // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
     return <pre>{JSON.stringify(bookData, null, 2)}{/* <div className={adjSelectedFontClass} dir={!sbScriptDirSet ? textDir : undefined}>

@@ -22,15 +22,16 @@ import TranslationPlanViewerMuncher from '../../munchers/TranslationPlan/Transla
 
 function WorkspaceCard({metadata, style, distractionModeCount,locationState}) {
 
-  const sbScriptDir = metadata.script_direction.toLowerCase();
+  const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
   const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
 
     if (!metadata.primary && (distractionModeCount % 2) > 0) {
         return <div style={{...style, backgroundImage:'url("/app-resources/pages/workspace/tile_blur.png")', filter: "blur(1px)"}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
         </div>
     }
+    // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
     if (metadata.primary && metadata.flavor === "textTranslation") {
-        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
+        return <div style={{...style, lineHeight: 'normal'}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
           <TextTranslationEditorMuncher
             metadata={metadata}
             locationState={locationState}

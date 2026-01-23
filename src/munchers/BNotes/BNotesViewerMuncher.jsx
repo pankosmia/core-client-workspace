@@ -10,11 +10,20 @@ import {
     getText
 } from "pithekos-lib";
 
+import TextDir from '../helpers/TextDir';
+
 function BNotesViewerMuncher({metadata}) {
     const [ingredient, setIngredient] = useState("");
+    const [textDir, setTextDir] = useState(
+      metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+    );
+    
     const {systemBcv} = useContext(BcvContext);
     const {debugRef} = useContext(DebugContext);
     const {i18nRef} = useContext(I18nContext);
+
+    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+    const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
 
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.md`;
@@ -23,6 +32,10 @@ function BNotesViewerMuncher({metadata}) {
             setIngredient(
                 response.text
             );
+            if (!sbScriptDirSet) {
+                const dir = await TextDir(response.text, 'md');
+                setTextDir(dir);
+            }
         } else {
             setIngredient("")
         }
@@ -32,11 +45,13 @@ function BNotesViewerMuncher({metadata}) {
         () => {
             getAllData().then();
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [systemBcv]
     );
 
+    // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
     return (
-        <Box>
+        <Box dir={!sbScriptDirSet ? textDir : undefined}>
             <h5>{`${metadata.name} (${systemBcv.bookCode})`}</h5>
             <h6>{doI18n("munchers:b_notes_viewer:title", i18nRef.current)}</h6>
             <div>

@@ -10,6 +10,8 @@ import EditableBible from "./components/EditableBible";
 import md5sum from "md5";
 import EditorTools from "./components/EditorTools";
 import filterByChapter from "../../../components/filterByChapter";
+import TextDir from '../../helpers/TextDir';
+import ExtractJsonValues from "../../helpers/ExtractJsonValues";
 
 function DraftingEditor(
     {
@@ -26,6 +28,12 @@ function DraftingEditor(
     const [md5sumScriptureJson, setMd5sumScriptureJson] = useState([]);
     const [currentBookCode, setCurrentBookCode] = useState("zzz");
     const [bookChangeCount, setBookChangeCount] = useState(0);
+    const [textDir, setTextDir] = useState(
+      metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+    );
+
+    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+    const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
 
     // Set up 'are you sure you want to leave page' for Electron
     useEffect(() => {
@@ -49,12 +57,16 @@ function DraftingEditor(
                     )
                     const hash = md5sum(JSON.stringify(usfmDraftJson));
                     setMd5sumScriptureJson(hash);
+                    if (!sbScriptDirSet) {
+                        const dir = await TextDir(usfmResponse.text, 'usfm');
+                        setTextDir(dir);
+                    }
                 }
             }
             doScriptureJson().then();
         }
 
-    }, [debugRef, systemBcv.bookCode, metadata, currentBookCode]);
+    }, [debugRef, systemBcv.bookCode, metadata, currentBookCode, sbScriptDirSet]);
 
     useEffect(
         () => {
@@ -65,6 +77,18 @@ function DraftingEditor(
         },
         [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]
     );
+
+useEffect(() => {
+  if (!sbScriptDirSet) {
+      const contentText = ExtractJsonValues(scriptureJson, ['content']).toString().replace(/,/g, "");
+      const dir = TextDir(contentText, 'text');
+      if (textDir !== dir) {
+          setTextDir(dir);
+      }
+  }
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [scriptureJson, sbScriptDirSet])
+
     return <>
         <EditorTools
             metadata={metadata}
@@ -76,7 +100,8 @@ function DraftingEditor(
             currentBookCode={currentBookCode}
             setCurrentBookCode={setCurrentBookCode}
         />
-        <Box>
+        {/** If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard */}
+        <Box dir={!sbScriptDirSet ? textDir : undefined}>
             {
                 chapterJson ? <EditableBible
                         chapterJson={chapterJson}
