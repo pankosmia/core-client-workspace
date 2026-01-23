@@ -24,17 +24,13 @@ export default function ViewableBible({chapterJson }) {
     }, []);
 
     return (
-        <div 
-            style={{ 
-                textAlign: "justify",
-                padding: "2px 12px",
-                wordBreak: "break-word"
-            }}
-        >
+        <div style={{ padding: "2px 12px" }}>
             {chapterJson.blocks
-                .filter(b => b.tag !== 'b')
                 .map(
                     (b, n) => {
+                        if (b.tag === 'b') {
+                            return <div key={n} style={{ height: "1em" }} />;
+                        }
                         switch (b.type) {
                             case "chapter": 
                                 return ""

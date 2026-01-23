@@ -14,16 +14,20 @@ export default function ViewableBibleBlock({ blockJson, systemBcv, lastPrintedVe
     }, [systemBcv.verseNum]);
 
     return (
-        <span
+        <div
             className={blockJson.tag} 
-            style={{ display: "contents" }}
+            style={{ 
+                marginBottom: "0.5em", 
+                textAlign: "justify",
+                wordBreak: "break-word" 
+            }}
         >
             {blockJson?.units?.map((u, i) => {
                 const rawContent = u.content || "";
                 const contentToDisplay = rawContent === "_" ? " " : rawContent;
                 const currentVerse = String(u.verses);
                 const isDuplicate = currentVerse === lastPrintedVerseRef.current;
-                lastPrintedVerseRef.current = currentVerse;
+                if (!isDuplicate) lastPrintedVerseRef.current = currentVerse;
                 const verseRange = currentVerse.split('-').map(Number);
                 const systemVerseNum = Number(systemBcv.verseNum);
                 const isSelected = verseRange.length === 1 
@@ -42,9 +46,6 @@ export default function ViewableBibleBlock({ blockJson, systemBcv, lastPrintedVe
                         style={{
                             backgroundColor: isSelected ? "#CCC" : "transparent",
                             display: "inline",
-                            padding: "0", 
-                            boxDecorationBreak: "clone",
-                            WebkitBoxDecorationBreak: "clone",
                         }}
                     >
                         {!isDuplicate && (
@@ -58,6 +59,6 @@ export default function ViewableBibleBlock({ blockJson, systemBcv, lastPrintedVe
                     </span>
                 );
             })}
-        </span>
+        </div>
     );
 }
