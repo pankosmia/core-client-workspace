@@ -14,7 +14,7 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
         const summariesResponse = await getJson(`/burrito/metadata/summary/${repoMetadata.local_path}`);
         if (summariesResponse.ok) {
             const data = summariesResponse.json;
-            setScriptDirection(data.script_direction);
+            setScriptDirection(data?.script_direction ?? undefined);
         } else {
             console.error(" Erreur lors de la récupération des données.");
         }

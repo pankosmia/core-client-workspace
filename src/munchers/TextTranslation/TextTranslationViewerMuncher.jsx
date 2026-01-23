@@ -11,9 +11,11 @@ function TextTranslationViewerMuncher({metadata}) {
     const {systemBcv} = useContext(bcvContext);
     const {debugRef} = useContext(debugContext);
     const [verseText, setVerseText] = useState([]);
-    const [textDir, setTextDir] = useState(metadata.script_direction.toLowerCase());
+    const [textDir, setTextDir] = useState(
+      metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+    );
 
-    const sbScriptDir = metadata.script_direction.toLowerCase();
+    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
 
     useEffect(

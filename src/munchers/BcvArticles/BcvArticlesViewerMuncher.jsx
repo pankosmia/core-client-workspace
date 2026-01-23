@@ -16,13 +16,15 @@ import TextDir from '../helpers/TextDir';
 function BcvArticlesViewerMuncher({metadata}) {
     const [ingredient, setIngredient] = useState([]);
     const [verseNotes, setVerseNotes] = useState([]);
-    const [textDir, setTextDir] = useState(metadata.script_direction.toLowerCase());
+    const [textDir, setTextDir] = useState(
+      metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+    );
 
     const {systemBcv} = useContext(BcvContext);
     const {debugRef} = useContext(DebugContext);
     const {i18nRef} = useContext(I18nContext);
 
-    const sbScriptDir = metadata.script_direction.toLowerCase();
+    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
 
     const getAllData = async () => {

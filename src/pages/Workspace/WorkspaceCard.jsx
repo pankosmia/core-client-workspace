@@ -22,7 +22,7 @@ import TranslationPlanViewerMuncher from '../../munchers/TranslationPlan/Transla
 
 function WorkspaceCard({metadata, style, distractionModeCount,locationState}) {
 
-  const sbScriptDir = metadata.script_direction.toLowerCase();
+  const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
   const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
 
     if (!metadata.primary && (distractionModeCount % 2) > 0) {

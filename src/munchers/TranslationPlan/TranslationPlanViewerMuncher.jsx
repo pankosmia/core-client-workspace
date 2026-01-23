@@ -33,11 +33,13 @@ function TranslationPlanViewerMuncher({metadata}) {
     const [selectedBurrito, setSelectedBurrito] = useState(null);
     const [selectedStory, setSelectedStory] = useState();
     const [search, setSearch] = useState("");
-    const [textDir, setTextDir] = useState(metadata.script_direction.toLowerCase());
+    const [textDir, setTextDir] = useState(
+      metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+    );
     const [selectedBurritoSbTextDir, setSelectedBurritoSbTextDir] = useState(undefined);
     const [selectedBurritoTextDir, setSelectedBurritoTextDir] = useState(undefined);
 
-    const sbScriptDir = metadata.script_direction.toLowerCase();
+    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
 
     const [anchorEl, setAnchorEl] = useState(null);
@@ -157,8 +159,12 @@ function TranslationPlanViewerMuncher({metadata}) {
 
     useEffect(() => {
         if (selectedBurrito !== null) {
-            setSelectedBurritoSbTextDir(selectedBurrito.script_direction.toLowerCase());
-            setSelectedBurritoTextDir(selectedBurrito.script_direction.toLowerCase());
+            setSelectedBurritoSbTextDir(
+              selectedBurrito?.script_direction ? selectedBurrito.script_direction.toLowerCase() : undefined
+            );
+            setSelectedBurritoTextDir(
+              selectedBurrito?.script_direction ? selectedBurrito.script_direction.toLowerCase() : undefined
+            );
         }
     },[selectedBurrito])
 
