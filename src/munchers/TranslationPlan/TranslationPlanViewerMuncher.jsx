@@ -18,7 +18,7 @@ import {bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, po
 import InfoIcon from '@mui/icons-material/Info';
 import SearchIcon from '@mui/icons-material/Search';
 import {Proskomma} from "proskomma-core";
-import {PanDialog} from 'pankosmia-rcl';
+import {PanDialog,PanDialogActions} from 'pankosmia-rcl';
 
 import TextDir from '../helpers/TextDir';
 import ExtractJsonValues from "../helpers/ExtractJsonValues";
@@ -514,7 +514,7 @@ function TranslationPlanViewerMuncher({metadata}) {
 
             {/* Dialog d'information */}
             <PanDialog
-                titleLabel="About"
+                titleLabel={doI18n(`pages:core-local-workspace:about_dialog`, i18nRef.current)}
                 isOpen={openDialogAbout}
                 closeFn={() => handleCloseDialogAbout()}
                 theme={theme}
@@ -536,6 +536,11 @@ function TranslationPlanViewerMuncher({metadata}) {
                     )
                     }
                 </DialogContent>
+                <PanDialogActions
+                onlyCloseButton={true}
+                closeFn={()=>handleCloseDialogAbout()}
+                closeLabel={doI18n(`pages:core-local-workspace:close`, i18nRef.current)}
+                />
             </PanDialog>
         </Box>
     );
