@@ -20,7 +20,7 @@ import OBSArticlesViewerMuncher from '../../munchers/OBSArticles/OBSArticlesView
 import JuxtalinearViewerMuncher from "../../munchers/Juxtalinear/JuxtalinearViewer";
 import TranslationPlanViewerMuncher from '../../munchers/TranslationPlan/TranslationPlanViewerMuncher';
 
-function WorkspaceCard({metadata, style, distractionModeCount,locationState}) {
+function WorkspaceCard({metadata, style, distractionModeCount}) {
 
   const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
   const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
@@ -34,7 +34,6 @@ function WorkspaceCard({metadata, style, distractionModeCount,locationState}) {
         return <div style={{...style, lineHeight: 'normal'}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
           <TextTranslationEditorMuncher
             metadata={metadata}
-            locationState={locationState}
           />
         </div>
     }

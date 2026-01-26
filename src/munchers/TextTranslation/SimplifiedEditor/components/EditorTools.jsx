@@ -5,7 +5,6 @@ import BookPicker from "./BookPicker";
 import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import md5sum from "md5";
-import SettingsIcon from '@mui/icons-material/Settings';
 import { useContext, useEffect, useState } from "react";
 import { bcvContext as BcvContext, debugContext as DebugContext, doI18n, getText, i18nContext } from "pithekos-lib";
 import usfm2draftJson from "../../../../components/usfm2draftJson";
@@ -20,8 +19,7 @@ function EditorTools(
         setMd5sumScriptureJson,
         scriptureJson,
         currentBookCode,
-        setCurrentBookCode,
-        locationState
+        setCurrentBookCode
     }
 ) {
 
@@ -113,8 +111,7 @@ function EditorTools(
                                 {
                                     pathname: "/",
                                     search: "return-page=workspace"
-                                },
-                                { state: locationState }
+                                }
                             )
                         }
                     >
