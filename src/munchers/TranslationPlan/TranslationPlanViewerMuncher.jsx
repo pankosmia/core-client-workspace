@@ -20,10 +20,10 @@ import {Proskomma} from "proskomma-core";
 import TextDir from '../helpers/TextDir';
 import ExtractJsonValues from "../helpers/ExtractJsonValues";
 import InformationDialog from "./InformationDialog";
+import processUsfm from "./processUsfm";
 
 function TranslationPlanViewerMuncher({metadata}) {
     const [planIngredient, setPlanIngredient] = useState();
-    console.log("planIngredient", planIngredient)
     const {i18nRef} = useContext(i18nContext);
     const {systemBcv} = useContext(BcvContext);
     const {debugRef} = useContext(debugContext);
@@ -57,73 +57,30 @@ function TranslationPlanViewerMuncher({metadata}) {
 
     useEffect(
         () => {
-            const getVerseText = async () => {
+            const getChapterText = async () => {
                 if (selectedBurrito) {
                     let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
                         debugRef.current
                     );
                     if (usfmResponse.ok) {
-                        const pk = new Proskomma();
-                        pk.importDocument({
-                                lang: "xxx",
-                                abbr: "yyy"
-                            },
-                            "usfm",
-                            usfmResponse.text
-                        );
                         const sbSelectedScriptDirSet = selectedBurritoSbTextDir === 'ltr' || selectedBurritoSbTextDir === 'rtl';
                         if (!sbSelectedScriptDirSet) {
                             const dir = await TextDir(usfmResponse.text, 'usfm');
-                            setSelectedBurritoTextDir(dir);
+                            if (dir !== sbSelectedScriptDirSet) {
+                                setSelectedBurritoTextDir(dir);
+                            }
                         }
-                        const query = `{
-                                            documents {
-                                                header(id: "bookCode")
-                                                cvIndexes {
-                                                chapter
-                                                verses {
-                                                    verse {
-                                                    verseRange
-                                                    text
-                                                    }
-                                                }
-                                                }
-                                            }
-                                        }`;
-
-                        const result = pk.gqlQuerySync(query);
-                        const newVerseText = Object.fromEntries(
-                            result.data.documents[0].cvIndexes
-                                .map(
-                                    i => [
-                                        i.chapter,
-                                        Object.fromEntries(
-                                            i.verses
-                                                .map(
-                                                    (v, n) => [
-                                                        `${n}`,
-                                                        v.verse.length > 0 ?
-                                                            v.verse[0].text :
-                                                            []
-                                                    ]
-                                                )
-                                                .filter(kv => typeof kv[1] === "string")
-                                        )
-                                    ]
-                                )
-                        )
+                        const newVerseText = processUsfm(usfmResponse.text);
                         setVerseText(newVerseText);
                     } else {
                         setVerseText([]);
                     }
                 }
-
             };
 
-            getVerseText().then();
+            getChapterText().then();
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [debugRef, systemBcv.bookCode, selectedBurrito]
+        [debugRef, systemBcv.bookCode, selectedBurrito, selectedBurritoSbTextDir]
     );
     useEffect(() => {
         async function fetchSummaries() {
@@ -207,7 +164,6 @@ function TranslationPlanViewerMuncher({metadata}) {
         () => {
             loadCSS();
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [selectedBurritoTextDir]
     );
 
@@ -215,7 +171,6 @@ function TranslationPlanViewerMuncher({metadata}) {
         () => {
             getAllData().then();
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         []
     );
 
