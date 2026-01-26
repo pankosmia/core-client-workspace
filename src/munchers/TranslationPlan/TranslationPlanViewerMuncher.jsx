@@ -25,7 +25,7 @@ import ExtractJsonValues from "../helpers/ExtractJsonValues";
 
 function TranslationPlanViewerMuncher({metadata}) {
     const [planIngredient, setPlanIngredient] = useState();
-    console.log("planIngredient",planIngredient)
+    console.log("planIngredient", planIngredient)
     const {i18nRef} = useContext(i18nContext);
     const {systemBcv} = useContext(BcvContext);
     const [openDialogAbout, setOpenDialogAbout] = useState(false);
@@ -36,7 +36,7 @@ function TranslationPlanViewerMuncher({metadata}) {
     const [selectedStory, setSelectedStory] = useState();
     const [search, setSearch] = useState("");
     const [textDir, setTextDir] = useState(
-      metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
+        metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     );
     const [selectedBurritoSbTextDir, setSelectedBurritoSbTextDir] = useState(undefined);
     const [selectedBurritoTextDir, setSelectedBurritoTextDir] = useState(undefined);
@@ -78,8 +78,8 @@ function TranslationPlanViewerMuncher({metadata}) {
                         );
                         const sbSelectedScriptDirSet = selectedBurritoSbTextDir === 'ltr' || selectedBurritoSbTextDir === 'rtl';
                         if (!sbSelectedScriptDirSet) {
-                          const dir = await TextDir(usfmResponse.text, 'usfm');
-                          setSelectedBurritoTextDir(dir);
+                            const dir = await TextDir(usfmResponse.text, 'usfm');
+                            setSelectedBurritoTextDir(dir);
                         }
                         const query = `{
                                             documents {
@@ -162,13 +162,13 @@ function TranslationPlanViewerMuncher({metadata}) {
     useEffect(() => {
         if (selectedBurrito !== null) {
             setSelectedBurritoSbTextDir(
-              selectedBurrito?.script_direction ? selectedBurrito.script_direction.toLowerCase() : undefined
+                selectedBurrito?.script_direction ? selectedBurrito.script_direction.toLowerCase() : undefined
             );
             setSelectedBurritoTextDir(
-              selectedBurrito?.script_direction ? selectedBurrito.script_direction.toLowerCase() : undefined
+                selectedBurrito?.script_direction ? selectedBurrito.script_direction.toLowerCase() : undefined
             );
         }
-    },[selectedBurrito])
+    }, [selectedBurrito])
 
     const handleSelectBurrito = (event) => {
         const name = event.target.value;
@@ -186,8 +186,8 @@ function TranslationPlanViewerMuncher({metadata}) {
             setPlanIngredient(data);
             const planText = ExtractJsonValues(data, ['name', 'description', 'sectionTitle', 'themeBody', 'principle', 'principleMore']).toString().replace(/,/g, "");
             if (!sbScriptDirSet) {
-              const dir = await TextDir(planText.toString(), 'text');
-              setTextDir(dir);
+                const dir = await TextDir(planText.toString(), 'text');
+                setTextDir(dir);
             }
 
         } else {
@@ -448,54 +448,57 @@ function TranslationPlanViewerMuncher({metadata}) {
                                                     </Typography>
                                                 </div>
                                             );
-                                        } 
-                                        if (Object.keys(verseText).length > 0 && field.type === "scripture") {
-                                            let chapterN = "0"
-                                            return (
-                                                <Box dir={selectedBurritoTextDir}>
-                                                    {
-                                                        section.paragraphs
-                                                            .map(
-                                                                p => {
-                                                                    if (p.units) {
-                                                                        const c = p.units[0].split(":")[0]
-                                                                        const newChapter = c !== chapterN
-                                                                        if (newChapter) {
-                                                                            chapterN = c
-                                                                        }
-                                                                        return (
-                                                                            <>
-                                                                                {newChapter && <div
-                                                                                    className="marks_chapter_label">{c}</div>}
-                                                                                <div className={p.paraTag}>
-                                                                                    {
-                                                                                        p.units.map(
-                                                                                            cv => <span>
+                                        }
+                                        if (field.type === "scripture") {
+                                            if (Object.keys(verseText).length > 0) {
+                                                let chapterN = "0"
+                                                return (
+                                                    <Box dir={selectedBurritoTextDir}>
+                                                        {
+                                                            section.paragraphs
+                                                                .map(
+                                                                    p => {
+                                                                        if (p.units) {
+                                                                            const c = p.units[0].split(":")[0]
+                                                                            const newChapter = c !== chapterN
+                                                                            if (newChapter) {
+                                                                                chapterN = c
+                                                                            }
+                                                                            return (
+                                                                                <>
+                                                                                    {newChapter && <div
+                                                                                        className="marks_chapter_label">{c}</div>}
+                                                                                    <div className={p.paraTag}>
+                                                                                        {
+                                                                                            p.units.map(
+                                                                                                cv => <span>
                                                                                             <span
                                                                                                 className="marks_verses_label">{cv.split(":")[1]} </span>
                                                                                             <span>{verseText[cv.split(":")[0]][cv.split(":")[1]]} </span>
                                                                                         </span>
-                                                                                        )
-                                                                                    }
-                                                                                </div>
-                                                                            </>
-                                                                        )
-                                                                    } else {
-                                                                        return <div className={p.paraTag}>
-                                                                            {section.fieldInitialValues[p.name]}
-                                                                            {" "}
-                                                                            ({p.cv.join(" - ")})
-                                                                        </div>
+                                                                                            )
+                                                                                        }
+                                                                                    </div>
+                                                                                </>
+                                                                            )
+                                                                        } else {
+                                                                            return <div className={p.paraTag}>
+                                                                                {section.fieldInitialValues[p.name]}
+                                                                                {" "}
+                                                                                ({p.cv.join(" - ")})
+                                                                            </div>
+                                                                        }
                                                                     }
-                                                                }
-                                                            )
-                                                    }
-                                                </Box>
-                                            );
+                                                                )
+                                                        }
+                                                    </Box>
+                                                );
+                                            } else {
+                                                return <Typography><b><i>{doI18n("pages:core-local-workspace:no_scripture_for_story", i18nRef.current)}</i></b></Typography>
+                                            }
                                         } else {
-                                            <Typography> loading ...</Typography>
+                                            return <Typography> loading ...</Typography>
                                         }
-                                        return null;
                                     }
                                 )
                                 }

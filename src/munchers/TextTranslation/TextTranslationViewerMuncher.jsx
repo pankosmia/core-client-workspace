@@ -1,6 +1,9 @@
 import {useEffect, useState, useContext} from "react";
 import {Box} from "@mui/material";
 import {Proskomma} from 'proskomma-core';
+import usfm2draftJson from "../../components/usfm2draftJson";
+import filterByChapter from "../../components/filterByChapter";
+import ViewableBible from "./SimplifiedEditor/components/ViewableBible";
 
 import {getText, debugContext, bcvContext} from "pithekos-lib";
 
@@ -10,41 +13,25 @@ import TextDir from '../helpers/TextDir';
 function TextTranslationViewerMuncher({metadata}) {
     const {systemBcv} = useContext(bcvContext);
     const {debugRef} = useContext(debugContext);
-    const [verseText, setVerseText] = useState([]);
-    const [textDir, setTextDir] = useState(
-      metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
-    );
+    const [bookData, setBookData] = useState([]);
+    const [textDir, setTextDir] = useState(metadata.script_direction.toLowerCase());
 
     const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
 
     useEffect(
         () => {
-            const getVerseText = async () => {
+            const getUsfm = async () => {
                 let usfmResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
                     debugRef.current
                 );
                 if (usfmResponse.ok) {
-                    const pk = new Proskomma();
-                    pk.importDocument({
-                            lang: "xxx",
-                            abbr: "yyy"
-                        },
-                        "usfm",
-                        usfmResponse.text
-                    );
-                    if (!sbScriptDirSet) {
-                      const dir = await TextDir(usfmResponse.text, 'usfm');
-                      setTextDir(dir);
-                    }
-                    const query = `{docSets { documents { mainSequence { blocks(withScriptureCV: "${systemBcv.chapterNum}:${systemBcv.verseNum}") {text items {type subType payload}}}}}}`;
-                    const result = pk.gqlQuerySync(query);
-                    setVerseText(result.data.docSets[0].documents[0].mainSequence.blocks);
+                    setBookData(filterByChapter(usfm2draftJson(usfmResponse.text), systemBcv.chapterNum));
                 } else {
-                    setVerseText([]);
+                    console.error("usfmResponse failed");
                 }
             };
-            getVerseText();
+            getUsfm().then();
         },
         [debugRef, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum, metadata.local_path, sbScriptDirSet, textDir]
     );
@@ -59,13 +46,20 @@ function TextTranslationViewerMuncher({metadata}) {
         }
     }
 
-    // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
-    return <Box dir={!sbScriptDirSet ? textDir : undefined}>
+    /* // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
+    return <pre>{JSON.stringify(bookData, null, 2)}{/* <div className={adjSelectedFontClass} dir={!sbScriptDirSet ? textDir : undefined}>
         {
             verseText.length > 0 ?
                 verseText.map(b => <p style={{marginBottom: "1em",padding:"1rem"}}>{b.items.map(i => renderItem(i))}</p>) :
                 <p style={{marginBottom: "1em",padding:"1rem"}}>No text found</p>
         }
-    </Box>
+    </div> }*/
+    //</pre> */
+    return (
+        Object.keys(bookData).length > 0 && 
+        <ViewableBible
+            chapterJson={bookData}
+        />
+    )
 }
 export default TextTranslationViewerMuncher;

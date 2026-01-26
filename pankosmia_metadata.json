@@ -264,60 +264,13 @@
       "fr": "Définir la combinaison de touches de déclenchement",
       "id": "Atur kombinasi tombol pemicu"
     },
-    "usfm_button_b": {
+    "usfm_b": {
       "en": "Blank line",
       "fr": "Ligne vide"
     },
-    "usfm_button_ib": {
+    "usfm_ib": {
       "en": "Blank line (intro)",
       "fr": "Ligne vide (intro)"
-    },
-    "usfm_button_c": {
-      "en": "Chapter number",
-      "fr": "Numéro du chapitre",
-      "id": "Nomor fasal"
-    },
-    "usfm_button_q": {
-      "en": "Poetry text, level 1 indent",
-      "id": "Teks puisi, indentasi tingkat 1"
-    },
-    "usfm_button_m": {
-      "en": "Paragraph text, with no first line indent",
-      "id": "Teks paragraf, tanpa indentasi di baris pertama"
-    },
-    "usfm_button_q1": {
-      "en": "Poetry text, level 1 indent",
-      "id": "Teks puisi, indentasi tingkat 1"
-    },
-    "usfm_button_q2": {
-      "en": "Poetry text, level 2 indent",
-      "id": "Teks puisi, indentasi tingkat 2"
-    },
-    "usfm_button_s2": {
-      "en": "A section heading, level 2",
-      "id": "Judul bagian, tingkat 2"
-    },
-    "usfm_button_mt": {
-      "en": "The main title of the book",
-      "fr": "Le titre principal du livre",
-      "id": "Judul utama buku"
-    },
-    "usfm_button_s3": {
-      "en": "A section heading, level 3",
-      "id": "Judul bagian, tingkat 3"
-    },
-    "usfm_button_s": {
-      "en": "A section heading, level 1",
-      "id": "Judul bagian, tingkat 1"
-    },
-    "usfm_button_v": {
-      "en": "A verse number",
-      "fr": "Un numéro de verset",
-      "id": "Nomor ayat"
-    },
-    "usfm_button_p": {
-      "en": "A paragraph text, with first line indent",
-      "id": "Teks paragraf, dengan indentasi di baris pertama"
     },
     "choose_resources_workspace": {
       "en": "Choose resources to display in the workspace alongside your editable document.",
@@ -745,6 +698,9 @@
     },
     "button_edit_layout":{
       "en":"Edit layout and resources"
+    "no_scripture_for_story": {
+      "en": "No Scripture found for this story in this translation",
+      "fr": "Aucun texte biblique trouvé dans cette traduction pour cette histoire"
     }
   }
 }

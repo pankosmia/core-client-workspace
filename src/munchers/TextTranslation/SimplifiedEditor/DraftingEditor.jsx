@@ -9,6 +9,7 @@ import usfm2draftJson from '../../../components/usfm2draftJson';
 import EditableBible from "./components/EditableBible";
 import md5sum from "md5";
 import EditorTools from "./components/EditorTools";
+import filterByChapter from "../../../components/filterByChapter";
 import TextDir from '../../helpers/TextDir';
 import ExtractJsonValues from "../../helpers/ExtractJsonValues";
 
@@ -66,26 +67,6 @@ function DraftingEditor(
         }
 
     }, [debugRef, systemBcv.bookCode, metadata, currentBookCode, sbScriptDirSet]);
-
-    // Make chapter content from whole book content
-    const filterByChapter = (usfmJson, requiredChapter) => {
-        let chapterBlocks = [];
-        let currentChapter = 0;
-        let blockN = 0;
-        for (const block of usfmJson.blocks) {
-            if (block.type === "chapter") {
-                currentChapter = block.chapter
-            }
-            if (currentChapter === requiredChapter) {
-                chapterBlocks.push({...block, position: blockN})
-            }
-            blockN += 1
-        }
-        return {
-            headers: usfmJson.headers,
-            blocks: chapterBlocks
-        }
-    }
 
     useEffect(
         () => {
