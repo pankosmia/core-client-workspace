@@ -2,7 +2,6 @@ import {useContext, useEffect, useState} from "react";
 import {
     Box,
     Button,
-    FormControl,
     IconButton,
     InputAdornment,
     Menu,
@@ -15,12 +14,12 @@ import {
 import {bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, postEmptyJson} from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
 import SearchIcon from '@mui/icons-material/Search';
-import {Proskomma} from "proskomma-core";
 
 import TextDir from '../helpers/TextDir';
 import ExtractJsonValues from "../helpers/ExtractJsonValues";
 import InformationDialog from "./InformationDialog";
 import processUsfm from "./processUsfm";
+import ScripturePicker from "./ScripturePicker";
 
 function TranslationPlanViewerMuncher({metadata}) {
     const [planIngredient, setPlanIngredient] = useState();
@@ -121,12 +120,6 @@ function TranslationPlanViewerMuncher({metadata}) {
             );
         }
     }, [selectedBurrito])
-
-    const handleSelectBurrito = (event) => {
-        const name = event.target.value;
-        const burrito = burritos.find(b => b.name === name);
-        setSelectedBurrito(burrito);
-    };
 
     const getAllData = async () => {
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=plan.json`;
@@ -302,35 +295,16 @@ function TranslationPlanViewerMuncher({metadata}) {
                     }
 
                 </Menu>
-                <IconButton onClick={() => handleOpenDialogAbout()}>
+                <IconButton onClick={handleOpenDialogAbout}>
                     <InfoIcon/>
                 </IconButton>
             </Box>
             <Box>
-                {/* choose your resources */}
-                <FormControl fullWidth
-                             sx={{paddingLeft: "1rem", paddingRight: "1rem"}}>
-                    <TextField
-                        required
-                        id="burrito-select-label"
-                        select
-                        value={selectedBurrito?.name || ""}
-                        onChange={handleSelectBurrito}
-                        label={doI18n(`pages:core-local-workspace:choose_document`, i18nRef.current)}
-
-                    >
-                        {
-                            burritos.map(
-                                (burrito) => (
-                                    <MenuItem key={burrito.name} value={burrito.name}>
-                                        {burrito.name}
-                                    </MenuItem>
-                                )
-                            )
-                        }
-
-                    </TextField>
-                </FormControl>
+                <ScripturePicker
+                    burritos={burritos}
+                    selectedBurrito={selectedBurrito}
+                    setSelectedBurrito={setSelectedBurrito}
+                />
 
                 {planIngredient && selectedBurrito && (
                     <>
@@ -377,8 +351,9 @@ function TranslationPlanViewerMuncher({metadata}) {
                                                         display: "flex",
                                                         flexDirection: "row",
                                                         alignItems: "center",
-                                                        textAlign: "left",
+                                                        textAlign: "left"
                                                     }}
+                                                    key={i}
                                                 >
                                                     <Typography
                                                         sx={{
@@ -403,7 +378,7 @@ function TranslationPlanViewerMuncher({metadata}) {
                                             if (Object.keys(verseText).length > 0) {
                                                 let chapterN = "0"
                                                 return (
-                                                    <Box dir={selectedBurritoTextDir}>
+                                                    <Box dir={selectedBurritoTextDir} key={i}>
                                                         {
                                                             section.paragraphs
                                                                 .map(
