@@ -7,6 +7,9 @@ import {
 } from "@mui/material";
 import {bcvContext as BcvContext, getText, debugContext} from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
+import SearchIcon from '@mui/icons-material/Search';
+import {Proskomma} from "proskomma-core";
+import {PanDialog,PanDialogActions} from 'pankosmia-rcl';
 
 import TextDir from '../helpers/TextDir';
 import ExtractJsonValues from "../helpers/ExtractJsonValues";
