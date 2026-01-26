@@ -696,8 +696,10 @@
       "fr": "Prévisualisation PDF",
       "id": "Pratinjau PDF"
     },
-    "button_edit_layout":{
-      "en":"Edit layout and resources"
+    "button_edit_layout": {
+      "en": "Edit layout and resources",
+      "fr": "Editer disposition et choix de ressources"
+    },
     "no_scripture_for_story": {
       "en": "No Scripture found for this story in this translation",
       "fr": "Aucun texte biblique trouvé dans cette traduction pour cette histoire"
