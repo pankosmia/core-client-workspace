@@ -11,14 +11,14 @@ function InformationDialog({ theme, planIngredient, openDialogAbout, setOpenDial
     const { i18nRef } = useContext(i18nContext);
     
     return <PanDialog
-        titleLabel="About"
+        titleLabel={`${doI18n(`pages:core-local-workspace:about_dialog`, i18nRef.current)} - ${planIngredient.name} `}
         isOpen={openDialogAbout}
         closeFn={() => setOpenDialogAbout(false)}
         theme={theme}
     >
         <DialogContent>
             {Object.entries(planIngredient).map(([key, value]) => {
-                const hiddenKeys = ["sectionStructure", "sections", "fieldInitialValues", "short_name", "versification"]
+                const hiddenKeys = ["sectionStructure", "sections", "fieldInitialValues", "short_name", "versification","name"]
                 if (hiddenKeys.includes(key)) {
                     return null;
                 }
