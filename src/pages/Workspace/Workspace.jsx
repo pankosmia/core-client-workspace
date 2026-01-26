@@ -1,5 +1,4 @@
 import {useContext, useState, useEffect} from 'react';
-import {useLocation} from "react-router-dom";
 import {Box, Chip, Stack, Typography} from "@mui/material";
 import GraphiteTest from "./GraphiteTest";
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
@@ -8,7 +7,6 @@ import {
     createTilePanes,
     TileContainer,
     TileProvider,
-
 } from 'react-tile-pane'
 import {i18nContext, doI18n, Header, currentProjectContext, getJson, debugContext} from "pithekos-lib";
 import {typographyContext} from "pithekos-lib";
