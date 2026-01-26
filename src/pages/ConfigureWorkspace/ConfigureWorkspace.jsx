@@ -26,7 +26,8 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
     const [projectSummaries, setProjectSummaries] = useState({});
     const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
-    const theme=useTheme();
+    const [alignment, setAlignment] = useState(selectedResources.size === 0 ? "" : layout);
+    const theme= useTheme();
 
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);

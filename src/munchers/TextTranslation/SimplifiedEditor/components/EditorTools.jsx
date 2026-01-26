@@ -1,4 +1,4 @@
-import {Box, Grid2, IconButton} from "@mui/material";
+import { Box, Grid2, IconButton, Tooltip } from "@mui/material";
 import ChapterPicker from "./ChapterPicker";
 import SaveButton from "./SaveButton";
 import BookPicker from "./BookPicker";
@@ -6,11 +6,11 @@ import PreviewText from "./PreviewText";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import md5sum from "md5";
 import SettingsIcon from '@mui/icons-material/Settings';
-import {useContext, useEffect, useState} from "react";
-import {bcvContext as BcvContext, debugContext as DebugContext, getText} from "pithekos-lib";
+import { useContext, useEffect, useState } from "react";
+import { bcvContext as BcvContext, debugContext as DebugContext, doI18n, getText, i18nContext } from "pithekos-lib";
 import usfm2draftJson from "../../../../components/usfm2draftJson";
-import {useNavigate} from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
+import LayoutIcon from "../layouts/LayoutIcon";
 function EditorTools(
     {
         metadata,
@@ -20,13 +20,14 @@ function EditorTools(
         setMd5sumScriptureJson,
         scriptureJson,
         currentBookCode,
-        setCurrentBookCode
+        setCurrentBookCode,
+        locationState
     }
 ) {
 
-    const {systemBcv} = useContext(BcvContext);
-    const {debugRef} = useContext(DebugContext);
-
+    const { systemBcv } = useContext(BcvContext);
+    const { debugRef } = useContext(DebugContext);
+    const { i18nRef } = useContext(i18nContext);
     const [openModalPreviewText, setOpenModalPreviewText] = useState(false);
     const [chapterNumbers, setChapterNumbers] = useState([]);
 
@@ -89,28 +90,37 @@ function EditorTools(
                 <IconButton onClick={() => {
                     setOpenModalPreviewText(true);
                 }}>
-                    <VisibilityIcon/>
+                    <VisibilityIcon />
                 </IconButton>
                 <PreviewText metadata={metadata} systemBcv={systemBcv} open={openModalPreviewText}
-                             setOpenModalPreviewText={setOpenModalPreviewText}/>
+                    setOpenModalPreviewText={setOpenModalPreviewText} />
             </Grid2>
 
             <Grid2 display="flex" gap={1}>
-                <BookPicker/>
+                <BookPicker />
                 <ChapterPicker
                     chapterNumbers={chapterNumbers}
                     repoMetadata={metadata}
                 />
             </Grid2>
             <Grid2 display="flex" gap={1}>
-                <IconButton
-                    disabled={md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson}
-                    onClick={() =>
-                        navigate("/")
-                    }
-                >
-                    <SettingsIcon/>
-                </IconButton>
+                <Tooltip title={doI18n("pages:core-local-workspace:button_edit", i18nRef.current, debugRef.current)}>
+                    <IconButton
+                        disabled={md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson}
+                        /* enables redirection based on the page */
+                        onClick={() =>
+                            navigate(
+                                {
+                                    pathname: "/",
+                                    search: "return-page=workspace"
+                                },
+                                { state: locationState }
+                            )
+                        }
+                    >
+                        <LayoutIcon />
+                    </IconButton>
+                </Tooltip>
             </Grid2>
         </Grid2>
     </Box>

@@ -99,6 +99,7 @@ useEffect(() => {
             scriptureJson={scriptureJson}
             currentBookCode={currentBookCode}
             setCurrentBookCode={setCurrentBookCode}
+            locationState={locationState}
         />
         {/** If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard */}
         <Box dir={!sbScriptDirSet ? textDir : undefined}>
