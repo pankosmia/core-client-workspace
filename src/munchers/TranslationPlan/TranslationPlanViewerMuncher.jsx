@@ -14,7 +14,9 @@ import InformationDialog from "./InformationDialog";
 import processUsfm from "./processUsfm";
 import ScripturePicker from "./ScripturePicker";
 import ScriptureField from './ScriptureField';
+import NonScriptureField from "./NonScriptureField";
 import JumpButton from "./JumpButton";
+import SectionReference from "./SectionReference";
 
 function TranslationPlanViewerMuncher({metadata}) {
     const [planIngredient, setPlanIngredient] = useState();
@@ -122,6 +124,7 @@ function TranslationPlanViewerMuncher({metadata}) {
                 style.textContent = cssText;
                 document.head.appendChild(style);
             }
+
             loadCSS().then();
         },
         [selectedBurritoTextDir]
@@ -150,12 +153,7 @@ function TranslationPlanViewerMuncher({metadata}) {
         [sbScriptDirSet, metadata.local_path]
     );
 
-    if (!planIngredient) {
-        return <Typography> loading...</Typography>
-    }
-
     const isInInterval = (section, systemBcv) => {
-
         const [startChapter, startVerse] = section.cv[0].split(":").map(Number);
         const [endChapter, endVerse] = section.cv[1].split(":").map(Number);
         const chapterNum = systemBcv.chapterNum;
@@ -165,6 +163,10 @@ function TranslationPlanViewerMuncher({metadata}) {
             (chapterNum < endChapter || (chapterNum === endChapter && verseNum <= endVerse))
         );
     };
+
+    if (!planIngredient) {
+        return <Typography> loading...</Typography>
+    }
 
     const section = planIngredient.sections.find(
         section =>
@@ -202,94 +204,42 @@ function TranslationPlanViewerMuncher({metadata}) {
                     setSelectedBurrito={setSelectedBurrito}
                 />
 
-                {planIngredient && selectedBurrito && (
-                    <>
-                        {section ? (
-                            <Box sx={{padding: 1}}>
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        flexDirection: "row",
-                                        fontFamily: "monospace",
-                                        fontSize: "medium",
-                                    }}>
-                                    <Typography
-                                        sx={{
-                                            padding: "5px",
-                                            background: "lightgray",
-                                            borderRadius: "4px 0px 0px 4px",
-                                            alignSelf: "center"
-                                        }}>
-                                        {"//"}
-                                    </Typography>
-                                    <Typography
-                                        sx={{
-                                            padding: "5px",
-                                            background: "lightgray",
-                                            borderRadius: "0px 4px 4px 0px"
-                                        }}
-                                    >
-                                        {section.cv.join('-')}
-                                    </Typography>
-                                </div>
+                {
+                    selectedBurrito && (
+                        <>
+                            {
+                                section && <Box sx={{padding: 1}}>
+                                    <SectionReference section={section}/>
+                                    {
+                                        planIngredient.sectionStructure.map(
+                                            (field, i) => {
+                                                if (field.type === "scripture") {
+                                                    return <ScriptureField
+                                                        key={i}
+                                                        section={section}
+                                                        verseText={verseText}
+                                                        selectedBurritoTextDir={selectedBurritoTextDir}
+                                                    />
+                                                } else {
+                                                    return <NonScriptureField
+                                                        key={i}
+                                                        planIngredient={planIngredient}
+                                                        section={section}
+                                                        field={field}
+                                                    />
 
-                                {planIngredient.sectionStructure.map(
-                                    (field, i) => {
-                                        if (field.type !== "scripture") {
-                                            const styleParaTag = field.paraTag || "";
-                                            const value =
-                                                section.fieldInitialValues[field.name] ||
-                                                planIngredient.fieldInitialValues[field.name] ||
-                                                "";
-                                            return (
-                                                <div
-                                                    style={{
-                                                        display: "flex",
-                                                        flexDirection: "row",
-                                                        alignItems: "center",
-                                                        textAlign: "left"
-                                                    }}
-                                                    key={i}
-                                                >
-                                                    <Typography
-                                                        sx={{
-                                                            fontFamily: "monospace",
-                                                            fontSize: "medium",
-                                                            paddingRight: "1em",
-                                                        }}
-                                                    >
-                                                        {styleParaTag}
-                                                    </Typography>
-
-                                                    <Typography
-                                                        className={styleParaTag}
-                                                        size="small"
-                                                    >
-                                                        {value}
-                                                    </Typography>
-                                                </div>
-                                            );
-                                        }
-                                        if (field.type === "scripture") {
-                                            return <ScriptureField
-                                                key={i}
-                                                section={section}
-                                                verseText={verseText}
-                                                selectedBurritoTextDir={selectedBurritoTextDir}
-                                            />
-                                        } else {
-                                            return <Typography> loading ...</Typography>
-                                        }
+                                                }
+                                            }
+                                        )
                                     }
-                                )
-                                }
-                            </Box>
-                        ) : (
-                            <Typography> no book found </Typography>
-                        )
-                        }
-                    </>
-                )
+                                </Box>
+                            }
+                            {
+                                !section &&
+                                <Typography> no content found </Typography>
+                            }
+                        </>
+                    )
                 }
             </Box>
             <InformationDialog
