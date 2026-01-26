@@ -2,8 +2,6 @@ import {useContext, useEffect, useState} from "react";
 import {
     Box,
     Button,
-    DialogContent,
-    DialogContentText,
     FormControl,
     IconButton,
     InputAdornment,
@@ -18,17 +16,16 @@ import {bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, po
 import InfoIcon from '@mui/icons-material/Info';
 import SearchIcon from '@mui/icons-material/Search';
 import {Proskomma} from "proskomma-core";
-import {PanDialog} from 'pankosmia-rcl';
 
 import TextDir from '../helpers/TextDir';
 import ExtractJsonValues from "../helpers/ExtractJsonValues";
+import InformationDialog from "./InformationDialog";
 
 function TranslationPlanViewerMuncher({metadata}) {
     const [planIngredient, setPlanIngredient] = useState();
     console.log("planIngredient", planIngredient)
     const {i18nRef} = useContext(i18nContext);
     const {systemBcv} = useContext(BcvContext);
-    const [openDialogAbout, setOpenDialogAbout] = useState(false);
     const {debugRef} = useContext(debugContext);
     const [verseText, setVerseText] = useState({});
     const [burritos, setBurritos] = useState([]);
@@ -40,6 +37,7 @@ function TranslationPlanViewerMuncher({metadata}) {
     );
     const [selectedBurritoSbTextDir, setSelectedBurritoSbTextDir] = useState(undefined);
     const [selectedBurritoTextDir, setSelectedBurritoTextDir] = useState(undefined);
+    const [openDialogAbout, setOpenDialogAbout] = useState(false);
 
     const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
@@ -55,9 +53,6 @@ function TranslationPlanViewerMuncher({metadata}) {
     };
     const handleOpenDialogAbout = () => {
         setOpenDialogAbout(true);
-    }
-    const handleCloseDialogAbout = () => {
-        setOpenDialogAbout(false);
     }
 
     useEffect(
@@ -511,32 +506,12 @@ function TranslationPlanViewerMuncher({metadata}) {
                 )
                 }
             </Box>
-
-            {/* Dialog d'information */}
-            <PanDialog
-                titleLabel="About"
-                isOpen={openDialogAbout}
-                closeFn={() => handleCloseDialogAbout()}
+            <InformationDialog
                 theme={theme}
-            >
-                <DialogContent>
-                    {Object.entries(planIngredient).map(([key, value]) => {
-                            const hiddenKeys = ["sectionStructure", "sections", "fieldInitialValues", "short_name", "versification"]
-                            if (hiddenKeys.includes(key)) {
-                                return null;
-                            }
-                            return (
-                                <DialogContentText key={key} mb={2}>
-                                    <Typography fullWidth size="small">
-                                        {value}
-                                    </Typography>
-                                </DialogContentText>
-                            );
-                        }
-                    )
-                    }
-                </DialogContent>
-            </PanDialog>
+                planIngredient={planIngredient}
+                openDialogAbout={openDialogAbout}
+                setOpenDialogAbout={setOpenDialogAbout}
+            />
         </Box>
     );
 }
