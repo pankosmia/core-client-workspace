@@ -7,7 +7,7 @@ import BcvContext from "pithekos-lib/dist/contexts/bcvContext";
 
 export default function EditableSpan({key, scriptureJson, setScriptureJson, position, chapter, verse}) {
     const incomingBlock = scriptureJson.blocks[position[0]];
-    const incomingContent = incomingBlock.units[position[1]].content ? incomingBlock.units[position[1]].content[0] : null;
+    const incomingContent = incomingBlock.units && incomingBlock.units[position[1]].content ? incomingBlock.units[position[1]].content[0] : null;
     const [firstTime, setFirstTime] = useState(true);
     const [value, setValue] = useState(incomingContent || '');
     const {debugRef} = useContext(DebugContext);

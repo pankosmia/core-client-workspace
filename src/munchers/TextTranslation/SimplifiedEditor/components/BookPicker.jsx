@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Box, MenuItem, TextField } from "@mui/material";
+import React, {useState, useContext, useEffect} from "react";
+import {Box, MenuItem, TextField} from "@mui/material";
 import {
     bcvContext as BcvContext,
     i18nContext as I18nContext,
@@ -12,12 +12,12 @@ import {
 } from "pithekos-lib";
 
 function BookPicker() {
-    const { bcvRef} = useContext(BcvContext);
-    const { debugRef } = useContext(DebugContext);
-    const { i18nRef } = useContext(I18nContext);
-    const { currentProjectRef } = useContext(CurrentProjectContext);
+    const {bcvRef} = useContext(BcvContext);
+    const {debugRef} = useContext(DebugContext);
+    const {i18nRef} = useContext(I18nContext);
+    const {currentProjectRef} = useContext(CurrentProjectContext);
     const [contentBooks, setContentBooks] = useState([]);
-    const [currentBook, setCurrentBook]= useState(bcvRef.current.bookCode);
+    const [currentBook, setCurrentBook] = useState(bcvRef.current.bookCode);
 
     useEffect(
         () => {
@@ -47,20 +47,20 @@ function BookPicker() {
             const re = /\\c\s+(\d+)/;
             const match = usfmString.match(re);
             if (match) {
-            const chapter = match[1];
-            postEmptyJson(
-                `/navigation/bcv/${b}/${chapter}/1`,
-                debugRef.current
-            );
-        }
+                const chapter = match[1];
+                postEmptyJson(
+                    `/navigation/bcv/${b}/${chapter}/1`,
+                    debugRef.current
+                );
             }
+        }
     };
 
     useEffect(() => {
         setFirstChapter(currentBook);
     }, [currentBook]);
 
-    return <Box sx={{ justifyContent: "space-between" }}>
+    return <Box sx={{justifyContent: "space-between"}}>
         <div>
             <TextField
                 label={`${doI18n("pages:core-local-workspace:book", i18nRef.current)}`}
@@ -73,7 +73,7 @@ function BookPicker() {
                 {
                     contentBooks.map((b, n) =>
                         <MenuItem
-                            sx={{ maxHeight: "3rem", height: "2rem" }}
+                            sx={{maxHeight: "3rem", height: "2rem"}}
                             value={b}
                             key={n}
                             onClick={
