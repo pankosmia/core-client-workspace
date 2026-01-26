@@ -1,19 +1,12 @@
 import {useContext, useEffect, useState} from "react";
 import {
     Box,
-    Button,
     IconButton,
-    InputAdornment,
-    Menu,
-    MenuItem,
-    TextField,
-    Tooltip,
     Typography,
     useTheme
 } from "@mui/material";
-import {bcvContext as BcvContext, getText, debugContext, i18nContext, doI18n, postEmptyJson} from "pithekos-lib";
+import {bcvContext as BcvContext, getText, debugContext} from "pithekos-lib";
 import InfoIcon from '@mui/icons-material/Info';
-import SearchIcon from '@mui/icons-material/Search';
 
 import TextDir from '../helpers/TextDir';
 import ExtractJsonValues from "../helpers/ExtractJsonValues";
@@ -21,17 +14,16 @@ import InformationDialog from "./InformationDialog";
 import processUsfm from "./processUsfm";
 import ScripturePicker from "./ScripturePicker";
 import ScriptureField from './ScriptureField';
+import JumpButton from "./JumpButton";
 
 function TranslationPlanViewerMuncher({metadata}) {
     const [planIngredient, setPlanIngredient] = useState();
-    const {i18nRef} = useContext(i18nContext);
     const {systemBcv} = useContext(BcvContext);
     const {debugRef} = useContext(debugContext);
     const [verseText, setVerseText] = useState({});
     const [burritos, setBurritos] = useState([]);
     const [selectedBurrito, setSelectedBurrito] = useState(null);
     const [selectedStory, setSelectedStory] = useState();
-    const [search, setSearch] = useState("");
     const [textDir, setTextDir] = useState(
         metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     );
@@ -45,12 +37,6 @@ function TranslationPlanViewerMuncher({metadata}) {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const theme = useTheme();
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
     const handleOpenDialogAbout = () => {
         setOpenDialogAbout(true);
     }
@@ -108,7 +94,7 @@ function TranslationPlanViewerMuncher({metadata}) {
             }
         }
 
-        fetchSummaries();
+        fetchSummaries().then();
     }, [selectedBurrito]);
 
     useEffect(() => {
@@ -122,50 +108,46 @@ function TranslationPlanViewerMuncher({metadata}) {
         }
     }, [selectedBurrito])
 
-    const getAllData = async () => {
-        const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=plan.json`;
-
-        const response = await fetch(ingredientLink);
-
-        if (response.ok) {
-            const data = await response.json();
-            setPlanIngredient(data);
-            const planText = ExtractJsonValues(data, ['name', 'description', 'sectionTitle', 'themeBody', 'principle', 'principleMore']).toString().replace(/,/g, "");
-            if (!sbScriptDirSet) {
-                const dir = await TextDir(planText.toString(), 'text');
-                setTextDir(dir);
-            }
-
-        } else {
-            setPlanIngredient({});
-        }
-    };
-
-    async function loadCSS() {
-        const url = selectedBurritoTextDir === "ltr" ? "/app-resources/usfm/bible_page_styles.css" : "/app-resources/usfm/bible_page_styles_rtl.css";
-        const response = await fetch(url);
-        if (!response.ok) {
-            console.error("Erreur de chargement du CSS :", response.status);
-            return;
-        }
-        const cssText = await response.text();
-        const style = document.createElement("style");
-        style.textContent = cssText;
-        document.head.appendChild(style);
-    }
-
     useEffect(
         () => {
-            loadCSS();
+            async function loadCSS() {
+                const url = selectedBurritoTextDir === "ltr" ? "/app-resources/usfm/bible_page_styles.css" : "/app-resources/usfm/bible_page_styles_rtl.css";
+                const response = await fetch(url);
+                if (!response.ok) {
+                    console.error("Erreur de chargement du CSS :", response.status);
+                    return;
+                }
+                const cssText = await response.text();
+                const style = document.createElement("style");
+                style.textContent = cssText;
+                document.head.appendChild(style);
+            }
+            loadCSS().then();
         },
         [selectedBurritoTextDir]
     );
 
     useEffect(
         () => {
+            const getAllData = async () => {
+                const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=plan.json`;
+                const response = await fetch(ingredientLink);
+                if (response.ok) {
+                    const data = await response.json();
+                    setPlanIngredient(data);
+                    const planText = ExtractJsonValues(data, ['name', 'description', 'sectionTitle', 'themeBody', 'principle', 'principleMore']).toString().replace(/,/g, "");
+                    if (!sbScriptDirSet) {
+                        const dir = await TextDir(planText.toString(), 'text');
+                        setTextDir(dir);
+                    }
+
+                } else {
+                    setPlanIngredient({});
+                }
+            };
             getAllData().then();
         },
-        []
+        [sbScriptDirSet, metadata.local_path]
     );
 
     if (!planIngredient) {
@@ -190,23 +172,6 @@ function TranslationPlanViewerMuncher({metadata}) {
             isInInterval(section, systemBcv)
     );
 
-    const filteredStories = planIngredient.sections.filter(
-        c => {
-            const label = `${c.fieldInitialValues.reference} ${c.fieldInitialValues.sectionTitle}`
-                .toLowerCase();
-
-            return label.includes(search.toLowerCase());
-        }
-    );
-
-    const updateBcv = (b, c, v) => {
-        postEmptyJson(
-            `/navigation/bcv/${b}/${c}/${v}`,
-            debugRef.current
-        );
-    }
-    const ITEM_HEIGHT = 48;
-
     // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
     return (
         <Box
@@ -218,84 +183,14 @@ function TranslationPlanViewerMuncher({metadata}) {
         >
             <Box
                 sx={{marginLeft: "auto"}}>
-                <Button
-                    id="fade-button"
-                    aria-controls={open ? 'fade-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={handleClick}
-                >
-                    {doI18n(`pages:core-local-workspace:jump_to_story`, i18nRef.current)}
-                </Button>
-                <Menu
-                    id="fade-menu"
+                <JumpButton
+                    planIngredient={planIngredient}
+                    selectedStory={selectedStory}
+                    setSelectedStory={setSelectedStory}
                     anchorEl={anchorEl}
+                    setAnchorEl={setAnchorEl}
                     open={open}
-                    onClose={handleClose}
-                    slotProps={{
-                        paper: {
-                            style: {
-                                maxHeight: ITEM_HEIGHT * 4.5,
-                                width: 'auto',
-                                overflow: "auto"
-                            },
-                        },
-                        list: {
-                            'aria-labelledby': 'fab-menu',
-                        },
-                    }}
-                >
-                    <MenuItem>
-                        <TextField
-                            placeholder="Search ..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            onKeyDown={(e) => e.stopPropagation()}
-                            size="small"
-                            fullWidth
-                            slotProps={{
-                                input: {
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchIcon/>
-                                        </InputAdornment>
-                                    )
-                                }
-                            }}
-                        />
-                    </MenuItem>
-                    {filteredStories.length === 0 ? (
-                        <MenuItem disabled>
-                            {`${doI18n("pages:core-local-workspace:no_result", i18nRef.current, debugRef.current)}`}
-                        </MenuItem>
-                    ) : (
-                        filteredStories.map(
-                            (c, i) => (
-                                <Tooltip key={i} title={c.fieldInitialValues.reference}>
-                                    <MenuItem
-                                        onClick={
-                                            () => {
-                                                setSelectedStory(c.fieldInitialValues.sectionNumber);
-                                                handleClose();
-                                                updateBcv(
-                                                    c.bookCode,
-                                                    c.cv[0].split(":")[0],
-                                                    c.cv[0].split(":")[1]
-                                                );
-                                            }
-                                        }
-                                        value={c.fieldInitialValues.sectionNumber}
-                                        selected={selectedStory === c.fieldInitialValues.sectionNumber}
-                                    >
-                                        {c.fieldInitialValues.sectionNumber} - {c.fieldInitialValues.sectionTitle}
-                                    </MenuItem>
-                                </Tooltip>
-                            )
-                        )
-                    )
-                    }
-
-                </Menu>
+                />
                 <IconButton onClick={handleOpenDialogAbout}>
                     <InfoIcon/>
                 </IconButton>
