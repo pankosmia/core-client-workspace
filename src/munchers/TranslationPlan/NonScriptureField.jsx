@@ -6,6 +6,9 @@ function NonScriptureField({key, planIngredient, section, field}) {
         section.fieldInitialValues[field.name] ||
         planIngredient.fieldInitialValues[field.name] ||
         "";
+    if (!value) {
+        return "";
+    }
     return (
         <div
             style={{
