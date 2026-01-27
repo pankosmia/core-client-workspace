@@ -11,20 +11,19 @@ function processUsfm(usfm) {
         usfm
     );
     const query = `{
-                                            documents {
-                                                header(id: "bookCode")
-                                                cvIndexes {
-                                                chapter
-                                                verses {
-                                                    verse {
-                                                    verseRange
-                                                    text
-                                                    }
-                                                }
-                                                }
-                                            }
-                                        }`;
-
+            documents {
+                header(id: "bookCode")
+                cvIndexes {
+                chapter
+                verses {
+                    verse {
+                    verseRange
+                    text
+                    }
+                }
+                }
+            }
+        }`;
     const result = pk.gqlQuerySync(query);
     return Object.fromEntries(
         result.data.documents[0].cvIndexes
