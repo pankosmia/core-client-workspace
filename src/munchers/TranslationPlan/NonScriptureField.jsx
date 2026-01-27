@@ -14,7 +14,7 @@ function NonScriptureField({key, planIngredient, section, field}) {
             style={{
                 display: "flex",
                 flexDirection: "row",
-                alignItems: "center",
+                alignItems: "start",
                 textAlign: "left"
             }}
             key={key}
