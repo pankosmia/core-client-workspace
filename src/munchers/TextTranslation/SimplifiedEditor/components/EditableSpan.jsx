@@ -32,7 +32,7 @@ export default function EditableSpan({key, scriptureJson, setScriptureJson, posi
         return "";
     }
 
-    if (firstTime && incomingContent !== null) {
+    if (firstTime) {
         setValue(incomingContent);
         setFirstTime(false);
     }

@@ -40,7 +40,7 @@ function ScriptureField({key, section, verseText, selectedBurritoTextDir}) {
                                                                 "#CCC" :
                                                                 "#FFF"
                                                         }}>
-                                                            {verseText[cv.split(":")[0]][cv.split(":")[1]]}
+                                                            {verseText[cv.split(":")[0]] ? verseText[cv.split(":")[0]][cv.split(":")[1]] : ""}
                                                         </span>
                                                     </span>
                                         )

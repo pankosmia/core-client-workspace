@@ -6,7 +6,7 @@ import EditableTag from "./EditableTag";
 export default function EditableGraft({scriptureJson, setScriptureJson, position}) {
     const [value, setValue] = useState("");
     const [firstTime, setFirstTime] = useState(true);
-    const incomingBlock = scriptureJson.blocks[position[0]];
+    const incomingBlock = scriptureJson.blocks ? scriptureJson.blocks[position[0]] : null;
     const editorRef = useRef(null);
     useEditable(editorRef, setValue);
     if (!incomingBlock || !incomingBlock.content) {
