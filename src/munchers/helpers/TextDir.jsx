@@ -16,6 +16,13 @@ import { useDetectDir } from "font-detect-rhl";
   USFM / MD:
     - Markup regex exclusion is applied, in addition to neutral direction characters
     - A lower ratioThreshold allows for the possibility that some LTR markup text could be missed by markup regex exclusion.
+    - Note that at new document headers that contain the following usfm underneath mean 18 LTR Book Code characters from the start!
+        \id TIT
+        \toc1 TIT
+        \toc2 TIT
+        \toc3 TIT
+        \h TIT
+        \mt TIT
 
   Unspecified text:
     - No regex exclusion is applied.
@@ -43,7 +50,7 @@ function TextDir(content, type) {
     };
     
     const useDetectDirHtmlProps = { text: content, ratioThreshold: 0.51, isMarkup: true, markupScope: htmlMarkupScope, neutralScope: neutralScope };
-    const useDetectDirUsfmProps = { text: content, isMarkup: true }; // Default usfm markup regex is in use.
+    const useDetectDirUsfmProps = { text: content, ratioThreshold: 0.24, isMarkup: true }; // Default usfm markup regex is in use.
     const useDetectDirMdProps = { text: content, isMarkup: true, markupScope: mdMarkupScope  };
     const useDetectDirTextProps = { text: content, ratioThreshold: 0.24, isMarkup: false, neutralScope: neutralScope };
     const useDetectDirUnspecifiedType = { text: content, isMarkup: true };
