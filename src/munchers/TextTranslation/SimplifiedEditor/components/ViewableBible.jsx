@@ -2,7 +2,7 @@ import React, { useRef, useContext, useEffect } from 'react';
 import ViewableBibleBlock from "./ViewableBibleBlock";
 import {bcvContext} from "pithekos-lib";
 
-export default function ViewableBible({chapterJson }) {
+export default function ViewableBible({ chapterJson, dir }) {
 
     const {systemBcv} = useContext(bcvContext);
     const lastPrintedVerseRef = useRef(null);
@@ -23,8 +23,10 @@ export default function ViewableBible({chapterJson }) {
         loadCSS();
     }, []);
 
+    console.log('passed: ' + dir)
+
     return (
-        <div style={{ padding: "2px 12px" }}>
+        <div style={{ padding: "2px 12px" }} dir={dir}>
             {chapterJson.blocks
                 .map(
                     (b, n) => {
