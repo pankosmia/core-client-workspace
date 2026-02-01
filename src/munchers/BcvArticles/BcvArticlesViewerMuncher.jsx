@@ -53,8 +53,20 @@ function BcvArticlesViewerMuncher({metadata}) {
         () => {
             const doVerseNotes = async () => {
                 let ret = [];
-                for (const row of ingredient
-                    .filter(l => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)) {
+                const filteredRows = ingredient.filter(row => {
+                    const reference = row[0];
+                    if (!reference) return false;
+                    const [chapterPart, versePart] = reference.split(':');
+                    const chapter = parseInt(chapterPart);
+                    if (chapter !== systemBcv.chapterNum) return false;
+                    if (versePart.includes('-')) {
+                        const [start, end] = versePart.split('-').map(Number);
+                        return systemBcv.verseNum >= start && systemBcv.verseNum <= end;
+                    } else {
+                        return parseInt(versePart) === systemBcv.verseNum;
+                    }
+                });
+                for (const row of filteredRows) {
                     let payloadLink = row[5];
                     let payloadResponse = await getText(`/burrito/ingredient/raw/${metadata.local_path}?ipath=${payloadLink.slice(2)}.md`);
                     if (payloadResponse.ok) {
@@ -70,8 +82,12 @@ function BcvArticlesViewerMuncher({metadata}) {
             doVerseNotes().then();
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ingredient]
+        [ingredient, systemBcv.chapterNum, systemBcv.verseNum]
     );
+
+
+    console.log("[DEBUG ELIAS] verseNotes", verseNotes);
+    console.log("[DEBUG ELIAS] ingredient", ingredient);
 
     // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
     return (
@@ -100,11 +116,11 @@ function BcvArticlesViewerMuncher({metadata}) {
                     {verseNotes.length > 0 && [...new Set(verseNotes)].map((v, n) => {
                         return <Accordion>
                             <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel1-content"
-                            id={`tword-${n}`}
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="panel1-content"
+                                id={`tword-${n}`}
                             >
-                            <Typography component="span" sx={{fontWeight: "bold"}}>{v.split("##")[0].slice(2)}</Typography>
+                                <Typography component="span" sx={{fontWeight: "bold"}}>{v.includes("In this step") ? v.split("In this step")[0].slice(2) : v.split("##")[0].slice(2)}</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
                                 {ingredient && <Markdown className='markdown'>{v}</Markdown>}
