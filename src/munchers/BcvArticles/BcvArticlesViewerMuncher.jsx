@@ -85,10 +85,6 @@ function BcvArticlesViewerMuncher({metadata}) {
         [ingredient, systemBcv.chapterNum, systemBcv.verseNum]
     );
 
-
-    console.log("[DEBUG ELIAS] verseNotes", verseNotes);
-    console.log("[DEBUG ELIAS] ingredient", ingredient);
-
     // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
     return (
         <Box sx={{ flexGrow: 1 }} dir={!sbScriptDirSet ? textDir : undefined}>
