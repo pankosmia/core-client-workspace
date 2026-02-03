@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
-import {SpaContainer} from "pithekos-lib";
 import './index.css';
 import {createHashRouter, RouterProvider} from "react-router-dom";
 import ConfigureWorkspace from "./pages/ConfigureWorkspace/ConfigureWorkspace";
 import Workspace from "./pages/Workspace/Workspace";
+import {SpaContainer} from 'pankosmia-rcl'
 
 function App() {
     const [layout, setLayout] = useState("ViewEditorRightRow");

@@ -3,10 +3,11 @@ import SaveIcon from "@mui/icons-material/Save";
 import md5sum from "md5";
 import { doI18n, postJson } from "pithekos-lib";
 import { enqueueSnackbar } from "notistack";
-import I18nContext from "pithekos-lib/dist/contexts/i18nContext";
 import { useContext } from "react";
 import draftJson2usfm from "../../../../components/draftJson2usfm";
 import { useEffect } from "react";
+import { i18nContext as I18nContext } from "pankosmia-rcl";
+
 function SaveButton({
   metadata,
   systemBcv,

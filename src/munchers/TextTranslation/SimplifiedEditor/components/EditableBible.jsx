@@ -2,7 +2,7 @@ import EditableBibleBlock from "./EditableBibleBlock";
 import EditableGraft from "./EditableGraft";
 import EditableRemark from "./EditableRemark";
 import {useContext, useEffect} from "react";
-import {bcvContext} from "pithekos-lib";
+import {bcvContext} from "pankosmia-rcl";
 
 export default function EditableBible({chapterJson, scriptureJson, setScriptureJson }) {
 

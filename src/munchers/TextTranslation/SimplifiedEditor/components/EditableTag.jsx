@@ -7,7 +7,10 @@ import titleBlockMenu from '../menuSpecs/title_blocks.json';
 import headingBlockMenu from '../menuSpecs/heading_blocks.json';
 import introduction_titleBlockMenu from '../menuSpecs/intro_title_blocks.json'
 import introduction_headingBlockMenu from '../menuSpecs/intro_heading_blocks.json'
-import I18nContext from 'pithekos-lib/dist/contexts/i18nContext';
+import {
+  i18nContext as I18nContext,
+} from "pankosmia-rcl";
+
 import { doI18n } from 'pithekos-lib';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 export default function EditableTag({ scriptureJson, setScriptureJson, position }) {
