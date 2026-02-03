@@ -7,6 +7,7 @@ import {
     i18nContext as I18nContext,
     debugContext as DebugContext,
     bcvContext as BcvContext,
+    netContext,
     doI18n,
     getText, getJson
 } from "pithekos-lib";
@@ -14,6 +15,7 @@ import {
 import TextDir from '../helpers/TextDir';
 
 function BcvArticlesViewerMuncher({metadata}) {
+    const { enabledRef } = useContext(netContext);
     const [ingredient, setIngredient] = useState([]);
     const [verseNotes, setVerseNotes] = useState([]);
     const [textDir, setTextDir] = useState(
@@ -116,10 +118,10 @@ function BcvArticlesViewerMuncher({metadata}) {
                                 aria-controls="panel1-content"
                                 id={`tword-${n}`}
                             >
-                                <Typography component="span" sx={{fontWeight: "bold"}}>{v.includes("In this step") ? v.split("In this step")[0].slice(2) : v.split("##")[0].slice(2)}</Typography>
+                                <Typography component="span" sx={{fontWeight: "bold"}}>{v.split("\n")[0].slice(2)}</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                {ingredient && <Markdown className='markdown'>{v}</Markdown>}
+                                {ingredient && <Markdown className='markdown'>{enabledRef.current ? v : v.replace(/\[([^\]]+)\]\([^\)]+\)/g, (match, p1) => `${p1} ${doI18n("pages:core-local-workspace:link_disabled_offline", i18nRef.current)}`)}</Markdown>}
                             </AccordionDetails>
                         </Accordion>
                     })}
