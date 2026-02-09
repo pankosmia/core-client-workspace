@@ -714,6 +714,10 @@
     "about_dialog":{
       "en":"About",
       "fr":"A propos"
+    },
+    "link_disabled_offline":{
+      "en":"Link disabled in offline mode",
+      "es":"El link está deshabilitado en el modo sin Internet"
     }
   }
 }
