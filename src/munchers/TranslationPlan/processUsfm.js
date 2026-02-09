@@ -32,12 +32,15 @@ function processUsfm(usfm) {
                     i.chapter,
                     Object.fromEntries(
                         i.verses
+                            .flatMap(v => v.verse)
                             .map(
                                 (v, n) => [
-                                    `${n}`,
+                                   /*  `${n}`,
                                     v.verse.length > 0 ?
                                         v.verse[0].text :
-                                        []
+                                        [] */
+                                    v.verseRange,
+                                    v.text
                                 ]
                             )
                             .filter(kv => typeof kv[1] === "string")

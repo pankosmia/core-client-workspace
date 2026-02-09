@@ -9,6 +9,23 @@ function ScriptureField({key, section, verseText, selectedBurritoTextDir}) {
     const {i18nRef} = useContext(i18nContext);
     const {systemBcv} = useContext(bcvContext);
 
+    const getVerseFromRange = (chapter, verse) => {
+        const chapterData = verseText[chapter];
+        if (!chapterData) return "";
+    
+        if (chapterData[verse]) return chapterData[verse];
+        const rangeEntry = Object.entries(chapterData).find(([key]) => {
+            if (key.includes('-')) {
+                const [start, end] = key.split('-').map(Number);
+                const target = Number(verse);
+                return target >= start && target <= end;
+            }
+            return false;
+        });
+    
+        return rangeEntry ? rangeEntry[1] : "";
+    };
+
     if (Object.keys(verseText).length > 0) {
         let chapterN = "0"
         return (<Box dir={selectedBurritoTextDir} key={key}>
@@ -35,12 +52,18 @@ function ScriptureField({key, section, verseText, selectedBurritoTextDir}) {
                                                             className="marks_verses_label">
                                                             {cv.split(":")[1]}
                                                         </span>
+                                                        {/* <span style={{
+                                                            backgroundColor: `${systemBcv.chapterNum}` === cv.split(":")[0] && `${systemBcv.verseNum}` === cv.split(":")[1] ?
+                                                                "#CCC" :
+                                                                "#FFF"
+                                                        }}> */}
                                                         <span style={{
                                                             backgroundColor: `${systemBcv.chapterNum}` === cv.split(":")[0] && `${systemBcv.verseNum}` === cv.split(":")[1] ?
                                                                 "#CCC" :
                                                                 "#FFF"
                                                         }}>
-                                                            {verseText[cv.split(":")[0]] ? verseText[cv.split(":")[0]][cv.split(":")[1]] : ""}
+                                                            {getVerseFromRange(cv.split(":")[0], cv.split(":")[1])}
+                                                            {/* {verseText[cv.split(":")[0]] ? verseText[cv.split(":")[0]][cv.split(":")[1]] : ""} */}
                                                         </span>
                                                     </span>
                                         )

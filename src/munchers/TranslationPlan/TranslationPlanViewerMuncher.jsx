@@ -50,28 +50,22 @@ function TranslationPlanViewerMuncher({metadata}) {
         () => {
             const getChapterText = async () => {
                 if (selectedBurrito) {
-                    let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
+                    let usfmResponse = await getText(
+                        `/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
                         debugRef.current
                     );
+                    
                     if (usfmResponse.ok) {
-                        const sbSelectedScriptDirSet = selectedBurritoSbTextDir === 'ltr' || selectedBurritoSbTextDir === 'rtl';
-                        if (!sbSelectedScriptDirSet) {
-                            const dir = await TextDir(usfmResponse.text, 'usfm');
-                            if (dir !== sbSelectedScriptDirSet) {
-                                setSelectedBurritoTextDir(dir);
-                            }
-                        }
-                        const newVerseText = processUsfm(usfmResponse.text);
+                        const newVerseText = processUsfm(usfmResponse.text, systemBcv.chapter, systemBcv.verse);
                         setVerseText(newVerseText);
                     } else {
                         setVerseText([]);
                     }
                 }
             };
-
             getChapterText().then();
         },
-        [debugRef, systemBcv.bookCode, selectedBurrito, selectedBurritoSbTextDir]
+        [debugRef, systemBcv.bookCode, systemBcv.chapter, systemBcv.verse, selectedBurrito, selectedBurritoSbTextDir]
     );
     useEffect(() => {
         async function fetchSummaries() {
@@ -161,10 +155,11 @@ function TranslationPlanViewerMuncher({metadata}) {
         const [endChapter, endVerse] = section.cv[1].split(":").map(Number);
         const chapterNum = systemBcv.chapterNum;
         const verseNum = systemBcv.verseNum;
-        return (
-            (chapterNum > startChapter || (chapterNum === startChapter && verseNum >= startVerse)) &&
-            (chapterNum < endChapter || (chapterNum === endChapter && verseNum <= endVerse))
-        );
+    
+        if (chapterNum < startChapter || chapterNum > endChapter) return false;
+        if (chapterNum === startChapter && verseNum < startVerse) return false;
+        if (chapterNum === endChapter && verseNum > endVerse) return false;
+        return true;
     };
 
     if (!planIngredient) {
@@ -221,6 +216,7 @@ function TranslationPlanViewerMuncher({metadata}) {
                                                         key={i}
                                                         section={section}
                                                         verseText={verseText}
+                                                        systemBcv={systemBcv}
                                                         selectedBurritoTextDir={selectedBurritoTextDir}
                                                     />
                                                 } else {
