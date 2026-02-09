@@ -150,6 +150,7 @@ function JuxtaEditorTools({
             md5sumScriptureJson={md5sumScriptureJson}
             setMd5sumScriptureJson={setMd5sumScriptureJson}
             sentences={sentences}
+            curIndex={curIndex}
           />
         </Grid2>
 
