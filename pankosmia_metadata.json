@@ -67,7 +67,8 @@
       "ar": "@تسييير و تغيير الموارد المحلية",
       "en": "Edit your document",
       "fr": "Éditer votre document",
-      "id": "@Kelola dan edit sumber daya lokal"
+      "id": "@Kelola dan edit sumber daya lokal",
+      "es": "Editar su documento"
     },
     "flavor": {
       "en": "flavor",
@@ -91,7 +92,8 @@
     "usfm_conversion_error": {
       "en": "Document could not be converted from USFM to USJ",
       "fr": "Le document n'a pas pu être converti de USFM à USJ",
-      "id": "@Kesalahan terjadi saat mengubah USFM ke USJ"
+      "id": "@Kesalahan terjadi saat mengubah USFM ke USJ",
+      "es": "El documento no se pudo convertir de USFM a USJ"
     },
     "load_error": {
       "en": "Could not load",
@@ -120,7 +122,7 @@
     },
     "change_book_question": {
       "en": "Change book will discard unsaved changes on the current book. Continue anyway?",
-      "es": "@Está a punto de cambiar de libro. Esto descartará cualquier cambio no guardado que haya realizado en el libro actual. ¿Desea continuar?",
+      "es": "Está a punto de cambiar de libro. Esto descartará cualquier cambio no guardado que haya realizado en el libro actual. ¿Desea continuar?",
       "fr": "Changer de livre supprimera les modifications non sauvegardées dans le livre actuel. Continuer quand même ?",
       "id": "@Akan beralih ke buku lain. Tindakan ini akan menghapus semua perubahan yang belum disimpan yang telah dibuat pada buku saat ini. Ingin melanjutkan?"
     },
@@ -175,7 +177,8 @@
     "delete_note_bcv": {
       "en": "Deletion is permanent and irreversible. Continue anyway?",
       "fr": "La suppression est définitive et irréversible. Continuer quand même ?",
-      "id": "@Akan menghapus konten ini. Operasi ini tidak dapat dibalikkan. Klik \"batal\" kecuali yakin ingin menghapus konten ini secara permanen."
+      "id": "@Akan menghapus konten ini. Operasi ini tidak dapat dibalikkan. Klik \"batal\" kecuali yakin ingin menghapus konten ini secara permanen.",
+      "es": "La opción de borrar es permanente e irreversible. ¿Desea continuar?"
     },
     "do_delete_button": {
       "en": "Delete",
@@ -247,7 +250,8 @@
     "toggle_block_view": {
       "en": "Toggle verse-by-verse view",
       "fr": "(Dés)activer la vue verset par verset",
-      "id": "@Alihkan tampilan blok"
+      "id": "@Alihkan tampilan blok",
+      "es": "Alternar vista verso por verso"
     },
     "toggle_markup": {
       "en": "Toggle formatting marks",
@@ -486,19 +490,19 @@
     },
     "change_editor_title": {
       "en": "Change editor mode",
-      "es": "@Cambiando el editor",
+      "es": "Cambiar el modo del editor",
       "fr": "Changer le mode d'éditeur",
       "id": "@Sedang mengganti editor"
     },
     "change_editor_without_saving": {
       "en": "Change editor will discard unsaved changes on the current editor. Continue anyway?",
-      "es": "@Tienes cambios sin guardar. Si cambias de editor ahora, perderás esos cambios. Si no es lo que deseas, pulsa 'cancelar'.",
+      "es": "Cambiar de editor va a descartar cualquier cambio que no se haya guardado. ¿Desea continuar?",
       "fr": "Changer d'éditeur supprimera les modifications non sauvegardées dans l'éditeur actuel. Continuer quand même ?",
       "id": "@Ada suntingan yang belum disimpan. Jika mengganti editor sekarang, perubahan tersebut akan hilang. Tekan 'batal' jika tidak sesuai keinginan."
     },
     "do_change_editor": {
       "en": "Change editor mode",
-      "es": "@Cambiar el editor de todas formas",
+      "es": "Cambiar el modo del editor",
       "fr": "Changer le mode d'éditeur",
       "id": "@Ganti saja editornya"
     },
@@ -509,7 +513,8 @@
     "_local_": {
       "en": "editable",
       "fr": "éditable",
-      "id": "@dapat diedit"
+      "id": "@dapat diedit",
+      "es": "editable"
     },
     "_sideloaded_": {
       "en": "imported from computer",
