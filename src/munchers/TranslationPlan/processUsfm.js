@@ -2,52 +2,42 @@ import {Proskomma} from "proskomma-core";
 import TextDir from '../helpers/TextDir';
 
 function processUsfm(usfm) {
-    const pk = new Proskomma();
-    pk.importDocument({
-            lang: "xxx",
-            abbr: "yyy"
-        },
-        "usfm",
-        usfm
-    );
-    const query = `{
+    if (!usfm) return {};
+    try {
+        const pk = new Proskomma();
+        pk.importDocument({ lang: "xxx", abbr: "yyy" }, "usfm", usfm);
+        const query = `{
             documents {
-                header(id: "bookCode")
                 cvIndexes {
-                chapter
-                verses {
-                    verse {
-                    verseRange
-                    text
+                    chapter
+                    verses {
+                        verse { verseRange text }
                     }
-                }
                 }
             }
         }`;
-    const result = pk.gqlQuerySync(query);
-    return Object.fromEntries(
-        result.data.documents[0].cvIndexes
-            .map(
-                i => [
-                    i.chapter,
-                    Object.fromEntries(
-                        i.verses
-                            .flatMap(v => v.verse)
-                            .map(
-                                (v, n) => [
-                                   /*  `${n}`,
-                                    v.verse.length > 0 ?
-                                        v.verse[0].text :
-                                        [] */
-                                    v.verseRange,
-                                    v.text
-                                ]
-                            )
-                            .filter(kv => typeof kv[1] === "string")
-                    )
-                ]
-            )
-    )
+        const result = pk.gqlQuerySync(query);
+
+        const doc = result?.data?.documents?.[0];
+        if (!doc) {
+            return {};
+        }
+
+        const output = {};
+        doc.cvIndexes.forEach(i => {
+            const chapter = i.chapter.toString();
+            output[chapter] = {};
+            i.verses.forEach(v => {
+                const range = v.verse?.[0]?.verseRange || "0";
+                const fullText = v.verse.map(vObj => vObj.text).join(" ");
+                output[chapter][range] = fullText;
+            });
+        });
+        return output;
+    } catch (e) {
+        console.error(e);
+        return {};
+    }
 }
 
 export default processUsfm;

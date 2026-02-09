@@ -46,27 +46,28 @@ function TranslationPlanViewerMuncher({metadata}) {
         setOpenDialogAbout(true);
     }
 
-    useEffect(
-        () => {
-            const getChapterText = async () => {
-                if (selectedBurrito) {
-                    let usfmResponse = await getText(
-                        `/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
-                        debugRef.current
-                    );
-                    
-                    if (usfmResponse.ok) {
-                        const newVerseText = processUsfm(usfmResponse.text, systemBcv.chapter, systemBcv.verse);
-                        setVerseText(newVerseText);
-                    } else {
-                        setVerseText([]);
-                    }
+    useEffect(() => {
+        const getChapterText = async () => {
+            if (!selectedBurrito || !systemBcv?.bookCode) {
+                return;
+            }
+            try {
+                const url = `/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`;
+                const usfmResponse = await getText(url, debugRef.current);
+                
+                if (usfmResponse?.ok) {
+                    const newVerseText = processUsfm(usfmResponse.text);
+                    setVerseText(newVerseText);
+                } else {
+                    setVerseText({});
                 }
-            };
-            getChapterText().then();
-        },
-        [debugRef, systemBcv.bookCode, systemBcv.chapter, systemBcv.verse, selectedBurrito, selectedBurritoSbTextDir]
-    );
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        getChapterText();
+    }, [systemBcv.bookCode, selectedBurrito]);
+
     useEffect(() => {
         async function fetchSummaries() {
             try {
@@ -89,7 +90,7 @@ function TranslationPlanViewerMuncher({metadata}) {
                 );
                 setBurritos(scriptures);
             } catch (err) {
-                console.error("Error fetching summaries:", err);
+                console.error(err);
             }
         }
 
@@ -113,7 +114,7 @@ function TranslationPlanViewerMuncher({metadata}) {
                 const url = selectedBurritoTextDir === "ltr" ? "/app-resources/usfm/bible_page_styles.css" : "/app-resources/usfm/bible_page_styles_rtl.css";
                 const response = await fetch(url);
                 if (!response.ok) {
-                    console.error("Erreur de chargement du CSS :", response.status);
+                    console.error(response.status);
                     return;
                 }
                 const cssText = await response.text();
