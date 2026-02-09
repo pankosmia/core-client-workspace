@@ -16,7 +16,7 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 export default function EditableTag({ scriptureJson, setScriptureJson, position }) {
     const { i18nRef } = useContext(I18nContext);
     const [anchorEl, setAnchorEl] = useState(null);
-    const incomingBlock = scriptureJson.blocks[position[0]];
+    const incomingBlock = scriptureJson.blocks ? scriptureJson.blocks[position[0]]: null;
     const [value, setValue] = useState("");
     const [subMenuAnchors, setSubMenuAnchors] = useState({});
 

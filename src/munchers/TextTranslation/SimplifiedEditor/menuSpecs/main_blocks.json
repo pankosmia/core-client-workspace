@@ -86,6 +86,11 @@
         "tag",
         "qd",
         "pages:core-local-workspace:usfm_qd"
+      ],
+      [
+        "tag",
+        "b",
+        "pages:core-local-workspace:usfm_b"
       ]
     ]
   ],

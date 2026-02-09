@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box } from "@mui/material";
 import JuxtaDraftingEditor from "./components/JuxtaDraftingEditor/JuxtaDraftingEditor";
 
-function JuxtalinearEditorMuncher({ metadata, locationState }) {
+function JuxtalinearEditorMuncher({ metadata }) {
   const [modified, setModified] = useState(false);
 
   return (
@@ -11,7 +11,6 @@ function JuxtalinearEditorMuncher({ metadata, locationState }) {
         metadata={metadata}
         modified={modified}
         setModified={setModified}
-        locationState={locationState}
       />
     </Box>
   );

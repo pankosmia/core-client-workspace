@@ -1,4 +1,4 @@
-import { Box, Grid2, IconButton } from "@mui/material";
+import { Box, Grid2, IconButton, Tooltip } from "@mui/material";
 import ChapterPicker from "./ChapterPicker";
 import SaveButton from "./SaveButton";
 import BookPicker from "./BookPicker";
@@ -10,9 +10,12 @@ import { useContext, useEffect, useState } from "react";
 import { getText } from "pithekos-lib";
 import usfm2draftJson from "../../../../components/usfm2draftJson";
 import { useNavigate } from "react-router-dom";
+import LayoutIcon from "../layouts/LayoutIcon";
+import { doI18n } from "pithekos-lib";
 import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
+  i18nContext as I18nContext
 } from "pankosmia-rcl";
 
 function EditorTools({
@@ -27,7 +30,7 @@ function EditorTools({
 }) {
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
-
+  const {i18nRef} = useContext(I18nContext)
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false);
   const [chapterNumbers, setChapterNumbers] = useState([]);
 
@@ -79,55 +82,57 @@ function EditorTools({
         padding: 2,
       }}
     >
-      <Grid2
-        container
-        alignItems="center"
-        justifyContent="space-between"
-        width="100%"
-      >
-        <Grid2 display="flex" gap={1}>
-          <SaveButton
-            metadata={metadata}
-            systemBcv={systemBcv}
-            modified={modified}
-            setModified={setModified}
-            md5sumScriptureJson={md5sumScriptureJson}
-            setMd5sumScriptureJson={setMd5sumScriptureJson}
-            scriptureJson={scriptureJson}
-          />
-          <IconButton
-            onClick={() => {
-              setOpenModalPreviewText(true);
-            }}
-          >
-            <VisibilityIcon />
-          </IconButton>
-          <PreviewText
-            metadata={metadata}
-            systemBcv={systemBcv}
-            open={openModalPreviewText}
-            setOpenModalPreviewText={setOpenModalPreviewText}
-          />
-        </Grid2>
+        <Grid2
+            container
+            alignItems="center"
+            justifyContent="space-between"
+            width="100%"
+        >
+            <Grid2 display="flex" gap={1}>
+                <SaveButton
+                    metadata={metadata}
+                    systemBcv={systemBcv}
+                    modified={modified}
+                    setModified={setModified}
+                    md5sumScriptureJson={md5sumScriptureJson}
+                    setMd5sumScriptureJson={setMd5sumScriptureJson}
+                    scriptureJson={scriptureJson}
+                />
+                <IconButton onClick={() => {
+                    setOpenModalPreviewText(true);
+                }}>
+                    <VisibilityIcon />
+                </IconButton>
+                <PreviewText metadata={metadata} systemBcv={systemBcv} open={openModalPreviewText}
+                    setOpenModalPreviewText={setOpenModalPreviewText} />
+            </Grid2>
 
-        <Grid2 display="flex" gap={1}>
-          <BookPicker />
-          <ChapterPicker
-            chapterNumbers={chapterNumbers}
-            repoMetadata={metadata}
-          />
+            <Grid2 display="flex" gap={1}>
+                <BookPicker />
+                <ChapterPicker
+                    chapterNumbers={chapterNumbers}
+                    repoMetadata={metadata}
+                />
+            </Grid2>
+            <Grid2 display="flex" gap={1}>
+                <Tooltip title={doI18n("pages:core-local-workspace:button_edit", i18nRef.current, debugRef.current)}>
+                    <IconButton
+                        disabled={md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson}
+                        /* enables redirection based on the page */
+                        onClick={() =>
+                            navigate(
+                                {
+                                    pathname: "/",
+                                    search: "return-page=workspace"
+                                }
+                            )
+                        }
+                    >
+                        <LayoutIcon />
+                    </IconButton>
+                </Tooltip>
+            </Grid2>
         </Grid2>
-        <Grid2 display="flex" gap={1}>
-          <IconButton
-            disabled={
-              md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson
-            }
-            onClick={() => navigate("/")}
-          >
-            <SettingsIcon />
-          </IconButton>
-        </Grid2>
-      </Grid2>
     </Box>
   );
 }

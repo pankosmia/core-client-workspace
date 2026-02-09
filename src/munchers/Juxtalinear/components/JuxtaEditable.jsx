@@ -140,18 +140,6 @@ function JuxtaEditable({
   return (
     <Box display="flex" flexDirection="column">
       <Box flex={1} overflow="auto" p={2}>
-        <Grid container>
-          <Grid item sm={4} p={2}>
-            <TextField
-              fullWidth
-              multiline
-              minRows={10}
-              value={originText[curIndex] || ""}
-              InputProps={{ readOnly: true }}
-            />
-          </Grid>
-
-          <Grid item sm={8} p={2}>
             <DragDropContext onDragEnd={onDragEnd}>
               {itemArrays[curIndex]?.map((items, n) => (
                 <Grid container key={n}>
@@ -223,8 +211,6 @@ function JuxtaEditable({
                 </Grid>
               ))}
             </DragDropContext>
-          </Grid>
-        </Grid>
       </Box>
     </Box>
   );

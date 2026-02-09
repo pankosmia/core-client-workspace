@@ -1,24 +1,24 @@
-import { Box, Grid2, IconButton } from "@mui/material";
+import { Box, Grid2, IconButton, Tooltip } from "@mui/material";
+import LayoutIcon from "../../../TextTranslation/SimplifiedEditor/layouts/LayoutIcon";
 import SaveButton from "../../../TextTranslation/SimplifiedEditor/components/SaveButton";
 import BookPicker from "../../../TextTranslation/SimplifiedEditor/components/BookPicker";
 import md5sum from "md5";
 import { useContext, useEffect, useState } from "react";
-import { getJson, getText, postEmptyJson } from "pithekos-lib";
+import { getJson, getText, postEmptyJson, doI18n } from "pithekos-lib";
 import usfm2draftJson from "../../../../components/usfm2draftJson";
 import { useNavigate } from "react-router-dom";
+import JuxtaSaveButton from "./JuxtaSaveButton";
 import JuxtaSentencesNav from "./JuxtaSentencesNav";
 import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
+  i18nContext,
 } from "pankosmia-rcl";
 
 function JuxtaEditorTools({
   metadata,
-  modified,
-  setModified,
   md5sumScriptureJson,
   setMd5sumScriptureJson,
-  scriptureJson,
   currentBookCode,
   setCurrentBookCode,
   curIndex,
@@ -27,6 +27,10 @@ function JuxtaEditorTools({
 }) {
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
+  const { i18nRef } = useContext(i18nContext);
+  const [modified, setModified] = useState(false);
+  console.log(modified);
+  const navigate = useNavigate();
   useEffect(() => {
     postEmptyJson(
       `/navigation/bcv/${currentBookCode}/${currentChapter()}/${startVerse()}`,
@@ -77,8 +81,8 @@ function JuxtaEditorTools({
   // Set up chapter numbers when changing book
 
   useEffect(() => {
-    if (systemBcv.bookCode !== currentBookCode) {
-      const doChapterNumbers = async () => {
+    const doChapterNumbers = async () => {
+      if (systemBcv?.bookCode && systemBcv.bookCode !== currentBookCode) {
         let jsonResponse = await getJson(
           `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.json`,
           debugRef.current,
@@ -87,9 +91,9 @@ function JuxtaEditorTools({
           const JsonDraft = jsonResponse.json;
           setCurrentBookCode(systemBcv.bookCode);
         }
-      };
-      doChapterNumbers().then();
-    }
+      }
+    };
+    doChapterNumbers().then();
   }, [
     systemBcv.bookCode,
     metadata,
@@ -103,7 +107,24 @@ function JuxtaEditorTools({
       setCurIndex(index - 1);
     }
   };
+  useEffect(() => {
+    const isElectron = !!window.electronAPI;
+    if (isElectron) {
+      if (modified) {
+        window.electronAPI.setCanClose(false);
+      } else {
+        window.electronAPI.setCanClose(true);
+      }
+    }
+  }, [modified]);
 
+  useEffect(() => {
+    setModified(
+      sentences.length > 0
+        ? md5sum(JSON.stringify(sentences[curIndex])) !== md5sumScriptureJson
+        : true,
+    );
+  }, [curIndex, md5sumScriptureJson,sentences]);
   return (
     <Box
       sx={{
@@ -122,14 +143,13 @@ function JuxtaEditorTools({
         width="100%"
       >
         <Grid2 display="flex" gap={1}>
-          <SaveButton
+          <JuxtaSaveButton
             metadata={metadata}
             systemBcv={systemBcv}
-            modified={modified}
-            setModified={setModified}
+            modified={!modified}
             md5sumScriptureJson={md5sumScriptureJson}
             setMd5sumScriptureJson={setMd5sumScriptureJson}
-            scriptureJson={scriptureJson}
+            sentences={sentences}
           />
         </Grid2>
 
@@ -146,7 +166,28 @@ function JuxtaEditorTools({
             endVerse={endVerse}
           />
         </Grid2>
-        <Grid2 display="flex" gap={1}></Grid2>
+        <Grid2 display="flex" gap={1}>
+          <Tooltip
+            title={doI18n(
+              "pages:core-local-workspace:button_edit",
+              i18nRef.current,
+              debugRef.current,
+            )}
+          >
+            <IconButton
+              disabled={modified}
+              /* enables redirection based on the page */
+              onClick={() =>
+                navigate({
+                  pathname: "/",
+                  search: "return-page=workspace",
+                })
+              }
+            >
+              <LayoutIcon />
+            </IconButton>
+          </Tooltip>
+        </Grid2>
       </Grid2>
     </Box>
   );

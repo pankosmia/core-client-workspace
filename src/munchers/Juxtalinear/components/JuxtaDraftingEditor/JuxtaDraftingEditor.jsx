@@ -9,18 +9,10 @@ import md5sum from "md5";
 import JuxtaEditorTools from "../JuxtaEditorTools/JuxtaEditorTools";
 import JuxtaEditable from "../JuxtaEditable";
 
-function JuxtaDraftingEditor({
-  metadata,
-  modified,
-  setModified,
-  locationState,
-}) {
+function JuxtaDraftingEditor({ metadata, modified, setModified }) {
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
-  const [scriptureJson, setScriptureJson] = useState({
-    headers: {},
-    blocks: [],
-  });
+
   const [md5sumScriptureJson, setMd5sumScriptureJson] = useState([]);
   const [currentBookCode, setCurrentBookCode] = useState(null);
   const [ingredient, setIngredient] = useState(null);
@@ -56,7 +48,11 @@ function JuxtaDraftingEditor({
       };
     });
 
-
+  useEffect(() => {
+    if (sentences.length > 0) {
+      setMd5sumScriptureJson(md5sum(JSON.stringify(sentences[curIndex])));
+    }
+  }, [curIndex]);
   const setGlobalItemArrays = (index, itemArr) => {
     setItemArrays((prev) => {
       const next = [...prev];
@@ -94,11 +90,14 @@ function JuxtaDraftingEditor({
 
     const openJsonHandler = async () => {
       const stcs = ingredient;
+      const sentencesInit = remakeSentences(stcs);
       setFileName("ici");
       setCurIndex(0);
-      setSentences(remakeSentences(stcs));
+      setSentences(sentencesInit);
       setOriginText(stcs.map((s) => s.sourceString));
       setItemArrays([getItemsFrom(stcs, 0)]);
+      setMd5sumScriptureJson(md5sum(JSON.stringify(sentencesInit[curIndex])));
+
     };
 
     openJsonHandler();
@@ -120,7 +119,7 @@ function JuxtaDraftingEditor({
   useEffect(() => {
     const getAllData = async () => {
       if (currentBookCode) {
-        setCurIndex(0)
+        setCurIndex(0);
         const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${currentBookCode}.json`;
         let response = await getJson(ingredientLink, debugRef.current);
         if (response.ok) {
@@ -142,7 +141,6 @@ function JuxtaDraftingEditor({
         setModified={setModified}
         md5sumScriptureJson={md5sumScriptureJson}
         setMd5sumScriptureJson={setMd5sumScriptureJson}
-        scriptureJson={scriptureJson}
         currentBookCode={currentBookCode}
         setCurrentBookCode={setCurrentBookCode}
         curIndex={curIndex}

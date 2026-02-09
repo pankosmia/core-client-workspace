@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import DraftingEditor from "./SimplifiedEditor/DraftingEditor";
 import { useState, useEffect } from "react";
 
-function TextTranslationEditorMuncher({ metadata, locationState }) {
+function TextTranslationEditorMuncher({ metadata }) {
   const [modified, setModified] = useState(false);
 
 
@@ -13,7 +13,6 @@ function TextTranslationEditorMuncher({ metadata, locationState }) {
         metadata={metadata}
         modified={modified}
         setModified={setModified}
-        locationState={locationState}
       />
     </Box>
   );
