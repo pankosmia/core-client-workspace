@@ -1,9 +1,12 @@
-import {useContext, useRef, useState} from "react";
-import {useEditable} from "use-editable";
-import {updateUnitContent} from "../Controller";
-import {postEmptyJson} from "pithekos-lib";
-import DebugContext from "pithekos-lib/dist/contexts/debugContext";
-import BcvContext from "pithekos-lib/dist/contexts/bcvContext";
+import { useContext, useRef, useState } from "react";
+import { useEditable } from "use-editable";
+import { updateUnitContent } from "../Controller";
+import { postEmptyJson } from "pithekos-lib";
+
+import {
+  bcvContext as BcvContext,
+  debugContext as DebugContext,
+} from "pankosmia-rcl";
 
 export default function EditableSpan({key, scriptureJson, setScriptureJson, position, chapter, verse}) {
     const incomingBlock = scriptureJson.blocks[position[0]];
@@ -15,22 +18,18 @@ export default function EditableSpan({key, scriptureJson, setScriptureJson, posi
     const editorRef = useRef(null);
     useEditable(editorRef, setValue);
 
-    const updateScriptureJson = async (scriptureJson, position, value) =>
-        setTimeout(() => {
-                setScriptureJson(updateUnitContent(scriptureJson, position, value));
-            },
-            100);
+  const updateScriptureJson = async (scriptureJson, position, value) =>
+    setTimeout(() => {
+      setScriptureJson(updateUnitContent(scriptureJson, position, value));
+    }, 100);
 
-    const updateBcv = (b, c, v) => {
-                postEmptyJson(
-                    `/navigation/bcv/${b}/${c}/${v}`,
-                    debugRef.current
-                );
-            }
+  const updateBcv = (b, c, v) => {
+    postEmptyJson(`/navigation/bcv/${b}/${c}/${v}`, debugRef.current);
+  };
 
-    if (incomingContent === null) {
-        return "";
-    }
+  if (incomingContent === null) {
+    return "";
+  }
 
     if (firstTime) {
         setValue(incomingContent);

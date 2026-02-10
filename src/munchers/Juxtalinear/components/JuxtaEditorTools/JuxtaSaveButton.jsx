@@ -8,43 +8,39 @@ import draftJson2usfm from "../../../../components/draftJson2usfm";
 import { useEffect } from "react";
 import { i18nContext as I18nContext } from "pankosmia-rcl";
 
-function SaveButton({
+function JuxtaSaveButton({
   metadata,
   systemBcv,
   modified,
   setModified,
   md5sumScriptureJson,
   setMd5sumScriptureJson,
-  scriptureJson,
+  sentences,
+  curIndex,
 }) {
   const { i18nRef } = useContext(I18nContext);
-  useEffect(() => {
-    const isElectron = !!window.electronAPI;
-    if (isElectron) {
-      console.log("ici");
-      if (!(md5sum(JSON.stringify(scriptureJson)) === md5sumScriptureJson)) {
-        window.electronAPI.setCanClose(false);
-      } else {
-        window.electronAPI.setCanClose(true);
-      }
-    }
-  }, [scriptureJson, md5sumScriptureJson]);
-  // Permet de sauvegarder dans le fichier TSV
-  const handleSaveUsfm = async (debugBool) => {
-    let usfm = draftJson2usfm(scriptureJson);
-    const payload = JSON.stringify({ payload: usfm });
+
+  const handleSaveJson = async (debugBool) => {
+    const s = [...sentences];
+    s[0].chunks
+      .filter(({ source }) => source[0])
+      .forEach(({ source }) => {
+        source.filter((e) => e);
+      });
+    console.log(s)
+    const payload = { payload: JSON.stringify(s,null,2) };
+    console.log(payload)
     const response = await postJson(
-      `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
-      payload,
-      debugBool,
+      `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.json`,
+      JSON.stringify(payload),
+      debugBool
     );
     if (response.ok) {
       enqueueSnackbar(
         `${doI18n("pages:core-local-workspace:saved", i18nRef.current)}`,
         { variant: "success" },
       );
-      setMd5sumScriptureJson(md5sum(JSON.stringify(scriptureJson)));
-      setModified(false);
+      setMd5sumScriptureJson(md5sum(JSON.stringify(sentences[curIndex])));
     } else {
       enqueueSnackbar(
         `${doI18n("pages:core-local-workspace:save_error", i18nRef.current)}: ${response.status}`,
@@ -57,12 +53,12 @@ function SaveButton({
     <IconButton
       variant="contained"
       onClick={() => {
-        handleSaveUsfm().then();
+        handleSaveJson().then();
       }}
-      disabled={md5sum(JSON.stringify(scriptureJson)) === md5sumScriptureJson}
+      disabled={modified}
     >
       <SaveIcon size="large" />
     </IconButton>
   );
 }
-export default SaveButton;
+export default JuxtaSaveButton;
