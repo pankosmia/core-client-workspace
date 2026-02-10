@@ -8,17 +8,19 @@ function JuxtaSentencesNav({
   currentChapter,
   startVerse,
   curIndex,
-  endVerse
+  endVerse,
+  modified,
 }) {
   return (
     <>
-      <Button onClick={onPrevHandler}>
+      <Button disabled={modified} onClick={onPrevHandler}>
         <ArrowCircleLeft size={32} />
       </Button>
       <Stack alignItems="center">
         <Box sx={{ color: "grey", fontSize: "14px" }}>
           Sentence
           <Input
+            disabled={modified}
             value={sentences.length ? curIndex + 1 : 0}
             sx={{ width: "30px" }}
             inputProps={{
@@ -32,7 +34,7 @@ function JuxtaSentencesNav({
           {endVerse()})
         </Box>
       </Stack>
-      <Button onClick={onNextHandler}>
+      <Button disabled={modified} onClick={onNextHandler}>
         <ArrowCircleRight size={32} />
       </Button>
     </>

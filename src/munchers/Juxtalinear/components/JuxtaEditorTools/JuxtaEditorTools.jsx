@@ -9,6 +9,7 @@ import usfm2draftJson from "../../../../components/usfm2draftJson";
 import { useNavigate } from "react-router-dom";
 import JuxtaSaveButton from "./JuxtaSaveButton";
 import JuxtaSentencesNav from "./JuxtaSentencesNav";
+import { getFirstChapterJuxta } from "../../../../common/findFirstChapter";
 import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
@@ -155,7 +156,7 @@ function JuxtaEditorTools({
         </Grid2>
 
         <Grid2 display="flex" gap={1}>
-          <BookPicker json={true} />
+          <BookPicker setFirstChapter={getFirstChapterJuxta} />
           <JuxtaSentencesNav
             onPrevHandler={onPrevHandler}
             onNextHandler={onNextHandler}
@@ -165,6 +166,7 @@ function JuxtaEditorTools({
             startVerse={startVerse}
             curIndex={curIndex}
             endVerse={endVerse}
+            modified={modified}
           />
         </Grid2>
         <Grid2 display="flex" gap={1}>

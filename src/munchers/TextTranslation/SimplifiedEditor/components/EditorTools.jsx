@@ -12,6 +12,7 @@ import usfm2draftJson from "../../../../components/usfm2draftJson";
 import { useNavigate } from "react-router-dom";
 import LayoutIcon from "../layouts/LayoutIcon";
 import { doI18n } from "pithekos-lib";
+import { getFirstChapterTextTranslation } from "../../../../common/findFirstChapter";
 import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
@@ -108,7 +109,7 @@ function EditorTools({
             </Grid2>
 
             <Grid2 display="flex" gap={1}>
-                <BookPicker />
+                <BookPicker setFirstChapter={getFirstChapterTextTranslation}/>
                 <ChapterPicker
                     chapterNumbers={chapterNumbers}
                     repoMetadata={metadata}

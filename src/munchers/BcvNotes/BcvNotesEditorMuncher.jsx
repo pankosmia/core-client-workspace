@@ -11,7 +11,7 @@ import AddFab from "./components/AddFab";
 import SaveTsvButton from "./components/SaveTsvButton";
 import md5 from "md5";
 import BookPicker from "../TextTranslation/SimplifiedEditor/components/BookPicker";
-
+import { getFirstChapterBCVNotes } from "../../common/findFirstChapter";
 function BcvNotesEditorMuncher({ metadata }) {
   const [ingredient, setIngredient] = useState([]);
   const { systemBcv } = useContext(BcvContext);
@@ -101,7 +101,7 @@ function BcvNotesEditorMuncher({ metadata }) {
           md5Ingredient={md5Ingredient}
           setMd5Ingredient={setMd5Ingredient}
         />
-        <BookPicker />
+        <BookPicker  setFirstChapter={getFirstChapterBCVNotes}/>
       </Box>
 
       <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
