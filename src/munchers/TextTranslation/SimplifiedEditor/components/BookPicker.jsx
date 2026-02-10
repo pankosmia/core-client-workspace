@@ -7,7 +7,7 @@ import {
   currentProjectContext as CurrentProjectContext,
   debugContext as DebugContext,
 } from "pankosmia-rcl";
-function BookPicker({ setFirstChapter }) {
+function BookPicker({ setFirstChapter,disable=false }) {
   const { bcvRef } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
   const { i18nRef } = useContext(I18nContext);
@@ -41,6 +41,7 @@ function BookPicker({ setFirstChapter }) {
     <Box sx={{ justifyContent: "space-between" }}>
       <div>
         <TextField
+          disabled={disable}
           label={`${doI18n("pages:core-local-workspace:book", i18nRef.current)}`}
           fullWidth
           id="book-button"

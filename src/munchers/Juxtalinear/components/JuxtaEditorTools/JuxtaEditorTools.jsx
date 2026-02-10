@@ -156,7 +156,9 @@ function JuxtaEditorTools({
         </Grid2>
 
         <Grid2 display="flex" gap={1}>
-          <BookPicker setFirstChapter={getFirstChapterJuxta} />
+          <BookPicker 
+          disable={modified}
+          setFirstChapter={getFirstChapterJuxta} />
           <JuxtaSentencesNav
             onPrevHandler={onPrevHandler}
             onNextHandler={onNextHandler}
