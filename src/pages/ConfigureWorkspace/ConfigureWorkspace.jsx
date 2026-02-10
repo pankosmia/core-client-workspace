@@ -9,8 +9,7 @@ import {
     DialogContent,
     useTheme,
 } from "@mui/material";
-import { PanDialog } from 'pankosmia-rcl';
-import { DataGrid } from '@mui/x-data-grid';
+import { PanDialog, PanTable } from 'pankosmia-rcl';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 import LayoutPicker from "./WorkspaceLayoutButton";
@@ -289,34 +288,27 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
                           }}
                         >
                           <Box sx={{ flex: 1, minHeight: 0 }}>
-                            <DataGrid
-                                getRowId={r => r.path}
-                                initialState={{
-                                    columns: {
-                                        columnVisibilityModel: {
-                                            description: false
-                                        }
-                                    },
-                                    sorting: {
-                                        sortModel: [{ field: 'name', sort: 'asc' }],
-                                    }
-                                }}
+                            <PanTable
                                 checkboxSelection
-                                rowSelectionModel={{ ids: selectedResources, type: "include" }}
-                                onRowSelectionModelChange={nv => setSelectedResources(nv.ids)}
+                                showColumnFilters
+                                theme={theme}
                                 rows={rows}
                                 columns={columns}
-                                sx={{
-                                  fontSize: "1rem",
-                                  height: "100%",
-                                  "& .MuiDataGrid-root": { height: "100%" },
-                                  "& .MuiDataGrid-columnHeaders": {
-                                    position: "sticky",
-                                    top: 0,
-                                    zIndex: 2,
-                                    backgroundColor: "background.paper",
-                                  },
+                                onRowSelectionModelChange={(ids) => {
+                                    const paths = rows.filter(r => ids.includes(r.id)).map(r => r.path);
+                                    setSelectedResources(new Set(paths));
                                 }}
+                                sx={{
+                                    fontSize: "1rem",
+                                    height: "100%",
+                                    "& .MuiTable-root": { height: "100%" }, 
+                                    "& .MuiTableCell-head": { 
+                                      position: "sticky",
+                                      top: 0,
+                                      zIndex: 2,
+                                      backgroundColor: "background.paper",
+                                    },
+                                  }}
                             />
                           </Box>
                         </Box>
