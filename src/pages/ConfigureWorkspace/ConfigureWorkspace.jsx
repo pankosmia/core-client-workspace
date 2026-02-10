@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useCallback } from "react";
+import { useState, useEffect, useContext, useCallback, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getJson, doI18n } from "pithekos-lib";
 import {
@@ -16,8 +16,7 @@ import {
     DialogContent,
     useTheme,
 } from "@mui/material";
-import { PanDialog } from 'pankosmia-rcl';
-import { DataGrid } from '@mui/x-data-grid';
+import { PanDialog, PanTable } from 'pankosmia-rcl';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 import LayoutPicker from "./WorkspaceLayoutButton";
@@ -104,91 +103,56 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
     "x-parallel": "parascriptural",
   };
 
-  const columns = [
-    {
-      field: "name",
-      headerName: doI18n(
-        "pages:core-local-workspace:row_name",
-        i18nRef.current,
-      ),
-      // minWidth: 110,
-      flex: 1,
-    },
-    {
-      field: "description",
-      headerName: doI18n(
-        "pages:core-local-workspace:row_description",
-        i18nRef.current,
-      ),
-      // minWidth: 130,
-      flex: 1,
-    },
-    {
-      field: "source",
-      headerName: doI18n(
-        "pages:core-local-workspace:row_source",
-        i18nRef.current,
-      ),
-      // minWidth: 110,
-      flex: 0.5,
-    },
-    {
-      field: "type",
-      headerName: doI18n(
-        "pages:core-local-workspace:row_type",
-        i18nRef.current,
-      ),
-      // minWidth: 80,
-      flex: 0.4,
-    },
-    {
-      field: "language",
-      headerName: doI18n(
-        "pages:core-local-workspace:row_language",
-        i18nRef.current,
-      ),
-      // minWidth: 100,
-      flex: 0.5,
-    },
-  ];
+    const columns = useMemo(() => [
+        {
+            field: 'name',
+            headerName: doI18n("pages:core-local-workspace:row_name", i18nRef.current),
+            flex: 1
+        },
+        {
+            field: 'description',
+            headerName: doI18n("pages:core-local-workspace:row_description", i18nRef.current),
+            flex: 1
+        },
+        {
+            field: 'source',
+            headerName: doI18n('pages:core-local-workspace:row_source', i18nRef.current),
+            flex: 0.5,
+        },
+        {
+            field: 'type',
+            headerName: doI18n("pages:core-local-workspace:row_type", i18nRef.current),
+            flex: 0.4
+        },
+        {
+            field: 'language',
+            headerName: doI18n("pages:core-local-workspace:row_language", i18nRef.current),
+            flex: 0.5
+        }
+    ], [i18nRef.current]);
 
-  const rows = Object.entries(projectSummaries)
-    .map((e) => {
-      return { ...e[1], path: e[0] };
-    })
-    .filter(
-      (r) =>
-        currentProjectRef.current &&
-        projectFlavors[projectSummaries[r.path].flavor] ===
-          projectFlavors[
-            projectSummaries[
-              `_local_/_local_/${currentProjectRef.current.project}`
-            ].flavor
-          ],
-    )
-    .filter(
-      (r) =>
-        r.path !==
-        `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`,
-    )
-    .map((rep, n) => {
-      return {
-        ...rep,
-        id: n.toString(),
-        name: `${rep.name} (${rep.abbreviation})`,
-        description: rep.description !== rep.name ? rep.description : "",
-        source: rep.path.startsWith("_local_")
-          ? rep.path.startsWith("_local_/_sideloaded_")
-            ? doI18n("pages:content:local_resource", i18nRef.current)
-            : doI18n("pages:content:local_project", i18nRef.current)
-          : `${rep.path.split("/")[1]} (${rep.path.split("/")[0]})`,
-        type: rep.flavor,
-        language:
-          isoThreeLookup?.[
-            isoOneToThreeLookup[rep.language_code] ?? rep.language_code
-          ]?.en ?? rep.language_code,
-      };
-    });
+    const rows = Object.entries(projectSummaries)
+        .map(e => {
+            return { ...e[1], path: e[0] }
+        })
+        .filter((r) => currentProjectRef.current && projectFlavors[projectSummaries[r.path].flavor] === projectFlavors[projectSummaries[`_local_/_local_/${currentProjectRef.current.project}`].flavor])
+        .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
+        .map((rep, n) => {
+            return {
+                ...rep,
+                id: n.toString(),
+                name: `${rep.name} (${rep.abbreviation})`,
+                description: rep.description !== rep.name ? rep.description : "",
+                source: rep.path.startsWith('_local_')
+                    ? rep.path.startsWith('_local_/_sideloaded_')
+                        ? doI18n('pages:content:local_resource', i18nRef.current)
+                        : doI18n('pages:content:local_project', i18nRef.current)
+                    : `${rep.path.split('/')[1]} (${rep.path.split('/')[0]})`,
+                type: rep.flavor,
+                language: isoThreeLookup?.[isoOneToThreeLookup[rep.language_code] ?? rep.language_code]?.en ??
+                    rep.language_code
+            }
+        });
 
   /**
    * Important: These are precise calculations given the state of this component at the time this was set up.
@@ -324,34 +288,27 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
                           }}
                         >
                           <Box sx={{ flex: 1, minHeight: 0 }}>
-                            <DataGrid
-                                getRowId={r => r.path}
-                                initialState={{
-                                    columns: {
-                                        columnVisibilityModel: {
-                                            description: false
-                                        }
-                                    },
-                                    sorting: {
-                                        sortModel: [{ field: 'name', sort: 'asc' }],
-                                    }
-                                }}
+                            <PanTable
                                 checkboxSelection
-                                rowSelectionModel={{ ids: selectedResources, type: "include" }}
-                                onRowSelectionModelChange={nv => setSelectedResources(nv.ids)}
+                                showColumnFilters
+                                theme={theme}
                                 rows={rows}
                                 columns={columns}
-                                sx={{
-                                  fontSize: "1rem",
-                                  height: "100%",
-                                  "& .MuiDataGrid-root": { height: "100%" },
-                                  "& .MuiDataGrid-columnHeaders": {
-                                    position: "sticky",
-                                    top: 0,
-                                    zIndex: 2,
-                                    backgroundColor: "background.paper",
-                                  },
+                                onRowSelectionModelChange={(ids) => {
+                                    const paths = rows.filter(r => ids.includes(r.id)).map(r => r.path);
+                                    setSelectedResources(new Set(paths));
                                 }}
+                                sx={{
+                                    fontSize: "1rem",
+                                    height: "100%",
+                                    "& .MuiTable-root": { height: "100%" }, 
+                                    "& .MuiTableCell-head": { 
+                                      position: "sticky",
+                                      top: 0,
+                                      zIndex: 2,
+                                      backgroundColor: "background.paper",
+                                    },
+                                  }}
                             />
                           </Box>
                         </Box>
