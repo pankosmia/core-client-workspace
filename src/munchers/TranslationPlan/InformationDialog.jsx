@@ -4,9 +4,9 @@ import {
     Typography,
 } from "@mui/material";
 import { PanDialog,PanDialogActions } from 'pankosmia-rcl';
-import { doI18n, i18nContext } from "pithekos-lib";
+import { doI18n } from "pithekos-lib";
 import { useContext } from "react";
-
+import {i18nContext} from 'pankosmia-rcl'
 function InformationDialog({ theme, planIngredient, openDialogAbout, setOpenDialogAbout }) {
     const { i18nRef } = useContext(i18nContext);
     

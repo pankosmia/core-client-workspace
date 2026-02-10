@@ -1,6 +1,6 @@
 import React, { useRef, useContext, useEffect } from 'react';
 import ViewableBibleBlock from "./ViewableBibleBlock";
-import {bcvContext} from "pithekos-lib";
+import {bcvContext} from "pankosmia-rcl";
 
 export default function ViewableBible({ chapterJson, dir }) {
 

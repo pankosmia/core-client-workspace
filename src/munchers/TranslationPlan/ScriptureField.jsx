@@ -2,7 +2,8 @@ import {
     Box,
     Typography
 } from "@mui/material";
-import {i18nContext, doI18n, bcvContext} from "pithekos-lib";
+import { doI18n} from "pithekos-lib";
+import {i18nContext,bcvContext} from "pankosmia-rcl"
 import {useContext} from "react";
 
 function ScriptureField({key, section, verseText, selectedBurritoTextDir}) {

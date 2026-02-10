@@ -3,7 +3,8 @@ import {
     MenuItem,
     TextField
 } from "@mui/material";
-import {doI18n, i18nContext} from "pithekos-lib";
+import {doI18n} from "pithekos-lib";
+import { i18nContext } from "pankosmia-rcl";
 import {useContext} from "react";
 
 function ScripturePicker({burritos, selectedBurrito, setSelectedBurrito}) {

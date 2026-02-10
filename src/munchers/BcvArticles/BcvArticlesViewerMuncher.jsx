@@ -1,18 +1,23 @@
-import {useEffect, useState, useContext} from "react";
-import {Box, Grid2, Typography, Accordion, AccordionSummary, AccordionDetails} from "@mui/material";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Markdown from 'react-markdown';
-
+import { useEffect, useState, useContext } from "react";
 import {
-    i18nContext as I18nContext,
-    debugContext as DebugContext,
-    bcvContext as BcvContext,
-    netContext,
-    doI18n,
-    getText, getJson
-} from "pithekos-lib";
+  Box,
+  Grid2,
+  Typography,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Markdown from "react-markdown";
+import { doI18n, getText, getJson } from "pithekos-lib";
+import {
+  i18nContext as I18nContext,
+  debugContext as DebugContext,
+  bcvContext as BcvContext,
+  netContext,
+} from "pankosmia-rcl";
 
-import TextDir from '../helpers/TextDir';
+import TextDir from "../helpers/TextDir";
 
 function BcvArticlesViewerMuncher({metadata}) {
     const { enabledRef } = useContext(netContext);
@@ -22,34 +27,36 @@ function BcvArticlesViewerMuncher({metadata}) {
       metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     );
 
-    const {systemBcv} = useContext(BcvContext);
-    const {debugRef} = useContext(DebugContext);
-    const {i18nRef} = useContext(I18nContext);
+  const { systemBcv } = useContext(BcvContext);
+  const { debugRef } = useContext(DebugContext);
+  const { i18nRef } = useContext(I18nContext);
 
-    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
-    const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
+  const sbScriptDir = metadata?.script_direction
+    ? metadata.script_direction.toLowerCase()
+    : undefined;
+  const sbScriptDirSet = sbScriptDir === "ltr" || sbScriptDir === "rtl";
 
-    const getAllData = async () => {
-        const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
-        let response = await getText(ingredientLink, debugRef.current);
-        if (response.ok) {
-            setIngredient(
-                response.text
-                    .split("\n")
-                    .map(l => l.split("\t").map(f => f.replace(/\\n/g, "\n\n")))
-            );
-        } else {
-            setIngredient([]);
-        }
-    };
+  const getAllData = async () => {
+    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
+    let response = await getText(ingredientLink, debugRef.current);
+    if (response.ok) {
+      setIngredient(
+        response.text
+          .split("\n")
+          .map((l) => l.split("\t").map((f) => f.replace(/\\n/g, "\n\n"))),
+      );
+    } else {
+      setIngredient([]);
+    }
+  };
 
-    useEffect(
-        () => {
-            getAllData().then();
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [systemBcv]
-    );
+  useEffect(
+    () => {
+      getAllData().then();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [systemBcv],
+  );
 
     useEffect(
         () => {

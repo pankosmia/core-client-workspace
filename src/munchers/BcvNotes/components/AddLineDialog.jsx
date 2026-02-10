@@ -2,10 +2,9 @@ import { useState, useContext, useEffect } from "react";
 import { AppBar, Dialog, IconButton, Toolbar, Typography, Button, Modal, Box } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import TsvLineForm from "./TsvLineForm";
-import {
-    i18nContext as I18nContext,
-    doI18n,
-} from "pithekos-lib";
+
+import { i18nContext as I18nContext } from "pankosmia-rcl";
+import { doI18n } from "pithekos-lib";
 import { v4 as uuidv4 } from 'uuid';
 
 function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRowN, cellValueChanged, setCellValueChanged }) {

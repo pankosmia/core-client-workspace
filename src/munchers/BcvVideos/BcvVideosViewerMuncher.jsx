@@ -2,15 +2,12 @@ import {useEffect, useState, useContext, useRef} from "react";
 import {Box, Stack} from "@mui/material";
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
-
 import {
-    i18nContext as I18nContext,
-    debugContext as DebugContext,
-    bcvContext as BcvContext,
-    doI18n,
-    getText
-} from "pithekos-lib";
-
+  i18nContext as I18nContext,
+  debugContext as DebugContext,
+  bcvContext as BcvContext,
+} from "pankosmia-rcl";
+import { doI18n, getText } from "pithekos-lib";
 import TextDir from '../helpers/TextDir';
 
 function VideoViewer({metadata, reference}) {

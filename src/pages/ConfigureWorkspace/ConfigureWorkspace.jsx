@@ -1,6 +1,13 @@
 import { useState, useEffect, useContext, useCallback, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { debugContext, i18nContext, currentProjectContext, getJson, doI18n, Header } from "pithekos-lib";
+import { getJson, doI18n } from "pithekos-lib";
+import {
+  debugContext,
+  i18nContext,
+  currentProjectContext,
+  Header
+} from "pankosmia-rcl";
+
 import {
     Box,
     Typography,
@@ -35,70 +42,66 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
         }
     }
 
-    useEffect(
-        () => {
-            getProjectSummaries().then();
-        },
-        []
-    );
+  useEffect(() => {
+    getProjectSummaries().then();
+  }, []);
 
-    const handleNext = async () => {
-        setOpen(false);
-        const params = new URLSearchParams(location.search);
-        const returnPage = params.get("return-page");
-        if (returnPage === "workspace") {
-            navigate("/workspace");
-        } else {
-            window.location.replace("/clients/content");
-        }
-    };
+  const handleNext = async () => {
+    setOpen(false);
+    const params = new URLSearchParams(location.search);
+    const returnPage = params.get("return-page");
+    if (returnPage === "workspace") {
+      navigate("/workspace");
+    } else {
+      window.location.replace("/clients/content");
+    }
+  };
 
 
-    useEffect(() => {
-        fetch('/app-resources/lookups/iso639-1-to-3.json') // ISO_639-1 codes mapped to ISO_639-3 codes
-            .then(r => r.json())
-            .then(data => setIsoOneToThreeLookup(data));
-    }, []);
+  useEffect(() => {
+    fetch("/app-resources/lookups/iso639-1-to-3.json") // ISO_639-1 codes mapped to ISO_639-3 codes
+      .then((r) => r.json())
+      .then((data) => setIsoOneToThreeLookup(data));
+  }, []);
 
-    useEffect(() => {
-        fetch('/app-resources/lookups/iso639-3.json') // ISO_639-3 2025-02-21 from https://hisregistries.org/rol/ plus zht, zhs, nep
+  useEffect(() => {
+    fetch("/app-resources/lookups/iso639-3.json") // ISO_639-3 2025-02-21 from https://hisregistries.org/rol/ plus zht, zhs, nep
+      .then((r) => r.json())
+      .then((data) => setIsoThreeLookup(data));
+  }, []);
 
-            .then(r => r.json())
-            .then(data => setIsoThreeLookup(data));
-    }, []);
+  const projectFlavors = {
+    textTranslation: "myBcvList",
+    audioTranslation: "myBcvList",
+    "x-bcvnotes": "myBcvList",
+    "x-bnotes": "myBcvList",
+    "x-bcvarticles": "myBcvList",
+    "x-bcvquestions": "myBcvList",
+    "x-bcvQuestions": "myBcvList",
+    "x-bcvimages": "myBcvList",
+    "x-bcvvideo": "myBcvList",
+    "x-juxtalinear": "myBcvList",
+    "x-parallel": "myBcvList",
+    "x-bcvImages": "myBcvList",
+    textStories: "myObsList",
+    "x-obsimages": [],
+    "x-obsarticles": "myObsList",
+    "x-obsquestions": "myObsList",
+    "x-obsnotes": "myObsList",
+    "x-translationplan": "myBcvList",
+  };
 
-    const projectFlavors = {
-        "textTranslation": "myBcvList",
-        "audioTranslation": "myBcvList",
-        "x-bcvnotes": "myBcvList",
-        "x-bnotes": "myBcvList",
-        "x-bcvarticles": "myBcvList",
-        "x-bcvquestions": "myBcvList",
-        "x-bcvQuestions": "myBcvList",
-        "x-bcvimages": "myBcvList",
-        "x-bcvvideo": "myBcvList",
-        "x-juxtalinear": "myBcvList",
-        "x-parallel": "myBcvList",
-        "x-bcvImages": "myBcvList",
-        "textStories": "myObsList",
-        "x-obsimages": [],
-        "x-obsarticles": "myObsList",
-        "x-obsquestions": "myObsList",
-        "x-obsnotes": "myObsList",
-        "x-translationplan": "myBcvList"
-    };
-
-    const flavorTypes = {
-        textTranslation: "scripture",
-        audioTranslation: "scripture",
-        "x-bcvnotes": "parascriptural",
-        "x-bnotes": "parascriptural",
-        "x-bcvarticles": "parascriptural",
-        "x-bcvquestions": "parascriptural",
-        "x-bcvimages": "parascriptural",
-        "x-juxtalinear": "scripture",
-        "x-parallel": "parascriptural",
-    };
+  const flavorTypes = {
+    textTranslation: "scripture",
+    audioTranslation: "scripture",
+    "x-bcvnotes": "parascriptural",
+    "x-bnotes": "parascriptural",
+    "x-bcvarticles": "parascriptural",
+    "x-bcvquestions": "parascriptural",
+    "x-bcvimages": "parascriptural",
+    "x-juxtalinear": "scripture",
+    "x-parallel": "parascriptural",
+  };
 
     const columns = useMemo(() => [
         {
@@ -128,63 +131,63 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
         }
     ], [i18nRef.current]);
 
-    const rows = useMemo(() => {
-        return Object.entries(projectSummaries)
-            .map(e => {
-                return { ...e[1], path: e[0] }
-            })
-            .filter((r) => currentProjectRef.current && projectFlavors[projectSummaries[r.path].flavor] === projectFlavors[projectSummaries[`_local_/_local_/${currentProjectRef.current.project}`].flavor])
-            .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
-            .map((rep, n) => {
-                return {
-                    ...rep,
-                    id: n.toString(),
-                    name: `${rep.name} (${rep.abbreviation})`,
-                    description: rep.description !== rep.name ? rep.description : "",
-                    source: rep.path.startsWith('_local_')
-                        ? rep.path.startsWith('_local_/_sideloaded_')
-                            ? doI18n('pages:content:local_resource', i18nRef.current)
-                            : doI18n('pages:content:local_project', i18nRef.current)
-                        : `${rep.path.split('/')[1]} (${rep.path.split('/')[0]})`,
-                    type: rep.flavor,
-                    language: isoThreeLookup?.[isoOneToThreeLookup[rep.language_code] ?? rep.language_code]?.en ??
-                        rep.language_code
-                }
-            });
-    }, [projectSummaries, projectFlavors, isoThreeLookup, isoOneToThreeLookup]);
+    const rows = Object.entries(projectSummaries)
+        .map(e => {
+            return { ...e[1], path: e[0] }
+        })
+        .filter((r) => currentProjectRef.current && projectFlavors[projectSummaries[r.path].flavor] === projectFlavors[projectSummaries[`_local_/_local_/${currentProjectRef.current.project}`].flavor])
+        .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
+        .map((rep, n) => {
+            return {
+                ...rep,
+                id: n.toString(),
+                name: `${rep.name} (${rep.abbreviation})`,
+                description: rep.description !== rep.name ? rep.description : "",
+                source: rep.path.startsWith('_local_')
+                    ? rep.path.startsWith('_local_/_sideloaded_')
+                        ? doI18n('pages:content:local_resource', i18nRef.current)
+                        : doI18n('pages:content:local_project', i18nRef.current)
+                    : `${rep.path.split('/')[1]} (${rep.path.split('/')[0]})`,
+                type: rep.flavor,
+                language: isoThreeLookup?.[isoOneToThreeLookup[rep.language_code] ?? rep.language_code]?.en ??
+                    rep.language_code
+            }
+        });
 
-      /**
-       * Important: These are precise calculations given the state of this component at the time this was set up.
-       *              The grid height plus all other elements in the dialog fit inside the PanDialog height.
-       *                 This prevents PanDialog from getting an extra, unwanted scrollbar.
-       *                    Scrolling is inside the DataGrid with a sticky header.
-       *      Wrap beyond the 48px height of the "display options row" is also prevented to avoid unwanted PanDialog scrolling.
-       * Reduce inner hight as follows to get the correct DataGrid height:
-       * - 64px Less PanDialog's default is `max-height: calc(100% - 64px);` (which corresponds to its surrounding 32px margins default)
-       * - 64px Less PanDialog's header
-       * - 20px Less Top Padding
-       * - 48px Less Display options row
-       * - 16px Less Margin
-       *      -> Grid is here. In this case the Pagination row is included in the grid height
-       * - 20px Less Bottom Padding
-       * - 16px Less Bottom Margin
-       *  ------
-       *   248px This is the minimum amount by which to reduce the innerHeight (const adjustment)
-       */
-      const adjustment = 248;
+  /**
+   * Important: These are precise calculations given the state of this component at the time this was set up.
+   *              The grid height plus all other elements in the dialog fit inside the PanDialog height.
+   *                 This prevents PanDialog from getting an extra, unwanted scrollbar.
+   *                    Scrolling is inside the DataGrid with a sticky header.
+   *      Wrap beyond the 48px height of the "display options row" is also prevented to avoid unwanted PanDialog scrolling.
+   * Reduce inner hight as follows to get the correct DataGrid height:
+   * - 64px Less PanDialog's default is `max-height: calc(100% - 64px);` (which corresponds to its surrounding 32px margins default)
+   * - 64px Less PanDialog's header
+   * - 20px Less Top Padding
+   * - 48px Less Display options row
+   * - 16px Less Margin
+   *      -> Grid is here. In this case the Pagination row is included in the grid height
+   * - 20px Less Bottom Padding
+   * - 16px Less Bottom Margin
+   *  ------
+   *   248px This is the minimum amount by which to reduce the innerHeight (const adjustment)
+   */
+  const adjustment = 248;
 
-      const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - adjustment);
+  const [maxWindowHeight, setMaxWindowHeight] = useState(
+    window.innerHeight - adjustment,
+  );
 
-      const handleWindowResize = useCallback(() => {
-          setMaxWindowHeight(window.innerHeight - adjustment);
-      }, []);
+  const handleWindowResize = useCallback(() => {
+    setMaxWindowHeight(window.innerHeight - adjustment);
+  }, []);
 
-      useEffect(() => {
-          window.addEventListener('resize', handleWindowResize);
-          return () => {
-              window.removeEventListener('resize', handleWindowResize);
-          };
-      }, [handleWindowResize]);
+  useEffect(() => {
+    window.addEventListener("resize", handleWindowResize);
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  }, [handleWindowResize]);
 
     return Object.keys(i18nRef.current).length === 0 ?
         <p>...</p> :

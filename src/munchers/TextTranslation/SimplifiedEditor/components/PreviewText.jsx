@@ -1,132 +1,155 @@
 import { SofriaRenderFromProskomma, render } from "proskomma-json-tools";
-import { Proskomma } from 'proskomma-core';
-import { getText, debugContext, i18nContext, doI18n, getJson, typographyContext } from "pithekos-lib";
+import { Proskomma } from "proskomma-core";
+import { getText, doI18n, getJson } from "pithekos-lib";
+import { debugContext, i18nContext, typographyContext } from "pankosmia-rcl";
 import { enqueueSnackbar } from "notistack";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useTheme } from "@mui/material";
-import GraphiteTest from './GraphiteTest';
-import TextDir from '../../../helpers/TextDir';
+import GraphiteTest from "./GraphiteTest";
+import TextDir from "../../../helpers/TextDir";
 
-function PreviewText({ open,setOpenModalPreviewText, metadata, systemBcv }) {
-    const { i18nRef } = useContext(i18nContext);
-    const { debugRef } = useContext(debugContext);
-    const fileExport = useRef();
-    const [showTitles, setShowTitles] = useState(true);
-    const [showHeadings, setShowHeadings] = useState(true);
-    const [showIntroductions, setShowIntroductions] = useState(true);
-    const [showFootnotes, setShowFootnotes] = useState(false);
-    const [showXrefs, setShowXrefs] = useState(false);
-    const [showParaStyles, setShowParaStyles] = useState(true);
-    const [showCharacterMarkup, setShowCharacterMarkup] = useState(true);
-    const [showChapterLabels, setShowChapterLabels] = useState(true);
-    const [showVersesLabels, setShowVersesLabels] = useState(true);
-    const [showFirstVerseLabel, setShowFirstVerseLabel] = useState(true);
-    const [selectedColumns, setSelectedColumns] = useState(2);
+function PreviewText({ open, setOpenModalPreviewText, metadata, systemBcv }) {
+  const { i18nRef } = useContext(i18nContext);
+  const { debugRef } = useContext(debugContext);
+  const fileExport = useRef();
+  const [showTitles, setShowTitles] = useState(true);
+  const [showHeadings, setShowHeadings] = useState(true);
+  const [showIntroductions, setShowIntroductions] = useState(true);
+  const [showFootnotes, setShowFootnotes] = useState(false);
+  const [showXrefs, setShowXrefs] = useState(false);
+  const [showParaStyles, setShowParaStyles] = useState(true);
+  const [showCharacterMarkup, setShowCharacterMarkup] = useState(true);
+  const [showChapterLabels, setShowChapterLabels] = useState(true);
+  const [showVersesLabels, setShowVersesLabels] = useState(true);
+  const [showFirstVerseLabel, setShowFirstVerseLabel] = useState(true);
+  const [selectedColumns, setSelectedColumns] = useState(2);
 
-    const { typographyRef } = useContext(typographyContext);
+  const { typographyRef } = useContext(typographyContext);
 
-    useEffect(() => {
-        if (open) {
-            generatePdf(fileExport.current);
-        }
-    }, [open]);
+  useEffect(() => {
+    if (open) {
+      generatePdf(fileExport.current);
+    }
+  }, [open]);
 
-    const isGraphite = GraphiteTest()
-    /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
-    const adjSelectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
+  const isGraphite = GraphiteTest();
+  /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
+  const adjSelectedFontClass = isGraphite
+    ? typographyRef.current.font_set
+    : typographyRef.current.font_set.replace(
+        /Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/gi,
+        "Pankosmia-NotoNastaliqUrdu",
+      );
 
-    // Eliminating _webfonts.css pdf load by getting computed font styles.
-    const [adjSelectedFontFamilies, setAdjSelectedFontFamilies] = useState(null);
-    useEffect(() => {
-      const element = document.getElementById('fontWrapper');
-      const computedStyles = window.getComputedStyle(element);
-      setAdjSelectedFontFamilies(computedStyles.fontFamily);
-    }, [adjSelectedFontClass]);
+  // Eliminating _webfonts.css pdf load by getting computed font styles.
+  const [adjSelectedFontFamilies, setAdjSelectedFontFamilies] = useState(null);
+  useEffect(() => {
+    const element = document.getElementById("fontWrapper");
+    const computedStyles = window.getComputedStyle(element);
+    setAdjSelectedFontFamilies(computedStyles.fontFamily);
+  }, [adjSelectedFontClass]);
 
-    const theme = useTheme(); // used for DOM preview print button style
+  const theme = useTheme(); // used for DOM preview print button style
 
-    const generatePdf = async (bookCode) => {
-        let pdfHtml;
-        if (metadata) {
-            const pdfTemplate = `<section style="page-break-inside: avoid"> %%BODY%% </section>`;
-            const bookUrl = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`;
-            const bookUsfmResponse = await getText(bookUrl, debugRef.current);
-            if (!bookUsfmResponse.ok) {
-                enqueueSnackbar(
-                    `${doI18n("pages:content:could_not_fetch", i18nRef.current)} ${bookCode}`,
-                    { variant: "error" }
-                );
-                return false;
-            }
-            const sectionConfig = {
-                "showWordAtts": false,
-                "showTitles": showTitles,
-                "showHeadings": showHeadings,
-                "showIntroductions": showIntroductions,
-                "showFootnotes": showFootnotes,
-                "showXrefs": showXrefs,
-                "showParaStyles": showParaStyles,
-                "showCharacterMarkup": showCharacterMarkup,
-                "showChapterLabels": showChapterLabels,
-                "showVersesLabels": showVersesLabels,
-                "showFirstVerseLabel": showFirstVerseLabel,
-                "nColumns": selectedColumns,
-                "showGlossaryStar": false
-            }
-            const pk = new Proskomma();
-            pk.importDocument({
-                lang: "xxx",
-                abbr: "yyy"
-            },
-                "usfm",
-                bookUsfmResponse.text
-            );
-            const docId = pk.gqlQuerySync('{documents { id } }').data.documents[0].id;
-            const actions = render.sofria2web.renderActions.sofria2WebActions;
-            const renderers = render.sofria2web.sofria2html.renderers;
-            const cl = new SofriaRenderFromProskomma({ proskomma: pk, actions, debugLevel: 0 })
-            const output = {};
-            sectionConfig.selectedBcvNotes = ["foo"];
-            sectionConfig.renderers = renderers;
-            sectionConfig.renderers.verses_label = vn => {
-                return `<span class="marks_verses_label">${vn}</span>`;
-            };
-            cl.renderDocument({ docId, config: sectionConfig, output });
-            pdfHtml = pdfTemplate.replace("%%BODY%%", output.paras);
+  const generatePdf = async (bookCode) => {
+    let pdfHtml;
+    if (metadata) {
+      const pdfTemplate = `<section style="page-break-inside: avoid"> %%BODY%% </section>`;
+      const bookUrl = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`;
+      const bookUsfmResponse = await getText(bookUrl, debugRef.current);
+      if (!bookUsfmResponse.ok) {
+        enqueueSnackbar(
+          `${doI18n("pages:content:could_not_fetch", i18nRef.current)} ${bookCode}`,
+          { variant: "error" },
+        );
+        return false;
+      }
+      const sectionConfig = {
+        showWordAtts: false,
+        showTitles: showTitles,
+        showHeadings: showHeadings,
+        showIntroductions: showIntroductions,
+        showFootnotes: showFootnotes,
+        showXrefs: showXrefs,
+        showParaStyles: showParaStyles,
+        showCharacterMarkup: showCharacterMarkup,
+        showChapterLabels: showChapterLabels,
+        showVersesLabels: showVersesLabels,
+        showFirstVerseLabel: showFirstVerseLabel,
+        nColumns: selectedColumns,
+        showGlossaryStar: false,
+      };
+      const pk = new Proskomma();
+      pk.importDocument(
+        {
+          lang: "xxx",
+          abbr: "yyy",
+        },
+        "usfm",
+        bookUsfmResponse.text,
+      );
+      const docId = pk.gqlQuerySync("{documents { id } }").data.documents[0].id;
+      const actions = render.sofria2web.renderActions.sofria2WebActions;
+      const renderers = render.sofria2web.sofria2html.renderers;
+      const cl = new SofriaRenderFromProskomma({
+        proskomma: pk,
+        actions,
+        debugLevel: 0,
+      });
+      const output = {};
+      sectionConfig.selectedBcvNotes = ["foo"];
+      sectionConfig.renderers = renderers;
+      sectionConfig.renderers.verses_label = (vn) => {
+        return `<span class="marks_verses_label">${vn}</span>`;
+      };
+      cl.renderDocument({ docId, config: sectionConfig, output });
+      pdfHtml = pdfTemplate.replace("%%BODY%%", output.paras);
+    }
+    const textDir = await TextDir(pdfHtml, "html");
 
-        }
-        const textDir = await TextDir(pdfHtml, 'html');
+    const pdfType = "para";
+    const cssFile = () => {
+      if (pdfType === "para") {
+        return textDir === "ltr"
+          ? "/app-resources/pdf/para_bible_page_styles.css"
+          : "/app-resources/pdf/para_bible_page_styles_rtl.css";
+      } else {
+        return textDir === "ltr"
+          ? "/app-resources/pdf/bcv_bible_page_styles.css"
+          : "/app-resources/pdf/bcv_bible_page_styles_rtl.css";
+      }
+    };
 
-        const pdfType = 'para';
-        const cssFile = () => {
-          if (pdfType === "para") {
-            return (textDir === "ltr" ? "/app-resources/pdf/para_bible_page_styles.css" : "/app-resources/pdf/para_bible_page_styles_rtl.css");
-          } else {
-            return (textDir === "ltr" ? "/app-resources/pdf/bcv_bible_page_styles.css" : "/app-resources/pdf/bcv_bible_page_styles_rtl.css");
-          }
-        }
+    // Extract names of font css files called by the font class
+    const parts = adjSelectedFontClass
+      .replace("fonts-", "")
+      .split("Pankosmia-");
+    const formatPart = (part) => {
+      return part
+        .replace(/([a-z])(?=[A-Z])/g, "$1_")
+        .replace(/SILSR/g, "SIL_SR"); // Insert underscores between lowercase and uppercase letters and handle SILSR
+    };
+    const fontUrlFilenames = parts
+      .map((part) => {
+        const formattedPart = formatPart(part);
+        return formattedPart ? `/webfonts/pankosmia-${formattedPart}.css` : "";
+      })
+      .filter(Boolean); // Remove empty values
 
-        // Extract names of font css files called by the font class
-        const parts = adjSelectedFontClass.replace("fonts-", "").split("Pankosmia-");
-        const formatPart = (part) => {
-            return part.replace(/([a-z])(?=[A-Z])/g, '$1_').replace(/SILSR/g, 'SIL_SR'); // Insert underscores between lowercase and uppercase letters and handle SILSR
-        };
-        const fontUrlFilenames = parts.map((part) => {
-            const formattedPart = formatPart(part);
-            return formattedPart ? `/webfonts/pankosmia-${formattedPart}.css` : '';
-        }).filter(Boolean); // Remove empty values
+    const adjSelectedFontFamiliesStr = adjSelectedFontFamilies.replace(
+      /"/g,
+      "'",
+    );
 
-        const adjSelectedFontFamiliesStr = adjSelectedFontFamilies.replace(/"/g, "'");
-
-        const openPagedPreviewForPdf = async () => {
-          const server = window.location.origin;
-          const dirAttr = textDir === 'rtl' ? ' dir="rtl"' : '';
-          const contentHtml = `
+    const openPagedPreviewForPdf = async () => {
+      const server = window.location.origin;
+      const dirAttr = textDir === "rtl" ? ' dir="rtl"' : "";
+      const contentHtml = `
               <div id="content"${dirAttr} style="font-family: ${adjSelectedFontFamiliesStr};">
                   ${pdfHtml}
               </div>
               <div id="preview-print-host">
-                  <button id="preview-print" type="button">${doI18n("pages:content:print", i18nRef.current) || 'Print'}</button>
+                  <button id="preview-print" type="button">${doI18n("pages:content:print", i18nRef.current) || "Print"}</button>
               </div>
               <script>
                   (function(){
@@ -284,73 +307,82 @@ function PreviewText({ open,setOpenModalPreviewText, metadata, systemBcv }) {
                 </script>
           `;
 
-          const openFn = (url => window.open(url, '_blank'));
-          const previewWin = openFn('about:blank');
-          if (!previewWin) return; // window.open failed or was blocked
-          try {
-             void previewWin.document; // attempt to read document property
-          } catch (e) {
-            return; // window currently inaccessible (e.g., not yet initialized or cross‑origin)
-          }
-          // Pass values to previewWin
-          previewWin.__printButtonText = doI18n("pages:core-local-workspace:print", i18nRef.current);
-          previewWin.__printButtonBackgroundColor = theme.palette.primary.main;
-          previewWin.__printButtonColor = theme.palette.primary.contrastText;
+      const openFn = (url) => window.open(url, "_blank");
+      const previewWin = openFn("about:blank");
+      if (!previewWin) return; // window.open failed or was blocked
+      try {
+        void previewWin.document; // attempt to read document property
+      } catch (e) {
+        return; // window currently inaccessible (e.g., not yet initialized or cross‑origin)
+      }
+      // Pass values to previewWin
+      previewWin.__printButtonText = doI18n(
+        "pages:core-local-workspace:print",
+        i18nRef.current,
+      );
+      previewWin.__printButtonBackgroundColor = theme.palette.primary.main;
+      previewWin.__printButtonColor = theme.palette.primary.contrastText;
 
-          // Initial Content
-          previewWin.document.open();
-          previewWin.document.write(contentHtml);
-          previewWin.document.close();
+      // Initial Content
+      previewWin.document.open();
+      previewWin.document.write(contentHtml);
+      previewWin.document.close();
 
-          // Ensure head exists
-          if (!previewWin.document.head) {
-            const head = previewWin.document.createElement('head');
-            previewWin.document.documentElement.insertBefore(head, previewWin.document.documentElement.firstChild);
-          }
+      // Ensure head exists
+      if (!previewWin.document.head) {
+        const head = previewWin.document.createElement("head");
+        previewWin.document.documentElement.insertBefore(
+          head,
+          previewWin.document.documentElement.firstChild,
+        );
+      }
 
-          // Set the page title.
-          previewWin.document.title = doI18n("pages:core-local-workspace:pdf_preview", i18nRef.current);
+      // Set the page title.
+      previewWin.document.title = doI18n(
+        "pages:core-local-workspace:pdf_preview",
+        i18nRef.current,
+      );
 
-          // Wait until document.body is present, retrying until body exists or timeout.
-          const waitForBody = (win, timeout = 3000) => {
-            return new Promise((resolve, reject) => {
-              const start = Date.now();
-              const check = () => {
-                try {
-                  if (win.document && win.document.body) return resolve();
-                } catch (e) {
-                    // Access may throw while the new window is not ready or is cross-origin; Retry until timeout.
-                }
-                if (Date.now() - start > timeout) return reject(new Error('preview body timeout'));
-                setTimeout(check, 25);
-              };
-              check();
-            });
+      // Wait until document.body is present, retrying until body exists or timeout.
+      const waitForBody = (win, timeout = 3000) => {
+        return new Promise((resolve, reject) => {
+          const start = Date.now();
+          const check = () => {
+            try {
+              if (win.document && win.document.body) return resolve();
+            } catch (e) {
+              // Access may throw while the new window is not ready or is cross-origin; Retry until timeout.
+            }
+            if (Date.now() - start > timeout)
+              return reject(new Error("preview body timeout"));
+            setTimeout(check, 25);
           };
-          await waitForBody(previewWin);
+          check();
+        });
+      };
+      await waitForBody(previewWin);
 
-          // Append PagedJS
-          const script = previewWin.document.createElement('script');
-          script.src = `${server}/app-resources/pdf/paged.polyfill.js`;
-          previewWin.document.head.appendChild(script);
+      // Append PagedJS
+      const script = previewWin.document.createElement("script");
+      script.src = `${server}/app-resources/pdf/paged.polyfill.js`;
+      previewWin.document.head.appendChild(script);
 
-          const loadStyles = (href) => {
-              const link = previewWin.document.createElement('link');
-              link.rel = "stylesheet";
-              link.href = href;
-              previewWin.document.head.appendChild(link);
-          };
+      const loadStyles = (href) => {
+        const link = previewWin.document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = href;
+        previewWin.document.head.appendChild(link);
+      };
 
-          // Load styles
-          loadStyles(`${server}${cssFile()}`);
-          fontUrlFilenames.forEach(loadStyles);
+      // Load styles
+      loadStyles(`${server}${cssFile()}`);
+      fontUrlFilenames.forEach(loadStyles);
+    };
 
-        };
-
-        openPagedPreviewForPdf();
-        setOpenModalPreviewText(false);
-        return true;
-    }
+    openPagedPreviewForPdf();
+    setOpenModalPreviewText(false);
+    return true;
+  };
 }
 
 export default PreviewText;

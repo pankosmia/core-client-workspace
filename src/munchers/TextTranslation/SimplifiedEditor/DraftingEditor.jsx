@@ -1,11 +1,11 @@
-import {useEffect, useContext, useState} from "react";
+import { useEffect, useContext, useState } from "react";
+import { getText } from "pithekos-lib";
 import {
-    bcvContext as BcvContext,
-    debugContext as DebugContext,
-    getText
-} from "pithekos-lib";
-import {Box, Typography} from "@mui/material";
-import usfm2draftJson from '../../../components/usfm2draftJson';
+  bcvContext as BcvContext,
+  debugContext as DebugContext,
+} from "pankosmia-rcl";
+import { Box, Typography } from "@mui/material";
+import usfm2draftJson from "../../../components/usfm2draftJson";
 import EditableBible from "./components/EditableBible";
 import md5sum from "md5";
 import EditorTools from "./components/EditorTools";
@@ -31,16 +31,18 @@ function DraftingEditor(
       metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     );
 
-    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
-    const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
+  const sbScriptDir = metadata?.script_direction
+    ? metadata.script_direction.toLowerCase()
+    : undefined;
+  const sbScriptDirSet = sbScriptDir === "ltr" || sbScriptDir === "rtl";
 
-    // Set up 'are you sure you want to leave page' for Electron
-    useEffect(() => {
-        const isElectron = !!window.electronAPI;
-        if (isElectron) {
-            window.electronAPI.setCanClose(!modified);
-        }
-    }, [modified]);
+  // Set up 'are you sure you want to leave page' for Electron
+  useEffect(() => {
+    const isElectron = !!window.electronAPI;
+    if (isElectron) {
+      window.electronAPI.setCanClose(!modified);
+    }
+  }, [modified]);
 
     // Get whole book content
     useEffect(() => {
@@ -77,41 +79,46 @@ function DraftingEditor(
         [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]
     );
 
-useEffect(() => {
-  if (!sbScriptDirSet) {
-      const contentText = ExtractJsonValues(scriptureJson, ['content']).toString().replace(/,/g, "");
-      const dir = TextDir(contentText, 'text');
+  useEffect(() => {
+    if (!sbScriptDirSet) {
+      const contentText = ExtractJsonValues(scriptureJson, ["content"])
+        .toString()
+        .replace(/,/g, "");
+      const dir = TextDir(contentText, "text");
       if (textDir !== dir) {
-          setTextDir(dir);
+        setTextDir(dir);
       }
-  }
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, [scriptureJson, sbScriptDirSet])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scriptureJson, sbScriptDirSet]);
 
-    return <>
-        <EditorTools
-            metadata={metadata}
-            modified={modified}
-            setModified={setModified}
-            md5sumScriptureJson={md5sumScriptureJson}
-            setMd5sumScriptureJson={setMd5sumScriptureJson}
+  return (
+    <>
+      <EditorTools
+        metadata={metadata}
+        modified={modified}
+        setModified={setModified}
+        md5sumScriptureJson={md5sumScriptureJson}
+        setMd5sumScriptureJson={setMd5sumScriptureJson}
+        scriptureJson={scriptureJson}
+        currentBookCode={currentBookCode}
+        setCurrentBookCode={setCurrentBookCode}
+      />
+      {/** If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard */}
+      <Box dir={!sbScriptDirSet ? textDir : undefined}>
+        {chapterJson ? (
+          <EditableBible
+            chapterJson={chapterJson}
             scriptureJson={scriptureJson}
-            currentBookCode={currentBookCode}
-            setCurrentBookCode={setCurrentBookCode}
-        />
-        {/** If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard */}
-        <Box dir={!sbScriptDirSet ? textDir : undefined}>
-            {
-                chapterJson ? <EditableBible
-                        chapterJson={chapterJson}
-                        scriptureJson={scriptureJson}
-                        setScriptureJson={setScriptureJson}
-                        key={bookChangeCount}
-                    /> :
-                    <Typography> loading ...</Typography>
-            }
-        </Box>
-    </>;
+            setScriptureJson={setScriptureJson}
+            key={bookChangeCount}
+          />
+        ) : (
+          <Typography> loading ...</Typography>
+        )}
+      </Box>
+    </>
+  );
 }
 
 export default DraftingEditor;

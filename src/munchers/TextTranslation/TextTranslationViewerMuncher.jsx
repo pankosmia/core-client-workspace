@@ -3,10 +3,10 @@ import usfm2draftJson from "../../components/usfm2draftJson";
 import filterByChapter from "../../components/filterByChapter";
 import ViewableBible from "./SimplifiedEditor/components/ViewableBible";
 
-import {getText, debugContext, bcvContext} from "pithekos-lib";
-
+import { getText } from "pithekos-lib";
+import { debugContext, bcvContext } from "pankosmia-rcl";
 import "./TextTranslationViewerMuncher.css";
-import TextDir from '../helpers/TextDir';
+import TextDir from "../helpers/TextDir";
 
 function TextTranslationViewerMuncher({metadata}) {
     const {systemBcv} = useContext(bcvContext);
@@ -16,8 +16,10 @@ function TextTranslationViewerMuncher({metadata}) {
       metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     );
 
-    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
-    const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
+  const sbScriptDir = metadata?.script_direction
+    ? metadata.script_direction.toLowerCase()
+    : undefined;
+  const sbScriptDirSet = sbScriptDir === "ltr" || sbScriptDir === "rtl";
 
     useEffect(
         () => {
