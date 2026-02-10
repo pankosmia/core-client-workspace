@@ -1,10 +1,8 @@
 import { useContext } from "react";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from "@mui/material";
-import {
-    i18nContext as I18nContext,
-    doI18n,
-} from "pithekos-lib";
 
+import { i18nContext as I18nContext } from "pankosmia-rcl";
+import { doI18n } from "pithekos-lib";
 function DeleteNote({open,closeModal, ingredient, setIngredient, rowData, currentRowN }) {
     const { i18nRef } = useContext(I18nContext);
 

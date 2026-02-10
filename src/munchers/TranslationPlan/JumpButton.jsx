@@ -6,7 +6,8 @@ import {
     TextField,
     Tooltip
 } from "@mui/material";
-import {i18nContext, doI18n, debugContext, postEmptyJson} from "pithekos-lib";
+import { doI18n, postEmptyJson} from "pithekos-lib";
+import {i18nContext, debugContext} from "pankosmia-rcl"
 import SearchIcon from '@mui/icons-material/Search';
 import {useContext, useState} from "react";
 

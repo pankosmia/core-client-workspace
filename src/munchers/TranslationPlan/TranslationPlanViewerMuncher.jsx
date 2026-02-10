@@ -1,17 +1,23 @@
-import {useContext, useEffect, useState} from "react";
+import { useContext, useEffect, useState } from "react";
 import {
     Box,
     IconButton,
     Typography,
     useTheme
 } from "@mui/material";
-import {bcvContext as BcvContext, getText, debugContext} from "pithekos-lib";
-import InfoIcon from '@mui/icons-material/Info';
-import SearchIcon from '@mui/icons-material/Search';
-import {Proskomma} from "proskomma-core";
-import {PanDialog,PanDialogActions} from 'pankosmia-rcl';
+import { doI18n, postEmptyJson, getText } from "pithekos-lib";
+import {
+  bcvContext as BcvContext,
+  debugContext,
+  i18nContext,
+} from "pankosmia-rcl";
 
-import TextDir from '../helpers/TextDir';
+import InfoIcon from "@mui/icons-material/Info";
+import SearchIcon from "@mui/icons-material/Search";
+import { Proskomma } from "proskomma-core";
+import { PanDialog } from "pankosmia-rcl";
+
+import TextDir from "../helpers/TextDir";
 import ExtractJsonValues from "../helpers/ExtractJsonValues";
 import InformationDialog from "./InformationDialog";
 import processUsfm from "./processUsfm";
@@ -36,8 +42,10 @@ function TranslationPlanViewerMuncher({metadata}) {
     const [selectedBurritoTextDir, setSelectedBurritoTextDir] = useState(undefined);
     const [openDialogAbout, setOpenDialogAbout] = useState(false);
 
-    const sbScriptDir = metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
-    const sbScriptDirSet = sbScriptDir === 'ltr' || sbScriptDir === 'rtl';
+  const sbScriptDir = metadata?.script_direction
+    ? metadata.script_direction.toLowerCase()
+    : undefined;
+  const sbScriptDirSet = sbScriptDir === "ltr" || sbScriptDir === "rtl";
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -84,15 +92,15 @@ function TranslationPlanViewerMuncher({metadata}) {
                     )
                 );
 
-                // Filter only scripture burritos
-                const scriptures = burritoArray.filter(
-                    (item) => item?.flavor === "textTranslation"
-                );
-                setBurritos(scriptures);
-            } catch (err) {
-                console.error(err);
-            }
-        }
+        // Filter only scripture burritos
+        const scriptures = burritoArray.filter(
+          (item) => item?.flavor === "textTranslation",
+        );
+        setBurritos(scriptures);
+      } catch (err) {
+        console.error("Error fetching summaries:", err);
+      }
+    }
 
         fetchSummaries().then();
     }, [selectedBurrito]);
