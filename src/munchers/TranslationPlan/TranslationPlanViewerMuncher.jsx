@@ -54,33 +54,28 @@ function TranslationPlanViewerMuncher({metadata}) {
         setOpenDialogAbout(true);
     }
 
-    useEffect(
-        () => {
-            const getChapterText = async () => {
-                if (selectedBurrito) {
-                    let usfmResponse = await getText(`/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`,
-                        debugRef.current
-                    );
-                    if (usfmResponse.ok) {
-                        const sbSelectedScriptDirSet = selectedBurritoSbTextDir === 'ltr' || selectedBurritoSbTextDir === 'rtl';
-                        if (!sbSelectedScriptDirSet) {
-                            const dir = await TextDir(usfmResponse.text, 'usfm');
-                            if (dir !== sbSelectedScriptDirSet) {
-                                setSelectedBurritoTextDir(dir);
-                            }
-                        }
-                        const newVerseText = processUsfm(usfmResponse.text);
-                        setVerseText(newVerseText);
-                    } else {
-                        setVerseText([]);
-                    }
+    useEffect(() => {
+        const getChapterText = async () => {
+            if (!selectedBurrito || !systemBcv?.bookCode) {
+                return;
+            }
+            try {
+                const url = `/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`;
+                const usfmResponse = await getText(url, debugRef.current);
+                
+                if (usfmResponse?.ok) {
+                    const newVerseText = processUsfm(usfmResponse.text);
+                    setVerseText(newVerseText);
+                } else {
+                    setVerseText({});
                 }
-            };
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        getChapterText();
+    }, [systemBcv.bookCode, selectedBurrito]);
 
-            getChapterText().then();
-        },
-        [debugRef, systemBcv.bookCode, selectedBurrito, selectedBurritoSbTextDir]
-    );
     useEffect(() => {
         async function fetchSummaries() {
             try {
@@ -127,7 +122,7 @@ function TranslationPlanViewerMuncher({metadata}) {
                 const url = selectedBurritoTextDir === "ltr" ? "/app-resources/usfm/bible_page_styles.css" : "/app-resources/usfm/bible_page_styles_rtl.css";
                 const response = await fetch(url);
                 if (!response.ok) {
-                    console.error("Erreur de chargement du CSS :", response.status);
+                    console.error(response.status);
                     return;
                 }
                 const cssText = await response.text();
@@ -169,10 +164,11 @@ function TranslationPlanViewerMuncher({metadata}) {
         const [endChapter, endVerse] = section.cv[1].split(":").map(Number);
         const chapterNum = systemBcv.chapterNum;
         const verseNum = systemBcv.verseNum;
-        return (
-            (chapterNum > startChapter || (chapterNum === startChapter && verseNum >= startVerse)) &&
-            (chapterNum < endChapter || (chapterNum === endChapter && verseNum <= endVerse))
-        );
+    
+        if (chapterNum < startChapter || chapterNum > endChapter) return false;
+        if (chapterNum === startChapter && verseNum < startVerse) return false;
+        if (chapterNum === endChapter && verseNum > endVerse) return false;
+        return true;
     };
 
     if (!planIngredient) {
@@ -229,6 +225,7 @@ function TranslationPlanViewerMuncher({metadata}) {
                                                         key={i}
                                                         section={section}
                                                         verseText={verseText}
+                                                        systemBcv={systemBcv}
                                                         selectedBurritoTextDir={selectedBurritoTextDir}
                                                     />
                                                 } else {
