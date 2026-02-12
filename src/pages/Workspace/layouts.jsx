@@ -1,5 +1,6 @@
 import WorkspaceCard from "./WorkspaceCard";
 import { doI18n } from "pithekos-lib";
+import WorkspaceCruncherCard from "./WorkspaceCruncherCard";
 
 const paneStyle = {
     width: '100%',
@@ -61,22 +62,36 @@ const layoutJson = (resources, layoutId, i18nRef, distractionModeCount) => {
         rp.children = [rp.children[0], null];
     }
     for (const resource of Object.values(resources)) {
-        let location = `${resource.local_path.split('/').slice(0, 2).reverse().join(" - ")}`;
-        if (resource.local_path.split('/')[1].startsWith("_")) {
-            location = doI18n(`pages:core-local-workspace:${resource.local_path.split('/')[1]}`, i18nRef.current);
-        }
-        const title = `${resource.name} (${location})`;
-        te[title] = <WorkspaceCard
-            metadata={resource}
-            style={paneStyle}
-            distractionModeCount={distractionModeCount}
-        />;
-        if (resource.primary) {
-            rp.children[layoutSpec.editorPos] = { children: title };
-        } else {
-            rp.children[1 - layoutSpec.editorPos].children.push({ children: title });
+        if (resource.local_path) { // muncher
+            let location = `${resource.local_path.split('/').slice(0, 2).reverse().join(" - ")}`;
+            if (resource.local_path.split('/')[1].startsWith("_")) {
+                location = doI18n(`pages:core-local-workspace:${resource.local_path.split('/')[1]}`, i18nRef.current);
+            }
+            const title = `${resource.name} (${location})`;
+            te[title] = <WorkspaceCard
+                metadata={resource}
+                style={paneStyle}
+                distractionModeCount={distractionModeCount}
+            />;
+            if (resource.primary) {
+                rp.children[layoutSpec.editorPos] = {children: title};
+            } else {
+                rp.children[1 - layoutSpec.editorPos].children.push({children: title});
+            }
+        } else { // TODO cruncher
         }
     }
+    // Temporary hack to see cruncher
+    te["Rhakos"] = <WorkspaceCruncherCard
+        metadata={{
+            type: "rhakos",
+            name: "Rhakos",
+            description: "A RAG chatbot"
+        }}
+        style={paneStyle}
+        distractionModeCount={distractionModeCount}
+    />;
+    rp.children[1 - layoutSpec.editorPos].children.push({children: "Rhakos"});
     if (rp.children[1 - layoutSpec.editorPos].children.length === 0) {
         layoutSpec.editorPos ? rp.children.shift() : rp.children.pop();
     }
