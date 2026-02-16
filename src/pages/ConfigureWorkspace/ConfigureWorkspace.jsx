@@ -34,6 +34,7 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
     const [alignment, setAlignment] = useState(selectedResources.size === 0 ? "" : layout);
     const theme= useTheme();
+    const [contentBooks, setContentBooks] = useState();
 
     const getProjectSummaries = async () => {
         const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
@@ -69,6 +70,26 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
       .then((r) => r.json())
       .then((data) => setIsoThreeLookup(data));
   }, []);
+
+  useEffect(() => {
+    const getProjectBooks = async () => {
+      if (currentProjectRef.current) {
+        const projectPath = `${currentProjectRef.current.source}/${currentProjectRef.current.organization}/${currentProjectRef.current.project}`;
+        const fullMetadataResponse = await getJson(
+          `/burrito/metadata/summary/${projectPath}`,
+          debugRef.current,
+        );
+        if (fullMetadataResponse.ok) {
+          console.log(fullMetadataResponse.json);
+          setContentBooks(new Set(fullMetadataResponse.json.book_codes));
+        }
+        if (!fullMetadataResponse.ok) {
+          fullMetadataResponse.json
+        }
+      }
+    };
+    getProjectBooks().then();
+  }, [currentProjectRef.current]);
 
   const projectFlavors = {
     textTranslation: "myBcvList",
@@ -131,28 +152,32 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
         }
     ], [i18nRef.current]);
 
-    const rows = Object.entries(projectSummaries)
-        .map(e => {
-            return { ...e[1], path: e[0] }
-        })
-        .filter((r) => currentProjectRef.current && projectFlavors[projectSummaries[r.path].flavor] === projectFlavors[projectSummaries[`_local_/_local_/${currentProjectRef.current.project}`].flavor])
-        .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
-        .map((rep, n) => {
-            return {
-                ...rep,
-                id: n.toString(),
-                name: `${rep.name} (${rep.abbreviation})`,
-                description: rep.description !== rep.name ? rep.description : "",
-                source: rep.path.startsWith('_local_')
-                    ? rep.path.startsWith('_local_/_sideloaded_')
-                        ? doI18n('pages:content:local_resource', i18nRef.current)
-                        : doI18n('pages:content:local_project', i18nRef.current)
-                    : `${rep.path.split('/')[1]} (${rep.path.split('/')[0]})`,
-                type: rep.flavor,
-                language: isoThreeLookup?.[isoOneToThreeLookup[rep.language_code] ?? rep.language_code]?.en ??
-                    rep.language_code
-            }
-        });
+    const rows = useMemo(() => {
+        return Object.entries(projectSummaries)
+          .map(e => {
+              return { ...e[1], path: e[0] }
+          })
+          .filter((r) => currentProjectRef.current && projectFlavors[projectSummaries[r.path].flavor] === projectFlavors[projectSummaries[`_local_/_local_/${currentProjectRef.current.project}`].flavor])
+          .filter(r => r.path !== `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`)
+          .filter(r => !contentBooks || contentBooks.size === 0 || new Set(r.book_codes).intersection(contentBooks).size > 0)
+          .map((rep, n) => {
+              return {
+                  ...rep,
+                  id: n.toString(),
+                  name: `${rep.name} (${rep.abbreviation})`,
+                  description: rep.description !== rep.name ? rep.description : "",
+                  source: rep.path.startsWith('_local_')
+                      ? rep.path.startsWith('_local_/_sideloaded_')
+                          ? doI18n('pages:content:local_resource', i18nRef.current)
+                          : doI18n('pages:content:local_project', i18nRef.current)
+                      : `${rep.path.split('/')[1]} (${rep.path.split('/')[0]})`,
+                  type: rep.flavor,
+                  language: isoThreeLookup?.[isoOneToThreeLookup[rep.language_code] ?? rep.language_code]?.en ??
+                      rep.language_code
+              }
+          })
+        }
+      , [contentBooks]);
 
   /**
    * Important: These are precise calculations given the state of this component at the time this was set up.
