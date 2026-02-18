@@ -34,7 +34,7 @@ function TranslationPlanViewerMuncher({metadata}) {
     const [verseText, setVerseText] = useState({});
     const [burritos, setBurritos] = useState([]);
     const [selectedBurrito, setSelectedBurrito] = useState(null);
-    const [selectedStory, setSelectedStory] = useState();
+    const [selectedSection, setSelectedSection] = useState();
     const [textDir, setTextDir] = useState(
         metadata?.script_direction ? metadata.script_direction.toLowerCase() : undefined
     );
@@ -194,8 +194,8 @@ function TranslationPlanViewerMuncher({metadata}) {
                 sx={{marginLeft: "auto"}}>
                 <JumpButton
                     planIngredient={planIngredient}
-                    selectedStory={selectedStory}
-                    setSelectedStory={setSelectedStory}
+                    selectedSection={selectedSection}
+                    setSelectedSection={setSelectedSection}
                     anchorEl={anchorEl}
                     setAnchorEl={setAnchorEl}
                     open={open}
