@@ -179,7 +179,16 @@
     "new_bcv_note": {
       "en": "New note",
       "fr": "Nouvelle note",
-      "id": "Catatan baru"
+      "id": "Catatan baru",
+      "es": "Nueva nota"
+    },
+    "new_bcv_question": {
+      "en": "New question",
+      "es": "Nueva pregunta"
+    },
+    "new_bcv_study_question": {
+      "en": "New study question",
+      "es": "Nueva pregunta de estudio"
     },
     "delete_note_bcv": {
       "en": "Deletion is permanent and irreversible. Continue anyway?",

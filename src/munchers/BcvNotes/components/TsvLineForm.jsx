@@ -26,35 +26,53 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
 
     return (
         <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
-            {columnNames.map((column, n) => (
-                <FormControl fullWidth margin="normal" key={n} >
-                    {['Note', 'Question', 'Response'].includes(column) ? (
-                        <MarkdownField
-                            value={currentRow[n]}
-                            columnNames={columnNames}
-                            onChangeNote={(e) => changeCell(e, n)}
-                            fieldN={n}
-                            ingredient={ingredient}
-                            currentRowN={currentRowN}
-                            mode={mode}
+            {columnNames.map((column, n) => {
+                // Identify which resource it is, to know which fields should be hidden
+                let tableType = null;
+                if (columnNames.some(c => c.includes('Response'))) tableType = 'questions';
+                else if (columnNames.some(c => c.includes('Question'))) tableType = 'studyQuestions';
 
-                        />
-                    ) : (
-                        <TextField
-                            label={column}
-                            value={currentRow[n]}
-                            placeholder={n === 0 ? "1:1" : ""}
-                            required={n === 0}
-                            disabled={n === 1 || (mode === "edit" && ingredient[currentRowN] && ingredient[currentRowN].length === 1)}
-                            variant="outlined"
-                            fullWidth
-                            size="small"
-                            onChange={(e) => changeCell(e, n)}
-                        />
-                    )}
-                </FormControl>
+                const visibilityMap = {
+                    questions: ['Reference', 'ID', 'Question', 'Response\r', 'Response'],
+                    studyQuestions: ['Reference', 'ID', 'Question\r', 'Question']
+                };
 
-            ))}
+                // We filter, if the tableType exists but the column isn't in the list, we don't render. IF the tableType exists, we render everything.
+                if (visibilityMap[tableType] && !visibilityMap[tableType].includes(column)) {
+                    return null;
+                }
+
+                // Make sure we get the right index
+                const realIndex = columnNames.indexOf(column);
+
+                return (
+                    <FormControl fullWidth margin="normal" key={column + realIndex} >
+                        {['Note', 'Question', 'Response'].some(word => column.includes(word)) ? (
+                            <MarkdownField
+                                value={currentRow[realIndex]}
+                                columnNames={columnNames}
+                                onChangeNote={(e) => changeCell(e, realIndex)}
+                                fieldN={realIndex}
+                                ingredient={ingredient}
+                                currentRowN={currentRowN}
+                                mode={mode}
+                            />
+                        ) : (
+                            <TextField
+                                label={column.replace('\r', '')}
+                                value={currentRow[realIndex] || ''}
+                                placeholder={column.includes("Reference") ? "1:1" : ""}
+                                required={column.includes("Reference")}
+                                disabled={column.includes("ID") || (mode === "edit" && ingredient[currentRowN]?.length === 1)}
+                                variant="outlined"
+                                fullWidth
+                                size="small"
+                                onChange={(e) => changeCell(e, realIndex)}
+                            />
+                        )}
+                    </FormControl>
+                );
+            })}
             <ActionsButtons
                 updateBcv={updateBcv}
                 rowData={currentRow}

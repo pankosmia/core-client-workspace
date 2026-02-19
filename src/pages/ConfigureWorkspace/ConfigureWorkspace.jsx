@@ -80,7 +80,6 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
           debugRef.current,
         );
         if (fullMetadataResponse.ok) {
-          console.log(fullMetadataResponse.json);
           setContentBooks(new Set(fullMetadataResponse.json.book_codes));
         }
         if (!fullMetadataResponse.ok) {
