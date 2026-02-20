@@ -2,7 +2,7 @@ import { Box, FormControl, TextField } from "@mui/material";
 import MarkdownField from "../../../components/MarkdownField";
 import ActionsButtons from "./ActionsButtons";
 
-function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction, cellValueChanged, setCellValueChanged }) {
+function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction, cellValueChanged, setCellValueChanged, resourceType }) {
     const columnNames = ingredient[0] || [];
 
     // Permet la modification d'une note
@@ -27,18 +27,14 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
     return (
         <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
             {columnNames.map((column, n) => {
-                // Identify which resource it is, to know which fields should be hidden
-                let tableType = null;
-                if (columnNames.some(c => c.includes('Response'))) tableType = 'questions';
-                else if (columnNames.some(c => c.includes('Question'))) tableType = 'studyQuestions';
 
                 const visibilityMap = {
-                    questions: ['Reference', 'ID', 'Question', 'Response\r', 'Response'],
-                    studyQuestions: ['Reference', 'ID', 'Question\r', 'Question']
+                    new_bcv_question: ['Reference', 'ID', 'Question', 'Response\r', 'Response'],
+                    new_bcv_study_question: ['Reference', 'ID', 'Question\r', 'Question']
                 };
 
-                // We filter, if the tableType exists but the column isn't in the list, we don't render. IF the tableType exists, we render everything.
-                if (visibilityMap[tableType] && !visibilityMap[tableType].includes(column)) {
+                // We filter, if the resourceType exists but the column isn't in the list, we don't render. IF the resourceType exists, we render everything.
+                if (visibilityMap[resourceType] && !visibilityMap[resourceType].includes(column)) {
                     return null;
                 }
 

@@ -47,9 +47,8 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                 setNewCurrentRow(newRowData);
             }
             // Change i18n depending on what resource we got
-            if (ingredient[0].some(c => (c.includes('Response') || c.includes('Question')) )) {
-                setResourceType("new_bcv_question");
-            }
+            if (ingredient[0].some(c => c.includes('Response'))) setResourceType("new_bcv_question");
+            else if (ingredient[0].some(c => c.includes('Question'))) setResourceType("new_bcv_study_question");
         }
     }, [ingredient]);
 
@@ -83,7 +82,7 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                         >
                             <CloseIcon />
                             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                                {doI18n(`pages:core-local-workspace:${resourceType}`, i18nRef.current)}
+                                {doI18n(`pages:core-local-workspace:${!resourceType.includes("note") ? "new_bcv_question" : resourceType}`, i18nRef.current)}
                             </Typography>
                         </IconButton>
                         <Button
@@ -107,6 +106,7 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                     handleCloseModalNewNote={handleCloseModalNewNote}
                     cellValueChanged={cellValueChanged}
                     setCellValueChanged={setCellValueChanged}
+                    resourceType={resourceType}
                 />
             </Box>
 
