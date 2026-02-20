@@ -47,8 +47,9 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                 setNewCurrentRow(newRowData);
             }
             // Change i18n depending on what resource we got
-            if (ingredient[0].some(c => c.includes('Response'))) setResourceType("new_bcv_question");
-            else if (ingredient[0].some(c => c.includes('Question'))) setResourceType("new_bcv_study_question");
+            if (ingredient[0].some(c => (c.includes('Response') || c.includes('Question')) )) {
+                setResourceType("new_bcv_question");
+            }
         }
     }, [ingredient]);
 
