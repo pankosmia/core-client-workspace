@@ -116,7 +116,7 @@ function EditorTools({
                 />
             </Grid2>
             <Grid2 display="flex" gap={1}>
-                <Tooltip title={doI18n("pages:core-local-workspace:button_edit", i18nRef.current, debugRef.current)}>
+                <Tooltip title={doI18n("pages:core-local-workspace:button_edit_layout", i18nRef.current, debugRef.current)}>
                     <IconButton
                         disabled={md5sum(JSON.stringify(scriptureJson)) !== md5sumScriptureJson}
                         /* enables redirection based on the page */

@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRowN, cellValueChanged, setCellValueChanged }) {
     const { i18nRef } = useContext(I18nContext);
     const [newCurrentRow, setNewCurrentRow] = useState(Array(7).fill("", 0, 7));
+    const [resourceType, setResourceType] = useState("new_bcv_note");
 
     // Permet de fermer la modal principale 
     const handleCloseModalNewNote = () => {
@@ -45,9 +46,11 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                 newRowData[1] = newId;
                 setNewCurrentRow(newRowData);
             }
+            // Change i18n depending on what resource we got
+            if (ingredient[0].some(c => c.includes('Response'))) setResourceType("new_bcv_question");
+            else if (ingredient[0].some(c => c.includes('Question'))) setResourceType("new_bcv_study_question");
         }
     }, [ingredient]);
-
 
     return (
         <Modal
@@ -79,7 +82,7 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                         >
                             <CloseIcon />
                             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                                {doI18n("pages:core-local-workspace:new_bcv_note", i18nRef.current)}
+                                {doI18n(`pages:core-local-workspace:${!resourceType.includes("note") ? "new_bcv_question" : resourceType}`, i18nRef.current)}
                             </Typography>
                         </IconButton>
                         <Button
@@ -103,6 +106,7 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                     handleCloseModalNewNote={handleCloseModalNewNote}
                     cellValueChanged={cellValueChanged}
                     setCellValueChanged={setCellValueChanged}
+                    resourceType={resourceType}
                 />
             </Box>
 
