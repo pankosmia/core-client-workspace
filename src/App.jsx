@@ -7,10 +7,10 @@ import { SpaContainer } from "pankosmia-rcl";
 import { createTheme, ThemeProvider, styled } from "@mui/material";
 import { getAndSetJson } from "pithekos-lib";
 import { SnackbarProvider, MaterialDesignContent } from "notistack";
-function App() {
+export default function App() {
   const [layout, setLayout] = useState("ViewEditorRightRow");
   const [selectedResources, setSelectedResources] = useState(new Set([]));
-
+  console.log("selectedResources_App",selectedResources)
   return (
     <Router
       layout={layout}
@@ -110,5 +110,3 @@ function Router({
     </ThemeProvider>
   );
 }
-
-export default App;
