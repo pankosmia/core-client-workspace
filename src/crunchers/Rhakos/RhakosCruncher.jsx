@@ -1,12 +1,14 @@
 import { useContext, useState, useEffect } from "react";
-import { Box, Button, Grid2, Checkbox, TextField } from "@mui/material";
-import { doI18n, getJson, postJson } from "pithekos-lib";
+import { Box, Button, Grid2, TextField, InputAdornment, IconButton } from "@mui/material";
+import {doI18n, getJson, postJson } from "pithekos-lib";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,
 } from "pankosmia-rcl";
-import LlmModelPicker from "./LlmModelPicker";
-import NumberPicker from "./NumberPicker";
+import SettingsIcon from '@mui/icons-material/Settings';
+import DialogConfigRhakos from "./DialogConfig";
+import InformationDialogRhakos from "./InformationDialog";
+import { InfoOutlined } from "@mui/icons-material";
 
 function RhakosCruncher({ metadata, style }) {
   const { i18nRef } = useContext(I18nContext);
@@ -32,6 +34,10 @@ function RhakosCruncher({ metadata, style }) {
       getModels().then();
     }
   });
+  const [openDialogConfig, setOpenDialogConfig] = useState(false);
+  const [openDialogInfo,setOpenDialogInfo] = useState(false);
+  const handleClickOpenDialogConfig = () => setOpenDialogConfig((show) => !show);
+  const handleClickOpenDialogInfo = () => setOpenDialogInfo((show) => !show);
 
   const rag_context = {
     model_name: selectedModel[0],
@@ -94,57 +100,29 @@ function RhakosCruncher({ metadata, style }) {
         }}
         spacing={2}
       >
-        <Grid2 item size={12}>
-          <h5>{metadata.name}</h5>
-          <p>
-            <b>{doI18n("crunchers:rhakos:title", i18nRef.current)}</b>
-          </p>
-          {metadata.description.length > 0 && (
-            <p>Description: {metadata.description}</p>
-          )}
-        </Grid2>
-        <Grid2 item size={2}>
-          Model
-        </Grid2>
-        <Grid2 item size={10}>
-          <LlmModelPicker
-            models={models}
-            selectedModel={selectedModel}
-            setSelectedModel={setSelectedModel}
-          />
-        </Grid2>
-        <Grid2 item size={2}>
-          Show full prompt?
-        </Grid2>
-        <Grid2 item size={2}>
-          <Checkbox
-            checked={showFullPrompt}
-            onChange={() => setShowFullPrompt(!showFullPrompt)}
-            slotProps={{
-              input: { "aria-label": "controlled" },
-            }}
-          />
-        </Grid2>
-        <Grid2 item size={2}>
-          TopK
-        </Grid2>
-        <Grid2 item size={2}>
-          <NumberPicker
-            state={topK}
-            setState={setTopK}
-            options={[1, 2, 5, 10, 20, 50, 100, 200, 500]}
-          />
-        </Grid2>
-        <Grid2 item size={2}>
-          Temperature
-        </Grid2>
-        <Grid2 item size={2}>
-          <NumberPicker
-            state={temperature}
-            setState={setTemperature}
-            options={[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
-          />
-        </Grid2>
+        <TextField
+          fullWidth
+          label={`
+            ${doI18n("pages:core-local-workspace:model_rhakos",i18nRef.current)} ${selectedModel[0]} 
+            ${doI18n("pages:core-local-workspace:topk_rhakos",i18nRef.current)} ${topK}
+            ${doI18n("pages:core-local-workspace:temperature_rhakos",i18nRef.current)} ${temperature} `}
+          slotProps={{
+            input: {
+              readOnly: true,
+              endAdornment: <InputAdornment position="end">
+                <IconButton
+                  onClick={handleClickOpenDialogConfig}
+                  edge="end"
+                >
+                  <SettingsIcon />
+                </IconButton>
+              </InputAdornment>
+            },
+            inputLabel: {
+              shrink: false
+            }
+          }}
+        />
         <Grid2 item size={12}>
           <TextField
             fullWidth
@@ -180,12 +158,19 @@ function RhakosCruncher({ metadata, style }) {
             <Grid2 key={`p-${n}`} item size={4}>
               {r.json.prompt}
             </Grid2>
-            <Grid2 key={`r-${n}`} item size={8}>
+            <Grid2 key={`r-${n}`} item size={6}>
               {r.json.response}
+            </Grid2>
+            <Grid2 key={`r-${n}`} item size={2}>
+              <IconButton onClick={handleClickOpenDialogInfo}>
+                <InfoOutlined/>
+              </IconButton>
             </Grid2>
           </>
         ))}
       </Grid2>
+      <DialogConfigRhakos open={openDialogConfig} close={setOpenDialogConfig} models={models} selectedModel={selectedModel} setSelectedModel={setSelectedModel} topK={topK} setTopK={setTopK} temperature={temperature} setTemperature={setTemperature} showFullPrompt={showFullPrompt} setShowFullPrompt={setShowFullPrompt}/>
+      <InformationDialogRhakos open={openDialogInfo} close={setOpenDialogInfo}/>
     </Box>
   );
 }

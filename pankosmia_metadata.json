@@ -728,6 +728,26 @@
     "link_disabled_offline":{
       "en":"Link disabled in offline mode",
       "es":"El link está deshabilitado en el modo sin Internet"
+    },
+    "settings_rhakos":{
+      "en":"AI settings",
+      "fr":"IA paramètres"
+    },
+    "model_rhakos":{
+      "en":"Model",
+      "fr":"Modèle"
+    },
+    "topk_rhakos":{
+      "en":"Topk",
+      "fr":"Topk"
+    },
+    "temperature_rhakos":{
+      "en":"Temperature",
+      "fr":"Température"
+    },
+    "show_prompt_rhakos":{
+      "en":"Show full prompt",
+      "fr":"Afficher prompt complet"
     }
   }
 }
