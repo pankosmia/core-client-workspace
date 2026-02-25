@@ -748,6 +748,23 @@
     "show_prompt_rhakos":{
       "en":"Show full prompt",
       "fr":"Afficher prompt complet"
+    },
+    "bcv_rhakos":{
+      "en":"Book Chapter Verse",
+      "fr":"Livre Chapitre Verset"
+    },
+    "quantized_rhakos":{
+      "en":"Quantized"
+    },
+    "submitted_rhakos":{
+      "en":"Submitted"
+    },
+    "elapsed_rhakos":{
+      "en":"Elapsed"
+    },
+    "info_rhakos":{
+      "en":"AI informations",
+      "fr":"IA informations"
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Checkbox, DialogContent, Grid2 } from "@mui/material";
+import { Checkbox, DialogContent, DialogContentText, Grid2 } from "@mui/material";
 import LlmModelPicker from "./LlmModelPicker";
 import NumberPicker from "./NumberPicker";
 import { PanDialog } from "pankosmia-rcl";
@@ -16,9 +16,10 @@ export default function DialogConfigRhakos({ open, close, models, selectedModel,
             closeFn={() => close(false)}
         >
             <DialogContent>
-                <Grid2 item size={2}>
+
+                <DialogContentText >
                     {doI18n("pages:core-local-workspace:model_rhakos", i18nRef.current)}
-                </Grid2>
+                </DialogContentText>
                 <Grid2 item size={10}>
                     <LlmModelPicker
                         models={models}
@@ -26,9 +27,9 @@ export default function DialogConfigRhakos({ open, close, models, selectedModel,
                         setSelectedModel={setSelectedModel}
                     />
                 </Grid2>
-                <Grid2 item size={2}>
+                <DialogContentText >
                     {doI18n("pages:core-local-workspace:show_prompt_rhakos", i18nRef.current)}
-                </Grid2>
+                </DialogContentText>
                 <Grid2 item size={2}>
                     <Checkbox
                         checked={showFullPrompt}
@@ -38,9 +39,9 @@ export default function DialogConfigRhakos({ open, close, models, selectedModel,
                         }}
                     />
                 </Grid2>
-                <Grid2 item size={2}>
+                <DialogContentText >
                     {doI18n("pages:core-local-workspace:topk_rhakos", i18nRef.current)}
-                </Grid2>
+                </DialogContentText>
                 <Grid2 item size={2}>
                     <NumberPicker
                         state={topK}
@@ -48,9 +49,9 @@ export default function DialogConfigRhakos({ open, close, models, selectedModel,
                         options={[1, 2, 5, 10, 20, 50, 100, 200, 500]}
                     />
                 </Grid2>
-                <Grid2 item size={2}>
+                <DialogContentText >
                     {doI18n("pages:core-local-workspace:temperature_rhakos", i18nRef.current)}
-                </Grid2>
+                </DialogContentText>
                 <Grid2 item size={2}>
                     <NumberPicker
                         state={temperature}

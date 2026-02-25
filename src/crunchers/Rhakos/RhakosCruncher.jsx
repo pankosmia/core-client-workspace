@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import { Box, Button, Grid2, TextField, InputAdornment, IconButton } from "@mui/material";
-import {doI18n, getJson, postJson } from "pithekos-lib";
+import { doI18n, getJson, postJson } from "pithekos-lib";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,
@@ -35,7 +35,7 @@ function RhakosCruncher({ metadata, style }) {
     }
   });
   const [openDialogConfig, setOpenDialogConfig] = useState(false);
-  const [openDialogInfo,setOpenDialogInfo] = useState(false);
+  const [openDialogInfo, setOpenDialogInfo] = useState(false);
   const handleClickOpenDialogConfig = () => setOpenDialogConfig((show) => !show);
   const handleClickOpenDialogInfo = () => setOpenDialogInfo((show) => !show);
 
@@ -95,17 +95,18 @@ function RhakosCruncher({ metadata, style }) {
         direction="row"
         sx={{
           display: "flex",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           alignItems: "center",
         }}
-        spacing={2}
+        columnSpacing={0.5}
+        rowSpacing={1}
       >
         <TextField
           fullWidth
           label={`
-            ${doI18n("pages:core-local-workspace:model_rhakos",i18nRef.current)} ${selectedModel[0]} 
-            ${doI18n("pages:core-local-workspace:topk_rhakos",i18nRef.current)} ${topK}
-            ${doI18n("pages:core-local-workspace:temperature_rhakos",i18nRef.current)} ${temperature} `}
+            ${doI18n("pages:core-local-workspace:model_rhakos", i18nRef.current)} ${selectedModel[0]} 
+            ${doI18n("pages:core-local-workspace:topk_rhakos", i18nRef.current)} ${topK}
+            ${doI18n("pages:core-local-workspace:temperature_rhakos", i18nRef.current)} ${temperature} `}
           slotProps={{
             input: {
               readOnly: true,
@@ -123,7 +124,7 @@ function RhakosCruncher({ metadata, style }) {
             }
           }}
         />
-        <Grid2 item size={12}>
+        <Grid2 item size={11}>
           <TextField
             fullWidth
             disabled={processing}
@@ -135,8 +136,9 @@ function RhakosCruncher({ metadata, style }) {
             }}
           />
         </Grid2>
-        <Grid2 item size={12}>
+        <Grid2 item size={1}>
           <Button
+            fullWidth
             disabled={processing}
             onClick={async () => {
               setProcessing(true);
@@ -153,6 +155,18 @@ function RhakosCruncher({ metadata, style }) {
             Send
           </Button>
         </Grid2>
+      </Grid2>
+      <Grid2
+        container
+        direction="row"
+        sx={{
+          display: "flex",
+          justifyContent:"space-between",
+          alignItems: "center",
+        }}
+        columnSpacing={0.5}
+        rowSpacing={1}
+      >
         {[...responses].reverse().map((r, n) => (
           <>
             <Grid2 key={`p-${n}`} item size={4}>
@@ -163,14 +177,14 @@ function RhakosCruncher({ metadata, style }) {
             </Grid2>
             <Grid2 key={`r-${n}`} item size={2}>
               <IconButton onClick={handleClickOpenDialogInfo}>
-                <InfoOutlined/>
+                <InfoOutlined />
               </IconButton>
             </Grid2>
           </>
         ))}
       </Grid2>
-      <DialogConfigRhakos open={openDialogConfig} close={setOpenDialogConfig} models={models} selectedModel={selectedModel} setSelectedModel={setSelectedModel} topK={topK} setTopK={setTopK} temperature={temperature} setTemperature={setTemperature} showFullPrompt={showFullPrompt} setShowFullPrompt={setShowFullPrompt}/>
-      <InformationDialogRhakos open={openDialogInfo} close={setOpenDialogInfo}/>
+      <DialogConfigRhakos open={openDialogConfig} close={setOpenDialogConfig} models={models} selectedModel={selectedModel} setSelectedModel={setSelectedModel} topK={topK} setTopK={setTopK} temperature={temperature} setTemperature={setTemperature} showFullPrompt={showFullPrompt} setShowFullPrompt={setShowFullPrompt} />
+      <InformationDialogRhakos open={openDialogInfo} close={setOpenDialogInfo} response={responses} />
     </Box>
   );
 }
