@@ -769,6 +769,11 @@
     "send_button":{
       "en":"Send",
       "fr":"Envoyer"
+    },
+    "prompt_rhakos":{
+      "en":"Prompt",
+      "fr":"Requête"
     }
+
   }
 }

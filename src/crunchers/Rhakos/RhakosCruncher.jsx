@@ -134,7 +134,8 @@ function RhakosCruncher({ metadata, style }) {
             fullWidth
             disabled={processing}
             id="prompt"
-            label="prompt"
+            label={doI18n("pages:core-local-workspace:prompt_rhakos", i18nRef.current)}
+
             value={prompt}
             onChange={(event) => {
               setPrompt(event.target.value);
