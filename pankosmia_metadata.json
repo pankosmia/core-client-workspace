@@ -765,6 +765,10 @@
     "info_rhakos":{
       "en":"AI informations",
       "fr":"IA informations"
+    },
+    "send_button":{
+      "en":"Send",
+      "fr":"Envoyer"
     }
   }
 }

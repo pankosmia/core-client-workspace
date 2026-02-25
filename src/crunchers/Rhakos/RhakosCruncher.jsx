@@ -22,6 +22,8 @@ function RhakosCruncher({ metadata, style }) {
   const [prompt, setPrompt] = useState("");
   const [processing, setProcessing] = useState(false);
   const [responses, setResponses] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [selectedResponseInfoDialog, setSelectedResponseInfoDialog] = useState(null);
 
   useEffect(() => {
     const getModels = async () => {
@@ -36,8 +38,11 @@ function RhakosCruncher({ metadata, style }) {
   });
   const [openDialogConfig, setOpenDialogConfig] = useState(false);
   const [openDialogInfo, setOpenDialogInfo] = useState(false);
-  const handleClickOpenDialogConfig = () => setOpenDialogConfig((show) => !show);
-  const handleClickOpenDialogInfo = () => setOpenDialogInfo((show) => !show);
+  const handleClickOpenDialogConfig = () =>  setOpenDialogConfig((show) => !show);
+  const handleClickOpenDialogInfo = (response) => {
+    setSelectedResponseInfoDialog(response)
+    setOpenDialogInfo((show) => !show);
+  }
 
   const rag_context = {
     model_name: selectedModel[0],
@@ -95,7 +100,7 @@ function RhakosCruncher({ metadata, style }) {
         direction="row"
         sx={{
           display: "flex",
-          justifyContent: "flex-start",
+          justifyContent: "center",
           alignItems: "center",
         }}
         columnSpacing={0.5}
@@ -139,7 +144,7 @@ function RhakosCruncher({ metadata, style }) {
         <Grid2 item size={1}>
           <Button
             fullWidth
-            disabled={processing}
+            disabled={processing || prompt === ""}
             onClick={async () => {
               setProcessing(true);
               const result = await postJson(
@@ -152,31 +157,19 @@ function RhakosCruncher({ metadata, style }) {
               setPrompt("");
             }}
           >
-            Send
+            {doI18n("pages:core-local-workspace:send_button", i18nRef.current)}
           </Button>
         </Grid2>
-      </Grid2>
-      <Grid2
-        container
-        direction="row"
-        sx={{
-          display: "flex",
-          justifyContent:"space-between",
-          alignItems: "center",
-        }}
-        columnSpacing={0.5}
-        rowSpacing={1}
-      >
         {[...responses].reverse().map((r, n) => (
           <>
             <Grid2 key={`p-${n}`} item size={4}>
               {r.json.prompt}
             </Grid2>
-            <Grid2 key={`r-${n}`} item size={6}>
+            <Grid2 key={`r-${n}`} item size={4}>
               {r.json.response}
             </Grid2>
-            <Grid2 key={`r-${n}`} item size={2}>
-              <IconButton onClick={handleClickOpenDialogInfo}>
+            <Grid2 key={`info-${n}`} item size={4}>
+              <IconButton onClick={() => handleClickOpenDialogInfo(r)}>
                 <InfoOutlined />
               </IconButton>
             </Grid2>
@@ -184,7 +177,7 @@ function RhakosCruncher({ metadata, style }) {
         ))}
       </Grid2>
       <DialogConfigRhakos open={openDialogConfig} close={setOpenDialogConfig} models={models} selectedModel={selectedModel} setSelectedModel={setSelectedModel} topK={topK} setTopK={setTopK} temperature={temperature} setTemperature={setTemperature} showFullPrompt={showFullPrompt} setShowFullPrompt={setShowFullPrompt} />
-      <InformationDialogRhakos open={openDialogInfo} close={setOpenDialogInfo} response={responses} />
+      <InformationDialogRhakos open={openDialogInfo} close={setOpenDialogInfo} response={selectedResponseInfoDialog}/>
     </Box>
   );
 }

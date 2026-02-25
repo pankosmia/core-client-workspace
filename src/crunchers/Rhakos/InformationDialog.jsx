@@ -14,33 +14,31 @@ export default function InformationDialogRhakos({ open, close, response }) {
             closeFn={() => close(false)}
         >
             <DialogContent>
-                {response.map(r => (
                     <>
                         <DialogContentText>
-                            {doI18n("pages:core-local-workspace:model_rhakos", i18nRef.current)} :  {r.json.model_name}
+                            {doI18n("pages:core-local-workspace:model_rhakos", i18nRef.current)} :  {response?.json?.model_name}
                         </DialogContentText>
                         <DialogContentText>
-                            {doI18n("pages:core-local-workspace:bcv_rhakos", i18nRef.current)} :  {r.json.book}   {r.json.from_chapter}   {r.json.from_verse}
+                            {doI18n("pages:core-local-workspace:bcv_rhakos", i18nRef.current)} :  {response?.json?.book}   {response?.json?.from_chapter}   {response?.json?.from_verse}
                         </DialogContentText>
                         <DialogContentText>
-                            {r.json.quantized === true ?
+                            {response?.json?.quantized === true ?
                                 `${doI18n("pages:core-local-workspace:quantized_rhakos", i18nRef.current)} :  true`
                                 :`${doI18n("pages:core-local-workspace:quantized_rhakos", i18nRef.current)} :  false`}
                         </DialogContentText>
                         <DialogContentText>
-                            {doI18n("pages:core-local-workspace:topk_rhakos", i18nRef.current)} : {r.json.top_k}
+                            {doI18n("pages:core-local-workspace:topk_rhakos", i18nRef.current)} : {response?.json?.top_k}
                         </DialogContentText>
                         <DialogContentText>
-                            {doI18n("pages:core-local-workspace:elapsed_rhakos", i18nRef.current)} : {r.json.elapsed}
+                            {doI18n("pages:core-local-workspace:elapsed_rhakos", i18nRef.current)} : {response?.json?.elapsed}
                         </DialogContentText>
                         <DialogContentText>
-                            {doI18n("pages:core-local-workspace:temperature_rhakos", i18nRef.current)} :  {r.json.temperature}
+                            {doI18n("pages:core-local-workspace:temperature_rhakos", i18nRef.current)} :  {response?.json?.temperature}
                         </DialogContentText>
                         <DialogContentText>
-                            {doI18n("pages:core-local-workspace:submitted_rhakos", i18nRef.current)} :  {r.json.submitted}
+                            {doI18n("pages:core-local-workspace:submitted_rhakos", i18nRef.current)} :  {response?.json?.submitted}
                         </DialogContentText>
                     </>
-                ))}
             </DialogContent>
         </PanDialog>
     )
