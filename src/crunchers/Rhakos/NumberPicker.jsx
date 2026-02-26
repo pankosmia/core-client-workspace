@@ -1,43 +1,31 @@
-import { useState } from "react";
-import Button from "@mui/material/Button";
-import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-
+import { FormControl, InputLabel, Select } from "@mui/material";
 
 export default function NumberPicker({
   state,
   setState,
-  options
+  options,
+  nameSelect
 }) {
-  const [anchorEl, setAnchorEl] = useState(null);
 
-    return (
-      <div>
-        <Button
-          id="number-picker-button"
-          onClick={(event) => {
-            setAnchorEl(event.currentTarget);
-          }}
-        >
-          {state}
-        </Button>
-        <Menu
-          id="basic-menu"
-          anchorEl={anchorEl}
-          open={!!anchorEl}
-          onClose={() => setAnchorEl(null)}
-          slotProps={{
-            list: {
-              "aria-labelledby": "llm-model-button",
-            },
-          }}
-        >
-          {
-              options.map(
-                  o => <MenuItem onClick={() => {setState(o); setAnchorEl(null);}}>{o}</MenuItem>
-              )
-          }
-        </Menu>
-      </div>
-    );
+  return (
+    <FormControl fullWidth>
+      <InputLabel id="number-picker-button"> {nameSelect}</InputLabel>
+      <Select
+        id="number-picker-button"
+        labelId="number-picker-button"
+        onChange={(event) => {
+          setState(event.target.value);
+        }}
+        value={state}
+        label={nameSelect}
+      >
+        {
+          options.map(
+            o => <MenuItem key={o} value={o}>{o}</MenuItem>
+          )
+        }
+      </Select>
+    </FormControl>
+  );
 }

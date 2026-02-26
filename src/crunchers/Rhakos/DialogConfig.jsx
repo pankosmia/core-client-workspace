@@ -1,4 +1,4 @@
-import { Checkbox, DialogContent, DialogContentText, Grid2 } from "@mui/material";
+import { Checkbox, DialogContent, DialogContentText, FormControlLabel, Grid2, Typography } from "@mui/material";
 import LlmModelPicker from "./LlmModelPicker";
 import NumberPicker from "./NumberPicker";
 import { PanDialog } from "pankosmia-rcl";
@@ -16,48 +16,47 @@ export default function DialogConfigRhakos({ open, close, models, selectedModel,
             closeFn={() => close(false)}
         >
             <DialogContent>
-
-                <DialogContentText >
-                    {doI18n("pages:core-local-workspace:model_rhakos", i18nRef.current)}
-                </DialogContentText>
-                <Grid2 item size={10}>
-                    <LlmModelPicker
-                        models={models}
-                        selectedModel={selectedModel}
-                        setSelectedModel={setSelectedModel}
-                    />
-                </Grid2>
-                <DialogContentText >
-                    {doI18n("pages:core-local-workspace:show_prompt_rhakos", i18nRef.current)}
-                </DialogContentText>
-                <Grid2 item size={2}>
-                    <Checkbox
-                        checked={showFullPrompt}
-                        onChange={() => setShowFullPrompt(!showFullPrompt)}
-                        slotProps={{
-                            input: { "aria-label": "controlled" },
-                        }}
-                    />
-                </Grid2>
-                <DialogContentText >
-                    {doI18n("pages:core-local-workspace:topk_rhakos", i18nRef.current)}
-                </DialogContentText>
-                <Grid2 item size={2}>
-                    <NumberPicker
-                        state={topK}
-                        setState={setTopK}
-                        options={[1, 2, 5, 10, 20, 50, 100, 200, 500]}
-                    />
-                </Grid2>
-                <DialogContentText >
-                    {doI18n("pages:core-local-workspace:temperature_rhakos", i18nRef.current)}
-                </DialogContentText>
-                <Grid2 item size={2}>
-                    <NumberPicker
-                        state={temperature}
-                        setState={setTemperature}
-                        options={[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
-                    />
+                <Grid2 container spacing={2}>
+                    <Grid2 size={6} sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                    }}>
+                        <Typography> {doI18n("pages:core-local-workspace:model_rhakos", i18nRef.current)} </Typography>
+                        <LlmModelPicker
+                            models={models}
+                            selectedModel={selectedModel}
+                            setSelectedModel={setSelectedModel}
+                        />
+                    </Grid2>
+                    <Grid2 size={6}>
+                        <FormControlLabel control={
+                            <Checkbox
+                                checked={showFullPrompt}
+                                onChange={() => setShowFullPrompt(!showFullPrompt)}
+                                slotProps={{
+                                    input: { "aria-label": "controlled" },
+                                }}
+                            />}
+                            label={doI18n("pages:core-local-workspace:show_prompt_rhakos", i18nRef.current)}
+                        />
+                    </Grid2>
+                    <Grid2 size={6}>
+                        <NumberPicker
+                            nameSelect={doI18n("pages:core-local-workspace:topk_rhakos", i18nRef.current)}
+                            state={topK}
+                            setState={setTopK}
+                            options={[1, 2, 5, 10, 20, 50, 100, 200, 500]}
+                        />
+                    </Grid2>
+                    <Grid2 size={6}>
+                        <NumberPicker
+                            nameSelect={doI18n("pages:core-local-workspace:temperature_rhakos", i18nRef.current)}
+                            state={temperature}
+                            setState={setTemperature}
+                            options={[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
+                        />
+                    </Grid2>
                 </Grid2>
             </DialogContent>
         </PanDialog>

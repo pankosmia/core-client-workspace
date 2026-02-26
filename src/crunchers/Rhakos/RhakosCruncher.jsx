@@ -22,7 +22,6 @@ function RhakosCruncher({ metadata, style }) {
   const [prompt, setPrompt] = useState("");
   const [processing, setProcessing] = useState(false);
   const [responses, setResponses] = useState([]);
-  const [selectedIndex, setSelectedIndex] = useState(null);
   const [selectedResponseInfoDialog, setSelectedResponseInfoDialog] = useState(null);
 
   useEffect(() => {
