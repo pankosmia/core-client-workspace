@@ -21,7 +21,6 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import LayoutPicker from "./WorkspaceLayoutButton";
 
 function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedResources }) {
-  console.log("selectedResources_Config", selectedResources)
 
   const { debugRef } = useContext(debugContext);
   const { i18nRef } = useContext(i18nContext);
@@ -34,8 +33,6 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
   const [isoThreeLookup, setIsoThreeLookup] = useState([]);
   const [contentBooks, setContentBooks] = useState();
   const [selectedResourcesIndexes, setSelectedResourcesIndexes] = useState([]);
-
-
 
   const getProjectSummaries = async () => {
     const summariesResponse = await getJson("/burrito/metadata/summaries", debugRef.current);
@@ -165,7 +162,7 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
         return {
           ...rep,
           id: n.toString(),
-          
+
           name: `${rep.name} (${rep.abbreviation})`,
           description: rep.description !== rep.name ? rep.description : "",
           source: rep.path.startsWith('_local_')
@@ -180,13 +177,13 @@ function ConfigureWorkspace({ layout, setLayout, selectedResources, setSelectedR
       })
   }
     , [contentBooks]);
+    
   useEffect(() => {
     if (rows) {
       setSelectedResourcesIndexes(rows.filter(r => selectedResources.has(r.path)).map(r => r.id))
     }
   }, [rows]);
-  console.log("rows", rows);
-  console.log('selectedResources', selectedResourcesIndexes);
+
   /**
    * Important: These are precise calculations given the state of this component at the time this was set up.
    *              The grid height plus all other elements in the dialog fit inside the PanDialog height.

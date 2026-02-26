@@ -10,7 +10,6 @@ import { SnackbarProvider, MaterialDesignContent } from "notistack";
 export default function App() {
   const [layout, setLayout] = useState("ViewEditorRightRow");
   const [selectedResources, setSelectedResources] = useState(new Set([]));
-  console.log("selectedResources_App",selectedResources)
   return (
     <Router
       layout={layout}
