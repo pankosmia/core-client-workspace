@@ -760,10 +760,10 @@
       "en":"Submitted"
     },
     "elapsed_rhakos":{
-      "en":"Elapsed"
+      "en":"Processing time"
     },
     "info_rhakos":{
-      "en":"AI informations",
+      "en":"Response information",
       "fr":"IA informations"
     },
     "send_button":{
@@ -773,6 +773,10 @@
     "prompt_rhakos":{
       "en":"Prompt",
       "fr":"Requête"
+    },
+    "second":{
+      "en":"sec",
+      "fr":"sec"
     }
 
   }
