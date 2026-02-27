@@ -9,6 +9,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DialogConfigRhakos from "./DialogConfig";
 import InformationDialogRhakos from "./InformationDialog";
 import { InfoOutlined } from "@mui/icons-material";
+import Markdown from 'react-markdown';
 
 function RhakosCruncher({ metadata, style }) {
   const { i18nRef } = useContext(I18nContext);
@@ -22,6 +23,7 @@ function RhakosCruncher({ metadata, style }) {
   const [prompt, setPrompt] = useState("");
   const [processing, setProcessing] = useState(false);
   const [responses, setResponses] = useState([]);
+  console.log("responses", responses);
   const [selectedResponseInfoDialog, setSelectedResponseInfoDialog] = useState(null);
 
   useEffect(() => {
@@ -167,9 +169,9 @@ function RhakosCruncher({ metadata, style }) {
         rowSpacing={1}
         sx={{
           direction: "column",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           alignItems: "flex-start",
-          paddingTop:2
+          paddingTop: 2
         }}
       >
         {[...responses].reverse().map((r, n) => (
@@ -178,7 +180,22 @@ function RhakosCruncher({ metadata, style }) {
               {r.json.prompt}
             </Grid2>
             <Grid2 key={`r-${n}`} item size={8}>
-              {r.json.response}
+              {!showFullPrompt
+                ?
+                (r.json.response).replace(/^[\s\S]*<\/think>/, '')
+                :
+                <>
+                  <Markdown>
+                    {(r.json.response).replace(/^([\s\S]*?)<[\s\S]*/, (a, b) => b)}
+                  </Markdown>
+
+                  <Markdown>
+                    {(r.json.response).replace(/^[\s\S]*<\/think>/, '')}
+                  </Markdown>
+                </>
+
+              }
+
             </Grid2>
             <Grid2 key={`info-${n}`} item size={1}>
               <IconButton onClick={() => handleClickOpenDialogInfo(r)}>
