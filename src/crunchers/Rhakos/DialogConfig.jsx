@@ -54,7 +54,7 @@ export default function DialogConfigRhakos({ open, close, models, selectedModel,
                             nameSelect={doI18n("pages:core-local-workspace:temperature_rhakos", i18nRef.current)}
                             state={temperature}
                             setState={setTemperature}
-                            options={[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
+                            options={[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,1.2,1.5,2]}
                         />
                     </Grid2>
                 </Grid2>

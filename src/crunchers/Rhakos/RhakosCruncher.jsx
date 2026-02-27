@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { Box, Button, Grid2, TextField, InputAdornment, IconButton } from "@mui/material";
+import { Box, Button, Grid2, TextField, InputAdornment, IconButton, CircularProgress } from "@mui/material";
 import { doI18n, getJson, postJson } from "pithekos-lib";
 import {
   i18nContext as I18nContext,
@@ -37,7 +37,7 @@ function RhakosCruncher({ metadata, style }) {
   });
   const [openDialogConfig, setOpenDialogConfig] = useState(false);
   const [openDialogInfo, setOpenDialogInfo] = useState(false);
-  const handleClickOpenDialogConfig = () =>  setOpenDialogConfig((show) => !show);
+  const handleClickOpenDialogConfig = () => setOpenDialogConfig((show) => !show);
   const handleClickOpenDialogInfo = (response) => {
     setSelectedResponseInfoDialog(response)
     setOpenDialogInfo((show) => !show);
@@ -157,18 +157,30 @@ function RhakosCruncher({ metadata, style }) {
               setPrompt("");
             }}
           >
-            {doI18n("pages:core-local-workspace:send_button", i18nRef.current)}
+            {processing === false ? doI18n("pages:core-local-workspace:send_button", i18nRef.current) : <CircularProgress enableTrackSlot size={25} />}
           </Button>
         </Grid2>
+      </Grid2>
+      <Grid2
+        container
+        columnSpacing={0.5}
+        rowSpacing={1}
+        sx={{
+          direction: "column",
+          justifyContent: "center",
+          alignItems: "flex-start",
+          paddingTop:2
+        }}
+      >
         {[...responses].reverse().map((r, n) => (
           <>
-            <Grid2 key={`p-${n}`} item size={4}>
+            <Grid2 key={`p-${n}`} item size={3}>
               {r.json.prompt}
             </Grid2>
-            <Grid2 key={`r-${n}`} item size={4}>
+            <Grid2 key={`r-${n}`} item size={8}>
               {r.json.response}
             </Grid2>
-            <Grid2 key={`info-${n}`} item size={4}>
+            <Grid2 key={`info-${n}`} item size={1}>
               <IconButton onClick={() => handleClickOpenDialogInfo(r)}>
                 <InfoOutlined />
               </IconButton>
@@ -177,7 +189,7 @@ function RhakosCruncher({ metadata, style }) {
         ))}
       </Grid2>
       <DialogConfigRhakos open={openDialogConfig} close={setOpenDialogConfig} models={models} selectedModel={selectedModel} setSelectedModel={setSelectedModel} topK={topK} setTopK={setTopK} temperature={temperature} setTemperature={setTemperature} showFullPrompt={showFullPrompt} setShowFullPrompt={setShowFullPrompt} />
-      <InformationDialogRhakos open={openDialogInfo} close={setOpenDialogInfo} response={selectedResponseInfoDialog}/>
+      <InformationDialogRhakos open={openDialogInfo} close={setOpenDialogInfo} response={selectedResponseInfoDialog} />
     </Box>
   );
 }

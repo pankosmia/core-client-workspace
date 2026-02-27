@@ -750,14 +750,15 @@
       "fr":"Afficher prompt complet"
     },
     "bcv_rhakos":{
-      "en":"Book Chapter Verse",
-      "fr":"Livre Chapitre Verset"
+      "en":"Reference",
+      "fr":"Référence"
     },
     "quantized_rhakos":{
       "en":"Quantized"
     },
     "submitted_rhakos":{
-      "en":"Submitted"
+      "en":"Sent at",
+      "fr":"Envoyé à"
     },
     "elapsed_rhakos":{
       "en":"Processing time"
