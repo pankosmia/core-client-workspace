@@ -65,7 +65,6 @@ function JuxtaEditable({
   };
 
   const onDragEnd = ({ source, destination }) => {
-    console.log("justa working");
     if (!destination) return;
 
     const sInd = +source.droppableId;
