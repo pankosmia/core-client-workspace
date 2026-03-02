@@ -23,7 +23,6 @@ function RhakosCruncher({ metadata, style }) {
   const [prompt, setPrompt] = useState("");
   const [processing, setProcessing] = useState(false);
   const [responses, setResponses] = useState([]);
-  console.log("responses", responses);
   const [selectedResponseInfoDialog, setSelectedResponseInfoDialog] = useState(null);
 
   useEffect(() => {
@@ -52,7 +51,7 @@ function RhakosCruncher({ metadata, style }) {
     from_chapter: 3,
     from_verse: 16,
     prompt: prompt,
-    show_prompt: showFullPrompt,
+    show_prompt: true,
     top_k: topK,
     temperature: temperature,
     rag_context: {
@@ -110,9 +109,12 @@ function RhakosCruncher({ metadata, style }) {
         <TextField
           fullWidth
           label={`
-            ${doI18n("pages:core-local-workspace:model_rhakos", i18nRef.current)} ${selectedModel[0]} 
-            ${doI18n("pages:core-local-workspace:topk_rhakos", i18nRef.current)} ${topK}
-            ${doI18n("pages:core-local-workspace:temperature_rhakos", i18nRef.current)} ${temperature} `}
+            ${doI18n("pages:core-local-workspace:model_rhakos", i18nRef.current)} ${selectedModel[0]}, 
+            ${doI18n("pages:core-local-workspace:topk_rhakos", i18nRef.current)} ${topK},
+            ${doI18n("pages:core-local-workspace:temperature_rhakos", i18nRef.current)} ${temperature}
+            ${!showFullPrompt ? "" :`, ${doI18n("pages:core-local-workspace:choose_prompt_rhakos", i18nRef.current)}`}`
+          }
+
           slotProps={{
             input: {
               readOnly: true,
@@ -130,7 +132,7 @@ function RhakosCruncher({ metadata, style }) {
             }
           }}
         />
-        <Grid2 item size={11}>
+        <Grid2 item size="grow">
           <TextField
             fullWidth
             disabled={processing}

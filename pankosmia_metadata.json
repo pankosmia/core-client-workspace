@@ -749,6 +749,10 @@
       "en":"Show full prompt",
       "fr":"Afficher prompt complet"
     },
+    "choose_prompt_rhakos":{
+      "en":"with prompt",
+      "fr":"avec prompt"
+    },
     "bcv_rhakos":{
       "en":"Reference",
       "fr":"Référence"
