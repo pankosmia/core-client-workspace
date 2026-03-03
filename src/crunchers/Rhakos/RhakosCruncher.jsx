@@ -1,13 +1,21 @@
 import { useContext, useState, useEffect } from "react";
-import { Box, Button, Grid2, TextField, InputAdornment, IconButton, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid2,
+  TextField,
+  InputAdornment,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
 import { doI18n, getJson, postJson } from "pithekos-lib";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,
 } from "pankosmia-rcl";
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from "@mui/icons-material/Settings";
 import DialogConfigRhakos from "./DialogConfig";
-import InformationDialogRhakos from "./InformationDialog";
+import ResponseRow from "./ResponseRow";
 
 function RhakosCruncher({ metadata, style }) {
   const { i18nRef } = useContext(I18nContext);
@@ -15,13 +23,11 @@ function RhakosCruncher({ metadata, style }) {
 
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState(["qwen3-4b", true]);
-  const [showFullPrompt, setShowFullPrompt] = useState(false);
   const [temperature, setTemperature] = useState(0.6);
   const [topK, setTopK] = useState(20);
   const [prompt, setPrompt] = useState("");
   const [processing, setProcessing] = useState(false);
   const [responses, setResponses] = useState([]);
-  const [selectedResponseInfoDialog, setSelectedResponseInfoDialog] = useState(null);
 
   useEffect(() => {
     const getModels = async () => {
@@ -35,12 +41,8 @@ function RhakosCruncher({ metadata, style }) {
     }
   });
   const [openDialogConfig, setOpenDialogConfig] = useState(false);
-  const [openDialogInfo, setOpenDialogInfo] = useState(false);
-  const handleClickOpenDialogConfig = () => setOpenDialogConfig((show) => !show);
-  const handleClickOpenDialogInfo = (response) => {
-    setSelectedResponseInfoDialog(response)
-    setOpenDialogInfo((show) => !show);
-  }
+  const handleClickOpenDialogConfig = () =>
+    setOpenDialogConfig((show) => !show);
 
   const rag_context = {
     model_name: selectedModel[0],
@@ -110,24 +112,21 @@ function RhakosCruncher({ metadata, style }) {
             ${doI18n("pages:core-local-workspace:model_rhakos", i18nRef.current)} ${selectedModel[0]}, 
             ${doI18n("pages:core-local-workspace:topk_rhakos", i18nRef.current)} ${topK},
             ${doI18n("pages:core-local-workspace:temperature_rhakos", i18nRef.current)} ${temperature}
-            ${!showFullPrompt ? "" :`, ${doI18n("pages:core-local-workspace:choose_prompt_rhakos", i18nRef.current)}`}`
-          }
-
+            `}
           slotProps={{
             input: {
               readOnly: true,
-              endAdornment: <InputAdornment position="end">
-                <IconButton
-                  onClick={handleClickOpenDialogConfig}
-                  edge="end"
-                >
-                  <SettingsIcon />
-                </IconButton>
-              </InputAdornment>
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleClickOpenDialogConfig} edge="end">
+                    <SettingsIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
             },
             inputLabel: {
-              shrink: false
-            }
+              shrink: false,
+            },
           }}
         />
         <Grid2 item size="grow">
@@ -135,8 +134,10 @@ function RhakosCruncher({ metadata, style }) {
             fullWidth
             disabled={processing}
             id="prompt"
-            label={doI18n("pages:core-local-workspace:prompt_rhakos", i18nRef.current)}
-
+            label={doI18n(
+              "pages:core-local-workspace:prompt_rhakos",
+              i18nRef.current,
+            )}
             value={prompt}
             onChange={(event) => {
               setPrompt(event.target.value);
@@ -159,7 +160,11 @@ function RhakosCruncher({ metadata, style }) {
               setPrompt("");
             }}
           >
-            {processing === false ? doI18n("pages:core-local-workspace:send_button", i18nRef.current) : <CircularProgress enableTrackSlot size={25} />}
+            {processing === false ? (
+              doI18n("pages:core-local-workspace:send_button", i18nRef.current)
+            ) : (
+              <CircularProgress enableTrackSlot size={25} />
+            )}
           </Button>
         </Grid2>
       </Grid2>
@@ -171,19 +176,24 @@ function RhakosCruncher({ metadata, style }) {
           direction: "column",
           justifyContent: "flex-start",
           alignItems: "flex-start",
-          paddingTop: 2
+          paddingTop: 2,
         }}
       >
         {[...responses].reverse().map((r, n) => (
-          <>
-          <ResponseRow n={n} response={r.json}/>
-
-
-          </>
+          <ResponseRow n={n} response={r} />
         ))}
       </Grid2>
-      <DialogConfigRhakos open={openDialogConfig} close={setOpenDialogConfig} models={models} selectedModel={selectedModel} setSelectedModel={setSelectedModel} topK={topK} setTopK={setTopK} temperature={temperature} setTemperature={setTemperature} showFullPrompt={showFullPrompt} setShowFullPrompt={setShowFullPrompt} />
-      <InformationDialogRhakos open={openDialogInfo} close={setOpenDialogInfo} response={selectedResponseInfoDialog} />
+      <DialogConfigRhakos
+        open={openDialogConfig}
+        close={setOpenDialogConfig}
+        models={models}
+        selectedModel={selectedModel}
+        setSelectedModel={setSelectedModel}
+        topK={topK}
+        setTopK={setTopK}
+        temperature={temperature}
+        setTemperature={setTemperature}
+      />
     </Box>
   );
 }
