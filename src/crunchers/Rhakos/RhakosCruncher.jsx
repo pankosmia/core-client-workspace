@@ -8,7 +8,7 @@ import {
 import SettingsIcon from '@mui/icons-material/Settings';
 import DialogConfigRhakos from "./DialogConfig";
 import InformationDialogRhakos from "./InformationDialog";
-import { InfoOutlined } from "@mui/icons-material";
+import { InfoOutlined, Send } from "@mui/icons-material";
 import Markdown from 'react-markdown';
 
 function RhakosCruncher({ metadata, style }) {
@@ -160,8 +160,14 @@ function RhakosCruncher({ metadata, style }) {
               setProcessing(false);
               setPrompt("");
             }}
+            sx={{
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
           >
-            {processing === false ? doI18n("pages:core-local-workspace:send_button", i18nRef.current) : <CircularProgress enableTrackSlot size={25} />}
+            {processing ? ( <CircularProgress enableTrackSlot size={25} color="inherit" />) : ( <Send fontSize="large" /> )}
           </Button>
         </Grid2>
       </Grid2>
