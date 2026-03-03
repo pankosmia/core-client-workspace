@@ -15,7 +15,8 @@ import {
 } from "pankosmia-rcl";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SendIcon from "@mui/icons-material/Send";
-import DialogConfigRhakos from "./DialogConfig";
+import DialogConfig from "./DialogConfig";
+import DialogResources from "./DialogResources";
 import ResponseRow from "./ResponseRow";
 
 function RhakosCruncher({ metadata, style }) {
@@ -26,9 +27,12 @@ function RhakosCruncher({ metadata, style }) {
   const [selectedModel, setSelectedModel] = useState(["qwen3-4b", true]);
   const [temperature, setTemperature] = useState(0.6);
   const [topK, setTopK] = useState(20);
+  const [resources, setResources] = useState({translations: [], juxta: [], notes: []});
   const [prompt, setPrompt] = useState("");
   const [processing, setProcessing] = useState(false);
   const [responses, setResponses] = useState([]);
+ const [openDialogConfig, setOpenDialogConfig] = useState(false);
+     const [openDialogResources, setOpenDialogResources] = useState(false);
 
   useEffect(() => {
     const getModels = async () => {
@@ -41,9 +45,6 @@ function RhakosCruncher({ metadata, style }) {
       getModels().then();
     }
   });
-  const [openDialogConfig, setOpenDialogConfig] = useState(false);
-  const handleClickOpenDialogConfig = () =>
-    setOpenDialogConfig((show) => !show);
 
   const rag_context = {
     model_name: selectedModel[0],
@@ -107,29 +108,58 @@ function RhakosCruncher({ metadata, style }) {
         columnSpacing={0.5}
         rowSpacing={1}
       >
-        <TextField
-          fullWidth
-          label={`
+        <Grid2 item size={12}>
+          <TextField
+            fullWidth
+            label={`
             ${doI18n("pages:core-local-workspace:model_rhakos", i18nRef.current)} ${selectedModel[0]}, 
             ${doI18n("pages:core-local-workspace:topk_rhakos", i18nRef.current)} ${topK},
             ${doI18n("pages:core-local-workspace:temperature_rhakos", i18nRef.current)} ${temperature}
             `}
-          slotProps={{
-            input: {
-              readOnly: true,
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleClickOpenDialogConfig} edge="end">
-                    <SettingsIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-            inputLabel: {
-              shrink: false,
-            },
-          }}
-        />
+            slotProps={{
+              input: {
+                readOnly: true,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setOpenDialogConfig(true)}
+                      edge="end"
+                    >
+                      <SettingsIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+              inputLabel: {
+                shrink: false,
+              },
+            }}
+          />
+        </Grid2>
+        <Grid2 item size={12}>
+          <TextField
+            fullWidth
+            label={`Resource abbreviations go here`}
+            slotProps={{
+              input: {
+                readOnly: true,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setOpenDialogResources(true)}
+                      edge="end"
+                    >
+                      <SettingsIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+              inputLabel: {
+                shrink: false,
+              },
+            }}
+          />
+        </Grid2>
         <Grid2 item size="grow">
           <TextField
             fullWidth
@@ -145,7 +175,7 @@ function RhakosCruncher({ metadata, style }) {
             }}
           />
         </Grid2>
-        <Grid2 item size={{ '@xs': 2, '@md': 1 }} sx={{ display: 'flex' }}>
+        <Grid2 item size={{ "@xs": 2, "@md": 1 }} sx={{ display: "flex" }}>
           <Button
             fullWidth
             disabled={processing || prompt === ""}
@@ -161,7 +191,11 @@ function RhakosCruncher({ metadata, style }) {
               setPrompt("");
             }}
           >
-            {processing ? ( <CircularProgress enableTrackSlot size={25} color="inherit" />) : ( <SendIcon fontSize="large" /> )}
+            {processing ? (
+              <CircularProgress enableTrackSlot size={25} color="inherit" />
+            ) : (
+              <SendIcon fontSize="large" />
+            )}
           </Button>
         </Grid2>
       </Grid2>
@@ -180,7 +214,7 @@ function RhakosCruncher({ metadata, style }) {
           <ResponseRow n={n} response={r} />
         ))}
       </Grid2>
-      <DialogConfigRhakos
+      <DialogConfig
         open={openDialogConfig}
         close={setOpenDialogConfig}
         models={models}
@@ -190,6 +224,12 @@ function RhakosCruncher({ metadata, style }) {
         setTopK={setTopK}
         temperature={temperature}
         setTemperature={setTemperature}
+      />
+      <DialogResources
+        open={openDialogResources}
+        close={setOpenDialogResources}
+        resources={resources}
+        setResources={setResources}
       />
     </Box>
   );

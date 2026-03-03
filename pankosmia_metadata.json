@@ -782,6 +782,10 @@
     "second":{
       "en":"sec",
       "fr":"sec"
+    },
+    "resources_rhakos": {
+      "en": "Resources to consult",
+      "fr": "Ressources à prendre en compte"
     }
 
   }

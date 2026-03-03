@@ -10,7 +10,7 @@ import { doI18n } from "pithekos-lib";
 import { useContext } from "react";
 import { i18nContext } from "pankosmia-rcl";
 
-export default function DialogConfigRhakos({
+export default function DialogConfig({
   open,
   close,
   models,
