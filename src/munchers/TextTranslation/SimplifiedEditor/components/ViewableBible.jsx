@@ -23,7 +23,7 @@ export default function ViewableBible({ chapterJson, dir }) {
         loadCSS();
     }, []);
 
-    console.log('passed: ' + dir)
+    //console.log('passed: ' + dir)
 
     return (
         <div style={{ padding: "2px 12px" }} dir={dir}>

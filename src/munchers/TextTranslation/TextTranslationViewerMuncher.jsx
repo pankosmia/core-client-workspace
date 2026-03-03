@@ -33,7 +33,7 @@ function TextTranslationViewerMuncher({metadata}) {
                       const dir = await TextDir(usfmResponse.text, 'usfm');
                       setTextDir(dir);
                     }
-                    console.log(usfmResponse.text);
+                    //console.log(usfmResponse.text);
                 } else {
                     console.error("usfmResponse failed");
                 }
@@ -43,8 +43,8 @@ function TextTranslationViewerMuncher({metadata}) {
         [debugRef, systemBcv.bookCode, systemBcv.chapterNum, systemBcv.verseNum, metadata.local_path, sbScriptDirSet, textDir]
     );
 
-    console.log('sbScriptDirSet: ' + !sbScriptDirSet.toString())
-    console.log('textDir: ' + textDir)
+    //console.log('sbScriptDirSet: ' + !sbScriptDirSet.toString())
+    //console.log('textDir: ' + textDir)
 
 
     // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
