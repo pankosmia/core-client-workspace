@@ -145,7 +145,7 @@ function RhakosCruncher({ metadata, style }) {
             }}
           />
         </Grid2>
-        <Grid2 item size={1}>
+        <Grid2 item size={{ '@xs': 2, '@md': 1 }} sx={{ display: 'flex' }}>
           <Button
             fullWidth
             disabled={processing || prompt === ""}
