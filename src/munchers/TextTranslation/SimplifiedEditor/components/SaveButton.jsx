@@ -21,7 +21,6 @@ function SaveButton({
   useEffect(() => {
     const isElectron = !!window.electronAPI;
     if (isElectron) {
-      console.log("ici");
       if (!(md5sum(JSON.stringify(scriptureJson)) === md5sumScriptureJson)) {
         window.electronAPI.setCanClose(false);
       } else {
