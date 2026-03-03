@@ -14,6 +14,7 @@ import {
   debugContext as DebugContext,
 } from "pankosmia-rcl";
 import SettingsIcon from "@mui/icons-material/Settings";
+import SendIcon from "@mui/icons-material/Send";
 import DialogConfigRhakos from "./DialogConfig";
 import ResponseRow from "./ResponseRow";
 
@@ -144,7 +145,7 @@ function RhakosCruncher({ metadata, style }) {
             }}
           />
         </Grid2>
-        <Grid2 item size={1}>
+        <Grid2 item size={{ '@xs': 2, '@md': 1 }} sx={{ display: 'flex' }}>
           <Button
             fullWidth
             disabled={processing || prompt === ""}
@@ -160,11 +161,7 @@ function RhakosCruncher({ metadata, style }) {
               setPrompt("");
             }}
           >
-            {processing === false ? (
-              doI18n("pages:core-local-workspace:send_button", i18nRef.current)
-            ) : (
-              <CircularProgress enableTrackSlot size={25} />
-            )}
+            {processing ? ( <CircularProgress enableTrackSlot size={25} color="inherit" />) : ( <SendIcon fontSize="large" /> )}
           </Button>
         </Grid2>
       </Grid2>
