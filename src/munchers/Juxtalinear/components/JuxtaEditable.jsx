@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { ArrowDropUp, ArrowDropDown } from "@mui/icons-material";
-import { DragDropContext, StrictModeDroppable, Draggable } from "./Droppable";
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { getJson } from "pithekos-lib";
 import { bcvContext, debugContext } from "pankosmia-rcl";
 import "./Home.css";
@@ -137,6 +137,8 @@ function JuxtaEditable({
     });
     setGlobalSentences(curIndex, newSentence);
   };
+
+  
   return (
     <Box display="flex" flexDirection="column">
       <Box flex={1} overflow="auto" p={2}>
@@ -157,7 +159,7 @@ function JuxtaEditable({
                         </Button>
                       </Stack>
 
-                      <StrictModeDroppable
+                      <Droppable
                         droppableId={`${n}`}
                         direction="horizontal"
                       >
@@ -198,7 +200,7 @@ function JuxtaEditable({
                             {provided.placeholder}
                           </div>
                         )}
-                      </StrictModeDroppable>
+                      </Droppable>
                     </Stack>
                   </Grid>
 
