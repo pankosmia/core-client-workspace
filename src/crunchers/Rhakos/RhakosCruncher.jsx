@@ -27,7 +27,7 @@ function RhakosCruncher({ metadata, style }) {
   const [selectedModel, setSelectedModel] = useState(["qwen3-4b", true]);
   const [temperature, setTemperature] = useState(0.6);
   const [topK, setTopK] = useState(20);
-  const [resources, setResources] = useState({translations: [], juxta: [], notes: []});
+  const [resources, setResources] = useState({translations: [], juxtas: [], notes: []});
   const [prompt, setPrompt] = useState("");
   const [processing, setProcessing] = useState(false);
   const [responses, setResponses] = useState([]);

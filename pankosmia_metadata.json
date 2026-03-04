@@ -786,6 +786,18 @@
     "resources_rhakos": {
       "en": "Resources to consult",
       "fr": "Ressources à prendre en compte"
+    },
+    "translations": {
+      "en": "Translations",
+      "fr": "Traductions"
+    },
+    "juxtas": {
+      "en": "Juxtalinears",
+      "fr": "Juxtalinéaires"
+    },
+    "notes": {
+      "en": "Notes",
+      "fr": "Notes"
     }
 
   }
