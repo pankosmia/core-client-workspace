@@ -112,67 +112,73 @@ function RhakosCruncher({ metadata, style }) {
         columnSpacing={0.5}
         rowSpacing={1}
       >
-        <Grid2 item size={12}>
-          <TextField
-            fullWidth
-            label={`
+        <Grid2 container
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }} item size={12}>
+          <Grid2 item size="grow">
+            <TextField
+              fullWidth
+              label={`
             ${doI18n("pages:core-local-workspace:model_rhakos", i18nRef.current)} ${selectedModel[0]}, 
             ${doI18n("pages:core-local-workspace:topk_rhakos", i18nRef.current)} ${topK},
             ${doI18n("pages:core-local-workspace:temperature_rhakos", i18nRef.current)} ${temperature}
             `}
-            slotProps={{
-              input: {
-                readOnly: true,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setOpenDialogConfig(true)}
-                      edge="end"
-                    >
-                      <SettingsIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-              inputLabel: {
-                shrink: false,
-              },
-            }}
-          />
+              slotProps={{
+                input: {
+                  readOnly: true,
+                },
+                inputLabel: {
+                  shrink: false,
+                },
+              }}
+            />
+          </Grid2>
+          <Grid2 item size={{ "@xs": 2, "@md": 1 }}>
+            <IconButton onClick={() => setOpenDialogConfig(true)}>
+              <SettingsIcon />
+            </IconButton>
+          </Grid2>
         </Grid2>
-        <Grid2 item size={12}>
-          <TextField
-            fullWidth
-            label={
-              Object.values(resources)
-                .reduce((a, b) => [...a, ...b], [])
-                .filter((ra) => ra[1])
-                .map((ra) => ra[0].abbreviation)
-                .join(", ") ||
-              doI18n(
-                "pages:core-local-workspace:no_resources_chosen",
-                i18nRef.current,
-              )
-            }
-            slotProps={{
-              input: {
-                readOnly: true,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setOpenDialogResources(true)}
-                      edge="end"
-                    >
-                      <SettingsIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-              inputLabel: {
-                shrink: false,
-              },
-            }}
-          />
+
+        <Grid2 container sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }} item size={12}>
+          <Grid2 item size="grow">
+            <TextField
+              fullWidth
+              label={
+                Object.values(resources)
+                  .reduce((a, b) => [...a, ...b], [])
+                  .filter((ra) => ra[1])
+                  .map((ra) => ra[0].abbreviation)
+                  .join(", ") ||
+                doI18n(
+                  "pages:core-local-workspace:no_resources_chosen",
+                  i18nRef.current,
+                )
+              }
+              slotProps={{
+                input: {
+                  readOnly: true,
+                },
+                inputLabel: {
+                  shrink: false,
+                },
+              }}
+            />
+          </Grid2>
+          <Grid2 item size={{ "@xs": 2, "@md": 1 }}>
+            <IconButton
+              onClick={() => setOpenDialogResources(true)}
+            >
+              <SettingsIcon />
+            </IconButton>
+          </Grid2>
         </Grid2>
         <Grid2 item size="grow">
           <TextField
@@ -190,7 +196,7 @@ function RhakosCruncher({ metadata, style }) {
           />
         </Grid2>
         <Grid2 item size={{ "@xs": 2, "@md": 1 }} sx={{ display: "flex" }}>
-          <Button
+          <IconButton
             fullWidth
             disabled={processing || prompt === ""}
             onClick={async () => {
@@ -208,9 +214,9 @@ function RhakosCruncher({ metadata, style }) {
             {processing ? (
               <CircularProgress enableTrackSlot size={25} color="inherit" />
             ) : (
-              <SendIcon fontSize="large" />
+              <SendIcon />
             )}
-          </Button>
+          </IconButton>
         </Grid2>
       </Grid2>
       <Grid2
