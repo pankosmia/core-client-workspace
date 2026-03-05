@@ -27,12 +27,16 @@ function RhakosCruncher({ metadata, style }) {
   const [selectedModel, setSelectedModel] = useState(["qwen3-4b", true]);
   const [temperature, setTemperature] = useState(0.6);
   const [topK, setTopK] = useState(20);
-  const [resources, setResources] = useState({translations: [], juxtas: [], notes: []});
+  const [resources, setResources] = useState({
+    translations: [],
+    juxtas: [],
+    notes: [],
+  });
   const [prompt, setPrompt] = useState("");
   const [processing, setProcessing] = useState(false);
   const [responses, setResponses] = useState([]);
- const [openDialogConfig, setOpenDialogConfig] = useState(false);
-     const [openDialogResources, setOpenDialogResources] = useState(false);
+  const [openDialogConfig, setOpenDialogConfig] = useState(false);
+  const [openDialogResources, setOpenDialogResources] = useState(false);
 
   useEffect(() => {
     const getModels = async () => {
@@ -141,10 +145,14 @@ function RhakosCruncher({ metadata, style }) {
             fullWidth
             label={
               Object.values(resources)
-              .reduce((a, b) => [...a, ...b], [])
-              .filter(ra => ra[1])
-              .map(ra => ra[0].abbreviation)
-              .join(", ") || doI18n("pages:core-local-workspace:no_resources_chosen", i18nRef.current)
+                .reduce((a, b) => [...a, ...b], [])
+                .filter((ra) => ra[1])
+                .map((ra) => ra[0].abbreviation)
+                .join(", ") ||
+              doI18n(
+                "pages:core-local-workspace:no_resources_chosen",
+                i18nRef.current,
+              )
             }
             slotProps={{
               input: {
