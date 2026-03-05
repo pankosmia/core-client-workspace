@@ -98,7 +98,7 @@ export default function DialogResources({
     >
       <DialogContent>
         <Grid2 container spacing={2}>
-          {["translations", "juxtas", "notes"].map(
+          {Object.keys(resources).map(
             (s) =>
               resources[s].length > 0 && (
                 <>
@@ -121,7 +121,7 @@ export default function DialogResources({
                               }
                             />
                           }
-                          label={`${t[0].name} (${t[0].path})`}
+                          label={`${t[0].abbreviation} - ${t[0].name} (${t[0].path})`}
                         />
                       ))}
                     </FormGroup>

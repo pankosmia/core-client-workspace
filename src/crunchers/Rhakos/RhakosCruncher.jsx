@@ -139,7 +139,13 @@ function RhakosCruncher({ metadata, style }) {
         <Grid2 item size={12}>
           <TextField
             fullWidth
-            label={`Resource abbreviations go here`}
+            label={
+              Object.values(resources)
+              .reduce((a, b) => [...a, ...b], [])
+              .filter(ra => ra[1])
+              .map(ra => ra[0].abbreviation)
+              .join(", ") || doI18n("pages:core-local-workspace:no_resources_chosen", i18nRef.current)
+            }
             slotProps={{
               input: {
                 readOnly: true,
