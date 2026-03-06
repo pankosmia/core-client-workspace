@@ -1,10 +1,8 @@
 import { useContext, useState, useEffect } from "react";
 import {
   Box,
-  Button,
   Grid2,
   TextField,
-  InputAdornment,
   IconButton,
   CircularProgress,
 } from "@mui/material";
@@ -52,7 +50,55 @@ function RhakosCruncher({ metadata, style }) {
     }
   });
 
+  const selectedResources = (category) =>
+    resources[category].filter((ra) => [ra[1]]).map((ra) => ra[0]);
+
   const makeRagContext = () => {
+    const translationPromptStrings = Object.fromEntries(
+      selectedResources("translations").map((t) => {
+        // Load USFM of correct book
+        // Import into Pk
+        // Query verse
+        // Return name/verseText tuple
+
+        return [t.name, "verse text"];
+      }),
+    );
+
+    const notePromptStrings = Object.fromEntries(
+      selectedResources("notes").map((note) => {
+        // Load TSV of correct book
+        // Filter by verse
+        // Filter out notes WITH bold markup not containing references
+        // Return name/[verseNotes] tuple
+
+        return [note.name, "verse note prompt"];
+      }),
+    );
+
+    const snippetPromptStrings = Object.fromEntries(
+      selectedResources("notes").map((note) => {
+        // Load TSV of correct book
+        // Filter by verse
+        // Filter out notes WITHOUT bold markup not containing references
+        // Return name/[verseNotes] tuple
+
+        return [note.name, "snippet prompt"];
+      }),
+    );
+
+    const juxtaPromptString = () => {
+      const juxtaResource = selectedResources("juxtas")[0];
+      if (juxtaResource) {
+        // Load JSON of correct book
+        // Find sentence for verse
+        // Return the prompt
+        return "juxta prompt";
+      } else {
+        return "";
+      }
+    };
+
     return {
       model_name: selectedModel[0],
       quantized: selectedModel[1],
@@ -63,6 +109,12 @@ function RhakosCruncher({ metadata, style }) {
       show_prompt: true,
       top_k: topK,
       temperature: temperature,
+      rag_context: {
+        juxta: "",
+        translations: translationPromptStrings,
+        notes: notePromptStrings,
+        snippets: snippetPromptStrings,
+      },
     };
   };
   console.log(makeRagContext());
@@ -129,12 +181,16 @@ function RhakosCruncher({ metadata, style }) {
         columnSpacing={0.5}
         rowSpacing={1}
       >
-        <Grid2 container
+        <Grid2
+          container
           sx={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-          }} item size={12}>
+          }}
+          item
+          size={12}
+        >
           <Grid2 item size="grow">
             <TextField
               fullWidth
@@ -160,20 +216,28 @@ function RhakosCruncher({ metadata, style }) {
           </Grid2>
         </Grid2>
 
-        <Grid2 container sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }} item size={12}>
+        <Grid2
+          container
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          item
+          size={12}
+        >
           <Grid2 item size="grow">
             <TextField
               fullWidth
               label={
-                Object.values(resources)
-                  .reduce((a, b) => [...a, ...b], [])
-                  .filter((ra) => ra[1])
-                  .map((ra) => ra[0].abbreviation)
-                  .join(", ") ||
+                [
+                  ...new Set(
+                    Object.values(resources)
+                      .reduce((a, b) => [...a, ...b], [])
+                      .filter((ra) => ra[1])
+                      .map((ra) => ra[0].abbreviation),
+                  ),
+                ].join(", ") ||
                 doI18n(
                   "pages:core-local-workspace:no_resources_chosen",
                   i18nRef.current,
@@ -190,9 +254,7 @@ function RhakosCruncher({ metadata, style }) {
             />
           </Grid2>
           <Grid2 item size={{ "@xs": 2, "@md": 1 }}>
-            <IconButton
-              onClick={() => setOpenDialogResources(true)}
-            >
+            <IconButton onClick={() => setOpenDialogResources(true)}>
               <SettingsIcon />
             </IconButton>
           </Grid2>
