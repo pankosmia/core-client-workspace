@@ -12,6 +12,7 @@ import { doI18n, getJson, postJson } from "pithekos-lib";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,
+  bcvContext as BcvContext,
 } from "pankosmia-rcl";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SendIcon from "@mui/icons-material/Send";
@@ -22,6 +23,7 @@ import ResponseRow from "./ResponseRow";
 function RhakosCruncher({ metadata, style }) {
   const { i18nRef } = useContext(I18nContext);
   const { debugRef } = useContext(DebugContext);
+  const { bcvRef } = useContext(BcvContext);
 
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState(["qwen3-4b", true]);
@@ -49,6 +51,21 @@ function RhakosCruncher({ metadata, style }) {
       getModels().then();
     }
   });
+
+  const makeRagContext = () => {
+    return {
+      model_name: selectedModel[0],
+      quantized: selectedModel[1],
+      book: bcvRef.current.bookCode,
+      from_chapter: bcvRef.current.chapterNum,
+      from_verse: bcvRef.current.verseNum,
+      prompt: prompt,
+      show_prompt: true,
+      top_k: topK,
+      temperature: temperature,
+    };
+  };
+  console.log(makeRagContext());
 
   const rag_context = {
     model_name: selectedModel[0],
