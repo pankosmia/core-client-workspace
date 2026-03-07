@@ -6,7 +6,7 @@ import {
   IconButton,
   CircularProgress,
 } from "@mui/material";
-import { doI18n, getJson, postJson } from "pithekos-lib";
+import { doI18n, getJson, postJson, getText } from "pithekos-lib";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,
@@ -53,10 +53,21 @@ function RhakosCruncher({ metadata, style }) {
   const selectedResources = (category) =>
     resources[category].filter((ra) => [ra[1]]).map((ra) => ra[0]);
 
-  const makeRagContext = () => {
+  const makeRagContext = async () => {
     const translationPromptStrings = Object.fromEntries(
-      selectedResources("translations").map((t) => {
+      selectedResources("translations").map(async (t) => {
         // Load USFM of correct book
+        let usfmResponse = await getText(
+          `/burrito/ingredient/raw/${t.path}?ipath=${bcvRef.current.bookCode}.usfm`,
+          debugRef.current,
+        );
+        if (usfmResponse.ok) {
+          console.log(`USFM loaded`);
+        } else {
+          console.log(`Error on USFM load! ${usfmResponse.error}`);
+          return;
+        }
+
         // Import into Pk
         // Query verse
         // Return name/verseText tuple
@@ -110,7 +121,7 @@ function RhakosCruncher({ metadata, style }) {
       top_k: topK,
       temperature: temperature,
       rag_context: {
-        juxta: "",
+        juxta: juxtaPromptString,
         translations: translationPromptStrings,
         notes: notePromptStrings,
         snippets: snippetPromptStrings,
