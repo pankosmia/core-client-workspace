@@ -12,6 +12,7 @@ import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
+import { Proskomma } from "proskomma-core";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SendIcon from "@mui/icons-material/Send";
 import DialogConfig from "./DialogConfig";
@@ -54,27 +55,49 @@ function RhakosCruncher({ metadata, style }) {
     resources[category].filter((ra) => [ra[1]]).map((ra) => ra[0]);
 
   const makeRagContext = async () => {
-    const translationPromptStrings = Object.fromEntries(
-      selectedResources("translations").map(async (t) => {
-        // Load USFM of correct book
-        let usfmResponse = await getText(
-          `/burrito/ingredient/raw/${t.path}?ipath=${bcvRef.current.bookCode}.usfm`,
-          debugRef.current,
+    let translationPromptStringEntries = [];
+    for (const t of selectedResources("translations")) {
+      // Load USFM of correct book
+      let usfmResponse = await getText(
+        `/burrito/ingredient/raw/${t.path}?ipath=${bcvRef.current.bookCode}.usfm`,
+        debugRef.current,
+      );
+      if (usfmResponse.ok) {
+        // Import into Pk
+        const pk = new Proskomma();
+        pk.importDocument(
+          { lang: "xxx", abbr: "yyy" },
+          "usfm",
+          usfmResponse.text,
         );
-        if (usfmResponse.ok) {
-          console.log(`USFM loaded`);
-        } else {
-          console.log(`Error on USFM load! ${usfmResponse.error}`);
+        // Query verse
+        const pkQuery = `{
+          documents {
+            cvIndex(chapter: ${bcvRef.current.chapterNum}) {
+              verses {
+                verse {
+                  text(normalizeSpace: true)
+                }
+              }
+            }
+          }
+        }`;
+        const pkResult = pk.gqlQuerySync(pkQuery);
+        if (!pkResult.data) {
+          console.log(`Error on Pk query: ${pkResult}`);
           return;
         }
-
-        // Import into Pk
-        // Query verse
         // Return name/verseText tuple
-
-        return [t.name, "verse text"];
-      }),
-    );
+        const verseText =
+          pkResult.data.documents[0].cvIndex.verses[bcvRef.current.verseNum];
+        if (verseText && verseText.verse && verseText.verse[0] && verseText.verse[0].text) {
+          translationPromptStringEntries.push([t.name, verseText.verse[0].text]);
+        }
+      } else {
+        console.log(`Error on USFM load! ${usfmResponse.error}`);
+        return;
+      }
+    }
 
     const notePromptStrings = Object.fromEntries(
       selectedResources("notes").map((note) => {
@@ -98,7 +121,7 @@ function RhakosCruncher({ metadata, style }) {
       }),
     );
 
-    const juxtaPromptString = () => {
+    const juxtaPromptStringFn = () => {
       const juxtaResource = selectedResources("juxtas")[0];
       if (juxtaResource) {
         // Load JSON of correct book
@@ -109,6 +132,8 @@ function RhakosCruncher({ metadata, style }) {
         return "";
       }
     };
+
+    const juxtaPromptString = juxtaPromptStringFn();
 
     return {
       model_name: selectedModel[0],
@@ -122,13 +147,13 @@ function RhakosCruncher({ metadata, style }) {
       temperature: temperature,
       rag_context: {
         juxta: juxtaPromptString,
-        translations: translationPromptStrings,
+        translations: Object.fromEntries(translationPromptStringEntries),
         notes: notePromptStrings,
         snippets: snippetPromptStrings,
       },
     };
   };
-  console.log(makeRagContext());
+  makeRagContext().then((r) => console.log(r));
 
   const rag_context = {
     model_name: selectedModel[0],
