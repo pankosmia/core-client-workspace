@@ -21,7 +21,7 @@ function AddFab({
   };
 
   return (
-    <Box>
+    <Box sx={{ pl:2 }}>
       <Fab
         variant="extended"
         color="primary"
