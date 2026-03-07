@@ -52,7 +52,10 @@ function RhakosCruncher({ metadata, style }) {
   });
 
   const selectedResources = (category) =>
-    resources[category].filter((ra) => [ra[1]]).map((ra) => ra[0]);
+    resources[category].filter((ra) => ra[1]).map((ra) => ra[0]);
+
+  console.log(resources["translations"]);
+  console.log("resources", selectedResources("translations"))
 
   const makeRagContext = async () => {
     let translationPromptStringEntries = [];
@@ -90,8 +93,16 @@ function RhakosCruncher({ metadata, style }) {
         // Return name/verseText tuple
         const verseText =
           pkResult.data.documents[0].cvIndex.verses[bcvRef.current.verseNum];
-        if (verseText && verseText.verse && verseText.verse[0] && verseText.verse[0].text) {
-          translationPromptStringEntries.push([t.name, verseText.verse[0].text]);
+        if (
+          verseText &&
+          verseText.verse &&
+          verseText.verse[0] &&
+          verseText.verse[0].text
+        ) {
+          translationPromptStringEntries.push([
+            t.name,
+            verseText.verse[0].text,
+          ]);
         }
       } else {
         console.log(`Error on USFM load! ${usfmResponse.error}`);
@@ -99,27 +110,51 @@ function RhakosCruncher({ metadata, style }) {
       }
     }
 
-    const notePromptStrings = Object.fromEntries(
-      selectedResources("notes").map((note) => {
-        // Load TSV of correct book
-        // Filter by verse
-        // Filter out notes WITH bold markup not containing references
-        // Return name/[verseNotes] tuple
+    const allNoteStringEntries = [];
+    for (const t of selectedResources("notes")) {
+      // Load TSV of correct book
+      let tsvResponse = await getText(
+        `/burrito/ingredient/raw/${t.path}?ipath=${bcvRef.current.bookCode}.tsv`,
+        debugRef.current,
+      );
+      if (tsvResponse.ok) {
+        let tsvLines = tsvResponse.text
+          .split("\n")
+          .slice(1)
+          .map((l) => l.split("\t").map((c) => c.trim()))
+          .filter((l) => l.length !== 0)
+          .filter(
+            (l) =>
+              l[0] ===
+              `${bcvRef.current.chapterNum}:${bcvRef.current.verseNum}`,
+          );
+        allNoteStringEntries.push([t.name, tsvLines.map((l) => l[6])]);
+      } else {
+        console.log(`Error on TSV load! ${tsvResponse.error}`);
+        return;
+      }
+    }
 
-        return [note.name, "verse note prompt"];
-      }),
-    );
-
-    const snippetPromptStrings = Object.fromEntries(
-      selectedResources("notes").map((note) => {
-        // Load TSV of correct book
-        // Filter by verse
-        // Filter out notes WITHOUT bold markup not containing references
-        // Return name/[verseNotes] tuple
-
-        return [note.name, "snippet prompt"];
-      }),
-    );
+    // Split notes depending on whether they have bold markup not containing references ('snippets')
+    let notePromptStrings = {};
+    let snippetPromptStrings = {};
+    const re = new RegExp(/\*\*([^*]*[A-Za-z]+[^*]*)\*\*/g);
+    for (const noteEntry of allNoteStringEntries) {
+      for (const noteString of noteEntry[1]) {
+        const captured = re.exec(noteString);
+        if (captured) {// snippet
+          if (!(captured[1] in snippetPromptStrings)) {
+            snippetPromptStrings[captured[1]] = [];
+          }
+          snippetPromptStrings[captured[1]].push(noteString);
+        } else {// note
+          if (!(noteEntry[0] in notePromptStrings)) {
+            notePromptStrings[noteEntry[0]] = [];
+          }
+          notePromptStrings[noteEntry[0]].push(noteString);
+        }
+      }
+    }
 
     const juxtaPromptStringFn = () => {
       const juxtaResource = selectedResources("juxtas")[0];
