@@ -7,7 +7,6 @@ import {
 import { getText, postEmptyJson } from "pithekos-lib";
 import SearchWithVerses from "./components/SearchWithVerses";
 import Editor from "./components/Editor";
-import AddFab from "./components/AddFab";
 import SaveTsvButton from "./components/SaveTsvButton";
 import md5 from "md5";
 import BookPicker from "../TextTranslation/SimplifiedEditor/components/BookPicker";
@@ -86,14 +85,6 @@ function BcvNotesEditorMuncher({ metadata }) {
           padding: 2,
         }}
       >
-        <AddFab
-          currentRowN={currentRowN}
-          setCurrentRowN={setCurrentRowN}
-          ingredient={ingredient}
-          setIngredient={setIngredient}
-          cellValueChanged={cellValueChanged}
-          setCellValueChanged={setCellValueChanged}
-        />
         <SaveTsvButton
           metadata={metadata}
           ingredient={ingredient}
@@ -107,8 +98,11 @@ function BcvNotesEditorMuncher({ metadata }) {
       <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
         <SearchWithVerses
           ingredient={ingredient}
+          setIngredient={setIngredient}
           currentRowN={currentRowN}
           setCurrentRowN={setCurrentRowN}
+          cellValueChanged={cellValueChanged}
+          setCellValueChanged={setCellValueChanged}
           updateBcv={updateBcv}
         />
         <Editor
