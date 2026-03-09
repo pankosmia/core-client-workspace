@@ -21,7 +21,7 @@ function AddFab({
   };
 
   return (
-    <Box sx={{ pl:2 }}>
+    <Box>
       <Fab
         variant="extended"
         color="primary"
@@ -34,7 +34,6 @@ function AddFab({
         <AddIcon sx={{ mr: 1 }} />
         {doI18n("pages:core-local-workspace:add", i18nRef.current)}
       </Fab>
-
       <AddLineDialog
         mode="add"
         open={openedModal === "add"}
