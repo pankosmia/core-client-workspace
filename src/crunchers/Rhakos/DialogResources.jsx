@@ -68,7 +68,7 @@ export default function DialogResources({
         .filter((ro) => ro.flavor === "x-bcvnotes")
         .map((ro) => [ro, false]),
     });
-  }, [summaries, setResources, systemBcv, language]);
+  }, [summaries, setResources, systemBcv.bookCode, language]);
 
   const toggleSelectedResource = (section, path) => {
     const newResources = Object.fromEntries(
@@ -99,10 +99,10 @@ export default function DialogResources({
       <DialogContent>
         <Grid2 container spacing={2}>
           {Object.keys(resources).map(
-            (s) =>
+            (s, n) =>
               resources[s].length > 0 && (
                 <>
-                  <Grid2 item size={12}>
+                  <Grid2 key={n} item size={12}>
                     <Typography variant="h6">
                       {doI18n(
                         `pages:core-local-workspace:${s}`,
