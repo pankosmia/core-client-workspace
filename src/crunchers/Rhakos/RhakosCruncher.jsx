@@ -132,14 +132,12 @@ function RhakosCruncher({ metadata, style }) {
         return;
       }
     }
-    console.log("all", allNoteStringEntries)
 
     // Split notes depending on whether they have bold markup not containing references ('snippets')
     let notePromptStrings = {};
     let snippetPromptStrings = {};
     const re = new RegExp(/\*\*([^*]*[A-Za-z]+[^*]*)\*\*/g);
     for (const noteEntry of allNoteStringEntries) {
-      console.log(noteEntry)
       for (const noteString of noteEntry[1]) {
         const captured = re.exec(noteString);
         if (captured) {
@@ -157,8 +155,6 @@ function RhakosCruncher({ metadata, style }) {
         }
       }
     }
-    console.log("notes", notePromptStrings)
-    console.log("snippets", snippetPromptStrings)
 
     let juxtaPromptString = "";
     const juxtaResource = selectedResources("juxtas")[0];
