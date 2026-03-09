@@ -32,7 +32,7 @@ export default function InformationDialogRhakos({ open, close, response }) {
               "pages:core-local-workspace:submitted_rhakos",
               i18nRef.current,
             )}
-            :
+            {": "}
             {response?.json?.submitted
               ? new Date(response.json.submitted * 1000).toUTCString()
               : "—"}
@@ -43,13 +43,11 @@ export default function InformationDialogRhakos({ open, close, response }) {
           </Grid2>
           <Grid2 size={6}>
             {doI18n("pages:core-local-workspace:bcv_rhakos", i18nRef.current)}:{" "}
-            {response?.json?.book} {response?.json?.from_chapter}{" "}
+            {response?.json?.book}{" "}{response?.json?.from_chapter}{":"}
             {response?.json?.from_verse}
           </Grid2>
           <Grid2 size={6}>
-            {response?.json?.quantized === true
-              ? `${doI18n("pages:core-local-workspace:quantized_rhakos", i18nRef.current)}:  true`
-              : `${doI18n("pages:core-local-workspace:quantized_rhakos", i18nRef.current)}:  false`}
+            {`${doI18n("pages:core-local-workspace:quantized_rhakos", i18nRef.current)}:  ${response?.json?.response?.quantized ? "true" : "false"}`}
           </Grid2>
 
           <Grid2 size={6}>

@@ -217,7 +217,6 @@ function RhakosCruncher({ metadata, style }) {
       },
     };
   };
-  makeRagContext().then((r) => console.log(r));
 
   const rag_context = {
     model_name: selectedModel[0],
@@ -379,6 +378,7 @@ function RhakosCruncher({ metadata, style }) {
             fullWidth
             disabled={processing || prompt === ""}
             onClick={async () => {
+              let rag_context =  await makeRagContext();
               setProcessing(true);
               const result = await postJson(
                 "/llm/rag-prompt",
