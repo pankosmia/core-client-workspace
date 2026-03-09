@@ -54,9 +54,6 @@ function RhakosCruncher({ metadata, style }) {
   const selectedResources = (category) =>
     resources[category].filter((ra) => ra[1]).map((ra) => ra[0]);
 
-  console.log(resources["translations"]);
-  console.log("resources", selectedResources("translations"))
-
   const makeRagContext = async () => {
     let translationPromptStringEntries = [];
     for (const t of selectedResources("translations")) {
@@ -142,12 +139,14 @@ function RhakosCruncher({ metadata, style }) {
     for (const noteEntry of allNoteStringEntries) {
       for (const noteString of noteEntry[1]) {
         const captured = re.exec(noteString);
-        if (captured) {// snippet
+        if (captured) {
+          // snippet
           if (!(captured[1] in snippetPromptStrings)) {
             snippetPromptStrings[captured[1]] = [];
           }
           snippetPromptStrings[captured[1]].push(noteString);
-        } else {// note
+        } else {
+          // note
           if (!(noteEntry[0] in notePromptStrings)) {
             notePromptStrings[noteEntry[0]] = [];
           }
@@ -156,19 +155,49 @@ function RhakosCruncher({ metadata, style }) {
       }
     }
 
-    const juxtaPromptStringFn = () => {
-      const juxtaResource = selectedResources("juxtas")[0];
-      if (juxtaResource) {
-        // Load JSON of correct book
-        // Find sentence for verse
-        // Return the prompt
-        return "juxta prompt";
-      } else {
-        return "";
-      }
-    };
+    let juxtaPromptString = "";
+    const juxtaResource = selectedResources("juxtas")[0];
+    if (juxtaResource) {
+      // Load JSON of correct book
+      let juxtaResponse = await getJson(
+        `/burrito/ingredient/raw/${juxtaResource.path}?ipath=${bcvRef.current.bookCode}.json`,
+        debugRef.current,
+      );
+      if (juxtaResponse.ok) {
+        // Find sentence(s) for verse
+        let cv = `${bcvRef.current.chapterNum}:${bcvRef.current.verseNum}`;
+        let verseSentences = juxtaResponse.json.filter(
+          (s) =>
+            s.chunks.filter(
+              (c) => c.source.filter((so) => so.cv === cv).length > 0,
+            ).length > 0,
+        );
+        // Find verses in sentence(s)
+        let cvSet = new Set([]);
+        for (const sentence of verseSentences) {
+          for (const chunk of sentence.chunks) {
+            for (const source of chunk.source) {
+              cvSet.add(source.cv);
+            }
+          }
+        }
 
-    const juxtaPromptString = juxtaPromptStringFn();
+        // extract Greek and gloss for each chunk
+        let juxtaChunks = [];
+        for (const sentence of verseSentences) {
+          for (const chunk of sentence.chunks) {
+            juxtaChunks.push([
+              chunk.source.map((s) => s.content).join(" "),
+              chunk.gloss,
+            ]);
+          }
+        }
+        // Build juxta prompt
+        juxtaPromptString = `This verse spans ${verseSentences.length} greek sentence${verseSentences.length === 1 ? "" : "s"} containing ${cvSet.size} verse${cvSet.size === 1 ? "" : "s"}. Here is the juxtalinear rendering of ${verseSentences.length === 1 ? "that" : "those"} greek sentence${verseSentences.length === 1 ? "" : "s"}. Each sentence has been broken into short chunks. Each chunk contains greek words followed by a very literal translation (between parentheses). The chunks are as follows:\n\n`;
+        juxtaPromptString += juxtaChunks.map(c => `- ${c[0]} (${c[1]})`).join("\n");
+        juxtaPromptString += "\n\nOnly include the juxtalinear in your answer if the user asks about greek, or if the juxtalinear is directly relevant to the question. For example, the juxtalinear may help the user to see the literal meaning of a text.";
+      }
+    }
 
     return {
       model_name: selectedModel[0],
