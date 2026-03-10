@@ -48,10 +48,28 @@ function JuxtaSentencesNav({
           Sentence
           <Input
             type="number"
+            sx={{
+              width: "5ch",
+              "& input": {
+                textAlign: "center",
+                paddingLeft: "6px",
+                paddingRight: "6px",
+              },
+              "& input::-webkit-outer-spin-button": {
+                WebkitAppearance: "none",
+                margin: 0,
+              },
+              "& input::-webkit-inner-spin-button": {
+                WebkitAppearance: "none",
+                margin: 0,
+              },
+              "& input[type=number]": {
+                MozAppearance: "textfield",
+              },
+            }}
             disabled={modified}
             value={inputValue}
-            sx={{ width: "30px" }}
-            inputProps={{ style: { textAlign: "center" } }}
+            inputProps={{ min: 1, style: { textAlign: "center" } }}
             onChange={(e) => setInputValue(e.target.value)}
           />
           of {sentences.length} (ch:{currentChapter()}, v{startVerse()} -{" "}
