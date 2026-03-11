@@ -1,10 +1,10 @@
 import { useEffect, useState, useContext, useCallback } from "react";
-import { Box, Stack, Grid2 } from "@mui/material";
+import { Box, Stack, Grid2, Typography } from "@mui/material";
 import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
-import { getText, postEmptyJson } from "pithekos-lib";
+import { getText, postEmptyJson, doI18n } from "pithekos-lib";
 import SearchWithVerses from "./components/SearchWithVerses";
 import Editor from "./components/Editor";
 import SaveTsvButton from "./components/SaveTsvButton";
@@ -71,6 +71,10 @@ function BcvNotesEditorMuncher({ metadata }) {
     }
   }, [isModified]);
 
+  const notesExist = currentChapter
+  ? ingredient.filter(l => l[0].startsWith(`${currentChapter}:`))
+  : [];
+
   return (
     <Stack
       sx={{
@@ -113,28 +117,36 @@ function BcvNotesEditorMuncher({ metadata }) {
           </Grid2>
         </Grid2>
       </Box>
-
-      <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
-        <SearchWithVerses
-          ingredient={ingredient}
-          setIngredient={setIngredient}
-          currentRowN={currentRowN}
-          setCurrentRowN={setCurrentRowN}
-          cellValueChanged={cellValueChanged}
-          setCellValueChanged={setCellValueChanged}
-          updateBcv={updateBcv}
-          currentChapter={currentChapter}
-        />
-        <Editor
-          currentRowN={currentRowN}
-          setCurrentRowN={setCurrentRowN}
-          ingredient={ingredient}
-          setIngredient={setIngredient}
-          updateBcv={updateBcv}
-          cellValueChanged={cellValueChanged}
-          setCellValueChanged={setCellValueChanged}
-        />
-      </Box>
+      {notesExist.length > 0 ?
+        <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
+          <SearchWithVerses
+            ingredient={ingredient}
+            setIngredient={setIngredient}
+            currentRowN={currentRowN}
+            setCurrentRowN={setCurrentRowN}
+            cellValueChanged={cellValueChanged}
+            setCellValueChanged={setCellValueChanged}
+            updateBcv={updateBcv}
+            currentChapter={currentChapter}
+          />
+          <Editor
+            currentRowN={currentRowN}
+            setCurrentRowN={setCurrentRowN}
+            ingredient={ingredient}
+            setIngredient={setIngredient}
+            updateBcv={updateBcv}
+            cellValueChanged={cellValueChanged}
+            setCellValueChanged={setCellValueChanged}
+          />
+        </Box>
+          :
+        <Typography>
+          {doI18n(
+            "pages:core-local-workspace:no_notes",
+            i18nRef.current,
+          )}
+        </Typography>
+      }
     </Stack>
   );
 }

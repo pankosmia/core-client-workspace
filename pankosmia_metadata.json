@@ -728,6 +728,11 @@
     "link_disabled_offline":{
       "en":"Link disabled in offline mode",
       "es":"El link está deshabilitado en el modo sin Internet"
+    },
+    "no_notes": {
+      "en": "No notes found",
+      "fr": "Aucune note trouvée",
+      "es": "No se encontraron notas"
     }
   }
 }
