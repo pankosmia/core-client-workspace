@@ -1,12 +1,14 @@
 import { useEffect, useState, useContext, useCallback } from "react";
 import { Box, Stack, Grid2, Typography } from "@mui/material";
 import {
+  i18nContext as I18nContext,
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
 import { getText, postEmptyJson, doI18n } from "pithekos-lib";
 import SearchWithVerses from "./components/SearchWithVerses";
 import Editor from "./components/Editor";
+import AddFab from "./components/AddFab";
 import SaveTsvButton from "./components/SaveTsvButton";
 import md5 from "md5";
 import BookPicker from "../TextTranslation/SimplifiedEditor/components/BookPicker";
@@ -16,6 +18,7 @@ function BcvNotesEditorMuncher({ metadata }) {
   const [ingredient, setIngredient] = useState([]);
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
+  const { i18nRef } = useContext(I18nContext);
   const [currentRowN, setCurrentRowN] = useState(1);
   const [md5Ingredient, setMd5Ingredient] = useState([]);
   const [cellValueChanged, setCellValueChanged] = useState(false);
@@ -117,35 +120,45 @@ function BcvNotesEditorMuncher({ metadata }) {
           </Grid2>
         </Grid2>
       </Box>
-      {notesExist.length > 0 ?
-        <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
-          <SearchWithVerses
-            ingredient={ingredient}
-            setIngredient={setIngredient}
-            currentRowN={currentRowN}
-            setCurrentRowN={setCurrentRowN}
-            cellValueChanged={cellValueChanged}
-            setCellValueChanged={setCellValueChanged}
-            updateBcv={updateBcv}
-            currentChapter={currentChapter}
-          />
-          <Editor
-            currentRowN={currentRowN}
-            setCurrentRowN={setCurrentRowN}
-            ingredient={ingredient}
-            setIngredient={setIngredient}
-            updateBcv={updateBcv}
-            cellValueChanged={cellValueChanged}
-            setCellValueChanged={setCellValueChanged}
-          />
-        </Box>
-          :
-        <Typography>
-          {doI18n(
-            "pages:core-local-workspace:no_notes",
-            i18nRef.current,
-          )}
-        </Typography>
+      {notesExist.length > 0 
+        ?
+          <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
+            <SearchWithVerses
+              ingredient={ingredient}
+              setIngredient={setIngredient}
+              currentRowN={currentRowN}
+              setCurrentRowN={setCurrentRowN}
+              cellValueChanged={cellValueChanged}
+              setCellValueChanged={setCellValueChanged}
+              updateBcv={updateBcv}
+              currentChapter={currentChapter}
+            />
+            <Editor
+              currentRowN={currentRowN}
+              setCurrentRowN={setCurrentRowN}
+              ingredient={ingredient}
+              setIngredient={setIngredient}
+              updateBcv={updateBcv}
+              cellValueChanged={cellValueChanged}
+              setCellValueChanged={setCellValueChanged}
+            />
+          </Box>
+        :
+          <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
+            <Stack spacing={2}>
+              <AddFab
+                  currentRowN={currentRowN}
+                  setCurrentRowN={setCurrentRowN}
+                  ingredient={ingredient}
+                  setIngredient={setIngredient}
+                  cellValueChanged={cellValueChanged}
+                  setCellValueChanged={setCellValueChanged}
+              />
+              <Typography>
+                {doI18n("pages:core-local-workspace:no_notes", i18nRef.current)}
+              </Typography>
+            </Stack>
+          </Box>
       }
     </Stack>
   );
