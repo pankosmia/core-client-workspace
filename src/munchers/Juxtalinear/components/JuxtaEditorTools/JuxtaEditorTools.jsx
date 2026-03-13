@@ -30,7 +30,6 @@ function JuxtaEditorTools({
   const { debugRef } = useContext(DebugContext);
   const { i18nRef } = useContext(i18nContext);
   const [modified, setModified] = useState(false);
-  console.log(modified);
   const navigate = useNavigate();
   useEffect(() => {
     postEmptyJson(

@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, useCallback } from "react";
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Grid2 } from "@mui/material";
 import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
@@ -7,10 +7,10 @@ import {
 import { getText, postEmptyJson } from "pithekos-lib";
 import SearchWithVerses from "./components/SearchWithVerses";
 import Editor from "./components/Editor";
-import AddFab from "./components/AddFab";
 import SaveTsvButton from "./components/SaveTsvButton";
 import md5 from "md5";
 import BookPicker from "../TextTranslation/SimplifiedEditor/components/BookPicker";
+import NotesChapterPicker from "./components/NotesChapterPicker";
 import { getFirstChapterBCVNotes } from "../../common/findFirstChapter";
 function BcvNotesEditorMuncher({ metadata }) {
   const [ingredient, setIngredient] = useState([]);
@@ -19,6 +19,8 @@ function BcvNotesEditorMuncher({ metadata }) {
   const [currentRowN, setCurrentRowN] = useState(1);
   const [md5Ingredient, setMd5Ingredient] = useState([]);
   const [cellValueChanged, setCellValueChanged] = useState(false);
+  const [currentChapter, setCurrentChapter] = useState('1');
+
   // Récupération des données du tsv
   const getAllData = async () => {
     const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
@@ -86,30 +88,42 @@ function BcvNotesEditorMuncher({ metadata }) {
           padding: 2,
         }}
       >
-        <AddFab
-          currentRowN={currentRowN}
-          setCurrentRowN={setCurrentRowN}
-          ingredient={ingredient}
-          setIngredient={setIngredient}
-          cellValueChanged={cellValueChanged}
-          setCellValueChanged={setCellValueChanged}
-        />
-        <SaveTsvButton
-          metadata={metadata}
-          ingredient={ingredient}
-          setIngredient={setIngredient}
-          md5Ingredient={md5Ingredient}
-          setMd5Ingredient={setMd5Ingredient}
-        />
-        <BookPicker  setFirstChapter={getFirstChapterBCVNotes}/>
+        <Grid2
+            container
+            alignItems="flex-start"
+            justifyContent="flex-start"
+            width="100%"
+        >
+          <Grid2 item size={6}>
+            <SaveTsvButton
+              metadata={metadata}
+              ingredient={ingredient}
+              setIngredient={setIngredient}
+              md5Ingredient={md5Ingredient}
+              setMd5Ingredient={setMd5Ingredient}
+            />
+          </Grid2>
+          <Grid2 item size={6} display="flex" gap={1}>
+            <BookPicker  setFirstChapter={getFirstChapterBCVNotes}/>
+            <NotesChapterPicker 
+              ingredient={ingredient}
+              currentChapter={currentChapter} 
+              setCurrentChapter={setCurrentChapter} 
+            />
+          </Grid2>
+        </Grid2>
       </Box>
 
       <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
         <SearchWithVerses
           ingredient={ingredient}
+          setIngredient={setIngredient}
           currentRowN={currentRowN}
           setCurrentRowN={setCurrentRowN}
+          cellValueChanged={cellValueChanged}
+          setCellValueChanged={setCellValueChanged}
           updateBcv={updateBcv}
+          currentChapter={currentChapter}
         />
         <Editor
           currentRowN={currentRowN}
