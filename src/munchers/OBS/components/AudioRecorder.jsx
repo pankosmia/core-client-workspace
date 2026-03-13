@@ -724,6 +724,19 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     updateAudioUrl();
   }, [obs, prise, bakExists]);
 
+  // Préserver un maxDuration cohérent quand les durées de pistes changent
+  useEffect(() => {
+    const durations = Object.values(trackDurations || {}).filter(
+        (value) => typeof value === "number" &&!isNaN(value) && value > 0
+    );
+    const mainDuration = wavesurfer?.getDuration?.() || 0;
+    const nextMaxDuration = Math.max(mainDuration, ...durations, 0);
+
+    if (nextMaxDuration > 0 && nextMaxDuration !== maxDuration) {
+      setMaxDuration(nextMaxDuration);
+    }
+  }, [trackDurations, wavesurfer, maxDuration]);
+
   // Mettre à jour le numéro de la prochaine prise
   useEffect(() => {
     const updateNextPrise = async () => {
@@ -959,12 +972,10 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
       setOtherPrises(sortedPrises.filter((prise) => !prise.includes(".json")));
 
       setTrackDurations({});
-      setMaxDuration(0);
       setSelectedRegion([]);
     } else {
       setOtherPrises([]);
       setTrackDurations({});
-      setMaxDuration(0);
       setSelectedRegion([]);
     }
   };
