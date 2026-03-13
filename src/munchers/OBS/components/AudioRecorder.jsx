@@ -337,6 +337,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
   }, []);
 
   const startRecording = async () => {
+    if (isRecordingRef.current) return;
+    isRecordingRef.current = true;
     try {
       // Calculer le numéro de la prochaine prise
       const nextPrise = (await getOldPriseNumber()) + 1;
@@ -414,13 +416,13 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
       // Démarrer l'enregistrement et la visualisation
       mediaRecorderRef.current.start(250);
-      isRecordingRef.current = true;
       setIsRecording(true);
 
       setTimeout(() => {
         startWaveformAnimation();
       }, 100);
     } catch (error) {
+      isRecordingRef.current = false;
       console.error("Error in recording", error);
     }
   };
@@ -1251,14 +1253,12 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
             >
               <IconButton
                 onClick={isRecording ? stopRecording : startRecording}
+                disabled={isRecordingRef.current && !isRecording}
                 sx={{ color: "white" }}
               >
                 {" "}
-                {isRecording ? (
-                  <StopIcon sx={{ color: "red" }} />
-                ) : (
-                  <MicIcon />
-                )}{" "}
+                {isRecording ? <StopIcon sx={{ color: "red" }} /> : <MicIcon />}
+                {" "}
               </IconButton>
             </Tooltip>
             {/* Restore Button */}
