@@ -625,7 +625,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
       if (!wavesurfer || !waveformRef.current) return;
       const rect = waveformRef.current.getBoundingClientRect();
       const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width || 0));
-      const baseDuration = effectiveDuration || wavesurfer.getDuration?.() || 0;
+      const displayedDuration = wavesurfer.getDuration?.() || 0;
+      const baseDuration = displayedDuration || effectiveDuration || 0;
       if (!baseDuration || !rect.width) return;
       const rawTime = (x / rect.width) * baseDuration;
       const targetTime = snapEnabled ? snapToGrid(rawTime) : rawTime;
