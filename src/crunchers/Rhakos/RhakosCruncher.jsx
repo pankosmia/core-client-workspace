@@ -34,7 +34,7 @@ function RhakosCruncher({ metadata, style }) {
     notes: [],
   });
   const [prompt, setPrompt] = useState("");
-  const [processing, setProcessing] = useState(false);
+  const [processing, setProcessing] = useState("waiting");
   const [responses, setResponses] = useState([]);
   const [openDialogConfig, setOpenDialogConfig] = useState(false);
   const [openDialogResources, setOpenDialogResources] = useState(false);
@@ -194,9 +194,9 @@ function RhakosCruncher({ metadata, style }) {
           }
         }
         // Build juxta prompt
-        juxtaPromptString = `This verse spans ${verseSentences.length} greek sentence${verseSentences.length === 1 ? "" : "s"} containing ${cvSet.size} verse${cvSet.size === 1 ? "" : "s"}. Here is the juxtalinear rendering of ${verseSentences.length === 1 ? "that" : "those"} greek sentence${verseSentences.length === 1 ? "" : "s"}. Each sentence has been broken into short chunks. Each chunk contains greek words followed by a very literal translation (between parentheses). The chunks are as follows:\n\n`;
+        juxtaPromptString = `\n\n${doI18n("pages:core-local-workspace:here_is_a_juxta", i18nRef.current)}`;
         juxtaPromptString += juxtaChunks.map(c => `- ${c[0]} (${c[1]})`).join("\n");
-        juxtaPromptString += "\n\nOnly include the juxtalinear in your answer if the user asks about greek, or if the juxtalinear is directly relevant to the question. For example, the juxtalinear may help the user to see the literal meaning of a text.";
+        juxtaPromptString += `\n\n${doI18n("pages:core-local-workspace:only_include_juxta", i18nRef.current)}`;
       }
     }
 
@@ -215,6 +215,15 @@ function RhakosCruncher({ metadata, style }) {
         translations: Object.fromEntries(translationPromptStringEntries),
         notes: notePromptStrings,
         snippets: snippetPromptStrings,
+        prompts: {
+              "system": doI18n("pages:core-local-workspace:system_prompt_rhakos", i18nRef.current),
+    "prologue": doI18n("pages:core-local-workspace:prologue_prompt_rhakos", i18nRef.current),
+    "user_prologue": doI18n("pages:core-local-workspace:user_prologue_prompt_rhakos", i18nRef.current),
+    "juxta": doI18n("pages:core-local-workspace:juxta_prompt_rhakos", i18nRef.current),
+    "notes": doI18n("pages:core-local-workspace:notes_prompt_rhakos", i18nRef.current),
+    "snippets": doI18n("pages:core-local-workspace:snippets_prompt_rhakos", i18nRef.current),
+    "translations": doI18n("pages:core-local-workspace:translations_prompt_rhakos", i18nRef.current)
+        }
       },
     };
   };
@@ -313,7 +322,7 @@ function RhakosCruncher({ metadata, style }) {
         <Grid2 item size="grow">
           <TextField
             fullWidth
-            disabled={processing}
+            disabled={processing !== "waiting"}
             id="prompt"
             label={doI18n(
               "pages:core-local-workspace:prompt_rhakos",
@@ -328,22 +337,26 @@ function RhakosCruncher({ metadata, style }) {
         <Grid2 item size={{ "@xs": 2, "@md": 1 }} sx={{ display: "flex" }}>
           <IconButton
             fullWidth
-            disabled={processing || prompt === ""}
+            disabled={processing !== "waiting" || prompt === ""}
             onClick={async () => {
+              setProcessing("prompt");
+              let beforeContextTime = Date.now();
               let rag_context =  await makeRagContext();
-              setProcessing(true);
-              const result = await postJson(
+              let contextElapsed = Date.now() - beforeContextTime;
+              setProcessing("model");
+              let result = await postJson(
                 "/llm/rag-prompt",
                 JSON.stringify(rag_context),
                 debugRef.current,
               );
+              result.contextElapsed = contextElapsed/1000.0;
               setResponses([...responses, result]);
-              setProcessing(false);
+              setProcessing("waiting");
               setPrompt("");
             }}
           >
-            {processing ? (
-              <CircularProgress enableTrackSlot size={25} color="inherit" />
+            {processing !== "waiting" ? (
+              <CircularProgress enableTrackSlot size={25} color={processing === "prompt" ? "secondary" : "primary"} />
             ) : (
               <SendIcon />
             )}

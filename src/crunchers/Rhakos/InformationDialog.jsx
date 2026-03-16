@@ -24,7 +24,7 @@ export default function InformationDialogRhakos({ open, close, response }) {
               "pages:core-local-workspace:elapsed_rhakos",
               i18nRef.current,
             )}
-            : {parseFloat(response?.json?.elapsed.toFixed(2))}{" "}
+            : {parseFloat(response?.contextElapsed.toFixed(2))}{"/"}{parseFloat(response?.json?.elapsed.toFixed(2))}{" "}
             {doI18n("pages:core-local-workspace:second", i18nRef.current)}
           </Grid2>
           <Grid2 size={6}>
