@@ -311,7 +311,8 @@
     "apply": {
       "en": "Apply",
       "fr": "Appliquer",
-      "id": "Terap"
+      "id": "Terap",
+      "es": "Aplicar"
     },
     "modification_key": {
       "en": "Press modifier keys (Ctrl, Alt, Shift) together with another key.",
@@ -733,6 +734,20 @@
       "en": "No notes found",
       "fr": "Aucune note trouvée",
       "es": "No se encontraron notas"
+    },
+    "reference": {
+      "en": "REF",
+      "es": "REF",
+      "fr": "REF"
+    },
+    "no_reference": {
+      "en": "No reference",
+      "es": "Si referencia"
+    },
+    "edit_reference": {
+      "en":"Edit reference (REF)",
+      "es":"Editar referencia (REF)",
+      "fr":"Modifier la référence (REF)"
     }
   }
 }

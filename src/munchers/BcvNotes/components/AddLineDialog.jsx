@@ -107,6 +107,7 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                     cellValueChanged={cellValueChanged}
                     setCellValueChanged={setCellValueChanged}
                     resourceType={resourceType}
+                    isCreate={true}
                 />
             </Box>
 

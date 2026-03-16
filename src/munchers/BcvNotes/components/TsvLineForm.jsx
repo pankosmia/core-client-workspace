@@ -1,9 +1,20 @@
-import { Box, FormControl, TextField } from "@mui/material";
+import { useState, useContext } from 'react';
+import { Box, FormControl, TextField, Dialog, DialogTitle, DialogActions, DialogContent, Button } from "@mui/material";
 import MarkdownField from "../../../components/MarkdownField";
 import ActionsButtons from "./ActionsButtons";
+import EditIcon from '@mui/icons-material/Edit';
+import { i18nContext as I18nContext } from "pankosmia-rcl";
+import { doI18n } from "pithekos-lib";
 
-function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction, cellValueChanged, setCellValueChanged, resourceType }) {
+
+function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction, cellValueChanged, setCellValueChanged, resourceType, isCreate }) {
+    
+    const { i18nRef } = useContext(I18nContext);
     const columnNames = ingredient[0] || [];
+    const [openRefDialog, setOpenRefDialog] = useState(false);
+    const [tempRef, setTempRef] = useState("");
+
+    const refIndex = columnNames.findIndex(col => col.replace('\r', '').trim() === "REF");
 
     // Permet la modification d'une note
     const changeCell = (event, n) => {
@@ -24,17 +35,78 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
         setCurrentRow(newRowData);
     };
 
+
+    const handleOpenRef = () => {
+        setTempRef(currentRow[refIndex] || "");
+        setOpenRefDialog(true);
+    };
+
+    const handleSaveRef = () => {
+        const updatedRow = [...currentRow];
+        updatedRow[refIndex] = tempRef;
+    
+        setCurrentRow(updatedRow);
+    
+        if (tempRef.length > 0 && /^[^:]+:[^:]+$/.test(tempRef)) {
+            setCellValueChanged(true);
+        } else {
+            setCellValueChanged(false);
+        }
+    
+        saveFunction(currentRowN, updatedRow); 
+    
+        setCellValueChanged(false); 
+        setOpenRefDialog(false);
+    };
+
     return (
         <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
+            {
+                !isCreate 
+                &&
+                <Button 
+                    variant="text" 
+                    size="small" 
+                    startIcon={<EditIcon />} 
+                    onClick={handleOpenRef}
+                    sx={{ mb: 1, color: 'text.secondary' }}
+                >
+                    {doI18n("pages:core-local-workspace:reference", i18nRef.current)} {currentRow[refIndex] || doI18n("pages:core-local-workspace:no_reference", i18nRef.current)}
+                </Button>
+            }
+            <Dialog open={openRefDialog} onClose={() => setOpenRefDialog(false)}>
+                <DialogTitle>{doI18n("pages:core-local-workspace:edit_reference", i18nRef.current)}</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Referencia (ej: 1:1)"
+                        fullWidth
+                        value={tempRef}
+                        onChange={(e) => setTempRef(e.target.value)}
+                        variant="standard"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenRefDialog(false) }>{doI18n("pages:core-local-workspace:cancel", i18nRef.current)}</Button>
+                    <Button onClick={handleSaveRef} variant="contained">{doI18n("pages:core-local-workspace:apply", i18nRef.current)}</Button>
+                </DialogActions>
+            </Dialog>
             {columnNames.map((column, n) => {
 
+                const cleanColumn = column.replace('\r', '').trim();
+
                 const visibilityMap = {
-                    new_bcv_question: ['Reference', 'ID', 'Question', 'Response\r', 'Response'],
-                    new_bcv_study_question: ['Reference', 'ID', 'Question\r', 'Question']
+                    new_bcv_question: [...(isCreate ? ['REF', 'ID'] : []), 'Question', 'Response', 'Response'],
+                    new_bcv_study_question: [...(isCreate ? ['REF', 'ID'] : []), 'Question', 'Question']
                 };
 
+                if (!isCreate && (cleanColumn === 'REF' || cleanColumn === 'ID')) {
+                    return null;
+                }
+
                 // We filter, if the resourceType exists but the column isn't in the list, we don't render. IF the resourceType exists, we render everything.
-                if (visibilityMap[resourceType] && !visibilityMap[resourceType].includes(column)) {
+                if (visibilityMap[resourceType] && !visibilityMap[resourceType].includes(cleanColumn)) {
                     return null;
                 }
 

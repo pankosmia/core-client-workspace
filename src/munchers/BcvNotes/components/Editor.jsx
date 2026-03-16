@@ -38,6 +38,7 @@ function Editor({ ingredient, setIngredient, currentRowN, setCurrentRowN, update
 
             cellValueChanged={cellValueChanged}
             setCellValueChanged={setCellValueChanged}
+            isCreate={false}
         />
     </Box>
 }
