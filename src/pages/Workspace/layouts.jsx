@@ -41,7 +41,7 @@ const layoutSpecs = {
     }
 };
 
-const layoutJson = (resources, layoutId, i18nRef, distractionModeCount) => {
+const layoutJson = (resources, crunchers, layoutId, i18nRef, distractionModeCount) => {
     const te = {};
     let layoutSpec = layoutSpecs[layoutId];
     if (!layoutSpec) {
@@ -81,7 +81,8 @@ const layoutJson = (resources, layoutId, i18nRef, distractionModeCount) => {
         } else { // TODO cruncher
         }
     }
-    // Temporary hack to see cruncher
+    // Maybe add Rhakos
+    if (crunchers.has("Rhakos")) {
     te["Rhakos"] = <WorkspaceCruncherCard
         metadata={{
             type: "rhakos",
@@ -92,6 +93,9 @@ const layoutJson = (resources, layoutId, i18nRef, distractionModeCount) => {
         distractionModeCount={distractionModeCount}
     />;
     rp.children[1 - layoutSpec.editorPos].children.push({children: "Rhakos"});
+    }
+
+    // Remove empty children
     if (rp.children[1 - layoutSpec.editorPos].children.length === 0) {
         layoutSpec.editorPos ? rp.children.shift() : rp.children.pop();
     }
