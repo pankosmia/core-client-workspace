@@ -27,9 +27,7 @@ function JuxtaSaveButton({
       .forEach(({ source }) => {
         source.filter((e) => e);
       });
-    console.log(s)
     const payload = { payload: JSON.stringify(s,null,2) };
-    console.log(payload)
     const response = await postJson(
       `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.json`,
       JSON.stringify(payload),

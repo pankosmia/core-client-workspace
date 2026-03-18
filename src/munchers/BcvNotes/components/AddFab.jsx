@@ -34,7 +34,6 @@ function AddFab({
         <AddIcon sx={{ mr: 1 }} />
         {doI18n("pages:core-local-workspace:add", i18nRef.current)}
       </Fab>
-
       <AddLineDialog
         mode="add"
         open={openedModal === "add"}

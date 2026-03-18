@@ -1,18 +1,6 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import {
-  AppBar,
-  Box,
-  Button,
-  Grid,
-  Stack,
-  TextField,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Grid, Stack } from "@mui/material";
 import { ArrowDropUp, ArrowDropDown } from "@mui/icons-material";
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { getJson } from "pithekos-lib";
-import { bcvContext, debugContext } from "pankosmia-rcl";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import "./Home.css";
 import { MarkdownInput } from "./MarkdownInput";
 
@@ -137,82 +125,119 @@ function JuxtaEditable({
     });
     setGlobalSentences(curIndex, newSentence);
   };
-
-  
+  const splitChunkHandler = (chunkIndex, wordIndex) => {
+    // CASE 1: fuse with chunk above (double-clicked first word of a non-first chunk)
+    if (chunkIndex > 0 && wordIndex === 0) {
+      const newChunks = [...sentences[curIndex].chunks];
+      const prevChunk = newChunks[chunkIndex - 1];
+      const currChunk = newChunks[chunkIndex];
+      // Merge current chunk's source words into the previous chunk
+      const mergedChunk = {
+        gloss: "",
+        source: [...prevChunk.source, ...currChunk.source],
+      };
+      newChunks.splice(chunkIndex - 1, 2, mergedChunk);
+      const newSentence = remakeSentence({
+        originalSource: sentences[curIndex].originalSource,
+        chunks: newChunks,
+        sourceString: sentences[curIndex].sourceString,
+      });
+      setGlobalSentences(curIndex, newSentence);
+      return;
+    }
+    // CASE 2: normal chunk split (unchanged)
+    const newChunks = [...sentences[curIndex].chunks];
+    const chunk = newChunks[chunkIndex];
+    const left = chunk.source.slice(0, wordIndex);
+    const right = chunk.source.slice(wordIndex);
+    if (!left.length || !right.length) return;
+    const leftChunk = { ...chunk, source: left };
+    const rightChunk = { ...chunk, source: right, gloss: "" };
+    newChunks.splice(chunkIndex, 1, leftChunk, rightChunk);
+    newChunks.gloss = "";
+    const newSentence = remakeSentence({
+      originalSource: sentences[curIndex].originalSource,
+      chunks: newChunks,
+      sourceString: sentences[curIndex].sourceString,
+    });
+    setGlobalSentences(curIndex, newSentence);
+  };
   return (
     <Box display="flex" flexDirection="column">
       <Box flex={1} overflow="auto" p={2}>
-            <DragDropContext onDragEnd={onDragEnd}>
-              {itemArrays[curIndex]?.map((items, n) => (
-                <Grid container key={n}>
-                  <Grid item sm={6} px={2} py={1}>
-                    <Stack direction="row">
-                      <Stack justifyContent="center">
-                        <Button onClick={() => chunkUpHandler(n)} disabled={!n}>
-                          <ArrowDropUp />
-                        </Button>
-                        <Button
-                          onClick={() => chunkDownHandler(n)}
-                          disabled={n === itemArrays[curIndex].length - 1}
-                        >
-                          <ArrowDropDown />
-                        </Button>
-                      </Stack>
-
-                      <Droppable
-                        droppableId={`${n}`}
-                        direction="horizontal"
+        <DragDropContext onDragEnd={onDragEnd}>
+          {itemArrays[curIndex]?.map((items, n) => (
+            <Grid container key={n}>
+              <Grid item sm={6} pl={2} py={1}>
+                <Stack direction="row" justifyContent="flex-end">
+                  <Droppable droppableId={`${n}`} direction="horizontal">
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        style={getListStyle(snapshot.isDraggingOver)}
                       >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            style={getListStyle(snapshot.isDraggingOver)}
+                        {items.chunk.map((item, index) => (
+                          <Draggable
+                            key={item.id}
+                            draggableId={item.id}
+                            index={index}
                           >
-                            {items.chunk.map((item, index) => (
-                              <Draggable
-                                key={item.id}
-                                draggableId={item.id}
-                                index={index}
-                              >
-                                {(provided, snapshot) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    style={getItemStyle(
-                                      snapshot.isDragging,
-                                      provided.draggableProps.style,
-                                    )}
-                                  >
-                                    <Stack direction="row" gap={1}>
-                                      <Box>{item.content}</Box>
-                                      {item.index ? (
-                                        <Box fontSize={10}>
-                                          {item.index + 1}
-                                        </Box>
-                                      ) : null}
-                                    </Stack>
-                                  </div>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                onDoubleClick={() =>
+                                  splitChunkHandler(n, index)
+                                }
+                                style={getItemStyle(
+                                  snapshot.isDragging,
+                                  provided.draggableProps.style,
                                 )}
-                              </Draggable>
-                            ))}
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                    </Stack>
-                  </Grid>
+                              >
+                                <Stack direction="row" gap={1}>
+                                  <Box>{item.content}</Box>
+                                  {item.index ? (
+                                    <Box fontSize={10}>{item.index + 1}</Box>
+                                  ) : null}
+                                </Stack>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                  <Stack justifyContent="center">
+                    <Button
+                      sx={{ padding: 0 }}
+                      onClick={() => chunkUpHandler(n)}
+                      disabled={!n}
+                    >
+                      <ArrowDropUp />
+                    </Button>
+                    <Button
+                      sx={{ padding: 0 }}
+                      onClick={() => chunkDownHandler(n)}
+                      disabled={n === itemArrays[curIndex].length - 1}
+                    >
+                      <ArrowDropDown />
+                    </Button>
+                  </Stack>
+                </Stack>
+              </Grid>
 
-                  <Grid item sm={6} px={2} py={1}>
-                    <MarkdownInput
-                      value={items.gloss}
-                      onChange={(e) => glossChangeHandler(e, n)}
-                    />
-                  </Grid>
-                </Grid>
-              ))}
-            </DragDropContext>
+              <Grid item sm={6} pr={2} py={1}>
+                <MarkdownInput
+                  value={items.gloss}
+                  onChange={(e) => glossChangeHandler(e, n)}
+                />
+              </Grid>
+            </Grid>
+          ))}
+        </DragDropContext>
       </Box>
     </Box>
   );

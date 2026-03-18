@@ -1,69 +1,54 @@
-import { useState } from "react";
-import { List, ListItemButton, ListItemText, Collapse, Typography } from "@mui/material";
-import ExpandLess from "@mui/icons-material/ExpandLess"
-import ExpandMore from "@mui/icons-material/ExpandMore"
+import { useEffect } from 'react';
+import {  ListItemButton, ListItemText, Typography, Box, Stack } from "@mui/material";
+import AddFab from "./AddFab";
 
-function SearchWithVerses({ ingredient, setCurrentRowN, currentRowN, updateBcv }) {
-
-    const [currentChapter, setCurrentChapter] = useState('');
-    const [openChapter, setOpenChapter] = useState(false)
-
-    // Permet d'afficher tous les versets 
-    const bookCode = [...new Set(ingredient.map(l => l[0].split(':')[0]))];
+function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRowN,cellValueChanged, setCellValueChanged, updateBcv, currentChapter }) {
 
     const verses = currentChapter
         ? ingredient.filter(l => l[0].startsWith(`${currentChapter}:`))
         : [];
 
-
-    const handleClick = () => {
-        setOpenChapter(!openChapter);
-    };
-
     const handleChangeId = (id) => {
         const index = ingredient.findIndex(l => l[1] === id);
+        console.log(index);
         if (index !== -1) {
             setCurrentRowN(index);
             updateBcv(index);
         }
     };
 
+    useEffect(() => {
+        if (verses.length > 0) {
+            const firstVerseId = verses[0][1];
+            handleChangeId(firstVerseId);
+        }
+    }, [currentChapter]);
+
     return (
-        <List sx={{ maxHeight: "100vh", overflowY: "auto", width:"15rem" }}>
-            {bookCode.splice(1).filter(chap => chap && chap.trim() !== "").map(chap => (
-                <>
-                    <ListItemButton
-                        key={chap}
-                        onClick={() => {
-
-                            setCurrentChapter(chap);
-                            handleClick();
-                        }}
-                    >
-                        <ListItemText primary={<Typography sx={{fontWeight: currentChapter === chap ? "bold" : "normal" }}>{`${/^\d+$/.test(chap) ? `Ch ${chap}` : chap}`}</Typography>} />
-                        {openChapter && currentChapter === chap ? <ExpandLess /> : <ExpandMore />}
+        <Stack spacing={2}>
+            <AddFab
+                currentRowN={currentRowN}
+                setCurrentRowN={setCurrentRowN}
+                ingredient={ingredient}
+                setIngredient={setIngredient}
+                cellValueChanged={cellValueChanged}
+                setCellValueChanged={setCellValueChanged}
+            />
+            <Box sx={{ maxHeight: "75vh", overflowY: "auto" }}>
+                {verses.map((v) => (
+                    <ListItemButton key={v[1]} onClick={() => handleChangeId(v[1])}>
+                        <ListItemText 
+                            primary={
+                                <Typography sx={{ fontWeight: ingredient[currentRowN][1] === v[1] ? "bold" : "normal" }}>
+                                    {`v${v[0].split(':')[1]} - ${v[1]}`}
+                                </Typography>
+                            } 
+                            sx={{ pl: 4 }} 
+                        />
                     </ListItemButton>
-
-                    <Collapse in={openChapter} timeout="auto" unmountOnExit>
-                        {chap === currentChapter && (
-                            <List component="div">
-                                {verses
-                                    .map(v => (
-                                        <ListItemButton
-                                            key={v[1]}
-                                            onClick={() => { handleChangeId(v[1]) }}
-                                        >
-                                            <ListItemText primary={<Typography sx={{ fontWeight: ingredient[currentRowN][1] === v[1] ? "bold" : "normal" }}>{/^\d+$/.test(v[0].split(':')[1])
-                                                ? `v${v[0].split(':')[1]} - ${v[1]}`
-                                                : `${v[0].split(':')[1]} - ${v[1]}`}</Typography>} sx={{ pl: 4 }} />
-                                        </ListItemButton>
-                                    ))}
-                            </List>
-                        )}
-                    </Collapse>
-                </>
-            ))}
-        </List>
+                ))}
+            </Box>
+        </Stack>
     );
 }
 
