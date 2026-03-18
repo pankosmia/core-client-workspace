@@ -46,6 +46,7 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
             />
         </div>
     }
+    // This component is using TW fonts and lineHeight, though also does not currently display translated words.
     if (metadata.flavor === "audioTranslation") {
         return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BcvAudioTranslationViewerMuncher
@@ -53,6 +54,7 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
             />
         </div>
     }
+    // This component has TW and MUI lineHeights and fonts interfering!
     if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvnotes") {
         return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
            <BcvNotesEditorMuncher
@@ -60,20 +62,23 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
             />
         </div>
     }
+    // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
     if (metadata.flavor.toLowerCase() === "x-bcvnotes") {
-        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
+        return <div style={{...style, lineHeight: 'normal'}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BcvNotesViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
+    // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
     if (metadata.flavor.toLowerCase() === "x-bnotes") {
-        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
+        return <div style={{...style, lineHeight: 'normal'}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BNotesViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
+    // This component has TW and MUI lineHeights and fonts interfering!
     if (metadata.primary && metadata.flavor.toLowerCase() === "x-juxtalinear") {
         return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <JuxtalinearEditorMuncher
@@ -81,13 +86,15 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
             />
         </div>
     }
+    // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
     if (metadata.flavor.toLowerCase() === "x-juxtalinear") {
-        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
+        return <div style={{...style, lineHeight: 'normal'}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <JuxtalinearViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
+    // This component has TW and MUI lineHeights and fonts interfering!
     if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvquestions") {
         return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
            <BcvNotesEditorMuncher
@@ -95,6 +102,7 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
             />
         </div>
     }
+    // This component has TW and MUI lineHeights and fonts interfering!
     if (metadata.flavor.toLowerCase() === "x-bcvquestions") {
         return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BcvQuestionsViewerMuncher
@@ -102,6 +110,7 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
             />
         </div>
     }
+    // This component has TW and MUI lineHeights and fonts interfering!
     if (metadata.flavor.toLowerCase() === "x-bcvarticles") {
         return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BcvArticlesViewerMuncher
@@ -109,6 +118,7 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
             />
         </div>
     }
+    // This component is built with TW classes with line heights interfering with AwamiNastliq's need for normal if/when caption translations become available.
     if (metadata.flavor.toLowerCase() === "x-bcvimages") {
         return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BcvImagesViewerMuncher
@@ -116,27 +126,31 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
             />
         </div>
     }
+    // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
     if (metadata.flavor === "x-videolinks") {
-        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
+        return <div style={{...style, lineHeight: 'normal'}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
           <VideoLinksViewerMuncher
               metadata={metadata}
           />
         </div>
-    } 
+    }
+    // This component has TW and MUI lineHeights and fonts interfering!
     if (metadata.primary && metadata.flavor === "textStories") {
         return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
           <OBSEditorMuncher
               metadata={metadata}
           />
         </div>
-    } 
+    }
+    // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
     if (metadata.flavor === "textStories") {
-        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
+        return <div style={{...style, lineHeight: 'normal'}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
           <OBSViewerMuncher
               metadata={metadata}
           />
         </div>
-    } 
+    }
+    // This component has TW and MUI lineHeights and fonts interfering!
     if (metadata.flavor.toLowerCase() === "x-obsquestions") {
         return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <OBSQuestionsViewerMuncher
@@ -144,13 +158,15 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
             />
         </div>
     }
+    // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
     if (metadata.flavor.toLowerCase() === "x-obsnotes") {
-        return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
+        return <div style={{...style, lineHeight: 'normal'}} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <OBSNotesViewerMuncher
                 metadata={metadata}
             />
         </div>
     }
+    // This component has TW and MUI lineHeights and fonts interfering!
     if (metadata.flavor.toLowerCase() === "x-obsarticles") {
         return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <OBSArticlesViewerMuncher
@@ -158,6 +174,7 @@ function WorkspaceCard({metadata, style, distractionModeCount}) {
             />
         </div>
     }
+    // This component is built with TW classes with line heights interfering with AwamiNastliq's need for Normal if/when useful videos with translated captions become available.
     if (metadata.flavor.toLowerCase() === "x-bcvvideo") {
         return <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
             <BcvVideosViewerMuncher
