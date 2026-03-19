@@ -5,6 +5,7 @@ import {
   TextField,
   IconButton,
   CircularProgress,
+  Typography
 } from "@mui/material";
 import { doI18n, getJson, postJson, getText } from "pithekos-lib";
 import {
@@ -26,7 +27,7 @@ function RhakosCruncher({ metadata, style }) {
 
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState(["qwen3-4b", true]);
-  const [temperature, setTemperature] = useState(0.6);
+  const [temperature, setTemperature] = useState(0.3);
   const [topK, setTopK] = useState(20);
   const [resources, setResources] = useState({
     translations: [],
@@ -241,6 +242,9 @@ function RhakosCruncher({ metadata, style }) {
         columnSpacing={0.5}
         rowSpacing={1}
       >
+        <Grid2 item size={12}>
+          <Typography variant="h6">{`${bcvRef.current.bookCode} ${bcvRef.current.chapterNum}:${bcvRef.current.verseNum}`}</Typography>
+        </Grid2>
         <Grid2
           container
           sx={{
@@ -275,7 +279,6 @@ function RhakosCruncher({ metadata, style }) {
             </IconButton>
           </Grid2>
         </Grid2>
-
         <Grid2
           container
           sx={{
@@ -349,6 +352,12 @@ function RhakosCruncher({ metadata, style }) {
                 JSON.stringify(rag_context),
                 debugRef.current,
               );
+              if (!result.ok) {
+                console.log("Error from LLM");
+                setProcessing("waiting");
+                setPrompt("");
+                return;
+              }
               result.contextElapsed = contextElapsed/1000.0;
               setResponses([...responses, result]);
               setProcessing("waiting");
