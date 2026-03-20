@@ -249,6 +249,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         const data = await response.json();
         // console.log(data);
 
+        await refreshMainTrackScale();
         return newUrl;
       }
     } catch (error) {
@@ -493,6 +494,19 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     [wavesurfer, maxDuration],
   );
 
+  const refreshMainTrackScale = useCallback(async () => {
+    const mainDuration = wavesurfer?.getDuration?.() || 0;
+    const trackDurationsList = Object.values(trackDurations || []).filter(
+        (value) => typeof value === "number" && value > 0,
+    );
+    const nextMaxDuration = Math.max(mainDuration, ...trackDurationsList, 0);
+
+    if (nextMaxDuration > 0) {
+      setMaxDuration(nextMaxDuration);
+      updateMainTrackWidth(mainDuration || undefined, nextMaxDuration);
+    }
+  }, [wavesurfer, trackDurations, updateMainTrackWidth])
+
   useEffect(() => {
     if (!waveformRef.current) return;
     const observer = new ResizeObserver((entries) => {
@@ -588,6 +602,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     if (!wavesurfer) return;
     const duration = wavesurfer.getDuration();
     updateMainTrackWidth(duration);
+    refreshMainTrackScale();
     setTimeout(() => {
       setIsLoading(false);
     }, 100);
@@ -823,6 +838,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     );
     setAudioUrl(concatenatedUrl);
     setCopiedRegion(null);
+    await refreshMainTrackScale();
   };
 
   const copyRegion = async (regionData) => {
@@ -883,6 +899,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         // console.log(data);
         //
         setAudioUrl(newUrl);
+        await refreshMainTrackScale();
 
         return newUrl;
       }
