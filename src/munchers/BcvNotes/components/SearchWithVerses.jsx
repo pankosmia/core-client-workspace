@@ -3,7 +3,7 @@ import {  ListItemButton, ListItemText, Box, Stack, List, Collapse, Typography }
 import AddFab from "./AddFab";
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
-function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRowN,cellValueChanged, setCellValueChanged, updateBcv, currentChapter }) {
+function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRowN,cellValueChanged, setCellValueChanged, updateBcv, currentChapter, refDisabled, setRefDisabled }) {
 
     const [openVerses, setOpenVerses] = useState({});
 
@@ -54,6 +54,8 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                 setIngredient={setIngredient}
                 cellValueChanged={cellValueChanged}
                 setCellValueChanged={setCellValueChanged}
+                refDisabled={refDisabled}
+                setRefDisabled={setRefDisabled}
             />
             <Box sx={{ maxHeight: "75vh", overflowY: "auto", overflowX: "hidden", width: '100%', pr: 1 }}>
                 <List component="nav">

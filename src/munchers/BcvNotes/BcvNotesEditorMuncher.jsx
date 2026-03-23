@@ -23,6 +23,7 @@ function BcvNotesEditorMuncher({ metadata }) {
   const [md5Ingredient, setMd5Ingredient] = useState([]);
   const [cellValueChanged, setCellValueChanged] = useState(false);
   const [currentChapter, setCurrentChapter] = useState('1');
+  const [refDisabled, setRefDisabled] = useState(false);
 
   // Récupération des données du tsv
   const getAllData = async () => {
@@ -132,6 +133,8 @@ function BcvNotesEditorMuncher({ metadata }) {
               setCellValueChanged={setCellValueChanged}
               updateBcv={updateBcv}
               currentChapter={currentChapter}
+              refDisabled={refDisabled}
+              setRefDisabled={setRefDisabled}
             />
             <Editor
               currentRowN={currentRowN}
@@ -141,6 +144,8 @@ function BcvNotesEditorMuncher({ metadata }) {
               updateBcv={updateBcv}
               cellValueChanged={cellValueChanged}
               setCellValueChanged={setCellValueChanged}
+              refDisabled={refDisabled}
+              setRefDisabled={setRefDisabled}
             />
           </Box>
         :
@@ -153,6 +158,8 @@ function BcvNotesEditorMuncher({ metadata }) {
                   setIngredient={setIngredient}
                   cellValueChanged={cellValueChanged}
                   setCellValueChanged={setCellValueChanged}
+                  refDisabled={refDisabled}
+                  setRefDisabled={setRefDisabled}
               />
               <Typography>
                 {doI18n("pages:core-local-workspace:no_notes", i18nRef.current)}

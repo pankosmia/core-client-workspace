@@ -1,20 +1,46 @@
-import { useState, useContext } from 'react';
-import { Box, FormControl, TextField, Dialog, DialogTitle, DialogActions, DialogContent, Button } from "@mui/material";
+import { useState, useContext, useEffect } from 'react';
+import { Box, FormControl, TextField, Dialog, DialogTitle, DialogActions, DialogContent, Button, IconButton, Stack } from "@mui/material";
 import MarkdownField from "../../../components/MarkdownField";
 import ActionsButtons from "./ActionsButtons";
+import AddLineDialog from "./AddLineDialog";
+import DeleteNote from "./DeleteNote";
 import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import { i18nContext as I18nContext } from "pankosmia-rcl";
 import { doI18n } from "pithekos-lib";
 
 
-function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, mode, currentRow, setCurrentRow, saveFunction, cellValueChanged, setCellValueChanged, resourceType, isCreate }) {
+function TsvLineForm({ 
+    ingredient, 
+    setIngredient, 
+    currentRowN, 
+    setCurrentRowN, 
+    updateBcv, 
+    mode, 
+    currentRow, 
+    setCurrentRow, 
+    saveFunction, 
+    cellValueChanged, 
+    setCellValueChanged, 
+    resourceType, 
+    refDisabled,
+    setRefDisabled
+}) {
     
     const { i18nRef } = useContext(I18nContext);
     const columnNames = ingredient[0] || [];
     const [openRefDialog, setOpenRefDialog] = useState(false);
     const [tempRef, setTempRef] = useState("");
 
-    const refIndex = columnNames.findIndex(col => col.replace('\r', '').trim() === "REF");
+    const [openedModal, setOpenedModal] = useState(null);
+
+    const isCreate = mode === "add"; 
+
+    const refIndex = columnNames.findIndex(col => {
+        const cleanCol = col.replace('\r', '').trim().toUpperCase();
+        return ["REF", "REFERENCE"].includes(cleanCol);
+    });
 
     // Permet la modification d'une note
     const changeCell = (event, n) => {
@@ -31,8 +57,11 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
 
     // Permet d'annuler les modications faites sur la note 
     const handleCancel = () => {
-        const newRowData = (mode === "edit" ? [...currentRow] : Array(7).fill("", 0, 7))
-        setCurrentRow(newRowData);
+        const originalData = mode === "edit" 
+            ? [...ingredient[currentRowN]] 
+            : Array(columnNames.length).fill("");
+        setCurrentRow(originalData);
+        setCellValueChanged(false);
     };
 
 
@@ -59,6 +88,27 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
         setOpenRefDialog(false);
     };
 
+    const visibilityMap = {
+        new_bcv_question: [...(isCreate ? ['ref', 'id', 'reference'] : []), 'question', 'response', 'quote', 'occurrence', 'occurence'],
+        new_bcv_study_question: [...(isCreate ? ['ref', 'id', 'reference'] : []), 'question']
+    };
+    
+    const activeColumns = visibilityMap[resourceType] || columnNames.map(c => c.replace('\r', '').trim().toLowerCase());
+
+    useEffect(() => {
+        let rowData;
+        if (mode === "edit") {
+            rowData = [...(ingredient[currentRowN] || [])];
+        } else {
+            rowData = Array(columnNames.length).fill("");
+
+            if (refDisabled && refIndex !== -1) {
+                rowData[refIndex] = ingredient[currentRowN]?.[refIndex] || "";
+            }
+        }
+        setCurrentRow(rowData);
+    }, [mode, refDisabled, currentRowN, ingredient]);
+
     return (
         <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
             {
@@ -80,7 +130,7 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="Referencia (ej: 1:1)"
+                        label={doI18n("pages:core-local-workspace:example_reference", i18nRef.current)}
                         fullWidth
                         value={tempRef}
                         onChange={(e) => setTempRef(e.target.value)}
@@ -92,30 +142,94 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
                     <Button onClick={handleSaveRef} variant="contained">{doI18n("pages:core-local-workspace:apply", i18nRef.current)}</Button>
                 </DialogActions>
             </Dialog>
-            {columnNames.map((column, n) => {
+            <AddLineDialog
+                mode="add"
+                open={openedModal === "add"}
+                closeModal={() => { setOpenedModal(null); setRefDisabled(false) }}
+                currentRowN={currentRowN}
+                setCurrentRowN={setCurrentRowN}
+                ingredient={ingredient}
+                setIngredient={setIngredient}
+                cellValueChanged={cellValueChanged}
+                setCellValueChanged={setCellValueChanged}
+                refDisabled={refDisabled}
+                setRefDisabled={setRefDisabled}
+            />
+            <DeleteNote
+                mode="delete"
+                open={openedModal === "delete"}
+                closeModal={() => setOpenedModal(null)}
+                ingredient={ingredient}
+                setIngredient={setIngredient}
+                rowData={currentRow}
+                currentRowN={currentRowN}
+            />
+            {activeColumns.map((column) => {
 
-                const cleanColumn = column.replace('\r', '').trim();
+                const cleanColumn = column.trim().replace(/\r/g, '').toLowerCase();
+                const realIndex = columnNames.findIndex(col => col.replace('\r', '').trim().toLowerCase() === cleanColumn.toLowerCase());
+                const isRef = cleanColumn === "ref" || cleanColumn === "reference";
+                const isId = cleanColumn.includes("id");
+                const isRefOrId = ['ref', 'id', 'reference'].includes(cleanColumn.toLowerCase());
 
-                const visibilityMap = {
-                    new_bcv_question: [...(isCreate ? ['REF', 'ID'] : []), 'Question', 'Response', 'Response'],
-                    new_bcv_study_question: [...(isCreate ? ['REF', 'ID'] : []), 'Question', 'Question']
+                if (realIndex === -1) return null;
+
+                if (!isCreate && isRefOrId && !refDisabled) {
+                    return null;  
+                }
+
+                if (openedModal !== "add" && !isCreate && ['ref', 'id', 'reference'].includes(cleanColumn)) {
+                    return null;
                 };
 
-                if (!isCreate && (cleanColumn === 'REF' || cleanColumn === 'ID')) {
-                    return null;
+                const occIndex = columnNames.findIndex(col => {
+                    const clean = col.replace('\r', '').trim().toLowerCase();
+                    return clean === 'occurrence' || clean === 'occurence'; 
+                });
+
+
+                if (cleanColumn.toLowerCase() === 'quote' && !isCreate) {
+                    return (
+                        <Stack direction="row" spacing={2} alignItems="center" key="row-quote-occ" sx={{ mt: 2, mb: 1 }}>
+                            <TextField 
+                                label="Quote" 
+                                value={currentRow[realIndex] || ''} 
+                                onChange={(e) => changeCell(e, realIndex)}
+                                fullWidth
+                                size="small"
+                            />
+                            <TextField 
+                                label="Occ" 
+                                value={currentRow[occIndex] || ''} 
+                                onChange={(e) => changeCell(e, occIndex)}
+                                sx={{ width: '80px' }} 
+                                size="small"
+                            />
+                            <Stack direction="row">
+                                <IconButton size="small" onClick={() => { 
+                                    setRefDisabled(true);
+                                    setTimeout(() => {
+                                      setOpenedModal("add"); 
+                                    }, 0);
+                                }}>
+                                    <AddIcon fontSize="small" />
+                                </IconButton>
+                                <IconButton size="small" onClick={() => setOpenedModal("delete") }>
+                                    <RemoveIcon fontSize="small" />
+                                </IconButton>
+                            </Stack>
+                        </Stack>
+                    );
                 }
 
-                // We filter, if the resourceType exists but the column isn't in the list, we don't render. IF the resourceType exists, we render everything.
-                if (visibilityMap[resourceType] && !visibilityMap[resourceType].includes(cleanColumn)) {
-                    return null;
-                }
-
-                // Make sure we get the right index
-                const realIndex = columnNames.indexOf(column);
+                if (cleanColumn.toLowerCase() === 'occurrence') return null;
+                const isLastNoteField = realIndex === 6;
+                const rawName = isLastNoteField ? "Note" : (columnNames[realIndex] || cleanColumn).replace('\r', '').trim();
+                const displayName = rawName.charAt(0).toUpperCase() + rawName.slice(1).toLowerCase();
 
                 return (
-                    <FormControl fullWidth margin="normal" key={column + realIndex} >
-                        {['Note', 'Question', 'Response'].some(word => column.includes(word)) ? (
+                    <FormControl fullWidth margin="normal" key={cleanColumn + realIndex} >
+                        {['note', 'question', 'response'].some(word => cleanColumn.toLowerCase().includes(word)) ? (
                             <MarkdownField
                                 value={currentRow[realIndex]}
                                 columnNames={columnNames}
@@ -127,15 +241,19 @@ function TsvLineForm({ ingredient, setIngredient, currentRowN, setCurrentRowN, u
                             />
                         ) : (
                             <TextField
-                                label={column.replace('\r', '')}
+                                label={displayName}
                                 value={currentRow[realIndex] || ''}
-                                placeholder={column.includes("Reference") ? "1:1" : ""}
-                                required={column.includes("Reference")}
-                                disabled={column.includes("ID") || (mode === "edit" && ingredient[currentRowN]?.length === 1)}
+                                placeholder={(cleanColumn.includes("Reference") || cleanColumn.includes("REF")) ? "1:1" : ""}
+                                required={cleanColumn.includes("Reference") || cleanColumn.includes("REF")}
+                                disabled={
+                                    isId || 
+                                    (mode === "edit" && isRef) || 
+                                    (refDisabled && isRef)
+                                }
                                 variant="outlined"
                                 fullWidth
                                 size="small"
-                                onChange={(e) => changeCell(e, realIndex)}
+                                onChange={(e) => { console.log(e); changeCell(e, realIndex) }}
                             />
                         )}
                     </FormControl>

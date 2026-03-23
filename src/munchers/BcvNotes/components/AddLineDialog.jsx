@@ -7,7 +7,7 @@ import { i18nContext as I18nContext } from "pankosmia-rcl";
 import { doI18n } from "pithekos-lib";
 import { v4 as uuidv4 } from 'uuid';
 
-function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRowN, cellValueChanged, setCellValueChanged }) {
+function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRowN, cellValueChanged, setCellValueChanged, refDisabled, setRefDisabled }) {
     const { i18nRef } = useContext(I18nContext);
     const [newCurrentRow, setNewCurrentRow] = useState(Array(7).fill("", 0, 7));
     const [resourceType, setResourceType] = useState("new_bcv_note");
@@ -107,7 +107,8 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
                     cellValueChanged={cellValueChanged}
                     setCellValueChanged={setCellValueChanged}
                     resourceType={resourceType}
-                    isCreate={true}
+                    refDisabled={refDisabled}
+                    setRefDisabled={setRefDisabled}
                 />
             </Box>
 
