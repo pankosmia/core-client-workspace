@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useMemo } from 'react';
 import { Box, FormControl, TextField, Dialog, DialogTitle, DialogActions, DialogContent, Button, IconButton, Stack } from "@mui/material";
 import MarkdownField from "../../../components/MarkdownField";
 import ActionsButtons from "./ActionsButtons";
@@ -109,6 +109,18 @@ function TsvLineForm({
         setCurrentRow(rowData);
     }, [mode, refDisabled, currentRowN, ingredient]);
 
+    const totalNotesInRef = useMemo(() => {
+        const currentRef = currentRow[refIndex];
+        if (!currentRef || !ingredient) return 0;
+    
+        const matches = ingredient.slice(1).filter(row => {
+            const rowRef = row[refIndex]?.replace('\r', '').trim();
+            return rowRef === currentRef.replace('\r', '').trim();
+        });
+    
+        return matches.length;
+    }, [ingredient, currentRow, refIndex]);
+
     return (
         <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
             {
@@ -182,12 +194,6 @@ function TsvLineForm({
                     return null;
                 };
 
-                const occIndex = columnNames.findIndex(col => {
-                    const clean = col.replace('\r', '').trim().toLowerCase();
-                    return clean === 'occurrence' || clean === 'occurence'; 
-                });
-
-
                 if (cleanColumn.toLowerCase() === 'quote' && !isCreate) {
                     return (
                         <Stack direction="row" spacing={2} alignItems="center" key="row-quote-occ" sx={{ mt: 2, mb: 1 }}>
@@ -200,10 +206,11 @@ function TsvLineForm({
                             />
                             <TextField 
                                 label="Occ" 
-                                value={currentRow[occIndex] || ''} 
-                                onChange={(e) => changeCell(e, occIndex)}
+                                value={totalNotesInRef} 
+                                disabled={true}
                                 sx={{ width: '80px' }} 
                                 size="small"
+                                variant="outlined"
                             />
                             <Stack direction="row">
                                 <IconButton size="small" onClick={() => { 
@@ -253,7 +260,7 @@ function TsvLineForm({
                                 variant="outlined"
                                 fullWidth
                                 size="small"
-                                onChange={(e) => { console.log(e); changeCell(e, realIndex) }}
+                                onChange={(e) => { changeCell(e, realIndex) }}
                             />
                         )}
                     </FormControl>
