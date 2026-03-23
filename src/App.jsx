@@ -10,12 +10,15 @@ import { SnackbarProvider, MaterialDesignContent } from "notistack";
 export default function App() {
   const [layout, setLayout] = useState("ViewEditorRightRow");
   const [selectedResources, setSelectedResources] = useState(new Set([]));
+  const [selectedCrunchers, setSelectedCrunchers] = useState(new Set([]));
   return (
     <Router
       layout={layout}
       setLayout={setLayout}
       selectedResources={selectedResources}
       setSelectedResources={setSelectedResources}
+      selectedCrunchers={selectedCrunchers}
+      setSelectedCrunchers={setSelectedCrunchers}
     />
   );
 }
@@ -25,6 +28,8 @@ function Router({
   setLayout,
   selectedResources,
   setSelectedResources,
+  selectedCrunchers,
+  setSelectedCrunchers
 }) {
   const [themeSpec, setThemeSpec] = useState({
     palette: {
@@ -59,6 +64,8 @@ function Router({
           setLayout={setLayout}
           selectedResources={selectedResources}
           setSelectedResources={setSelectedResources}
+          selectedCrunchers={selectedCrunchers}
+          setSelectedCrunchers={setSelectedCrunchers}
         />
       ),
     },
@@ -69,6 +76,7 @@ function Router({
           layout={layout}
           setLayout={setLayout}
           selectedResources={selectedResources}
+          selectedCrunchers={selectedCrunchers}
         />
       ),
     },
