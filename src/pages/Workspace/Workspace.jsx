@@ -15,7 +15,7 @@ import {
   typographyContext,
 } from "pankosmia-rcl";
 
-const Workspace = ({ layout, selectedResources }) => {
+const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
   const { i18nRef } = useContext(i18nContext);
   const { typographyRef } = useContext(typographyContext);
   const { currentProjectRef } = useContext(currentProjectContext);
@@ -83,6 +83,7 @@ const Workspace = ({ layout, selectedResources }) => {
 
   const [rootPane, tileElements] = layoutJson(
     resourceDetails,
+    selectedCrunchers,
     layout,
     i18nRef,
     distractionModeCount,
