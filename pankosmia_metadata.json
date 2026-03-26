@@ -1,6 +1,6 @@
 {
   "id": "core-local-workspace",
-  "minServerVersion": "0.12.14",
+  "minServerVersion": "0.14.4",
 
   "require": {
     "net": false
@@ -13,7 +13,7 @@
         "url": ""
       }
     },
-    "x-juxtalinear":{
+    "x-juxtalinear": {
       "edit": {
         "doc": "main page for workspace",
         "label": "pages:core-client-workspace:main",
@@ -701,7 +701,7 @@
       "en": "Intro outline tags"
     },
     "jump_to_story": {
-      "en":"Jump"
+      "en": "Jump"
     },
     "print": {
       "en": "Print",
@@ -721,13 +721,123 @@
       "en": "No Scripture found for this story in this translation",
       "fr": "Aucun texte biblique trouvé dans cette traduction pour cette histoire"
     },
-    "about_dialog":{
-      "en":"About",
-      "fr":"A propos"
+    "about_dialog": {
+      "en": "About",
+      "fr": "A propos"
     },
-    "link_disabled_offline":{
-      "en":"Link disabled in offline mode",
-      "es":"El link está deshabilitado en el modo sin Internet"
+    "link_disabled_offline": {
+      "en": "Link disabled in offline mode",
+      "es": "El link está deshabilitado en el modo sin Internet"
+    },
+    "settings_rhakos": {
+      "en": "AI settings",
+      "fr": "IA paramètres"
+    },
+    "model_rhakos": {
+      "en": "Model",
+      "fr": "Modèle"
+    },
+    "topk_rhakos": {
+      "en": "Topk",
+      "fr": "Topk"
+    },
+    "temperature_rhakos": {
+      "en": "Temperature",
+      "fr": "Température"
+    },
+    "show_prompt_rhakos": {
+      "en": "Show full prompt",
+      "fr": "Afficher prompt complet"
+    },
+    "choose_prompt_rhakos": {
+      "en": "with prompt",
+      "fr": "avec prompt"
+    },
+    "bcv_rhakos": {
+      "en": "Reference",
+      "fr": "Référence"
+    },
+    "quantized_rhakos": {
+      "en": "Quantized"
+    },
+    "submitted_rhakos": {
+      "en": "Sent at",
+      "fr": "Envoyé à"
+    },
+    "elapsed_rhakos": {
+      "en": "Prompt/processing time"
+    },
+    "info_rhakos": {
+      "en": "Response information",
+      "fr": "IA informations"
+    },
+    "system_prompt_rhakos": {
+      "en": "You are a helpful assistant. You speak English. The user is translating a verse in the Bible. She is translating from English, which she speaks fluently. However, she left school when she was 11 years old so her written English is limited. She likes to read short, precise answers. She likes answers that contain between one and three short paragraphs. She does not want to see the entire verse, only the parts of the verse that are relevant to the question.",
+      "fr": "Vous êtes an assistant qui aime rendre service. Vous parlez français. L'utilisateur traduit un verset de la Bible. Elle traduit depuis le français, langue qu'elle parle courrament. Cependant, elle a quitté l'école à l'âge de 11 ans, ce qui fait que son français écrit est basique. Elle aime lire des réponses courtes et précises. Elle aime des réponses qui comprennent entre 1 et 3 paragraphes. Elle n'a pas besoin de voir le verset entier, seulement less extraits du verset qui sont pertinants pour répondre à sa question."
+    },
+    "prologue_prompt_rhakos": {
+      "en": "# Source Documents\n\nHere are some important documents. You should base your answer to her questions on these documents.",
+      "fr": "# Documents sources\n\nVoici quelques documents importants. Vos réponses à ses questions doivent reposer sur ces documents."
+    },
+    "user_prologue_prompt_rhakos": {
+      "en": "# The user's question\n\nNow answer the following question, in English, using only the documents above.",
+      "fr": "# La question de l'utilisateur\n\nRépondez maintenant la question suivante, en français, utilisant uniquement les documents ci-hauts."
+    },
+    "juxta_prompt_rhakos": {
+      "en": "# Juxtalinear Translation",
+      "fr": "# Traduction juxtalinéaire"
+    },
+    "notes_prompt_rhakos": {
+      "en": "# Verse notes\n\nHere are some notes on the whole verse. These are NOT Bible translations. The notes apply to ALL Bible translations. These notes help us to understand the Bible translations.",
+      "fr": "# Notes sur le verset\n\nVoici quelques notes sur le verset tout entier. Ces notes NE SONT PAS des traductions bibliques. Les notes sont pertinentes pour TOUTE traduction biblique. Ces notes nous aident à bien comprendre les traductions bibliques."
+    },
+    "snippets_prompt_rhakos": {
+      "en": "# Notes on key words in the verse\n\nHere are some notes on important words in this verse. These notes are also NOT Bible translations. They refer to the unfoldingWord Literal Translation, but may be applied to other Bible translations.",
+      "fr": "# Notes sur des mots-clés dans le verset\n\nVoici quelques notes sur des mots importants dans ce verset. Ces notes NE SONT PAS des traductions bibliques. Elles font référence à la traduction ULT d'unfoldingWord, mais elles peuvent s'appliquer à d'autres traductions bibliques."
+    },
+    "translations_prompt_rhakos": {
+      "en": "# English Bible Translations\n\nHere are different English Bible translations of the same verse. These are important. Pay attention to the names of the translations, and to the differences between the translations for this verse.",
+      "fr": "# Traductions bibliques en français\n\nVoici le même verset selon diverses traductions françaises de la Bible. Elles sont importantes. Faites attention aux noms des traductions, et aux différences entre les traductions de ce verset."
+    },
+    "here_is_a_juxta": {
+      "en": "Here is the juxtalinear rendering of the greek text for all greek sentences that include this verse. Each greek sentence has been broken into short chunks. Each chunk contains greek words followed by a very literal translation (between parentheses) in the same order as the greek words. The chunks are as follows:",
+      "fr": "Voici la représentation juxtalinéaire du texte grec pour toutes les phrases grecques qui comprennent ce verset. Chaque phrase grecque a été coupé en de courts morceaux. Chaque morceau comprend des mots grecs suivis par une traduction très littérale (entre parenthèses) suivant l'ordre des mots grecs. Voici ces morceaux :"
+    },
+    "only_include_juxta": {
+      "en": "Only include the juxtalinear in your answer if the user asks about greek, or if the juxtalinear is directly relevant to the question. For example, the juxtalinear may help the user to see the literal meaning of a text.",
+      "fr": "N'utilisez pas le juxtalinéaire dans votre réponse, sauf si l'utilisateur pose une question par rapport au grec, ou si le juxtalinéaire est spécialement pertinent par rapport à la question. Par exemple, le juxtalinéaire peut aider l'utilisateur à comprendre le sens précis d'un texte."
+    },
+    "send_button": {
+      "en": "Send",
+      "fr": "Envoyer"
+    },
+    "prompt_rhakos": {
+      "en": "Prompt",
+      "fr": "Requête"
+    },
+    "second": {
+      "en": "sec",
+      "fr": "sec"
+    },
+    "resources_rhakos": {
+      "en": "Resources to consult",
+      "fr": "Ressources à prendre en compte"
+    },
+    "translations": {
+      "en": "Translations",
+      "fr": "Traductions"
+    },
+    "juxtas": {
+      "en": "Juxtalinears",
+      "fr": "Juxtalinéaires"
+    },
+    "notes": {
+      "en": "Notes",
+      "fr": "Notes"
+    },
+    "no_resources_chosen": {
+      "en": "No resources selected",
+      "fr": "Aucune ressource choisie"
     }
   }
 }
