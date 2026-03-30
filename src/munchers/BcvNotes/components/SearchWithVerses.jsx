@@ -1,11 +1,14 @@
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState, Fragment, useContext } from 'react';
 import {  ListItemButton, ListItemText, Box, Stack, List, Collapse, Typography, Button } from "@mui/material";
 import AddFab from "./AddFab";
 import AddLineDialog from './AddLineDialog';
 import { ExpandLess, ExpandMore, Add } from '@mui/icons-material';
+import { i18nContext as I18nContext } from "pankosmia-rcl";
+import { doI18n } from "pithekos-lib";
 
 function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRowN,cellValueChanged, setCellValueChanged, updateBcv, currentChapter, refDisabled, setRefDisabled }) {
 
+    const { i18nRef } = useContext(I18nContext);
     const [openVerses, setOpenVerses] = useState({});
     const [openedModal, setOpenedModal] = useState(null);
 
@@ -128,8 +131,8 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                                     {(n === notes.length - 1) 
                                                         && 
                                                         <ListItemButton 
-                                                            key={n+1} 
-                                                            sx={{ pl: 2, py: 1 }} 
+                                                            key={`add-inner-${vNum}`}
+                                                            sx={{ pl: 2, py: 2 }} 
                                                             onClick={() => { 
                                                                 const index = ingredient.findIndex(l => l[1] === note[1]);
                                                                 if (index !== -1) {
@@ -147,7 +150,10 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                                                     width: '100%'
                                                                 }}
                                                             >
-                                                                <Add aria-label="@New note" />
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', color: 'text.secondary' }}>
+                                                                    <Add sx={{ fontSize: '1.2rem' }} />
+                                                                    <Typography variant="caption">{doI18n("pages:core-local-workspace:new", i18nRef.current)}</Typography>
+                                                                </Box>
                                                             </Box>
                                                         </ListItemButton>
                                                     }
@@ -155,6 +161,25 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                             ))}
                                         </List>
                                     </Collapse>
+                                )}
+                                {!isMultiple && (
+                                    <ListItemButton 
+                                        key={`add-single-${vNum}`}
+                                        sx={{ pl: 2, py: 1 }}
+                                        onClick={() => { 
+                                            const index = ingredient.findIndex(l => l[1] === notes[0][1]);
+                                            if (index !== -1) {
+                                                setCurrentRowN(index)
+                                            };
+                                            setRefDisabled(true); 
+                                            setOpenedModal("add"); 
+                                        }}
+                                    >
+                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', color: 'text.secondary' }}>
+                                            <Add sx={{ fontSize: '1.2rem' }} />
+                                            <Typography variant="caption">{doI18n("pages:core-local-workspace:new", i18nRef.current)}</Typography>
+                                        </Box>
+                                    </ListItemButton>
                                 )}
                             </Fragment>
                         );

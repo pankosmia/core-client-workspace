@@ -862,6 +862,10 @@
     "example_reference": {
       "en":"Reference (e.g., 1:1)",
       "es":"Referencia (ej: 1:1)"
+    },
+    "new": {
+      "en":"New",
+      "es":"Nueva"
     }
   }
 }
