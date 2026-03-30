@@ -2,11 +2,9 @@ import { useState, useContext, useEffect, useMemo } from 'react';
 import { Box, FormControl, TextField, Dialog, DialogTitle, DialogActions, DialogContent, Button, IconButton, Stack } from "@mui/material";
 import MarkdownField from "../../../components/MarkdownField";
 import ActionsButtons from "./ActionsButtons";
-import AddLineDialog from "./AddLineDialog";
-import DeleteNote from "./DeleteNote";
 import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { i18nContext as I18nContext } from "pankosmia-rcl";
 import { doI18n } from "pithekos-lib";
 
@@ -33,14 +31,20 @@ function TsvLineForm({
     const [openRefDialog, setOpenRefDialog] = useState(false);
     const [tempRef, setTempRef] = useState("");
 
-    const [openedModal, setOpenedModal] = useState(null);
-
     const isCreate = mode === "add"; 
-
+    const quoteIndex = columnNames.findIndex(c => c.toLowerCase().includes('quote'));
     const refIndex = columnNames.findIndex(col => {
-        const cleanCol = col.replace('\r', '').trim().toUpperCase();
-        return ["REF", "REFERENCE"].includes(cleanCol);
+        const cleanCol = col.replace('\r', '').trim().toLowerCase();
+        return ["ref", "reference"].includes(cleanCol);
     });
+    const occIndex = columnNames.findIndex(col => {
+        const c = col.trim().toLowerCase().replace('\r', '');
+        return c === 'occurrence' || c === 'occurence';
+    });
+
+    const isNoteResource = () => {
+        return !(ingredient[0].some(c => c.includes('Response')) || ingredient[0].some(c => c.includes('Question')));
+    };
 
     // Permet la modification d'une note
     const changeCell = (event, n) => {
@@ -89,37 +93,79 @@ function TsvLineForm({
     };
 
     const visibilityMap = {
-        new_bcv_question: [...(isCreate ? ['ref', 'id', 'reference'] : []), 'question', 'response', 'quote', 'occurrence', 'occurence'],
+        new_bcv_question: [...(isCreate ? ['ref', 'id', 'reference'] : []), 'question', 'response'],
         new_bcv_study_question: [...(isCreate ? ['ref', 'id', 'reference'] : []), 'question']
     };
     
     const activeColumns = visibilityMap[resourceType] || columnNames.map(c => c.replace('\r', '').trim().toLowerCase());
 
+    const totalNotesInRef = useMemo(() => {
+        const currentRef = currentRow[refIndex]?.replace('\r', '').trim();
+        if (!currentRef || !ingredient) return 1;
+    
+        const getBaseRef = (ref) => ref.split('-')[0].trim();
+        const currentBase = getBaseRef(currentRef);
+    
+        const existingMatches = ingredient.slice(1).filter(row => {
+            const rowRef = row[refIndex]?.replace('\r', '').trim();
+            if (!rowRef) return false;
+            
+            return getBaseRef(rowRef) === currentBase;
+        });
+    
+        return mode === "add" ? existingMatches.length + 1 : existingMatches.length;
+    
+    }, [ingredient, currentRow[refIndex], mode, refIndex]);
+    
+    const suggestedOrder = useMemo(() => {
+        const currentRef = currentRow[refIndex]?.replace('\r', '').trim();
+        if (!currentRef || !ingredient) return "1";
+    
+        const getBaseRef = (ref) => ref.split('-')[0].trim();
+        const currentBase = getBaseRef(currentRef);
+    
+        const matchesCount = ingredient.slice(1, (mode === "edit" ? currentRowN + 1 : undefined)).filter(row => {
+            const rowRef = row[refIndex]?.replace('\r', '').trim();
+            return rowRef && getBaseRef(rowRef) === currentBase;
+        }).length;
+    
+        const order = mode === "add" ? (matchesCount + 1) : matchesCount;
+        return (order || 1).toString();
+    }, [ingredient, currentRow[refIndex], mode, currentRowN, refIndex]);
+
+    const handleNudge = (amount, targetIndex) => {
+        if (targetIndex === -1) return;
+    
+        const currentVal = parseInt(currentRow[targetIndex]) || parseInt(suggestedOrder) || 1;
+        
+        const newVal = Math.max(1, Math.min(currentVal + amount, totalNotesInRef));
+    
+        if (newVal.toString() !== (currentRow[targetIndex] || "").toString()) {
+            const newRowData = [...currentRow];
+            newRowData[targetIndex] = newVal.toString();
+            setCurrentRow(newRowData);
+            setCellValueChanged(true);
+        }
+    };
+
     useEffect(() => {
+        if (!ingredient || currentRowN === -1) return;
+
         let rowData;
+
         if (mode === "edit") {
             rowData = [...(ingredient[currentRowN] || [])];
         } else {
             rowData = Array(columnNames.length).fill("");
-
             if (refDisabled && refIndex !== -1) {
                 rowData[refIndex] = ingredient[currentRowN]?.[refIndex] || "";
             }
         }
-        setCurrentRow(rowData);
-    }, [mode, refDisabled, currentRowN, ingredient]);
 
-    const totalNotesInRef = useMemo(() => {
-        const currentRef = currentRow[refIndex];
-        if (!currentRef || !ingredient) return 0;
+        setCurrentRow(rowData);
+        setCellValueChanged(false);
     
-        const matches = ingredient.slice(1).filter(row => {
-            const rowRef = row[refIndex]?.replace('\r', '').trim();
-            return rowRef === currentRef.replace('\r', '').trim();
-        });
-    
-        return matches.length;
-    }, [ingredient, currentRow, refIndex]);
+    }, [currentRowN, mode, refDisabled, ingredient]); 
 
     return (
         <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
@@ -145,7 +191,10 @@ function TsvLineForm({
                         label={doI18n("pages:core-local-workspace:example_reference", i18nRef.current)}
                         fullWidth
                         value={tempRef}
-                        onChange={(e) => setTempRef(e.target.value)}
+                        onChange={(e) => {
+                            const cleanRef = e.target.value.replace(/\s/g, '');
+                            setTempRef(cleanRef)
+                        }}
                         variant="standard"
                     />
                 </DialogContent>
@@ -154,35 +203,16 @@ function TsvLineForm({
                     <Button onClick={handleSaveRef} variant="contained">{doI18n("pages:core-local-workspace:apply", i18nRef.current)}</Button>
                 </DialogActions>
             </Dialog>
-            <AddLineDialog
-                mode="add"
-                open={openedModal === "add"}
-                closeModal={() => { setOpenedModal(null); setRefDisabled(false) }}
-                currentRowN={currentRowN}
-                setCurrentRowN={setCurrentRowN}
-                ingredient={ingredient}
-                setIngredient={setIngredient}
-                cellValueChanged={cellValueChanged}
-                setCellValueChanged={setCellValueChanged}
-                refDisabled={refDisabled}
-                setRefDisabled={setRefDisabled}
-            />
-            <DeleteNote
-                mode="delete"
-                open={openedModal === "delete"}
-                closeModal={() => setOpenedModal(null)}
-                ingredient={ingredient}
-                setIngredient={setIngredient}
-                rowData={currentRow}
-                currentRowN={currentRowN}
-            />
             {activeColumns.map((column) => {
 
                 const cleanColumn = column.trim().replace(/\r/g, '').toLowerCase();
-                const realIndex = columnNames.findIndex(col => col.replace('\r', '').trim().toLowerCase() === cleanColumn.toLowerCase());
                 const isRef = cleanColumn === "ref" || cleanColumn === "reference";
                 const isId = cleanColumn.includes("id");
                 const isRefOrId = ['ref', 'id', 'reference'].includes(cleanColumn.toLowerCase());
+                const realIndex = columnNames.findIndex(col => col.replace('\r', '').trim().toLowerCase() === cleanColumn.toLowerCase());
+                const isLastNoteField = realIndex === 6;
+                const rawName = isLastNoteField ? "Note" : (columnNames[realIndex] || cleanColumn).replace('\r', '').trim();
+                const displayName = rawName.charAt(0).toUpperCase() + rawName.slice(1).toLowerCase();
 
                 if (realIndex === -1) return null;
 
@@ -190,50 +220,65 @@ function TsvLineForm({
                     return null;  
                 }
 
-                if (openedModal !== "add" && !isCreate && ['ref', 'id', 'reference'].includes(cleanColumn)) {
-                    return null;
-                };
-
-                if (cleanColumn.toLowerCase() === 'quote' && !isCreate) {
+                if (cleanColumn === 'quote' && isNoteResource()) {
                     return (
-                        <Stack direction="row" spacing={2} alignItems="center" key="row-quote-occ" sx={{ mt: 2, mb: 1 }}>
+                        <Stack direction="row" spacing={1} alignItems="flex-end" key="snippet-row" sx={{ pt: 1, mb: 2 }}>
                             <TextField 
-                                label="Quote" 
-                                value={currentRow[realIndex] || ''} 
-                                onChange={(e) => changeCell(e, realIndex)}
+                                label="Quote"
+                                value={currentRow[quoteIndex] || ''} 
+                                onChange={(e) => changeCell(e, quoteIndex)}
                                 fullWidth
                                 size="small"
                             />
-                            <TextField 
-                                label="Occ" 
-                                value={totalNotesInRef} 
-                                disabled={true}
-                                sx={{ width: '80px' }} 
-                                size="small"
-                                variant="outlined"
-                            />
-                            <Stack direction="row">
-                                <IconButton size="small" onClick={() => { 
-                                    setRefDisabled(true);
-                                    setTimeout(() => {
-                                      setOpenedModal("add"); 
-                                    }, 0);
-                                }}>
-                                    <AddIcon fontSize="small" />
-                                </IconButton>
-                                <IconButton size="small" onClick={() => setOpenedModal("delete") }>
-                                    <RemoveIcon fontSize="small" />
-                                </IconButton>
+                            <Stack direction="row" alignItems="center" spacing={0} sx={{ width: "25%" }}>
+                                <TextField
+                                    fullWidth
+                                    label="Occurrence"
+                                    value={currentRow[occIndex] || ''}
+                                    placeholder={suggestedOrder}
+                                    size="small"
+                                    onFocus={() => {
+                                        if (!currentRow[occIndex]) {
+                                            const newRow = [...currentRow];
+                                            newRow[occIndex] = suggestedOrder;
+                                            setCurrentRow(newRow);
+                                            setCellValueChanged(true);
+                                        }
+                                    }}
+                                    slotProps={{
+                                        input: {
+                                            readOnly: true,
+                                            sx: { textAlign: 'center', fontWeight: 'bold' },
+                                            endAdornment: (
+                                                <Stack direction="column" sx={{ mr: -0.5 }}> 
+                                                    <IconButton size="small" onClick={() => handleNudge(1, occIndex)} sx={{ p: 0, height: 15 }}>
+                                                        <ArrowDropUpIcon fontSize="inherit" />
+                                                    </IconButton>
+                                                    <IconButton size="small" onClick={() => handleNudge(-1, occIndex)} sx={{ p: 0, height: 15 }}>
+                                                        <ArrowDropDownIcon fontSize="inherit" />
+                                                    </IconButton>
+                                                </Stack>
+                                            )
+                                        }
+                                    }}
+                                />
                             </Stack>
+                            <TextField 
+                                fullWidth
+                                label="Total" 
+                                value={totalNotesInRef}
+                                size="small" 
+                                sx={{ width: '13%' }} 
+                                slotProps={{ input: { readOnly: true } }} 
+                            />
                         </Stack>
                     );
                 }
 
-                if (cleanColumn.toLowerCase() === 'occurrence') return null;
-                const isLastNoteField = realIndex === 6;
-                const rawName = isLastNoteField ? "Note" : (columnNames[realIndex] || cleanColumn).replace('\r', '').trim();
-                const displayName = rawName.charAt(0).toUpperCase() + rawName.slice(1).toLowerCase();
-
+                if (cleanColumn === 'occurrence' || cleanColumn === 'occurence') {
+                    return null;
+                }
+                
                 return (
                     <FormControl fullWidth margin="normal" key={cleanColumn + realIndex} >
                         {['note', 'question', 'response'].some(word => cleanColumn.toLowerCase().includes(word)) ? (

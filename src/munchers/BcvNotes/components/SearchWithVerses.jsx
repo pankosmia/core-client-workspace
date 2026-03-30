@@ -1,11 +1,13 @@
 import { useEffect, useState, Fragment } from 'react';
-import {  ListItemButton, ListItemText, Box, Stack, List, Collapse, Typography } from "@mui/material";
+import {  ListItemButton, ListItemText, Box, Stack, List, Collapse, Typography, Button } from "@mui/material";
 import AddFab from "./AddFab";
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import AddLineDialog from './AddLineDialog';
+import { ExpandLess, ExpandMore, Add } from '@mui/icons-material';
 
 function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRowN,cellValueChanged, setCellValueChanged, updateBcv, currentChapter, refDisabled, setRefDisabled }) {
 
     const [openVerses, setOpenVerses] = useState({});
+    const [openedModal, setOpenedModal] = useState(null);
 
     const groupedVerses = currentChapter ? ingredient.reduce((acc, item) => {
         const reference = item[0];
@@ -35,6 +37,10 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
             if (isOpening) handleSelectNote(firstNoteId);
             return { ...prev, [vNum]: isOpening };
         });
+    };
+
+    const isNoteResource = () => {
+        return ingredient[0].some(c => c.includes('Response')) || ingredient[0].some(c => c.includes('Question'));
     };
 
     useEffect(() => {
@@ -83,41 +89,62 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                 {isMultiple && (
                                     <Collapse in={isOpen} timeout="auto" unmountOnExit>
                                         <List component="div" disablePadding>
-                                            {notes.map((note) => (
-                                                <ListItemButton 
-                                                    key={note[1]} 
-                                                    sx={{ pl: 2 }} 
-                                                    onClick={() => { console.log(note); handleSelectNote(note[1])} }
-                                                    selected={ingredient[currentRowN] && ingredient[currentRowN][1] === note[1]}
-                                                >
-                                                    <ListItemText 
-                                                        primary={
-                                                            <Box 
-                                                                sx={{ 
-                                                                    display: 'flex', 
-                                                                    flexDirection: 'column', 
-                                                                    alignItems: 'center',
-                                                                    width: '100%'
-                                                                }}
-                                                            >
-                                                                <Typography>
-                                                                    {note[4]?.length > 0 ? note[4] : note[0]}
-                                                                </Typography>
-                                                                <Typography 
-                                                                    variant="caption" 
+                                            {notes.map((note, n) => (
+                                                <>
+                                                    <ListItemButton 
+                                                        key={note[1]} 
+                                                        sx={{ pl: 2 }} 
+                                                        onClick={() => { console.log(note); handleSelectNote(note[1])} }
+                                                        selected={ingredient[currentRowN] && ingredient[currentRowN][1] === note[1]}
+                                                    >
+                                                        <ListItemText 
+                                                            primary={
+                                                                <Box 
                                                                     sx={{ 
-                                                                        color: 'text.secondary', 
-                                                                        fontSize: '0.75rem',
-                                                                        whiteSpace: 'nowrap',
-                                                                        overflow: 'hidden',
-                                                                        textOverflow: 'ellipsis'
+                                                                        display: 'flex', 
+                                                                        flexDirection: 'column', 
+                                                                        alignItems: 'center',
+                                                                        width: '100%'
                                                                     }}
                                                                 >
-                                                                    {note[1]}
-                                                                </Typography>
-                                                            </Box>
-                                                    }/>
-                                                </ListItemButton>
+                                                                    <Typography>
+                                                                        {(note[4]?.length > 0 && isNoteResource()) ? note[4] : note[0]}
+                                                                    </Typography>
+                                                                    <Typography 
+                                                                        variant="caption" 
+                                                                        sx={{ 
+                                                                            color: 'text.secondary', 
+                                                                            fontSize: '0.75rem',
+                                                                            whiteSpace: 'nowrap',
+                                                                            overflow: 'hidden',
+                                                                            textOverflow: 'ellipsis'
+                                                                        }}
+                                                                    >
+                                                                        {note[1]}
+                                                                    </Typography>
+                                                                </Box>
+                                                        }/>
+                                                    </ListItemButton>
+                                                    {(n === notes.length - 1) 
+                                                        && 
+                                                        <Box 
+                                                            sx={{ 
+                                                                display: 'flex', 
+                                                                flexDirection: 'column', 
+                                                                alignItems: 'center',
+                                                                width: '100%'
+                                                            }}
+                                                        >
+                                                            <ListItemButton 
+                                                                key={n+1} 
+                                                                sx={{ pl: 2 }} 
+                                                                onClick={() => { setRefDisabled(true); setOpenedModal("add") }}
+                                                            >
+                                                                <Add aria-label="@New note" />
+                                                            </ListItemButton>
+                                                        </Box>
+                                                    }
+                                                </>
                                             ))}
                                         </List>
                                     </Collapse>
@@ -127,6 +154,19 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                     })}
                 </List>
             </Box>
+            <AddLineDialog
+                mode="add"
+                open={openedModal === "add"}
+                closeModal={() => { setOpenedModal(null); setRefDisabled(false) }}
+                currentRowN={currentRowN}
+                setCurrentRowN={setCurrentRowN}
+                ingredient={ingredient}
+                setIngredient={setIngredient}
+                cellValueChanged={cellValueChanged}
+                setCellValueChanged={setCellValueChanged}
+                refDisabled={refDisabled}
+                setRefDisabled={setRefDisabled}
+            />
         </Stack>
     );
 }
