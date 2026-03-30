@@ -269,7 +269,6 @@ function TsvLineForm({
                                     fullWidth
                                     label="Occurrence"
                                     value={currentRow[occIndex] || ''}
-                                    /* placeholder={suggestedOrder.toString()} */
                                     size="small"
                                     onFocus={() => {
                                         if (!currentRow[occIndex]) {
