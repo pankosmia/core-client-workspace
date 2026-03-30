@@ -94,7 +94,7 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                                     <ListItemButton 
                                                         key={note[1]} 
                                                         sx={{ pl: 2 }} 
-                                                        onClick={() => { console.log(note); handleSelectNote(note[1])} }
+                                                        onClick={() => { handleSelectNote(note[1])} }
                                                         selected={ingredient[currentRowN] && ingredient[currentRowN][1] === note[1]}
                                                     >
                                                         <ListItemText 
@@ -127,22 +127,29 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                                     </ListItemButton>
                                                     {(n === notes.length - 1) 
                                                         && 
-                                                        <Box 
-                                                            sx={{ 
-                                                                display: 'flex', 
-                                                                flexDirection: 'column', 
-                                                                alignItems: 'center',
-                                                                width: '100%'
+                                                        <ListItemButton 
+                                                            key={n+1} 
+                                                            sx={{ pl: 2, py: 1 }} 
+                                                            onClick={() => { 
+                                                                const index = ingredient.findIndex(l => l[1] === note[1]);
+                                                                if (index !== -1) {
+                                                                    setCurrentRowN(index);
+                                                                }
+                                                                setRefDisabled(true); 
+                                                                setOpenedModal("add"); 
                                                             }}
                                                         >
-                                                            <ListItemButton 
-                                                                key={n+1} 
-                                                                sx={{ pl: 2 }} 
-                                                                onClick={() => { setRefDisabled(true); setOpenedModal("add") }}
+                                                            <Box 
+                                                                sx={{ 
+                                                                    display: 'flex', 
+                                                                    flexDirection: 'column', 
+                                                                    alignItems: 'center',
+                                                                    width: '100%'
+                                                                }}
                                                             >
                                                                 <Add aria-label="@New note" />
-                                                            </ListItemButton>
-                                                        </Box>
+                                                            </Box>
+                                                        </ListItemButton>
                                                     }
                                                 </>
                                             ))}

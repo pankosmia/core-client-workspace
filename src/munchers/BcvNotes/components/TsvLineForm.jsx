@@ -7,6 +7,7 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { i18nContext as I18nContext } from "pankosmia-rcl";
 import { doI18n } from "pithekos-lib";
+import { v4 as uuidv4 } from 'uuid';
 
 
 function TsvLineForm({ 
@@ -41,6 +42,7 @@ function TsvLineForm({
         const c = col.trim().toLowerCase().replace('\r', '');
         return c === 'occurrence' || c === 'occurence';
     });
+    const occsIndex = 7; 
 
     const isNoteResource = () => {
         return !(ingredient[0].some(c => c.includes('Response')) || ingredient[0].some(c => c.includes('Question')));
@@ -138,11 +140,32 @@ function TsvLineForm({
     
         const currentVal = parseInt(currentRow[targetIndex]) || parseInt(suggestedOrder) || 1;
         
-        const newVal = Math.max(1, Math.min(currentVal + amount, totalNotesInRef));
+        const limit = parseInt(currentRow[occsIndex]) || totalNotesInRef;
+        
+        const newVal = Math.max(1, Math.min(currentVal + amount, limit));
     
         if (newVal.toString() !== (currentRow[targetIndex] || "").toString()) {
             const newRowData = [...currentRow];
             newRowData[targetIndex] = newVal.toString();
+            setCurrentRow(newRowData);
+            setCellValueChanged(true);
+        }
+    };
+
+    const handleTotalNudge = (amount, targetIndex, otherIndex) => {
+        if (targetIndex === -1) return;
+        const currentVal = parseInt(currentRow[targetIndex]) || totalNotesInRef;
+        const newVal = Math.max(1, Math.min(currentVal + amount, 99));
+    
+        if (newVal.toString() !== (currentRow[targetIndex] || "").toString()) {
+            const newRowData = [...currentRow];
+            newRowData[targetIndex] = newVal.toString();
+    
+            const posActual = parseInt(newRowData[otherIndex]) || parseInt(suggestedOrder) || 1;
+            if (posActual > newVal) {
+                newRowData[otherIndex] = newVal.toString();
+            }
+
             setCurrentRow(newRowData);
             setCellValueChanged(true);
         }
@@ -157,15 +180,26 @@ function TsvLineForm({
             rowData = [...(ingredient[currentRowN] || [])];
         } else {
             rowData = Array(columnNames.length).fill("");
+
+            const existingIds = ingredient.map(l => l[1]);
+            let newId = "";
+            let found = false;
+            while (!found) {
+                newId = uuidv4().substring(0, 4);
+                if (!existingIds.includes(newId)) found = true;
+            }
+            rowData[1] = newId;
+
             if (refDisabled && refIndex !== -1) {
-                rowData[refIndex] = ingredient[currentRowN]?.[refIndex] || "";
+                const rawRef = ingredient[currentRowN]?.[refIndex] || "";
+                rowData[refIndex] = rawRef.split('-')[0].trim();
             }
         }
 
         setCurrentRow(rowData);
         setCellValueChanged(false);
     
-    }, [currentRowN, mode, refDisabled, ingredient]); 
+    }, [mode, refDisabled, ingredient]); 
 
     return (
         <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
@@ -206,8 +240,8 @@ function TsvLineForm({
             {activeColumns.map((column) => {
 
                 const cleanColumn = column.trim().replace(/\r/g, '').toLowerCase();
-                const isRef = cleanColumn === "ref" || cleanColumn === "reference";
-                const isId = cleanColumn.includes("id");
+                const isRef = cleanColumn.toLowerCase() === "ref" || cleanColumn.toLowerCase() === "reference";
+                const isId = cleanColumn.toLowerCase().includes("id");
                 const isRefOrId = ['ref', 'id', 'reference'].includes(cleanColumn.toLowerCase());
                 const realIndex = columnNames.findIndex(col => col.replace('\r', '').trim().toLowerCase() === cleanColumn.toLowerCase());
                 const isLastNoteField = realIndex === 6;
@@ -230,12 +264,12 @@ function TsvLineForm({
                                 fullWidth
                                 size="small"
                             />
-                            <Stack direction="row" alignItems="center" spacing={0} sx={{ width: "25%" }}>
+                            <Stack direction="row" alignItems="center" spacing={0} sx={{ width: "30%" }}>
                                 <TextField
                                     fullWidth
                                     label="Occurrence"
                                     value={currentRow[occIndex] || ''}
-                                    placeholder={suggestedOrder}
+                                    /* placeholder={suggestedOrder.toString()} */
                                     size="small"
                                     onFocus={() => {
                                         if (!currentRow[occIndex]) {
@@ -259,17 +293,43 @@ function TsvLineForm({
                                                     </IconButton>
                                                 </Stack>
                                             )
-                                        }
+                                        },
+                                        inputLabel: { shrink: !!currentRow[occIndex] }
                                     }}
                                 />
                             </Stack>
-                            <TextField 
+                            <TextField
                                 fullWidth
-                                label="Total" 
-                                value={totalNotesInRef}
-                                size="small" 
-                                sx={{ width: '13%' }} 
-                                slotProps={{ input: { readOnly: true } }} 
+                                label="Total"
+                                value={currentRow[occsIndex] || ''}
+                                placeholder={totalNotesInRef.toString()}
+                                size="small"
+                                sx={{ width: '30%' }}
+                                slotProps={{
+                                    input: {
+                                        readOnly: true,
+                                        sx: { textAlign: 'center', fontWeight: 'bold' },
+                                        endAdornment: (
+                                            <Stack direction="column" sx={{ mr: -0.5 }}> 
+                                                <IconButton size="small" onClick={() => handleTotalNudge(1, occsIndex, occIndex)} sx={{ p: 0, height: 15 }}>
+                                                    <ArrowDropUpIcon fontSize="inherit" />
+                                                </IconButton>
+                                                <IconButton size="small" onClick={() => handleTotalNudge(-1, occsIndex, occIndex)} sx={{ p: 0, height: 15 }}>
+                                                    <ArrowDropDownIcon fontSize="inherit" />
+                                                </IconButton>
+                                            </Stack>
+                                        )
+                                    },
+                                    inputLabel: { shrink: true }
+                                }}
+                                onFocus={() => {
+                                    if (!currentRow[occsIndex]) {
+                                        const newRow = [...currentRow];
+                                        newRow[occsIndex] = totalNotesInRef.toString();
+                                        setCurrentRow(newRow);
+                                        setCellValueChanged(true);
+                                    }
+                                }}
                             />
                         </Stack>
                     );
