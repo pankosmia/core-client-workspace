@@ -52,9 +52,14 @@ function ConfigureWorkspace({
     setOpen(false);
     const params = new URLSearchParams(location.search);
     const returnPage = params.get("return-page");
+    const returnPageDashboard = params.get("returnTypePage");
     if (returnPage === "workspace") {
       navigate("/workspace");
-    } else {
+    } 
+    else if (returnPageDashboard === "dashboard") {
+      window.location.replace("/clients/main");
+    }
+    else {
       window.location.replace("/clients/content");
     }
   };
@@ -178,11 +183,11 @@ function ConfigureWorkspace({
         (r) =>
           currentProjectRef.current &&
           projectFlavors[projectSummaries[r.path].flavor] ===
-            projectFlavors[
-              projectSummaries[
-                `_local_/_local_/${currentProjectRef.current.project}`
-              ].flavor
-            ],
+          projectFlavors[
+          projectSummaries[
+            `_local_/_local_/${currentProjectRef.current.project}`
+          ].flavor
+          ],
       )
       .filter(
         (r) =>
@@ -333,19 +338,19 @@ function ConfigureWorkspace({
                         selectedResources.has(re[0]) ||
                         (currentProjectRef.current &&
                           re[0] ===
-                            Object.values(currentProjectRef.current).join("/")),
+                          Object.values(currentProjectRef.current).join("/")),
                     )
                     .map((re) =>
                       currentProjectRef.current &&
-                      re[0] ===
+                        re[0] ===
                         Object.values(currentProjectRef.current).join("/")
                         ? [
-                            re[0],
-                            {
-                              ...re[1],
-                              primary: true,
-                            },
-                          ]
+                          re[0],
+                          {
+                            ...re[1],
+                            primary: true,
+                          },
+                        ]
                         : re,
                     );
                   navigate("/workspace", {
