@@ -138,34 +138,28 @@ function TsvLineForm({
     const handleNudge = (amount, targetIndex) => {
         if (targetIndex === -1) return;
     
-        const currentVal = parseInt(currentRow[targetIndex]) || parseInt(suggestedOrder) || 1;
-        
-        const limit = parseInt(currentRow[occsIndex]) || totalNotesInRef;
-        
-        const newVal = Math.max(1, Math.min(currentVal + amount, limit));
+        const isPosition = targetIndex === occIndex;
+        const otherIndex = isPosition ? occsIndex : occIndex;
     
-        if (newVal.toString() !== (currentRow[targetIndex] || "").toString()) {
-            const newRowData = [...currentRow];
-            newRowData[targetIndex] = newVal.toString();
-            setCurrentRow(newRowData);
-            setCellValueChanged(true);
-        }
-    };
-
-    const handleTotalNudge = (amount, targetIndex, otherIndex) => {
-        if (targetIndex === -1) return;
-        const currentVal = parseInt(currentRow[targetIndex]) || totalNotesInRef;
-        const newVal = Math.max(1, Math.min(currentVal + amount, 99));
+        const currentVal = parseInt(currentRow[targetIndex]) || (isPosition ? parseInt(suggestedOrder) : totalNotesInRef) || 1;
+        const otherVal = parseInt(currentRow[otherIndex]) || (isPosition ? totalNotesInRef : parseInt(suggestedOrder)) || 1;
     
-        if (newVal.toString() !== (currentRow[targetIndex] || "").toString()) {
-            const newRowData = [...currentRow];
-            newRowData[targetIndex] = newVal.toString();
+        let newVal = Math.max(1, Math.min(currentVal + amount, 99));
     
-            const posActual = parseInt(newRowData[otherIndex]) || parseInt(suggestedOrder) || 1;
-            if (posActual > newVal) {
+        const newRowData = [...currentRow];
+        newRowData[targetIndex] = newVal.toString();
+    
+        if (isPosition) {
+            if (newVal > otherVal) {
                 newRowData[otherIndex] = newVal.toString();
             }
-
+        } else {
+            if (newVal < otherVal) {
+                newRowData[otherIndex] = newVal.toString();
+            }
+        }
+    
+        if (newVal.toString() !== (currentRow[targetIndex] || "").toString()) {
             setCurrentRow(newRowData);
             setCellValueChanged(true);
         }
@@ -244,9 +238,6 @@ function TsvLineForm({
                 const isId = cleanColumn.toLowerCase().includes("id");
                 const isRefOrId = ['ref', 'id', 'reference'].includes(cleanColumn.toLowerCase());
                 const realIndex = columnNames.findIndex(col => col.replace('\r', '').trim().toLowerCase() === cleanColumn.toLowerCase());
-                const isLastNoteField = realIndex === 6;
-                const rawName = isLastNoteField ? "Note" : (columnNames[realIndex] || cleanColumn).replace('\r', '').trim();
-                const displayName = rawName.charAt(0).toUpperCase() + rawName.slice(1).toLowerCase();
 
                 if (realIndex === -1) return null;
 
@@ -258,16 +249,16 @@ function TsvLineForm({
                     return (
                         <Stack direction="row" spacing={1} alignItems="flex-end" key="snippet-row" sx={{ pt: 1, mb: 2 }}>
                             <TextField 
-                                label="Quote"
+                                label={doI18n("pages:core-local-workspace:quote", i18nRef.current)}
                                 value={currentRow[quoteIndex] || ''} 
                                 onChange={(e) => changeCell(e, quoteIndex)}
                                 fullWidth
                                 size="small"
                             />
-                            <Stack direction="row" alignItems="center" spacing={0} sx={{ width: "30%" }}>
+                            <Stack direction="row" alignItems="center" spacing={0} sx={{ width: "40%" }}>
                                 <TextField
                                     fullWidth
-                                    label="Occurrence"
+                                    label={doI18n("pages:core-local-workspace:occurrence_number", i18nRef.current)}
                                     value={currentRow[occIndex] || ''}
                                     size="small"
                                     onFocus={() => {
@@ -299,27 +290,26 @@ function TsvLineForm({
                             </Stack>
                             <TextField
                                 fullWidth
-                                label="Total"
+                                label={doI18n("pages:core-local-workspace:total_occurrences", i18nRef.current)}
                                 value={currentRow[occsIndex] || ''}
-                                placeholder={totalNotesInRef.toString()}
                                 size="small"
-                                sx={{ width: '30%' }}
+                                sx={{ width: '40%' }}
                                 slotProps={{
                                     input: {
                                         readOnly: true,
                                         sx: { textAlign: 'center', fontWeight: 'bold' },
                                         endAdornment: (
                                             <Stack direction="column" sx={{ mr: -0.5 }}> 
-                                                <IconButton size="small" onClick={() => handleTotalNudge(1, occsIndex, occIndex)} sx={{ p: 0, height: 15 }}>
+                                                <IconButton size="small" onClick={() => handleNudge(1, occsIndex)} sx={{ p: 0, height: 15 }}>
                                                     <ArrowDropUpIcon fontSize="inherit" />
                                                 </IconButton>
-                                                <IconButton size="small" onClick={() => handleTotalNudge(-1, occsIndex, occIndex)} sx={{ p: 0, height: 15 }}>
+                                                <IconButton size="small" onClick={() => handleNudge(-1, occsIndex)} sx={{ p: 0, height: 15 }}>
                                                     <ArrowDropDownIcon fontSize="inherit" />
                                                 </IconButton>
                                             </Stack>
                                         )
                                     },
-                                    inputLabel: { shrink: true }
+                                    inputLabel: { shrink: !!currentRow[occsIndex] }
                                 }}
                                 onFocus={() => {
                                     if (!currentRow[occsIndex]) {
@@ -337,7 +327,7 @@ function TsvLineForm({
                 if (cleanColumn === 'occurrence' || cleanColumn === 'occurence') {
                     return null;
                 }
-                
+
                 return (
                     <FormControl fullWidth margin="normal" key={cleanColumn + realIndex} >
                         {['note', 'question', 'response'].some(word => cleanColumn.toLowerCase().includes(word)) ? (
@@ -352,7 +342,7 @@ function TsvLineForm({
                             />
                         ) : (
                             <TextField
-                                label={displayName}
+                                label={doI18n(`pages:core-local-workspace:${cleanColumn}`, i18nRef.current)}
                                 value={currentRow[realIndex] || ''}
                                 placeholder={(cleanColumn.includes("Reference") || cleanColumn.includes("REF")) ? "1:1" : ""}
                                 required={cleanColumn.includes("Reference") || cleanColumn.includes("REF")}

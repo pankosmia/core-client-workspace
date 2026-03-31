@@ -24,6 +24,7 @@ function BcvNotesEditorMuncher({ metadata }) {
   const [cellValueChanged, setCellValueChanged] = useState(false);
   const [currentChapter, setCurrentChapter] = useState('1');
   const [refDisabled, setRefDisabled] = useState(false);
+  const [resourceType, setResourceType] = useState("new_bcv_note");
 
   // Récupération des données du tsv
   const getAllData = async () => {
@@ -78,6 +79,35 @@ function BcvNotesEditorMuncher({ metadata }) {
   const notesExist = currentChapter
   ? ingredient.filter(l => l[0].startsWith(`${currentChapter}:`))
   : [];
+
+  useEffect(() => {
+      if (!ingredient || ingredient.length < 2) {
+        return
+      };
+
+      const header = ingredient[0].join(' ').toLowerCase();
+      const firstRow = ingredient[1].join(' ').toLowerCase();
+
+      if (firstRow.includes('front:intro')) {
+          if (firstRow.includes('study') && header.includes('question')) {
+              setResourceType("new_bcv_study_question");  
+          } else {
+              setResourceType("new_bcv_question");
+          }
+          return;
+      }
+
+      if (header.includes('response')) {
+          setResourceType("new_bcv_question");
+      } 
+      else if (header.includes('question')) {
+          setResourceType("new_bcv_study_question");
+      }
+      else {
+          setResourceType("new_bcv_note");
+      }
+
+  }, [ingredient]);
 
   return (
     <Stack
@@ -135,6 +165,7 @@ function BcvNotesEditorMuncher({ metadata }) {
               currentChapter={currentChapter}
               refDisabled={refDisabled}
               setRefDisabled={setRefDisabled}
+              resourceType={resourceType}
             />
             <Editor
               currentRowN={currentRowN}
@@ -146,6 +177,7 @@ function BcvNotesEditorMuncher({ metadata }) {
               setCellValueChanged={setCellValueChanged}
               refDisabled={refDisabled}
               setRefDisabled={setRefDisabled}
+              resourceType={resourceType}
             />
           </Box>
         :
@@ -160,6 +192,7 @@ function BcvNotesEditorMuncher({ metadata }) {
                   setCellValueChanged={setCellValueChanged}
                   refDisabled={refDisabled}
                   setRefDisabled={setRefDisabled}
+                  resourceType={resourceType}
               />
               <Typography>
                 {doI18n("pages:core-local-workspace:no_notes", i18nRef.current)}

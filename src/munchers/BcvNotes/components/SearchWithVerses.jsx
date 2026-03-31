@@ -6,7 +6,7 @@ import { ExpandLess, ExpandMore, Add } from '@mui/icons-material';
 import { i18nContext as I18nContext } from "pankosmia-rcl";
 import { doI18n } from "pithekos-lib";
 
-function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRowN,cellValueChanged, setCellValueChanged, updateBcv, currentChapter, refDisabled, setRefDisabled }) {
+function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRowN,cellValueChanged, setCellValueChanged, updateBcv, currentChapter, refDisabled, setRefDisabled, resourceType }) {
 
     const { i18nRef } = useContext(I18nContext);
     const [openVerses, setOpenVerses] = useState({});
@@ -42,7 +42,7 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
         });
     };
 
-    const isNoteResource = () => {
+    const isQuestionResource = () => {
         return ingredient[0].some(c => c.includes('Response')) || ingredient[0].some(c => c.includes('Question'));
     };
 
@@ -65,6 +65,7 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                 setCellValueChanged={setCellValueChanged}
                 refDisabled={refDisabled}
                 setRefDisabled={setRefDisabled}
+                resourceType={resourceType}
             />
             <Box sx={{ maxHeight: "75vh", overflowY: "auto", overflowX: "hidden", width: '100%', pr: 1 }}>
                 <List component="nav">
@@ -92,8 +93,11 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                 {isMultiple && (
                                     <Collapse in={isOpen} timeout="auto" unmountOnExit>
                                         <List component="div" disablePadding>
-                                            {notes.map((note, n) => (
-                                                <>
+                                            {notes.map((note, n) => {
+                                                const rawContent = isQuestionResource() ? note[5] : note[4];
+                                                const displayValue = (rawContent && rawContent.trim() !== "") ? rawContent : note[0];
+
+                                                return <>
                                                     <ListItemButton 
                                                         key={note[1]} 
                                                         sx={{ pl: 2 }} 
@@ -111,7 +115,7 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                                                     }}
                                                                 >
                                                                     <Typography>
-                                                                        {(note[4]?.length > 0 && isNoteResource()) ? note[4] : note[0]}
+                                                                        {displayValue}
                                                                     </Typography>
                                                                     <Typography 
                                                                         variant="caption" 
@@ -152,13 +156,13 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                                             >
                                                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', color: 'text.secondary' }}>
                                                                     <Add sx={{ fontSize: '1.2rem' }} />
-                                                                    <Typography variant="caption">{doI18n("pages:core-local-workspace:new", i18nRef.current)}</Typography>
+                                                                    <Typography variant="caption">{doI18n("pages:core-local-workspace:add", i18nRef.current)}</Typography>
                                                                 </Box>
                                                             </Box>
                                                         </ListItemButton>
                                                     }
                                                 </>
-                                            ))}
+                                            })}
                                         </List>
                                     </Collapse>
                                 )}
@@ -177,7 +181,7 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                     >
                                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', color: 'text.secondary' }}>
                                             <Add sx={{ fontSize: '1.2rem' }} />
-                                            <Typography variant="caption">{doI18n("pages:core-local-workspace:new", i18nRef.current)}</Typography>
+                                            <Typography variant="caption">{doI18n("pages:core-local-workspace:add", i18nRef.current)}</Typography>
                                         </Box>
                                     </ListItemButton>
                                 )}
@@ -198,6 +202,7 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                 setCellValueChanged={setCellValueChanged}
                 refDisabled={refDisabled}
                 setRefDisabled={setRefDisabled}
+                resourceType={resourceType}
             />
         </Stack>
     );

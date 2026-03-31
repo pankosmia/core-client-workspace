@@ -6,10 +6,9 @@ import TsvLineForm from "./TsvLineForm";
 import { i18nContext as I18nContext } from "pankosmia-rcl";
 import { doI18n } from "pithekos-lib";
 
-function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRowN, cellValueChanged, setCellValueChanged, refDisabled, setRefDisabled }) {
+function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRowN, cellValueChanged, setCellValueChanged, refDisabled, setRefDisabled, resourceType }) {
     const { i18nRef } = useContext(I18nContext);
     const [newCurrentRow, setNewCurrentRow] = useState(Array(7).fill("", 0, 7));
-    const [resourceType, setResourceType] = useState("new_bcv_note");
 
     // Permet de fermer la modal principale 
     const handleCloseModalNewNote = () => {
@@ -23,14 +22,6 @@ function AddLineDialog({ open, closeModal, ingredient, setIngredient, currentRow
         setIngredient(newIngredient);
         closeModal();
     };
-
-    useEffect(() => {
-        if (ingredient.length > 0) {
-            // Change i18n depending on what resource we got
-            if (ingredient[0].some(c => c.includes('Response'))) setResourceType("new_bcv_question");
-            else if (ingredient[0].some(c => c.includes('Question'))) setResourceType("new_bcv_study_question");
-        }
-    }, [ingredient]);
 
     return (
         <Modal

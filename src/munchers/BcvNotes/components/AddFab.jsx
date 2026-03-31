@@ -13,7 +13,8 @@ function AddFab({
   cellValueChanged,
   setCellValueChanged,
   refDisabled,
-  setRefDisabled
+  setRefDisabled,
+  resourceType
 }) {
   const { i18nRef } = useContext(I18nContext);
   const [openedModal, setOpenedModal] = useState(null);
@@ -49,6 +50,7 @@ function AddFab({
         setCellValueChanged={setCellValueChanged}
         refDisabled={refDisabled}
         setRefDisabled={setRefDisabled}
+        resourceType={resourceType}
       />
     </Box>
   );
