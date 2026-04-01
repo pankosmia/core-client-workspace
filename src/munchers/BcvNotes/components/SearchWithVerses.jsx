@@ -88,6 +88,17 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                             }
                                         }}
                                     />
+                                    {!isMultiple && (
+                                        <Typography 
+                                            variant="caption" 
+                                            sx={{ 
+                                                color: 'text.secondary', 
+                                                fontSize: '0.75rem',
+                                            }}
+                                        >
+                                            {notes[0][1]}
+                                        </Typography>
+                                    )}
                                     {isMultiple && (isOpen ? <ExpandLess /> : <ExpandMore />)}
                                 </ListItemButton>
                                 {isMultiple && (

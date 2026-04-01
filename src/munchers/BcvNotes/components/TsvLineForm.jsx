@@ -94,9 +94,29 @@ function TsvLineForm({
         setOpenRefDialog(false);
     };
 
+    /* Here we pick the order and which fields we are printing depending on what resource we got. Some are repeated because they have different names in different file formats. */
     const visibilityMap = {
-        new_bcv_question: [...(isCreate ? ['ref', 'reference', 'id' ] : []), 'quote', 'question', 'response'],
-        new_bcv_study_question: [...(isCreate ? ['ref', 'reference', 'id'] : []), 'quote', 'question']
+        new_bcv_note: [
+            ...(isCreate ? ['reference', 'ref', 'id'] : []), 
+            'tags',
+            'supportreference',
+            'support',
+            'quote', 
+            'occurrence',
+            'occurence',
+            'note'
+        ],
+        new_bcv_question: [
+            ...(isCreate ? ['reference', 'ref', 'id' ] : []), 
+            'quote',
+            'question',
+            'response'
+        ],
+        new_bcv_study_question: [
+            ...(isCreate ? ['reference', 'ref', 'id'] : []),
+            'quote',
+            'question'
+        ]
     };
     
     const activeColumns = visibilityMap[resourceType] || columnNames.map(c => c.replace('\r', '').trim().toLowerCase());
@@ -140,10 +160,17 @@ function TsvLineForm({
     
         const isPosition = targetIndex === occIndex;
         const otherIndex = isPosition ? occsIndex : occIndex;
-    
-        const currentVal = parseInt(currentRow[targetIndex]) || (isPosition ? parseInt(suggestedOrder) : totalNotesInRef) || 1;
-        const otherVal = parseInt(currentRow[otherIndex]) || (isPosition ? totalNotesInRef : parseInt(suggestedOrder)) || 1;
-    
+
+        let currentVal = parseInt(currentRow[targetIndex]);
+        if (!currentVal || currentVal < 1) {
+            currentVal = isPosition ? parseInt(suggestedOrder) : totalNotesInRef;
+        }
+        
+        let otherVal = parseInt(currentRow[otherIndex]);
+        if (!otherVal || otherVal < 1) {
+            otherVal = isPosition ? totalNotesInRef : parseInt(suggestedOrder);
+        }
+
         let newVal = Math.max(1, Math.min(currentVal + amount, 99));
     
         const newRowData = [...currentRow];
@@ -178,7 +205,7 @@ function TsvLineForm({
             if (currentRow && currentRow[1]) {
                 return;
             }
-            
+
             rowData = Array(columnNames.length).fill("");
 
             const existingIds = ingredient.map(l => l[1]);
@@ -265,10 +292,11 @@ function TsvLineForm({
                                 <TextField
                                     fullWidth
                                     label={doI18n("pages:core-local-workspace:occurrence_number", i18nRef.current)}
-                                    value={currentRow[occIndex] || ''}
+                                    value={(currentRow[occIndex]?.toString() === "0" || !currentRow[occIndex]) ? "" : currentRow[occIndex].toString()}
                                     size="small"
                                     onFocus={() => {
-                                        if (!currentRow[occIndex]) {
+                                        const currentVal = currentRow[occIndex]?.toString();
+                                        if (!currentVal || currentVal === "0") {
                                             const newRow = [...currentRow];
                                             newRow[occIndex] = suggestedOrder;
                                             setCurrentRow(newRow);
@@ -278,7 +306,10 @@ function TsvLineForm({
                                     slotProps={{
                                         input: {
                                             readOnly: true,
-                                            sx: { textAlign: 'center', fontWeight: 'bold' },
+                                            sx: { 
+                                                textAlign: 'center', 
+                                                fontWeight: 'bold'
+                                            },
                                             endAdornment: (
                                                 <Stack direction="column" sx={{ mr: -0.5 }}> 
                                                     <IconButton size="small" onClick={() => handleNudge(1, occIndex)} sx={{ p: 0, height: 15 }}>
@@ -290,7 +321,7 @@ function TsvLineForm({
                                                 </Stack>
                                             )
                                         },
-                                        inputLabel: { shrink: !!currentRow[occIndex] }
+                                        inputLabel: { shrink: !!(currentRow[occIndex] && currentRow[occIndex].toString() !== "0")}
                                     }}
                                 />
                             </Stack>

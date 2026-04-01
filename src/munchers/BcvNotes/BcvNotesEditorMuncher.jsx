@@ -80,34 +80,40 @@ function BcvNotesEditorMuncher({ metadata }) {
   ? ingredient.filter(l => l[0].startsWith(`${currentChapter}:`))
   : [];
 
+  /* useEffect that detects which resource we're printing, checks if it's translationNotes, translationQuestions or Study questions, then we use the value of resourceType to print the fields inside of TsvLineForm */
   useEffect(() => {
-      if (!ingredient || ingredient.length < 2) {
-        return
-      };
+    if (!ingredient || ingredient.length < 2) {
+        return;
+    }
 
-      const header = ingredient[0].join(' ').toLowerCase();
-      const firstRow = ingredient[1].join(' ').toLowerCase();
+    const header = ingredient[0].join(' ').toLowerCase();
+    const firstRow = ingredient[1].join(' ').toLowerCase();
 
-      if (firstRow.includes('front:intro')) {
-          if (firstRow.includes('study') && header.includes('question')) {
-              setResourceType("new_bcv_study_question");  
-          } else {
-              setResourceType("new_bcv_question");
-          }
-          return;
-      }
+    if (header.includes('note')) {
+        setResourceType("new_bcv_note");
+        return;
+    }
 
-      if (header.includes('response')) {
-          setResourceType("new_bcv_question");
-      } 
-      else if (header.includes('question')) {
-          setResourceType("new_bcv_study_question");
-      }
-      else {
-          setResourceType("new_bcv_note");
-      }
+    if (firstRow.includes('front:intro')) {
+        if (firstRow.includes('study')) {
+            setResourceType("new_bcv_study_question");  
+        } else {
+            setResourceType("new_bcv_question");
+        }
+        return;
+    }
 
-  }, [ingredient]);
+    if (header.includes('response')) {
+        setResourceType("new_bcv_question");
+    } 
+    else if (header.includes('question')) {
+        setResourceType("new_bcv_study_question");
+    }
+    else {
+        setResourceType("new_bcv_note");
+    }
+
+}, [ingredient]);
 
   return (
     <Stack
