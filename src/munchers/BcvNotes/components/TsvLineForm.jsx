@@ -95,8 +95,8 @@ function TsvLineForm({
     };
 
     const visibilityMap = {
-        new_bcv_question: [...(isCreate ? ['ref', 'id', 'reference'] : []), 'question', 'response'],
-        new_bcv_study_question: [...(isCreate ? ['ref', 'id', 'reference'] : []), 'question']
+        new_bcv_question: [...(isCreate ? ['ref', 'reference', 'id' ] : []), 'quote', 'question', 'response'],
+        new_bcv_study_question: [...(isCreate ? ['ref', 'reference', 'id'] : []), 'quote', 'question']
     };
     
     const activeColumns = visibilityMap[resourceType] || columnNames.map(c => c.replace('\r', '').trim().toLowerCase());
@@ -166,13 +166,19 @@ function TsvLineForm({
     };
 
     useEffect(() => {
-        if (!ingredient || currentRowN === -1) return;
+        if (!ingredient || currentRowN === -1) {
+            return;
+        }
 
         let rowData;
 
         if (mode === "edit") {
             rowData = [...(ingredient[currentRowN] || [])];
         } else {
+            if (currentRow && currentRow[1]) {
+                return;
+            }
+            
             rowData = Array(columnNames.length).fill("");
 
             const existingIds = ingredient.map(l => l[1]);
@@ -193,7 +199,7 @@ function TsvLineForm({
         setCurrentRow(rowData);
         setCellValueChanged(false);
     
-    }, [mode, refDisabled, ingredient]); 
+    }, [mode, refDisabled, ingredient, currentRowN]); 
 
     return (
         <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>

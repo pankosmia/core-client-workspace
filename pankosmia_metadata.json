@@ -868,6 +868,10 @@
       "en":"Note",
       "es":"Nota"
     },
+    "href": {
+      "en":"Note",
+      "es":"Nota"
+    },
     "occurrence_number": {
       "en":"Occurrence n°",
       "es":"N° de ocurrencia"
