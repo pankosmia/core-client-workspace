@@ -838,6 +838,18 @@
     "no_resources_chosen": {
       "en": "No resources selected",
       "fr": "Aucune ressource choisie"
+    },
+    "offline_AI":{
+      "en":"Offline AI asistant",
+      "fr":"Assistant IA hors-ligne"
+    },
+    "layout": {
+      "en": "Layout",
+      "fr": "Disposition"
+    },
+    "tools": {
+      "en": "Tools",
+      "fr": "Outils"
     }
   }
 }

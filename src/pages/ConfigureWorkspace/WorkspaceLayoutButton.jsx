@@ -5,18 +5,17 @@ import SvgViewEditorRightColumn from "../../munchers/TextTranslation/SimplifiedE
 import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_row";
 import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row";
 import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_top";
-import SmartToy from "@mui/icons-material/SmartToy";
 import { useEffect, useState, useContext } from "react";
-import { getJson } from "pithekos-lib";
+import {getJson } from "pithekos-lib";
 import { debugContext } from "pankosmia-rcl";
 
 export default function LayoutPicker({
   selectedResources,
   selectedCrunchers,
-  setSelectedCrunchers,
   layout,
   setLayout,
 }) {
+
   const [alignment, setAlignment] = useState(
     selectedResources.size === 0 ? "" : layout,
   );
@@ -101,27 +100,7 @@ export default function LayoutPicker({
           })}
         </ToggleButtonGroup>
       </Grid2>
-      {showRhakos && (
-        <Grid2 display="flex" gap={1}>
-          <ToggleButtonGroup>
-            <ToggleButton
-              value="check"
-              selected={selectedCrunchers.has("Rhakos")}
-              onChange={() => {
-                let newSelected = new Set(selectedCrunchers);
-                if (selectedCrunchers.has("Rhakos")) {
-                  newSelected.delete("Rhakos");
-                } else {
-                  newSelected.add("Rhakos");
-                }
-                setSelectedCrunchers(newSelected);
-              }}
-            >
-              <SmartToy />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Grid2>
-      )}
+      
     </>
   );
 }
