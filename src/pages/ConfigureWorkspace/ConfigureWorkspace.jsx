@@ -307,64 +307,30 @@ function ConfigureWorkspace({
         closeFn={() => handleNext()}
         size="xl"
       >
-          <DialogContent sx={{ overflow: "hidden" }}>
-            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-              <Fab
-                variant="extended"
-                color="primary"
-                size="small"
-                aria-label={doI18n("pages:content:add", i18nRef.current)}
-                onClick={(e) => {
-                  let stateEntries = Object.entries(projectSummaries)
-                    .map((e) => ({ ...e[1], path: e[0] }))
-                    .map((r) => [r.path, r])
-                    .filter(
-                      (re) =>
-                        selectedResources.has(re[0]) ||
-                        (currentProjectRef.current &&
-                          re[0] === Object.values(currentProjectRef.current).join("/")),
-                    )
-                    .map((re) =>
-                      currentProjectRef.current &&
-                        re[0] === Object.values(currentProjectRef.current).join("/")
-                        ? [re[0], { ...re[1], primary: true }]
-                        : re,
-                    );
-                  navigate("/workspace", { state: Object.fromEntries(stateEntries) });
-                  e.stopPropagation();
-                }}
-              >
-                <Typography variant="body2">
-                  {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
-                </Typography>
-                <PlayArrowIcon />
-              </Fab>
-            </Box>
-            <Grid2
-              container
-              direction="row"
-              sx={{
-                display: "flex",
-                justifyContent: "space-around",
-                alignItems: "center",
-              }}
-              spacing={1}
-            >
-              <Grid2 item size={6} sx={{ display: "flex", alignItems: "center", gap: 1 }} >
-                <Typography variant="body2">
-                  {doI18n("pages:core-local-workspace:layout", i18nRef.current)}
-                </Typography>
-                <LayoutPicker
-                  layout={layout}
-                  setLayout={setLayout}
-                  selectedResources={selectedResources}
-                  selectedCrunchers={selectedCrunchers}
-                />
-              </Grid2>
-
+        <DialogContent sx={{ overflow: "hidden" }}>
+          <Grid2
+            container
+            direction="row"
+            sx={{
+              display: "flex",
+              justifyContent: "space-around",
+              alignItems: "flex-start",
+            }}
+            spacing={1}
+          >
+            <Grid2 item size={6} direction="row">
+              <Typography variant="h6">
+                {doI18n("pages:core-local-workspace:layout", i18nRef.current)}
+              </Typography>
+              <LayoutPicker
+                layout={layout}
+                setLayout={setLayout}
+                selectedResources={selectedResources}
+                selectedCrunchers={selectedCrunchers}
+              />
               {showRhakos && (
-                <Grid2 item size={5} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>
+                <>
+                  <Typography variant="h6" sx={{ whiteSpace: "nowrap" }}>
                     {doI18n("pages:core-local-workspace:tools", i18nRef.current)}
                   </Typography>
                   <Tooltip title={doI18n("pages:core-local-workspace:offline_AI", i18nRef.current)}>
@@ -386,9 +352,10 @@ function ConfigureWorkspace({
                       </ToggleButton>
                     </ToggleButtonGroup>
                   </Tooltip>
-                </Grid2>
+                </>
               )}
-              {/* <Grid2 item size={1}>
+            </Grid2>
+            <Grid2 item size={2}>
               <Fab
                 variant="extended"
                 color="primary"
@@ -413,58 +380,56 @@ function ConfigureWorkspace({
                   navigate("/workspace", { state: Object.fromEntries(stateEntries) });
                   e.stopPropagation();
                 }}
-                sx={{ width: "100%" }}
               >
                 <Typography variant="body2">
                   {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
                 </Typography>
                 <PlayArrowIcon />
               </Fab>
-            </Grid2> */}
             </Grid2>
-
-            <Box
-              sx={{
-                height: `${maxWindowHeight}px`,
-                display: "flex",
-                flexDirection: "column",
-                width: "100%",
-              }}
-            >
-              <Box sx={{ flex: 1, minHeight: 0 }}>
-                <PanTable
-                  tableTitle={doI18n(
-                    "pages:core-local-workspace:choose_resources_workspace",
-                    i18nRef.current,
-                  )}
-                  checkboxSelection
-                  showColumnFilters
-                  rows={rows}
-                  preSelections={selectedResourcesIndexes}
-                  columns={columns}
-                  onRowSelectionModelChange={(ids) => {
-                    const paths = rows
-                      .filter((r) => ids.includes(r.id))
-                      .map((r) => r.path);
-                    setSelectedResources(new Set(paths));
-                  }}
-                  sx={{
-                    fontSize: "1rem",
-                    height: "450px",
-                    "& .MuiTable-root": { height: "100%" },
-                    "& .MuiTableCell-head": {
-                      position: "sticky",
-                      top: 0,
-                      zIndex: 2,
-                      backgroundColor: "background.paper",
-                    },
-                  }}
-                />
-              </Box>
+          </Grid2>
+          <Box
+            sx={{
+              height: `${maxWindowHeight}px`,
+              display: "flex",
+              flexDirection: "column",
+              width: "100%",
+            }}
+          >
+            <Box sx={{ minHeight: 0 }}>
+              <Typography variant="h6">{doI18n(
+                "pages:core-local-workspace:choose_resources_workspace",
+                i18nRef.current,
+              )}</Typography>
+              <PanTable
+                checkboxSelection
+                showColumnFilters
+                rows={rows}
+                preSelections={selectedResourcesIndexes}
+                columns={columns}
+                onRowSelectionModelChange={(ids) => {
+                  const paths = rows
+                    .filter((r) => ids.includes(r.id))
+                    .map((r) => r.path);
+                  setSelectedResources(new Set(paths));
+                }}
+                sx={{
+                  fontSize: "1rem",
+                  height: "90%",
+                  "& .MuiTable-root": { height: "100%" },
+                  "& .MuiTableCell-head": {
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 2,
+                    backgroundColor: "background.paper",
+                  },
+                }}
+              />
             </Box>
-          </DialogContent>
+          </Box>
+        </DialogContent>
       </PanDialog>
-    </Box>
+    </Box >
   );
 }
 export default ConfigureWorkspace;
