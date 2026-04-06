@@ -24,7 +24,7 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
         return acc;
     }, {}) : {};
 
-    const sortedVerseKeys = Object.keys(groupedVerses).sort((a, b) => parseInt(a) - parseInt(b));
+    const sortedVerseKeys = Object.keys(groupedVerses).sort((a, b) => Number(a) - Number(b));
 
     const handleSelectNote = (id) => {
         const index = ingredient.findIndex(l => l[1] === id);
