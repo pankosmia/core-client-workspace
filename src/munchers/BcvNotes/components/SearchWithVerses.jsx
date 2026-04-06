@@ -37,7 +37,9 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
     const toggleVerse = (vNum, firstNoteId) => {
         setOpenVerses(prev => {
             const isOpening = !prev[vNum];
-            if (isOpening) handleSelectNote(firstNoteId);
+            if (isOpening) {
+                handleSelectNote(firstNoteId);
+            }
             return { ...prev, [vNum]: isOpening };
         });
     };
@@ -79,7 +81,7 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
 
                         return (
                             <Fragment key={vNum}>
-                                <ListItemButton onClick={() => isMultiple ? toggleVerse(vNum, notes[0][1]) : handleSelectNote(notes[0][1])}>
+                                <ListItemButton selected={isSelected} onClick={() => toggleVerse(vNum, notes[0][1])}>
                                     <ListItemText 
                                         primary={`v${vNum} ${isMultiple ? `(${notes.length})` : ""}`} 
                                         slotProps={{
@@ -88,75 +90,24 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                             }
                                         }}
                                     />
-                                    {!isMultiple && (
-                                        <Typography 
-                                            variant="caption" 
-                                            sx={{ 
-                                                color: 'text.secondary', 
-                                                fontSize: '0.75rem',
-                                            }}
-                                        >
-                                            {notes[0][1]}
-                                        </Typography>
-                                    )}
-                                    {isMultiple && (isOpen ? <ExpandLess /> : <ExpandMore />)}
+                                    {isOpen ? <ExpandLess /> : <ExpandMore />}
                                 </ListItemButton>
-                                {isMultiple && (
-                                    <Collapse in={isOpen} timeout="auto" unmountOnExit>
-                                        <List component="div" disablePadding>
-                                            {notes.map((note, n) => {
-                                                const rawContent = isQuestionResource() ? note[5] : note[4];
-                                                const displayValue = (rawContent && rawContent.trim() !== "") ? rawContent : note[0];
+                                <Collapse in={isOpen} timeout="auto" unmountOnExit>
+                                    <List component="div" disablePadding>
+                                        {notes.map((note, n) => {
+                                            const isNoteSelected = ingredient[currentRowN] && ingredient[currentRowN][1] === note[1];
+                                            const rawContent = isQuestionResource() ? note[5] : note[4];
+                                            const displayValue = (rawContent && rawContent.trim() !== "") ? rawContent : note[0];
 
-                                                return <>
-                                                    <ListItemButton 
-                                                        key={note[1]} 
-                                                        sx={{ pl: 2 }} 
-                                                        onClick={() => { handleSelectNote(note[1])} }
-                                                        selected={ingredient[currentRowN] && ingredient[currentRowN][1] === note[1]}
-                                                    >
-                                                        <ListItemText 
-                                                            primary={
-                                                                <Box 
-                                                                    sx={{ 
-                                                                        display: 'flex', 
-                                                                        flexDirection: 'column', 
-                                                                        alignItems: 'center',
-                                                                        width: '100%'
-                                                                    }}
-                                                                >
-                                                                    <Typography>
-                                                                        {displayValue}
-                                                                    </Typography>
-                                                                    <Typography 
-                                                                        variant="caption" 
-                                                                        sx={{ 
-                                                                            color: 'text.secondary', 
-                                                                            fontSize: '0.75rem',
-                                                                            whiteSpace: 'nowrap',
-                                                                            overflow: 'hidden',
-                                                                            textOverflow: 'ellipsis'
-                                                                        }}
-                                                                    >
-                                                                        {note[1]}
-                                                                    </Typography>
-                                                                </Box>
-                                                        }/>
-                                                    </ListItemButton>
-                                                    {(n === notes.length - 1) 
-                                                        && 
-                                                        <ListItemButton 
-                                                            key={`add-inner-${vNum}`}
-                                                            sx={{ pl: 2, py: 2 }} 
-                                                            onClick={() => { 
-                                                                const index = ingredient.findIndex(l => l[1] === note[1]);
-                                                                if (index !== -1) {
-                                                                    setCurrentRowN(index);
-                                                                }
-                                                                setRefDisabled(true); 
-                                                                setOpenedModal("add"); 
-                                                            }}
-                                                        >
+                                            return <>
+                                                <ListItemButton 
+                                                    key={note[1]} 
+                                                    sx={{ pl: 2 }} 
+                                                    onClick={() => { handleSelectNote(note[1])} }
+                                                    selected={isNoteSelected}
+                                                >
+                                                    <ListItemText 
+                                                        primary={
                                                             <Box 
                                                                 sx={{ 
                                                                     display: 'flex', 
@@ -165,37 +116,62 @@ function SearchWithVerses({ ingredient, setIngredient, setCurrentRowN, currentRo
                                                                     width: '100%'
                                                                 }}
                                                             >
-                                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', color: 'text.secondary' }}>
-                                                                    <Add sx={{ fontSize: '1.2rem' }} />
-                                                                    <Typography variant="caption">{doI18n("pages:core-local-workspace:add", i18nRef.current)}</Typography>
-                                                                </Box>
+                                                                <Typography 
+                                                                    sx={{ 
+                                                                        fontWeight: isNoteSelected ? "bold" : "normal",  
+                                                                        color: isNoteSelected ? "primary.main" : "inherit"  
+                                                                    }}
+                                                                >
+                                                                    {displayValue}
+                                                                </Typography>
+                                                                <Typography 
+                                                                    variant="caption" 
+                                                                    sx={{ 
+                                                                        color: 'text.secondary', 
+                                                                        fontSize: '0.75rem',
+                                                                        whiteSpace: 'nowrap',
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis'
+                                                                    }}
+                                                                >
+                                                                    {note[1]}
+                                                                </Typography>
                                                             </Box>
-                                                        </ListItemButton>
-                                                    }
-                                                </>
-                                            })}
-                                        </List>
-                                    </Collapse>
-                                )}
-                                {!isMultiple && (
-                                    <ListItemButton 
-                                        key={`add-single-${vNum}`}
-                                        sx={{ pl: 2, py: 1 }}
-                                        onClick={() => { 
-                                            const index = ingredient.findIndex(l => l[1] === notes[0][1]);
-                                            if (index !== -1) {
-                                                setCurrentRowN(index)
-                                            };
-                                            setRefDisabled(true); 
-                                            setOpenedModal("add"); 
-                                        }}
-                                    >
-                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', color: 'text.secondary' }}>
-                                            <Add sx={{ fontSize: '1.2rem' }} />
-                                            <Typography variant="caption">{doI18n("pages:core-local-workspace:add", i18nRef.current)}</Typography>
-                                        </Box>
-                                    </ListItemButton>
-                                )}
+                                                    }/>
+                                                </ListItemButton>
+                                                {(n === notes.length - 1) 
+                                                    && 
+                                                    <ListItemButton 
+                                                        key={`add-inner-${vNum}`}
+                                                        sx={{ pl: 2, py: 2 }} 
+                                                        onClick={() => { 
+                                                            const index = ingredient.findIndex(l => l[1] === note[1]);
+                                                            if (index !== -1) {
+                                                                setCurrentRowN(index);
+                                                            }
+                                                            setRefDisabled(true); 
+                                                            setOpenedModal("add"); 
+                                                        }}
+                                                    >
+                                                        <Box 
+                                                            sx={{ 
+                                                                display: 'flex', 
+                                                                flexDirection: 'column', 
+                                                                alignItems: 'center',
+                                                                width: '100%'
+                                                            }}
+                                                        >
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', color: 'text.secondary' }}>
+                                                                <Add sx={{ fontSize: '1.2rem' }} />
+                                                                <Typography variant="caption">{doI18n("pages:core-local-workspace:add", i18nRef.current)}</Typography>
+                                                            </Box>
+                                                        </Box>
+                                                    </ListItemButton>
+                                                }
+                                            </>
+                                        })}
+                                    </List>
+                                </Collapse>
                             </Fragment>
                         );
                     })}
