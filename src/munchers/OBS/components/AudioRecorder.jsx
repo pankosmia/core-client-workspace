@@ -238,7 +238,6 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         if (newMaxDuration > maxDuration) {
           setMaxDuration(newMaxDuration);
         }
-        updateMainTrackWidth(newMaxDuration);
 
         const formData = new FormData();
         formData.append("file", wav);
@@ -248,8 +247,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         });
         const data = await response.json();
         // console.log(data);
-
-        await refreshMainTrackScale();
+        refreshMainTrackScale();
         return newUrl;
       }
     } catch (error) {
@@ -494,7 +492,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     [wavesurfer, maxDuration],
   );
 
-  const refreshMainTrackScale = useCallback(async () => {
+  const refreshMainTrackScale = useCallback(() => {
     const mainDuration = wavesurfer?.getDuration?.() || 0;
     const trackDurationsList = Object.values(trackDurations || []).filter(
         (value) => typeof value === "number" && value > 0,
@@ -601,12 +599,11 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
   const handleReady = useCallback(() => {
     if (!wavesurfer) return;
     const duration = wavesurfer.getDuration();
-    updateMainTrackWidth(duration);
     refreshMainTrackScale();
     setTimeout(() => {
       setIsLoading(false);
     }, 100);
-  }, [wavesurfer, updateMainTrackWidth]);
+  }, [wavesurfer, updateMainTrackWidth, refreshMainTrackScale]);
 
   const handleLoading = useCallback(() => {
     setIsLoading(true);
@@ -838,7 +835,6 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     );
     setAudioUrl(concatenatedUrl);
     setCopiedRegion(null);
-    await refreshMainTrackScale();
   };
 
   const copyRegion = async (regionData) => {
@@ -887,7 +883,6 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         if (newMaxDuration > maxDuration) {
           setMaxDuration(newMaxDuration);
         }
-        updateMainTrackWidth(newMaxDuration);
 
         const formData = new FormData();
         formData.append("file", wav);
@@ -899,8 +894,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         // console.log(data);
         //
         setAudioUrl(newUrl);
-        await refreshMainTrackScale();
-
+        refreshMainTrackScale();
         return newUrl;
       }
     } catch (error) {
