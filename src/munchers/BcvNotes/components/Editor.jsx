@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import TsvLineForm from "./TsvLineForm";
-function Editor({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, cellValueChanged, setCellValueChanged}) {
+function Editor({ ingredient, setIngredient, currentRowN, setCurrentRowN, updateBcv, cellValueChanged, setCellValueChanged, refDisabled, setRefDisabled, resourceType}) {
     const [currentRow, setCurrentRow] = useState( Array(7).fill("", 0, 7));
 
     useEffect(
@@ -38,6 +38,9 @@ function Editor({ ingredient, setIngredient, currentRowN, setCurrentRowN, update
 
             cellValueChanged={cellValueChanged}
             setCellValueChanged={setCellValueChanged}
+            refDisabled={refDisabled}
+            setRefDisabled={setRefDisabled}
+            resourceType={resourceType}
         />
     </Box>
 }

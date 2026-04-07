@@ -164,7 +164,8 @@
     "add": {
       "en": "Add",
       "fr": "Ajouter",
-      "id": "Tambah"
+      "id": "Tambah",
+      "es": "Agregar"
     },
     "save_note": {
       "en": "Save note",
@@ -311,7 +312,8 @@
     "apply": {
       "en": "Apply",
       "fr": "Appliquer",
-      "id": "Terap"
+      "id": "Terap",
+      "es": "Aplicar"
     },
     "modification_key": {
       "en": "Press modifier keys (Ctrl, Alt, Shift) together with another key.",
@@ -838,6 +840,81 @@
     "no_resources_chosen": {
       "en": "No resources selected",
       "fr": "Aucune ressource choisie"
+    },
+    "no_notes": {
+      "en": "No notes found",
+      "fr": "Aucune note trouvée",
+      "es": "No se encontraron notas"
+    },
+    "reference": {
+      "en": "REF",
+      "es": "REF",
+      "fr": "REF"
+    },
+    "no_reference": {
+      "en": "No reference",
+      "es": "Sin referencia"
+    },
+    "edit_reference": {
+      "en":"Edit reference (REF)",
+      "es":"Editar referencia (REF)",
+      "fr":"Modifier la référence (REF)"
+    },
+    "example_reference": {
+      "en":"Reference (e.g., 1:1)",
+      "es":"Referencia (ej: 1:1)"
+    },
+    "note": {
+      "en":"Note",
+      "es":"Nota"
+    },
+    "href": {
+      "en":"Note",
+      "es":"Nota"
+    },
+    "occurrence_number": {
+      "en":"Occurrence n°",
+      "es":"N° de ocurrencia"
+    },
+    "occurence": {
+      "en":"Occurrence",
+      "es":"Ocurrencia"
+    },
+    "total_occurrences": {
+      "en":"Total occurrences",
+      "es":"Ocurrencias totales"
+    },
+    "quote": {
+      "en":"Quote",
+      "es":"Cita"
+    },
+    "tags": {
+      "en":"Tags",
+      "es":"Etiquetas"
+    },
+    "question": {
+      "en":"Question",
+      "es":"Pregunta"
+    },
+    "response": {
+      "en":"Response",
+      "es":"Respuesta"
+    },
+    "ref": {
+      "en":"REF",
+      "es":"REF"
+    },
+    "id": {
+      "en":"id",
+      "es":"id"
+    },
+    "support": {
+      "en":"Support reference",
+      "es":"Referencia de ayuda"
+    },
+    "supportreference": {
+      "en":"Support reference",
+      "es":"Referencia de ayuda"
     }
   }
 }

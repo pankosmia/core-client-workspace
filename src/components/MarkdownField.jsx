@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import Markdown from 'react-markdown';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import CreateIcon from '@mui/icons-material/Create';
 import { Box, ToggleButton, ToggleButtonGroup, FormControl, TextField } from "@mui/material";
+import { i18nContext as I18nContext } from "pankosmia-rcl";
+import { doI18n } from "pithekos-lib";
 
 function MarkdownField({ columnNames, onChangeNote, value, fieldN, ingredient, currentRowN,mode }) {
+    const { i18nRef } = useContext(I18nContext);
     const [displayMode, setdisplayMode] = useState('write');
+    const cleanName = columnNames[fieldN].trim().replace(/\r/g, '').toLowerCase()
 
     return (
         <Box>
@@ -26,7 +30,7 @@ function MarkdownField({ columnNames, onChangeNote, value, fieldN, ingredient, c
             {displayMode === 'write' ? (
                 <FormControl fullWidth margin="normal" >
                     <TextField
-                        label={columnNames[fieldN]}
+                        label={doI18n(`pages:core-local-workspace:${cleanName}`, i18nRef.current)}
                         value={value}
                         onChange={onChangeNote}
                         minRows={5}
