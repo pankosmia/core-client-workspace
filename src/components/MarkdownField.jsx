@@ -9,7 +9,7 @@ import { doI18n } from "pithekos-lib";
 function MarkdownField({ columnNames, onChangeNote, value, fieldN, ingredient, currentRowN,mode }) {
     const { i18nRef } = useContext(I18nContext);
     const [displayMode, setdisplayMode] = useState('write');
-    const cleanName = columnNames[fieldN].trim().replace(/\r/g, '').toLowerCase()
+    const cleanName = (columnNames[fieldN] || '???').trim().replace(/\r/g, '').toLowerCase()
 
     return (
         <Box>
