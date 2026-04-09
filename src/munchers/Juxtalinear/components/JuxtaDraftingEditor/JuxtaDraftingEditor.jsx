@@ -97,7 +97,6 @@ function JuxtaDraftingEditor({ metadata, modified, setModified }) {
       setOriginText(stcs.map((s) => s.sourceString));
       setItemArrays([getItemsFrom(stcs, 0)]);
       setMd5sumScriptureJson(md5sum(JSON.stringify(sentencesInit[curIndex])));
-
     };
 
     openJsonHandler();
