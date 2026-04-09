@@ -29,7 +29,7 @@ function Router({
   selectedResources,
   setSelectedResources,
   selectedCrunchers,
-  setSelectedCrunchers
+  setSelectedCrunchers,
 }) {
   const [themeSpec, setThemeSpec] = useState({
     palette: {

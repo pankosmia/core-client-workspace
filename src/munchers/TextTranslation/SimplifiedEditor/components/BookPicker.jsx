@@ -7,7 +7,7 @@ import {
   currentProjectContext as CurrentProjectContext,
   debugContext as DebugContext,
 } from "pankosmia-rcl";
-function BookPicker({ setFirstChapter,disable=false }) {
+function BookPicker({ setFirstChapter, disable = false }) {
   const { bcvRef } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
   const { i18nRef } = useContext(I18nContext);

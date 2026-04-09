@@ -1,29 +1,34 @@
-p, .header {
-    margin: 0;
-    padding: 0 1rem;
+p,
+.header {
+  margin: 0;
+  padding: 0 1rem;
 }
 
 .bare-text {
-    break-before: avoid;
-    break-after: auto;
+  break-before: avoid;
+  break-after: auto;
 }
 
 .para-tool {
-    float: right;
-    font-family: monospace;
-    font-size: 0.8em;
-    color: #FFFFFF;
-    background-color: #000000;
-    padding: 2px;
+  float: right;
+  font-family: monospace;
+  font-size: 0.8em;
+  color: #ffffff;
+  background-color: #000000;
+  padding: 2px;
 }
 
-.usfm-p, .usfm-m, .usfm-q, .usfm-q1 {
-    font-size: 1rem;
-    padding-bottom: 18pt;
+.usfm-p,
+.usfm-m,
+.usfm-q,
+.usfm-q1 {
+  font-size: 1rem;
+  padding-bottom: 18pt;
 }
 
-.usfm-q, .usfm-q1 {
-    padding-left: 1em;
+.usfm-q,
+.usfm-q1 {
+  padding-left: 1em;
 }
 
 .usfm-c {
@@ -32,40 +37,40 @@ p, .header {
 }
 
 .usfm-v {
-    font-weight: bold;
-    font-style: italic;
-    font-size: 0.8em;
-    font-weight: 600;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
-    break-after: avoid;
+  font-weight: bold;
+  font-style: italic;
+  font-size: 0.8em;
+  font-weight: 600;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  break-after: avoid;
 }
 
 .usfm-mt {
-    font-weight: 700;
-    font-size: 2.0em;
+  font-weight: 700;
+  font-size: 2em;
 }
 
 .usfm-s {
-    font-size: 1.2em;
-    font-weight: bold;
+  font-size: 1.2em;
+  font-weight: bold;
 }
 .usfm-s2 {
-    font-size: 1.2em;
-    font-style: italic;
+  font-size: 1.2em;
+  font-style: italic;
 }
 .usfm-add {
-    font-style: italic;
+  font-style: italic;
 }
 .usfm-pn {
-    text-decoration: underline;
-    text-decoration-style: dotted;
+  text-decoration: underline;
+  text-decoration-style: dotted;
 }
 .usfm-png {
-    text-decoration: underline;
-    text-decoration-style: dashed;
+  text-decoration: underline;
+  text-decoration-style: dashed;
 }
 .usfm-unknown {
-    color: red;
-    background-color: yellow;
+  color: red;
+  background-color: yellow;
 }

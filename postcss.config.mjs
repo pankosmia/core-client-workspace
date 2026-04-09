@@ -3,5 +3,5 @@ export default {
     "@tailwindcss/postcss": {},
     "postcss-import": {},
     "postcss-nested": {},
-  }
-}
+  },
+};

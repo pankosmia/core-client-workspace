@@ -124,7 +124,7 @@ function JuxtaEditorTools({
         ? md5sum(JSON.stringify(sentences[curIndex])) !== md5sumScriptureJson
         : true,
     );
-  }, [curIndex, md5sumScriptureJson,sentences]);
+  }, [curIndex, md5sumScriptureJson, sentences]);
   return (
     <Box
       sx={{
@@ -155,9 +155,10 @@ function JuxtaEditorTools({
         </Grid2>
 
         <Grid2 display="flex" gap={1}>
-          <BookPicker 
-          disable={modified}
-          setFirstChapter={getFirstChapterJuxta} />
+          <BookPicker
+            disable={modified}
+            setFirstChapter={getFirstChapterJuxta}
+          />
           <JuxtaSentencesNav
             onPrevHandler={onPrevHandler}
             onNextHandler={onNextHandler}
