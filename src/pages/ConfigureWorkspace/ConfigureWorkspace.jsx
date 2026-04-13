@@ -322,21 +322,42 @@ function ConfigureWorkspace({
               display: "flex",
               justifyContent: "space-around",
               alignItems: "flex-start",
+              gap: 1,
+              mb: 2,
             }}
-            spacing={1}
           >
-            <Grid2 item size={6} direction="row">
+            <Grid2 item size={12}>
               <Typography variant="h6">
-                {doI18n("pages:core-local-workspace:layout", i18nRef.current)}
+                {doI18n(
+                  "pages:core-local-workspace:choose_resources_workspace",
+                  i18nRef.current,
+                )}
               </Typography>
-              <LayoutPicker
-                layout={layout}
-                setLayout={setLayout}
-                selectedResources={selectedResources}
-                selectedCrunchers={selectedCrunchers}
-              />
+            </Grid2>
+            <Grid2
+              item
+              size="grow"
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                flexWrap: "nowrap",
+                gap: 1,
+              }}
+            >
+              <Box>
+                <Typography variant="h6">
+                  {doI18n("pages:core-local-workspace:layout", i18nRef.current)}
+                </Typography>
+                <LayoutPicker
+                  layout={layout}
+                  setLayout={setLayout}
+                  selectedResources={selectedResources}
+                  selectedCrunchers={selectedCrunchers}
+                />
+              </Box>
               {showRhakos && (
-                <>
+                <Box>
                   <Typography variant="h6" sx={{ whiteSpace: "nowrap" }}>
                     {doI18n(
                       "pages:core-local-workspace:tools",
@@ -367,7 +388,7 @@ function ConfigureWorkspace({
                       </ToggleButton>
                     </ToggleButtonGroup>
                   </Tooltip>
-                </>
+                </Box>
               )}
             </Grid2>
             <Grid2 item size={2}>
@@ -422,12 +443,6 @@ function ConfigureWorkspace({
             }}
           >
             <Box sx={{ minHeight: 0 }}>
-              <Typography variant="h6">
-                {doI18n(
-                  "pages:core-local-workspace:choose_resources_workspace",
-                  i18nRef.current,
-                )}
-              </Typography>
               <PanTable
                 checkboxSelection
                 showColumnFilters
