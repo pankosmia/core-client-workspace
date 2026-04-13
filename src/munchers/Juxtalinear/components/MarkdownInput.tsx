@@ -38,7 +38,7 @@ export const MarkdownInput = (props: InputProps) => {
         sx={{
           background: "lightgrey",
           pl: "8px",
-          
+
           position: "absolute",
           inset: 0,
           width: "100%",

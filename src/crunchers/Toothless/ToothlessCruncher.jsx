@@ -1,9 +1,7 @@
 import { useContext } from "react";
 import { Box, Grid2 } from "@mui/material";
 import { doI18n } from "pithekos-lib";
-import {
-  i18nContext as I18nContext,
-} from "pankosmia-rcl";
+import { i18nContext as I18nContext } from "pankosmia-rcl";
 
 function ToothlessCruncher({ metadata, style }) {
   const { i18nRef } = useContext(I18nContext);
@@ -31,9 +29,7 @@ function ToothlessCruncher({ metadata, style }) {
             )}
           </Box>
         </Grid2>
-        <Box sx={{ p: 2 }}>
-          Cruuuunch!
-          </Box>
+        <Box sx={{ p: 2 }}>Cruuuunch!</Box>
       </Grid2>
     </Box>
   );

@@ -22,7 +22,7 @@ function BcvNotesEditorMuncher({ metadata }) {
   const [currentRowN, setCurrentRowN] = useState(1);
   const [md5Ingredient, setMd5Ingredient] = useState([]);
   const [cellValueChanged, setCellValueChanged] = useState(false);
-  const [currentChapter, setCurrentChapter] = useState('1');
+  const [currentChapter, setCurrentChapter] = useState("1");
   const [refDisabled, setRefDisabled] = useState(false);
   const [resourceType, setResourceType] = useState("new_bcv_note");
 
@@ -77,43 +77,40 @@ function BcvNotesEditorMuncher({ metadata }) {
   }, [isModified]);
 
   const notesExist = currentChapter
-  ? ingredient.filter(l => l[0].startsWith(`${currentChapter}:`))
-  : [];
+    ? ingredient.filter((l) => l[0].startsWith(`${currentChapter}:`))
+    : [];
 
   /* useEffect that detects which resource we're printing, checks if it's translationNotes, translationQuestions or Study questions, then we use the value of resourceType to print the fields inside of TsvLineForm */
   useEffect(() => {
     if (!ingredient || ingredient.length < 2) {
-        return;
+      return;
     }
 
-    const header = ingredient[0].join(' ').toLowerCase();
-    const firstRow = ingredient[1].join(' ').toLowerCase();
+    const header = ingredient[0].join(" ").toLowerCase();
+    const firstRow = ingredient[1].join(" ").toLowerCase();
 
-    if (header.includes('note')) {
-        setResourceType("new_bcv_note");
-        return;
+    if (header.includes("note")) {
+      setResourceType("new_bcv_note");
+      return;
     }
 
-    if (firstRow.includes('front:intro')) {
-        if (firstRow.includes('study')) {
-            setResourceType("new_bcv_study_question");  
-        } else {
-            setResourceType("new_bcv_question");
-        }
-        return;
-    }
-
-    if (header.includes('response')) {
-        setResourceType("new_bcv_question");
-    } 
-    else if (header.includes('question')) {
+    if (firstRow.includes("front:intro")) {
+      if (firstRow.includes("study")) {
         setResourceType("new_bcv_study_question");
-    }
-    else {
-        setResourceType("new_bcv_note");
+      } else {
+        setResourceType("new_bcv_question");
+      }
+      return;
     }
 
-}, [ingredient]);
+    if (header.includes("response")) {
+      setResourceType("new_bcv_question");
+    } else if (header.includes("question")) {
+      setResourceType("new_bcv_study_question");
+    } else {
+      setResourceType("new_bcv_note");
+    }
+  }, [ingredient]);
 
   return (
     <Stack
@@ -133,10 +130,10 @@ function BcvNotesEditorMuncher({ metadata }) {
         }}
       >
         <Grid2
-            container
-            alignItems="flex-start"
-            justifyContent="flex-start"
-            width="100%"
+          container
+          alignItems="flex-start"
+          justifyContent="flex-start"
+          width="100%"
         >
           <Grid2 item size={6}>
             <SaveTsvButton
@@ -148,64 +145,63 @@ function BcvNotesEditorMuncher({ metadata }) {
             />
           </Grid2>
           <Grid2 item size={6} display="flex" gap={1}>
-            <BookPicker  setFirstChapter={getFirstChapterBCVNotes}/>
-            <NotesChapterPicker 
+            <BookPicker setFirstChapter={getFirstChapterBCVNotes} />
+            <NotesChapterPicker
               ingredient={ingredient}
-              currentChapter={currentChapter} 
-              setCurrentChapter={setCurrentChapter} 
+              currentChapter={currentChapter}
+              setCurrentChapter={setCurrentChapter}
             />
           </Grid2>
         </Grid2>
       </Box>
-      {notesExist.length > 0 
-        ?
-          <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
-            <SearchWithVerses
-              ingredient={ingredient}
-              setIngredient={setIngredient}
+      {notesExist.length > 0 ? (
+        <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
+          <SearchWithVerses
+            ingredient={ingredient}
+            setIngredient={setIngredient}
+            currentRowN={currentRowN}
+            setCurrentRowN={setCurrentRowN}
+            cellValueChanged={cellValueChanged}
+            setCellValueChanged={setCellValueChanged}
+            updateBcv={updateBcv}
+            currentChapter={currentChapter}
+            refDisabled={refDisabled}
+            setRefDisabled={setRefDisabled}
+            resourceType={resourceType}
+          />
+          <Editor
+            currentRowN={currentRowN}
+            setCurrentRowN={setCurrentRowN}
+            ingredient={ingredient}
+            setIngredient={setIngredient}
+            updateBcv={updateBcv}
+            cellValueChanged={cellValueChanged}
+            setCellValueChanged={setCellValueChanged}
+            refDisabled={refDisabled}
+            setRefDisabled={setRefDisabled}
+            resourceType={resourceType}
+          />
+        </Box>
+      ) : (
+        <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
+          <Stack spacing={2}>
+            <AddFab
               currentRowN={currentRowN}
               setCurrentRowN={setCurrentRowN}
+              ingredient={ingredient}
+              setIngredient={setIngredient}
               cellValueChanged={cellValueChanged}
               setCellValueChanged={setCellValueChanged}
-              updateBcv={updateBcv}
-              currentChapter={currentChapter}
               refDisabled={refDisabled}
               setRefDisabled={setRefDisabled}
               resourceType={resourceType}
             />
-            <Editor
-              currentRowN={currentRowN}
-              setCurrentRowN={setCurrentRowN}
-              ingredient={ingredient}
-              setIngredient={setIngredient}
-              updateBcv={updateBcv}
-              cellValueChanged={cellValueChanged}
-              setCellValueChanged={setCellValueChanged}
-              refDisabled={refDisabled}
-              setRefDisabled={setRefDisabled}
-              resourceType={resourceType}
-            />
-          </Box>
-        :
-          <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
-            <Stack spacing={2}>
-              <AddFab
-                  currentRowN={currentRowN}
-                  setCurrentRowN={setCurrentRowN}
-                  ingredient={ingredient}
-                  setIngredient={setIngredient}
-                  cellValueChanged={cellValueChanged}
-                  setCellValueChanged={setCellValueChanged}
-                  refDisabled={refDisabled}
-                  setRefDisabled={setRefDisabled}
-                  resourceType={resourceType}
-              />
-              <Typography>
-                {doI18n("pages:core-local-workspace:no_notes", i18nRef.current)}
-              </Typography>
-            </Stack>
-          </Box>
-      }
+            <Typography>
+              {doI18n("pages:core-local-workspace:no_notes", i18nRef.current)}
+            </Typography>
+          </Stack>
+        </Box>
+      )}
     </Stack>
   );
 }

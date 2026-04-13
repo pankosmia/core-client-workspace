@@ -34,6 +34,7 @@ function PreviewText({ open, setOpenModalPreviewText, metadata, systemBcv }) {
 
   const isGraphite = GraphiteTest();
   /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
+
   const adjSelectedFontClass = isGraphite
     ? typographyRef.current.font_set
     : typographyRef.current.font_set.replace(

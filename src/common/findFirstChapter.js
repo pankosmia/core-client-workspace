@@ -15,10 +15,7 @@ export async function getFirstChapterTextTranslation(
     const match = usfmString.match(re);
     if (match) {
       const chapter = match[1];
-      postEmptyJson(
-        `/navigation/bcv/${bookCode}/${chapter}/1`,
-        debugRefCurr,
-      );
+      postEmptyJson(`/navigation/bcv/${bookCode}/${chapter}/1`, debugRefCurr);
     }
   }
 }
@@ -53,7 +50,7 @@ export async function getFirstChapterBCVNotes(
     debugRefCurr,
   );
   if (responce.ok) {
-    const firstCol = responce.text 
+    const firstCol = responce.text
       .split("\n")
       .map((line) => line.split("\t")[0].trim()) // first column
       .filter((v) => /^\d+:\d+$/.test(v)) // only chapter:verse
