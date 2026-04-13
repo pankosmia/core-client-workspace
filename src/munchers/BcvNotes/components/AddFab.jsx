@@ -12,11 +12,15 @@ function AddFab({
   setIngredient,
   cellValueChanged,
   setCellValueChanged,
+  refDisabled,
+  setRefDisabled,
+  resourceType,
 }) {
   const { i18nRef } = useContext(I18nContext);
   const [openedModal, setOpenedModal] = useState(null);
 
   const handleCreateForm = () => {
+    setRefDisabled(false);
     setOpenedModal("add");
   };
 
@@ -44,6 +48,9 @@ function AddFab({
         setIngredient={setIngredient}
         cellValueChanged={cellValueChanged}
         setCellValueChanged={setCellValueChanged}
+        refDisabled={refDisabled}
+        setRefDisabled={setRefDisabled}
+        resourceType={resourceType}
       />
     </Box>
   );

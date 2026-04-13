@@ -3,7 +3,9 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
-function formattedModel(m)  {return m ? `${m[0]}${m[1] ? " (quantized)" : ""}` : '-'};
+function formattedModel(m) {
+  return m ? `${m[0]}${m[1] ? " (quantized)" : ""}` : "-";
+}
 
 export default function LlmModelPicker({
   models,
@@ -33,11 +35,16 @@ export default function LlmModelPicker({
           },
         }}
       >
-        {
-            models.map(
-                e => <MenuItem onClick={() => {setSelectedModel(e); setAnchorEl(null);}}>{formattedModel(e)}</MenuItem>
-            )
-        }
+        {models.map((e) => (
+          <MenuItem
+            onClick={() => {
+              setSelectedModel(e);
+              setAnchorEl(null);
+            }}
+          >
+            {formattedModel(e)}
+          </MenuItem>
+        ))}
       </Menu>
     </div>
   );

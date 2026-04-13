@@ -5,7 +5,7 @@ import {
   TextField,
   IconButton,
   CircularProgress,
-  Typography
+  Typography,
 } from "@mui/material";
 import { doI18n, getJson, postJson, getText } from "pithekos-lib";
 import {
@@ -50,8 +50,7 @@ function RhakosCruncher({ metadata, style }) {
     if (models.length === 0) {
       getModels().then();
     }
-  },
-  []);
+  }, []);
 
   const selectedResources = (category) =>
     resources[category].filter((ra) => ra[1]).map((ra) => ra[0]);
@@ -196,7 +195,9 @@ function RhakosCruncher({ metadata, style }) {
         }
         // Build juxta prompt
         juxtaPromptString = `\n\n${doI18n("pages:core-local-workspace:here_is_a_juxta", i18nRef.current)}`;
-        juxtaPromptString += juxtaChunks.map(c => `- ${c[0]} (${c[1]})`).join("\n");
+        juxtaPromptString += juxtaChunks
+          .map((c) => `- ${c[0]} (${c[1]})`)
+          .join("\n");
         juxtaPromptString += `\n\n${doI18n("pages:core-local-workspace:only_include_juxta", i18nRef.current)}`;
       }
     }
@@ -217,14 +218,35 @@ function RhakosCruncher({ metadata, style }) {
         notes: notePromptStrings,
         snippets: snippetPromptStrings,
         prompts: {
-              "system": doI18n("pages:core-local-workspace:system_prompt_rhakos", i18nRef.current),
-    "prologue": doI18n("pages:core-local-workspace:prologue_prompt_rhakos", i18nRef.current),
-    "user_prologue": doI18n("pages:core-local-workspace:user_prologue_prompt_rhakos", i18nRef.current),
-    "juxta": doI18n("pages:core-local-workspace:juxta_prompt_rhakos", i18nRef.current),
-    "notes": doI18n("pages:core-local-workspace:notes_prompt_rhakos", i18nRef.current),
-    "snippets": doI18n("pages:core-local-workspace:snippets_prompt_rhakos", i18nRef.current),
-    "translations": doI18n("pages:core-local-workspace:translations_prompt_rhakos", i18nRef.current)
-        }
+          system: doI18n(
+            "pages:core-local-workspace:system_prompt_rhakos",
+            i18nRef.current,
+          ),
+          prologue: doI18n(
+            "pages:core-local-workspace:prologue_prompt_rhakos",
+            i18nRef.current,
+          ),
+          user_prologue: doI18n(
+            "pages:core-local-workspace:user_prologue_prompt_rhakos",
+            i18nRef.current,
+          ),
+          juxta: doI18n(
+            "pages:core-local-workspace:juxta_prompt_rhakos",
+            i18nRef.current,
+          ),
+          notes: doI18n(
+            "pages:core-local-workspace:notes_prompt_rhakos",
+            i18nRef.current,
+          ),
+          snippets: doI18n(
+            "pages:core-local-workspace:snippets_prompt_rhakos",
+            i18nRef.current,
+          ),
+          translations: doI18n(
+            "pages:core-local-workspace:translations_prompt_rhakos",
+            i18nRef.current,
+          ),
+        },
       },
     };
   };
@@ -344,7 +366,7 @@ function RhakosCruncher({ metadata, style }) {
             onClick={async () => {
               setProcessing("prompt");
               let beforeContextTime = Date.now();
-              let rag_context =  await makeRagContext();
+              let rag_context = await makeRagContext();
               let contextElapsed = Date.now() - beforeContextTime;
               setProcessing("model");
               let result = await postJson(
@@ -358,14 +380,18 @@ function RhakosCruncher({ metadata, style }) {
                 setPrompt("");
                 return;
               }
-              result.contextElapsed = contextElapsed/1000.0;
+              result.contextElapsed = contextElapsed / 1000.0;
               setResponses([...responses, result]);
               setProcessing("waiting");
               setPrompt("");
             }}
           >
             {processing !== "waiting" ? (
-              <CircularProgress enableTrackSlot size={25} color={processing === "prompt" ? "secondary" : "primary"} />
+              <CircularProgress
+                enableTrackSlot
+                size={25}
+                color={processing === "prompt" ? "secondary" : "primary"}
+              />
             ) : (
               <SendIcon />
             )}

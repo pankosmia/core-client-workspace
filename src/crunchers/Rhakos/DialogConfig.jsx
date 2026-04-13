@@ -1,8 +1,4 @@
-import {
-  DialogContent,
-  Grid2,
-  Typography,
-} from "@mui/material";
+import { DialogContent, Grid2, Typography } from "@mui/material";
 import LlmModelPicker from "./LlmModelPicker";
 import NumberPicker from "./NumberPicker";
 import { PanDialog } from "pankosmia-rcl";

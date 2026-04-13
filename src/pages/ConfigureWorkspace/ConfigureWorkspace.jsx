@@ -8,11 +8,20 @@ import {
   Header,
 } from "pankosmia-rcl";
 
-import { Box, Typography, Fab, Grid2, DialogContent, ToggleButtonGroup, ToggleButton, Tooltip } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Fab,
+  Grid2,
+  DialogContent,
+  ToggleButtonGroup,
+  ToggleButton,
+  Tooltip,
+} from "@mui/material";
 import { PanDialog, PanTable } from "pankosmia-rcl";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import LayoutPicker from "./WorkspaceLayoutButton";
-import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
+import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 
 function ConfigureWorkspace({
   layout,
@@ -69,11 +78,9 @@ function ConfigureWorkspace({
     const returnPageDashboard = params.get("returnTypePage");
     if (returnPage === "workspace") {
       navigate("/workspace");
-    }
-    else if (returnPageDashboard === "dashboard") {
+    } else if (returnPageDashboard === "dashboard") {
       window.location.replace("/clients/main");
-    }
-    else {
+    } else {
       window.location.replace("/clients/content");
     }
   };
@@ -197,11 +204,11 @@ function ConfigureWorkspace({
         (r) =>
           currentProjectRef.current &&
           projectFlavors[projectSummaries[r.path].flavor] ===
-          projectFlavors[
-          projectSummaries[
-            `_local_/_local_/${currentProjectRef.current.project}`
-          ].flavor
-          ],
+            projectFlavors[
+              projectSummaries[
+                `_local_/_local_/${currentProjectRef.current.project}`
+              ].flavor
+            ],
       )
       .filter(
         (r) =>
@@ -331,9 +338,17 @@ function ConfigureWorkspace({
               {showRhakos && (
                 <>
                   <Typography variant="h6" sx={{ whiteSpace: "nowrap" }}>
-                    {doI18n("pages:core-local-workspace:tools", i18nRef.current)}
+                    {doI18n(
+                      "pages:core-local-workspace:tools",
+                      i18nRef.current,
+                    )}
                   </Typography>
-                  <Tooltip title={doI18n("pages:core-local-workspace:offline_AI", i18nRef.current)}>
+                  <Tooltip
+                    title={doI18n(
+                      "pages:core-local-workspace:offline_AI",
+                      i18nRef.current,
+                    )}
+                  >
                     <ToggleButtonGroup>
                       <ToggleButton
                         value="check"
@@ -369,15 +384,25 @@ function ConfigureWorkspace({
                       (re) =>
                         selectedResources.has(re[0]) ||
                         (currentProjectRef.current &&
-                          re[0] === Object.values(currentProjectRef.current).join("/")),
+                          re[0] ===
+                            Object.values(currentProjectRef.current).join("/")),
                     )
                     .map((re) =>
                       currentProjectRef.current &&
-                        re[0] === Object.values(currentProjectRef.current).join("/")
-                        ? [re[0], { ...re[1], primary: true }]
+                      re[0] ===
+                        Object.values(currentProjectRef.current).join("/")
+                        ? [
+                            re[0],
+                            {
+                              ...re[1],
+                              primary: true,
+                            },
+                          ]
                         : re,
                     );
-                  navigate("/workspace", { state: Object.fromEntries(stateEntries) });
+                  navigate("/workspace", {
+                    state: Object.fromEntries(stateEntries),
+                  });
                   e.stopPropagation();
                 }}
               >
@@ -397,10 +422,12 @@ function ConfigureWorkspace({
             }}
           >
             <Box sx={{ minHeight: 0 }}>
-              <Typography variant="h6">{doI18n(
-                "pages:core-local-workspace:choose_resources_workspace",
-                i18nRef.current,
-              )}</Typography>
+              <Typography variant="h6">
+                {doI18n(
+                  "pages:core-local-workspace:choose_resources_workspace",
+                  i18nRef.current,
+                )}
+              </Typography>
               <PanTable
                 checkboxSelection
                 showColumnFilters
@@ -429,7 +456,7 @@ function ConfigureWorkspace({
           </Box>
         </DialogContent>
       </PanDialog>
-    </Box >
+    </Box>
   );
 }
 export default ConfigureWorkspace;

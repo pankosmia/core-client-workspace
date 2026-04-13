@@ -27,11 +27,11 @@ function JuxtaSaveButton({
       .forEach(({ source }) => {
         source.filter((e) => e);
       });
-    const payload = { payload: JSON.stringify(s,null,2) };
+    const payload = { payload: JSON.stringify(s, null, 2) };
     const response = await postJson(
       `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.json`,
       JSON.stringify(payload),
-      debugBool
+      debugBool,
     );
     if (response.ok) {
       enqueueSnackbar(

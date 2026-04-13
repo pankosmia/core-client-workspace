@@ -24,7 +24,9 @@ export default function InformationDialogRhakos({ open, close, response }) {
               "pages:core-local-workspace:elapsed_rhakos",
               i18nRef.current,
             )}
-            : {parseFloat(response?.contextElapsed.toFixed(2))}{"/"}{parseFloat(response?.json?.elapsed.toFixed(2))}{" "}
+            : {parseFloat(response?.contextElapsed.toFixed(2))}
+            {"/"}
+            {parseFloat(response?.json?.elapsed.toFixed(2))}{" "}
             {doI18n("pages:core-local-workspace:second", i18nRef.current)}
           </Grid2>
           <Grid2 size={6}>
@@ -43,7 +45,8 @@ export default function InformationDialogRhakos({ open, close, response }) {
           </Grid2>
           <Grid2 size={6}>
             {doI18n("pages:core-local-workspace:bcv_rhakos", i18nRef.current)}:{" "}
-            {response?.json?.book}{" "}{response?.json?.from_chapter}{":"}
+            {response?.json?.book} {response?.json?.from_chapter}
+            {":"}
             {response?.json?.from_verse}
           </Grid2>
           <Grid2 size={6}>
