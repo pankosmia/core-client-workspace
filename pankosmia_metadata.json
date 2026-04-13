@@ -70,6 +70,10 @@
       "fr": "Sélectionner des ressources",
       "id": "Pilih Sumber Daya"
     },
+    "configure_workspace": {
+      "en": "Configure Workspace",
+      "fr": "Configurer plan de travail"
+    },
     "summary": {
       "ar": "@تسييير و تغيير الموارد المحلية",
       "en": "Edit your document",

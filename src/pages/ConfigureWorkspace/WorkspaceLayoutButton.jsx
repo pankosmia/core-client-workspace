@@ -6,7 +6,7 @@ import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEdito
 import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row";
 import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_top";
 import { useEffect, useState, useContext } from "react";
-import {getJson } from "pithekos-lib";
+import { getJson } from "pithekos-lib";
 import { debugContext } from "pankosmia-rcl";
 
 export default function LayoutPicker({
@@ -15,16 +15,22 @@ export default function LayoutPicker({
   layout,
   setLayout,
 }) {
-
   const [alignment, setAlignment] = useState(
     selectedResources.size === 0 ? "" : layout,
   );
   const [showRhakos, setShowRhakos] = useState(null);
   const { debugRef } = useContext(debugContext);
 
-  const handleAlignment = (newAlignment) => {
-    setAlignment(newAlignment);
+  const handleAlignment = (event, newAlignment) => {
+    if (newAlignment !== null) {
+      const selectedLayout = layouts.find(
+        (item) => item.value === newAlignment,
+      )?.layout;
+      setLayout(selectedLayout);
+      setAlignment(newAlignment);
+    }
   };
+
   useEffect(() => {
     if (selectedResources.size === 0) {
       setAlignment("");
@@ -47,6 +53,26 @@ export default function LayoutPicker({
 
   const layouts = [
     {
+      value: "ViewEditorRightRow",
+      layout: "ViewEditorRightRow",
+      icon: SvgViewEditorRightRow,
+    },
+    {
+      value: "ViewEditorLeftRow",
+      layout: "ViewEditorLeftRow",
+      icon: SvgViewEditorLeftRow,
+    },
+    {
+      value: "ViewEditorRightColumn",
+      layout: "ViewEditorRightColumn",
+      icon: SvgViewEditorRightColumn,
+    },
+    {
+      value: "ViewEditorLeftColumn",
+      layout: "ViewEditorLeftColumn",
+      icon: SvgViewEditorLeftColumn,
+    },
+    {
       value: "ViewEditorTop",
       layout: "ViewEditorTop",
       icon: SvgViewEditorTop,
@@ -55,26 +81,6 @@ export default function LayoutPicker({
       value: "ViewEditorBottom",
       layout: "ViewEditorBottom",
       icon: SvgViewEditorBottom,
-    },
-    {
-      value: "ViewEditorLeftColumn",
-      layout: "ViewEditorLeftColumn",
-      icon: SvgViewEditorLeftColumn,
-    },
-    {
-      value: "ViewEditorRightColumn",
-      layout: "ViewEditorRightColumn",
-      icon: SvgViewEditorRightColumn,
-    },
-    {
-      value: "ViewEditorLeftRow",
-      layout: "ViewEditorLeftRow",
-      icon: SvgViewEditorLeftRow,
-    },
-    {
-      value: "ViewEditorRightRow",
-      layout: "ViewEditorRightRow",
-      icon: SvgViewEditorRightRow,
     },
   ];
 
@@ -91,7 +97,6 @@ export default function LayoutPicker({
               <ToggleButton
                 key={item.value}
                 value={item.value}
-                onClick={() => setLayout(item.layout)}
                 disabled={selectedResources.size + selectedCrunchers.size === 0}
               >
                 <item.icon />
@@ -100,7 +105,6 @@ export default function LayoutPicker({
           })}
         </ToggleButtonGroup>
       </Grid2>
-      
     </>
   );
 }

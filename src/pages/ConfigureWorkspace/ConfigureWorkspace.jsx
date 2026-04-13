@@ -309,7 +309,7 @@ function ConfigureWorkspace({
         />
       </Box>
       <PanDialog
-        titleLabel={`${doI18n("pages:core-local-workspace:Select_Resources", i18nRef.current, debugRef.current)}`}
+        titleLabel={`${doI18n("pages:core-local-workspace:configure_workspace", i18nRef.current, debugRef.current)}`}
         isOpen={open}
         closeFn={() => handleNext()}
         size="xl"
@@ -326,14 +326,6 @@ function ConfigureWorkspace({
               mb: 2,
             }}
           >
-            <Grid2 item size={12}>
-              <Typography variant="h6">
-                {doI18n(
-                  "pages:core-local-workspace:choose_resources_workspace",
-                  i18nRef.current,
-                )}
-              </Typography>
-            </Grid2>
             <Grid2
               item
               size="grow"
@@ -342,7 +334,7 @@ function ConfigureWorkspace({
                 flexDirection: "row",
                 alignItems: "center",
                 flexWrap: "nowrap",
-                gap: 1,
+                gap: 3,
               }}
             >
               <Box>
@@ -432,6 +424,14 @@ function ConfigureWorkspace({
                 </Typography>
                 <PlayArrowIcon />
               </Fab>
+            </Grid2>
+            <Grid2 item size={12}>
+              <Typography variant="h6">
+                {doI18n(
+                  "pages:core-local-workspace:choose_resources_workspace",
+                  i18nRef.current,
+                )}
+              </Typography>
             </Grid2>
           </Grid2>
           <Box
