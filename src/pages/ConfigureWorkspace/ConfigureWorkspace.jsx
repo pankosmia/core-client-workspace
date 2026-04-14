@@ -8,11 +8,20 @@ import {
   Header,
 } from "pankosmia-rcl";
 
-import { Box, Typography, Fab, Grid2, DialogContent } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Fab,
+  Grid2,
+  DialogContent,
+  ToggleButtonGroup,
+  ToggleButton,
+  Tooltip,
+} from "@mui/material";
 import { PanDialog, PanTable } from "pankosmia-rcl";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-
 import LayoutPicker from "./WorkspaceLayoutButton";
+import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 
 function ConfigureWorkspace({
   layout,
@@ -33,6 +42,7 @@ function ConfigureWorkspace({
   const [isoThreeLookup, setIsoThreeLookup] = useState([]);
   const [contentBooks, setContentBooks] = useState();
   const [selectedResourcesIndexes, setSelectedResourcesIndexes] = useState([]);
+  const [showRhakos, setShowRhakos] = useState(null);
 
   const getProjectSummaries = async () => {
     const summariesResponse = await getJson(
@@ -43,6 +53,19 @@ function ConfigureWorkspace({
       setProjectSummaries(summariesResponse.json);
     }
   };
+  useEffect(() => {
+    const getModels = async () => {
+      const result = await getJson("/llm/model", debugRef.current);
+      if (result.ok) {
+        setShowRhakos(result.json.length > 0);
+      } else {
+        setShowRhakos(false);
+      }
+    };
+    if (showRhakos === null) {
+      getModels().then();
+    }
+  }, []);
 
   useEffect(() => {
     getProjectSummaries().then();
@@ -286,50 +309,89 @@ function ConfigureWorkspace({
         />
       </Box>
       <PanDialog
-        titleLabel={`${doI18n("pages:core-local-workspace:Select_Resources", i18nRef.current, debugRef.current)}`}
+        titleLabel={`${doI18n("pages:core-local-workspace:configure_workspace", i18nRef.current, debugRef.current)}`}
         isOpen={open}
         closeFn={() => handleNext()}
         size="xl"
       >
-        <DialogContent>
+        <DialogContent sx={{ overflow: "hidden" }}>
           <Grid2
-            sx={{ display: "flex", flexFlow: "row nowrap" }}
             container
-            alignItems="center"
-            justifyContent="space-between"
-            width="100%"
+            direction="row"
+            sx={{
+              display: "flex",
+              justifyContent: "space-around",
+              alignItems: "flex-start",
+              gap: 1,
+              mb: 2,
+            }}
           >
-            <Grid2 display="flex" gap={1}>
-              <Typography
-                sx={{
-                  overflow: "hide",
-                  maxHeight: 48,
-                }}
-              >
-                {doI18n(
-                  "pages:core-local-workspace:choose_resources_workspace",
-                  i18nRef.current,
-                )}
-              </Typography>
+            <Grid2
+              item
+              size="grow"
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                flexWrap: "nowrap",
+                gap: 3,
+              }}
+            >
+              <Box>
+                <Typography variant="h6">
+                  {doI18n("pages:core-local-workspace:layout", i18nRef.current)}
+                </Typography>
+                <LayoutPicker
+                  layout={layout}
+                  setLayout={setLayout}
+                  selectedResources={selectedResources}
+                  selectedCrunchers={selectedCrunchers}
+                />
+              </Box>
+              {showRhakos && (
+                <Box>
+                  <Typography variant="h6" sx={{ whiteSpace: "nowrap" }}>
+                    {doI18n(
+                      "pages:core-local-workspace:tools",
+                      i18nRef.current,
+                    )}
+                  </Typography>
+                  <Tooltip
+                    title={doI18n(
+                      "pages:core-local-workspace:offline_AI",
+                      i18nRef.current,
+                    )}
+                  >
+                    <ToggleButtonGroup>
+                      <ToggleButton
+                        value="check"
+                        selected={selectedCrunchers.has("Rhakos")}
+                        onChange={() => {
+                          let newSelected = new Set(selectedCrunchers);
+                          if (selectedCrunchers.has("Rhakos")) {
+                            newSelected.delete("Rhakos");
+                          } else {
+                            newSelected.add("Rhakos");
+                          }
+                          setSelectedCrunchers(newSelected);
+                        }}
+                      >
+                        <SmartToyOutlinedIcon />
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                  </Tooltip>
+                </Box>
+              )}
             </Grid2>
-            <LayoutPicker
-              layout={layout}
-              setLayout={setLayout}
-              selectedResources={selectedResources}
-              selectedCrunchers={selectedCrunchers}
-              setSelectedCrunchers={setSelectedCrunchers}
-            />
-            <Grid2 display="flex" gap={1}>
+            <Grid2 item size={2}>
               <Fab
                 variant="extended"
                 color="primary"
-                length="small"
+                size="small"
                 aria-label={doI18n("pages:content:add", i18nRef.current)}
                 onClick={(e) => {
                   let stateEntries = Object.entries(projectSummaries)
-                    .map((e) => {
-                      return { ...e[1], path: e[0] };
-                    })
+                    .map((e) => ({ ...e[1], path: e[0] }))
                     .map((r) => [r.path, r])
                     .filter(
                       (re) =>
@@ -363,45 +425,49 @@ function ConfigureWorkspace({
                 <PlayArrowIcon />
               </Fab>
             </Grid2>
-          </Grid2>
-          <Box sx={{ m: 2 }}>
             <Grid2 item size={12}>
-              <Box
-                sx={{
-                  height: `${maxWindowHeight}px`,
-                  display: "flex",
-                  flexDirection: "column",
-                  width: "100%",
-                }}
-              >
-                <Box sx={{ flex: 1, minHeight: 0 }}>
-                  <PanTable
-                    checkboxSelection
-                    showColumnFilters
-                    rows={rows}
-                    preSelections={selectedResourcesIndexes}
-                    columns={columns}
-                    onRowSelectionModelChange={(ids) => {
-                      const paths = rows
-                        .filter((r) => ids.includes(r.id))
-                        .map((r) => r.path);
-                      setSelectedResources(new Set(paths));
-                    }}
-                    sx={{
-                      fontSize: "1rem",
-                      height: "100%",
-                      "& .MuiTable-root": { height: "100%" },
-                      "& .MuiTableCell-head": {
-                        position: "sticky",
-                        top: 0,
-                        zIndex: 2,
-                        backgroundColor: "background.paper",
-                      },
-                    }}
-                  />
-                </Box>
-              </Box>
+              <Typography variant="h6">
+                {doI18n(
+                  "pages:core-local-workspace:choose_resources_workspace",
+                  i18nRef.current,
+                )}
+              </Typography>
             </Grid2>
+          </Grid2>
+          <Box
+            sx={{
+              height: `${maxWindowHeight}px`,
+              display: "flex",
+              flexDirection: "column",
+              width: "100%",
+            }}
+          >
+            <Box sx={{ minHeight: 0 }}>
+              <PanTable
+                checkboxSelection
+                showColumnFilters
+                rows={rows}
+                preSelections={selectedResourcesIndexes}
+                columns={columns}
+                onRowSelectionModelChange={(ids) => {
+                  const paths = rows
+                    .filter((r) => ids.includes(r.id))
+                    .map((r) => r.path);
+                  setSelectedResources(new Set(paths));
+                }}
+                sx={{
+                  fontSize: "1rem",
+                  height: "90%",
+                  "& .MuiTable-root": { height: "100%" },
+                  "& .MuiTableCell-head": {
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 2,
+                    backgroundColor: "background.paper",
+                  },
+                }}
+              />
+            </Box>
           </Box>
         </DialogContent>
       </PanDialog>
