@@ -38,7 +38,6 @@ function ConfigureWorkspace({
   const navigate = useNavigate();
   const location = useLocation();
   const [projectSummaries, setProjectSummaries] = useState({});
-  console.log("project", projectSummaries);
   const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
   const [isoThreeLookup, setIsoThreeLookup] = useState([]);
   const [contentBooks, setContentBooks] = useState();
