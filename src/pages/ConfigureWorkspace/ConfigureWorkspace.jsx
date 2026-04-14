@@ -239,7 +239,7 @@ function ConfigureWorkspace({
             ]?.en ?? rep.language_code,
         };
       });
-  }, [contentBooks]);
+  }, [contentBooks, projectSummaries]);
 
   useEffect(() => {
     if (rows) {
