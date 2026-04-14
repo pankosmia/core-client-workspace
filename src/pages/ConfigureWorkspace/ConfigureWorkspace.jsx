@@ -38,6 +38,7 @@ function ConfigureWorkspace({
   const navigate = useNavigate();
   const location = useLocation();
   const [projectSummaries, setProjectSummaries] = useState({});
+  console.log("project", projectSummaries);
   const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
   const [isoThreeLookup, setIsoThreeLookup] = useState([]);
   const [contentBooks, setContentBooks] = useState();
@@ -239,7 +240,7 @@ function ConfigureWorkspace({
             ]?.en ?? rep.language_code,
         };
       });
-  }, [contentBooks]);
+  }, [contentBooks, projectSummaries]);
 
   useEffect(() => {
     if (rows) {
