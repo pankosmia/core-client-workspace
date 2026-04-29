@@ -915,6 +915,26 @@
     "supportreference": {
       "en": "Support reference",
       "es": "Referencia de ayuda"
+    },
+    "morphLookup_e_perf": {
+      "en": "perf",
+      "fr": "parf"
+    },
+    "morphLookup_l_ppf": {
+      "en": "ppf",
+      "fr": "pqp"
+    },
+    "morphLookup_m_mid": {
+      "en": "mid",
+      "fr": "moy"
+    },
+    "morphLookup_m_imper": {
+      "en": "imper",
+      "fr": "impér"
+    },
+    "morphLookup_p_pres": {
+      "en": "pres",
+      "fr": "prés"
     }
   }
 }
