@@ -18,6 +18,7 @@ import {
   debugContext as DebugContext,
   i18nContext as I18nContext,
 } from "pankosmia-rcl";
+import { PrintOutlined } from "@mui/icons-material";
 
 function EditorTools({
   metadata,
@@ -104,7 +105,7 @@ function EditorTools({
               setOpenModalPreviewText(true);
             }}
           >
-            <VisibilityIcon />
+            <PrintOutlined />
           </IconButton>
           <PreviewText
             metadata={metadata}
