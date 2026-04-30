@@ -147,6 +147,11 @@ function ConfigureWorkspace({
     "x-bcvimages": "parascriptural",
     "x-juxtalinear": "scripture",
     "x-parallel": "parascriptural",
+    "x-obsimages": "parascriptural",
+    "x-obsarticles": "peripheral",
+    "x-obsquestions": "parascriptural",
+    "x-obsnotes": "parascriptural",
+    "x-translationplan": "parascriptural",
   };
 
   const columns = useMemo(
@@ -195,51 +200,51 @@ function ConfigureWorkspace({
     [i18nRef.current],
   );
 
-  const rows = useMemo(() => {
-    return Object.entries(projectSummaries)
-      .map((e) => {
-        return { ...e[1], path: e[0] };
-      })
-      .filter(
-        (r) =>
-          currentProjectRef.current &&
-          projectFlavors[projectSummaries[r.path].flavor] ===
-            projectFlavors[
-              projectSummaries[
-                `_local_/_local_/${currentProjectRef.current.project}`
-              ].flavor
-            ],
-      )
-      .filter(
-        (r) =>
-          r.path !==
-          `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`,
-      )
-      .filter(
-        (r) =>
-          !contentBooks ||
-          contentBooks.size === 0 ||
-          new Set(r.book_codes).intersection(contentBooks).size > 0,
-      )
-      .map((rep, n) => {
-        return {
-          ...rep,
-          id: n.toString(),
-          name: `${rep.name} (${rep.abbreviation})`,
-          description: rep.description !== rep.name ? rep.description : "",
-          source: rep.path.startsWith("_local_")
-            ? rep.path.startsWith("_local_/_sideloaded_")
-              ? doI18n("pages:content:local_resource", i18nRef.current)
-              : doI18n("pages:content:local_project", i18nRef.current)
-            : `${rep.path.split("/")[1]} (${rep.path.split("/")[0]})`,
-          type: rep.flavor,
-          language:
-            isoThreeLookup?.[
-              isoOneToThreeLookup[rep.language_code] ?? rep.language_code
-            ]?.en ?? rep.language_code,
-        };
-      });
-  }, [contentBooks, projectSummaries]);
+  let rows = Object.entries(projectSummaries).map((e) => {
+    return { ...e[1], path: e[0] };
+  });
+  rows = rows.filter(
+    (r) =>
+      currentProjectRef.current &&
+      projectFlavors[projectSummaries[r.path].flavor] ===
+        projectFlavors[
+          projectSummaries[
+            `_local_/_local_/${currentProjectRef.current.project}`
+          ].flavor
+        ],
+  );
+  rows = rows.filter(
+    (r) =>
+      r.path !==
+      `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`,
+  );
+  rows = rows
+    .filter(
+      (r) =>
+        true ||
+        !contentBooks ||
+        contentBooks.size === 0 ||
+        new Set(r.book_codes).intersection(contentBooks).size > 0,
+    )
+    .map((rep, n) => {
+      return {
+        ...rep,
+        id: n.toString(),
+        name: `${rep.name} (${rep.abbreviation})`,
+        description: rep.description !== rep.name ? rep.description : "",
+        source: rep.path.startsWith("_local_")
+          ? rep.path.startsWith("_local_/_sideloaded_")
+            ? doI18n("pages:content:local_resource", i18nRef.current)
+            : doI18n("pages:content:local_project", i18nRef.current)
+          : `${rep.path.split("/")[1]} (${rep.path.split("/")[0]})`,
+        type: rep.flavor,
+        language:
+          isoThreeLookup?.[
+            isoOneToThreeLookup[rep.language_code] ?? rep.language_code
+          ]?.en ?? rep.language_code,
+      };
+    });
+  console.log(rows);
 
   useEffect(() => {
     if (rows) {
