@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 function TextTranslationEditorMuncher({ metadata }) {
   const [modified, setModified] = useState(false);
 
-
   return (
     <Box sx={{ p: 2 }}>
       <DraftingEditor

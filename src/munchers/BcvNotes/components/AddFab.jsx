@@ -14,7 +14,7 @@ function AddFab({
   setCellValueChanged,
   refDisabled,
   setRefDisabled,
-  resourceType
+  resourceType,
 }) {
   const { i18nRef } = useContext(I18nContext);
   const [openedModal, setOpenedModal] = useState(null);
@@ -22,7 +22,7 @@ function AddFab({
   const handleCreateForm = () => {
     setRefDisabled(false);
     setOpenedModal("add");
-};
+  };
 
   return (
     <Box>

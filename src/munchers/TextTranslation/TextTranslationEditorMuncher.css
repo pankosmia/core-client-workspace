@@ -1,48 +1,49 @@
 p {
-    margin: 0;
-    padding: 0 5pt;
+  margin: 0;
+  padding: 0 5pt;
 }
 
 .bare-text {
-    break-before: avoid;
-    break-after: auto;
+  break-before: avoid;
+  break-after: auto;
 }
 
 .para-tool {
-    float: right;
-    /* font-family: monospace; */
-    font-size: 18pt;
-    color: #FFFFFF;
-    background-color: #000000;
-    padding: 2px;
+  float: right;
+  /* font-family: monospace; */
+  font-size: 18pt;
+  color: #ffffff;
+  background-color: #000000;
+  padding: 2px;
 }
 
-.usfm-p, .usfm-m {
-    font-size: 18pt;
+.usfm-p,
+.usfm-m {
+  font-size: 18pt;
 }
 
 .usfm-c {
-    font-size: 60pt;
+  font-size: 60pt;
 }
 
 .usfm-v {
-    font-weight: bold;
-    font-style: italic;
-    font-size: 18pt;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
-    break-after: avoid;
+  font-weight: bold;
+  font-style: italic;
+  font-size: 18pt;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  break-after: avoid;
 }
 
 .usfm-mt {
-    font-size: 48pt;
+  font-size: 48pt;
 }
 
 .usfm-s {
-    font-size: 36pt;
+  font-size: 36pt;
 }
 
 .usfm-unknown {
-    color: red;
-    background-color: yellow;
+  color: red;
+  background-color: yellow;
 }
