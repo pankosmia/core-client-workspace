@@ -238,7 +238,6 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         if (newMaxDuration > maxDuration) {
           setMaxDuration(newMaxDuration);
         }
-        updateMainTrackWidth(newMaxDuration);
 
         const formData = new FormData();
         formData.append("file", wav);
@@ -248,7 +247,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         });
         const data = await response.json();
         // console.log(data);
-
+        refreshMainTrackScale();
         return newUrl;
       }
     } catch (error) {
@@ -495,6 +494,19 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     [wavesurfer, maxDuration],
   );
 
+  const refreshMainTrackScale = useCallback(() => {
+    const mainDuration = wavesurfer?.getDuration?.() || 0;
+    const trackDurationsList = Object.values(trackDurations || []).filter(
+        (value) => typeof value === "number" && value > 0,
+    );
+    const nextMaxDuration = Math.max(mainDuration, ...trackDurationsList, 0);
+
+    if (nextMaxDuration > 0) {
+      setMaxDuration(nextMaxDuration);
+      updateMainTrackWidth(mainDuration || undefined, nextMaxDuration);
+    }
+  }, [wavesurfer, trackDurations, updateMainTrackWidth])
+
   useEffect(() => {
     if (!waveformRef.current) return;
     const observer = new ResizeObserver((entries) => {
@@ -589,11 +601,11 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
   const handleReady = useCallback(() => {
     if (!wavesurfer) return;
     const duration = wavesurfer.getDuration();
-    updateMainTrackWidth(duration);
+    refreshMainTrackScale();
     setTimeout(() => {
       setIsLoading(false);
     }, 100);
-  }, [wavesurfer, updateMainTrackWidth]);
+  }, [wavesurfer, updateMainTrackWidth, refreshMainTrackScale]);
 
   const handleLoading = useCallback(() => {
     setIsLoading(true);
@@ -627,7 +639,8 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
       if (!wavesurfer || !waveformRef.current) return;
       const rect = waveformRef.current.getBoundingClientRect();
       const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width || 0));
-      const baseDuration = effectiveDuration || wavesurfer.getDuration?.() || 0;
+      const displayedDuration = wavesurfer.getDuration?.() || 0;
+      const baseDuration = displayedDuration || effectiveDuration || 0;
       if (!baseDuration || !rect.width) return;
       const rawTime = (x / rect.width) * baseDuration;
       const targetTime = snapEnabled ? snapToGrid(rawTime) : rawTime;
@@ -725,6 +738,19 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     };
     updateAudioUrl();
   }, [obs, prise, bakExists]);
+
+  // Préserver un maxDuration cohérent quand les durées de pistes changent
+  useEffect(() => {
+    const durations = Object.values(trackDurations || {}).filter(
+        (value) => typeof value === "number" &&!isNaN(value) && value > 0
+    );
+    const mainDuration = wavesurfer?.getDuration?.() || 0;
+    const nextMaxDuration = Math.max(mainDuration, ...durations, 0);
+
+    if (nextMaxDuration > 0 && nextMaxDuration !== maxDuration) {
+      setMaxDuration(nextMaxDuration);
+    }
+  }, [trackDurations, wavesurfer, maxDuration]);
 
   // Mettre à jour le numéro de la prochaine prise
   useEffect(() => {
@@ -859,7 +885,6 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         if (newMaxDuration > maxDuration) {
           setMaxDuration(newMaxDuration);
         }
-        updateMainTrackWidth(newMaxDuration);
 
         const formData = new FormData();
         formData.append("file", wav);
@@ -871,7 +896,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
         // console.log(data);
         //
         setAudioUrl(newUrl);
-
+        refreshMainTrackScale();
         return newUrl;
       }
     } catch (error) {
@@ -961,12 +986,10 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
       setOtherPrises(sortedPrises.filter((prise) => !prise.includes(".json")));
 
       setTrackDurations({});
-      setMaxDuration(0);
       setSelectedRegion([]);
     } else {
       setOtherPrises([]);
       setTrackDurations({});
-      setMaxDuration(0);
       setSelectedRegion([]);
     }
   };
