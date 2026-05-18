@@ -634,6 +634,19 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     updateCursorTime(now, { force: true });
   }, [wavesurfer, updateCursorTime]);
 
+  // Map des regionsPlugin des pistes secondaires, indexée par priseNumber.
+  const secondaryRegionsPluginsRef = useRef({});
+
+  const clearSecondaryRegions = useCallback((exceptPriseNumber = null) => {
+    const map = secondaryRegionsPluginsRef.current;
+    Object.entries(map).forEach(([priseNumber, plugin]) => {
+      if (priseNumber === exceptPriseNumber) return;
+      try {
+        plugin?.clearRegions();
+      } catch (_) {}
+    });
+  }, []);
+
   const handleMainWaveformClick = useCallback(
     (e) => {
       if (!wavesurfer || !waveformRef.current) return;
@@ -645,6 +658,12 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
       const rawTime = (x / rect.width) * baseDuration;
       const targetTime = snapEnabled ? snapToGrid(rawTime) : rawTime;
       updateCursorTime(targetTime);
+      // Click simple = on vide les régions partout (principale + secondaires).
+      try {
+        regionsPlugin?.clearRegions();
+      } catch (_) {}
+      clearSecondaryRegions();
+      setSelectedRegion([]);
       try {
         wavesurfer.setTime(targetTime);
       } catch (_) {}
@@ -656,6 +675,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
       snapEnabled,
       snapToGrid,
       updateCursorTime,
+      clearSecondaryRegions,
     ],
   );
 
@@ -672,6 +692,15 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
   // Timestamp du dernier "region-update" : sert à distinguer un déplacement
   // de région existante d'une vraie création par drag-selection.
   const lastRegionUpdateAtRef = useRef(0);
+
+  const handleSecondaryEmptyClick = useCallback(() => {
+    // Click simple = on vide les régions partout (principale + secondaires).
+    try {
+      regionsPlugin?.clearRegions();
+    } catch (_) {}
+    clearSecondaryRegions();
+    setSelectedRegion([]);
+  }, [regionsPlugin, clearSecondaryRegions]);
 
   useEffect(() => {
     // Toujours désactiver avant d'activer
@@ -1742,6 +1771,11 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                         gridPx={gridPx}
                         majorGridPx={majorGridPx}
                         selectedRegion={selectedRegion}
+                        onRegionsPluginReady={(plugin) => {
+                          secondaryRegionsPluginsRef.current[priseNumber] =
+                            plugin;
+                        }}
+                        onEmptyClick={handleSecondaryEmptyClick}
                         onWavesurferReady={(ws) => {
                           setWaveformRefs((prev) => ({
                             ...prev,
