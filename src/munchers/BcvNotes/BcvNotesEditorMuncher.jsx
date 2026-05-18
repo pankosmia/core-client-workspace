@@ -47,36 +47,27 @@ function BcvNotesEditorMuncher({ metadata }) {
   const updateBcv = (rowN) => {
     const newCurrentRow = ingredient[rowN][0];
     const newCurrentRowCV = newCurrentRow.split(":");
+    const chapter = newCurrentRowCV[0];
+    const verseRange = newCurrentRowCV[1];
+    const startVerse = verseRange.split("-")[0];
+    const endVerseNum = verseRange.includes("-") 
+      ? verseRange.split("-")[1] 
+      : startVerse;
+    const rowData = ingredient[rowN];
+    const alignment = rowData[6] || "";
     if (newCurrentRow[0]) {
       if (newCurrentRowCV.length === 2) {
         postEmptyJson(
           `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1].split("-")[0]}`,
           debugRef.current,
         );
+        postEmptyJson(
+          `/navigation/bcv/${systemBcv["bookCode"]}/${chapter}/${startVerse}/${endVerseNum}`,
+          debugRef.current,
+          alignment ? { alignment } : undefined
+        );
       }
     }
-    const rowData = ingredient[rowN];
-    const verseRange = newCurrentRowCV[1];
-    const endVerseNum = verseRange.includes("-") 
-      ? verseRange.split("-")[1] 
-      : verseRange;
-    const alignment = rowData[6] || "";
-  
-    const startVerse = newCurrentRowCV[1].split("-")[0];
-    if (endVerseNum && endVerseNum !== startVerse) {
-      postEmptyJson(
-        `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${endVerseNum}`,
-        debugRef.current,
-      );
-    }
-  
-    if (alignment) {
-      postEmptyJson(
-        `/api/update-alignment/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${startVerse}/${endVerseNum}/${encodeURIComponent(alignment)}`,
-        debugRef.current,
-      );
-    }
-    console.log(newCurrentRow);
   };
 
   const isModified = useCallback(() => {
@@ -133,6 +124,8 @@ function BcvNotesEditorMuncher({ metadata }) {
       setResourceType("new_bcv_note");
     }
   }, [ingredient]);
+
+  console.log(systemBcv);
 
   return (
     <Stack
