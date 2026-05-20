@@ -118,6 +118,13 @@ export default function TrackView({
     };
   }, [wavesurfer, regionsPlugin]);
 
+  // Synchronise le curseur de progression de wavesurfer avec le playhead custom.
+  useEffect(() => {
+    if (!wavesurfer || dur <= 0 || playheadTime == null) return;
+    const ratio = Math.max(0, Math.min(1, playheadTime / dur));
+    wavesurfer.seekTo(ratio);
+  }, [wavesurfer, playheadTime, dur]);
+
   // Escape : efface la sélection (utile quand la région couvre toute la zone et qu'on ne peut plus draguer une zone vide pour la recréer).
   useEffect(() => {
     const onKey = (e) => {
