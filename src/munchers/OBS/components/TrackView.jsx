@@ -8,6 +8,7 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/EditOutlined";
+import TextField from "@mui/material/TextField";
 
 import { virtualDuration, computeVirtualPeaks } from "./lib/edl";
 
@@ -20,6 +21,7 @@ export default function TrackView({
   playheadTime, // temps virtuel actuel sur cette piste (null si pas en lecture)
   regionSelection,
   onRegionChange,
+  onRename,
 }) {
   const dur = useMemo(() => virtualDuration(track), [track]);
   const widthPct = projectDuration > 0 ? (dur / projectDuration) * 100 : 100;
@@ -32,6 +34,10 @@ export default function TrackView({
 
   const containerRef = useRef(null);
   const [selection, setSelection] = useState(null);
+
+  // Pour rename
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [draftName, setDraftName] = useState(track.name);
 
   const regionsPlugin = useMemo(() => RegionsPlugin.create(), []);
   const timelinePlugin = useMemo(
@@ -179,46 +185,97 @@ export default function TrackView({
         borderTop: isSelected ? "0.1px solid #1565c0" : "0px solid #fff",
       }}
     >
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        spacing={5}
-      >
-        <Box
-          sx={{
-            width: `${widthPct}%`,
-            position: "relative",
-            overflow: "hidden",
-            borderRadius: 1,
-          }}
-        >
-          <Box ref={containerRef} />
-          {playheadTime != null && dur > 0 && (
-            <Box
-              sx={{
-                position: "absolute",
-                left: `${(playheadTime / dur) * 100}%`,
-                top: 0,
-                bottom: 0,
-                width: "2px",
-                bgcolor: "red",
-                pointerEvents: "none",
-                zIndex: 2,
-              }}
-            />
-          )}
+      <Stack direction="row" alignItems="center" spacing={5}>
+        {/* Conteneur "rail temporel" : prend toute la place restante, identique sur chaque piste.
+                    widthPct% est ensuite appliqué sur cette largeur stable -> px/sec aligné inter-pistes. */}
+        <Box sx={{ flex: 1, minWidth: 0, position: "relative" }}>
+          <Box
+            sx={{
+              width: `${widthPct}%`,
+              position: "relative",
+              overflow: "hidden",
+              borderRadius: 1,
+            }}
+          >
+            <Box ref={containerRef} />
+            {playheadTime != null && dur > 0 && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  left: `${(playheadTime / dur) * 100}%`,
+                  top: 0,
+                  bottom: 0,
+                  width: "2px",
+                  bgcolor: "red",
+                  pointerEvents: "none",
+                  zIndex: 2,
+                }}
+              />
+            )}
+          </Box>
         </Box>
-        <Stack direction="row" overflow="hidde">
-          <Divider orientation="vertical" flexItem sx={{ margin: "-16px 0" }} />
-          <Stack spacing={0} paddingRight={7} paddingLeft={1}>
-            <Box marginLeft={0.7} overflow="hidden" minWidth={60} maxWidth={60}>
-              {track.name}
+        <Divider
+          orientation="vertical"
+          flexItem
+          sx={{ alignSelf: "stretch" }}
+        />
+        <Stack direction="row" overflow="visible" flexShrink={0}>
+          <Stack
+            spacing={0}
+            paddingRight={7}
+            paddingLeft={1}
+            justifyContent="center"
+            overflow="visible"
+          >
+            <Box
+              marginLeft={0.7}
+              minWidth={60}
+              maxWidth={60}
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              sx={{ position: "relative", overflow: "visible" }}
+            >
+              {isRenaming ? (
+                <TextField
+                  size="small"
+                  value={draftName}
+                  autoFocus
+                  onChange={(e) => setDraftName(e.target.value)}
+                  onBlur={() => {
+                    onRename?.(track.id, draftName.trim() || track.name);
+                    setIsRenaming(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      onRename?.(track.id, draftName.trim() || track.name);
+                      setIsRenaming(false);
+                    } else if (e.key === "Escape") {
+                      setDraftName(track.name);
+                      setIsRenaming(false);
+                    }
+                  }}
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: 200,
+                    zIndex: 3,
+                    backgroundColor: "background.paper",
+                  }}
+                />
+              ) : (
+                track.name
+              )}
             </Box>
             <Stack direction="row" margin={0}>
               <IconButton
                 size="small"
-                // onClick={}
+                onClick={() => {
+                  setDraftName(track.name);
+                  setIsRenaming(true);
+                }}
                 title="Rename track"
               >
                 <EditIcon fontSize="small" />
