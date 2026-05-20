@@ -1,20 +1,16 @@
 import { useState, useContext, useEffect } from "react";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
-import ImportExportIcon from "@mui/icons-material/ImportExport";
 import OBSContext from "../../contexts/obsContext";
-import OBSNavigator from "./components/OBSNavigator";
-import SaveOBSButton from "./components/SaveOBSButton";
 import AudioRecorder from "./components/AudioRecorder";
 import MarkdownField from "../../components/MarkdownField";
-import { IconButton, Menu, MenuItem } from "@mui/material";
 
 import "./OBSMuncher.css";
 
 import { debugContext as DebugContext } from "pankosmia-rcl";
 import { getText, postText } from "pithekos-lib";
 import md5 from "md5";
-import Switch from "@mui/material/Switch";
+import OBSEditorTools from "./components/OBSEditorTools";
 
 function OBSEditorMuncher({ metadata }) {
   const { obs, setObs } = useContext(OBSContext);
@@ -266,78 +262,43 @@ function OBSEditorMuncher({ metadata }) {
   };
 
   return (
-    <Stack sx={{ p: 2 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "left",
-          alignItems: "center",
-          mb: 1,
-        }}
-      >
-        {/* <Box /> */}
-        <Box>
-          <SaveOBSButton
-            obs={obs}
-            isModified={isModified}
-            handleSave={handleSaveOBS}
+    <>
+      <OBSEditorTools
+        obs={obs}
+        setObs={setObs}
+        isModified={isModified}
+        handleSaveOBS={handleSaveOBS}
+        audioEnabled={audioEnabled}
+        setAudioEnabled={setAudioEnabled}
+        currentChapter={currentChapter}
+        chapterTitle={chapterTitle}
+        handleExportVideoParagraph={handleExportVideoParagraph}
+        isExportingParaEnabled={isExportingParaEnabled}
+        handleExportVideoStory={handleExportVideoStory}
+        isMenuOpen={isMenuOpen}
+        menuAnchorEl={menuAnchorEl}
+        setMenuAnchorEl={setMenuAnchorEl}
+      />
+      <Box sx={{ mt: "120px", padding: 2 }}>
+        <Stack>
+          <MarkdownField
+            currentRow={obs[1]}
+            columnNames={currentChapter}
+            onChangeNote={handleChange}
+            value={currentChapter[obs[1]] || ""}
+            mode="write"
           />
-        </Box>
-        <Box sx={{ ml: 2 }}>
-          Audio
-          <Switch
-            checked={audioEnabled}
-            onChange={() => setAudioEnabled(!audioEnabled)}
-          />
-        </Box>
-        <Box>
-          <IconButton
-            id="obs-export-button"
-            aria-controls={isMenuOpen ? "obs-export-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={isMenuOpen ? "true" : undefined}
-            onClick={(event) => setMenuAnchorEl(event.currentTarget)}
-          >
-            <ImportExportIcon />
-          </IconButton>
-          <Menu
-            id="obs-export-menu"
-            anchorEl={menuAnchorEl}
-            open={isMenuOpen}
-            onClose={() => setMenuAnchorEl(null)}
-            slotProps={{ list: { "aria-labelledby": "obs-export-button" } }}
-          >
-            <MenuItem
-              onClick={() => handleExportVideoParagraph()}
-              disabled={!isExportingParaEnabled}
-            >
-              Export video paragraph
-            </MenuItem>
-            <MenuItem onClick={() => handleExportVideoStory()}>
-              Export video story
-            </MenuItem>
-          </Menu>
-        </Box>
+          {audioEnabled && (
+            <AudioRecorder
+              audioUrl={audioUrl}
+              setAudioUrl={setAudioUrl}
+              metadata={metadata}
+              obs={obs}
+            />
+          )}
+        </Stack>
       </Box>
-      <OBSNavigator max={currentChapter.length - 1} title={chapterTitle} />
-      <Stack>
-        <MarkdownField
-          currentRow={obs[1]}
-          columnNames={currentChapter}
-          onChangeNote={handleChange}
-          value={currentChapter[obs[1]] || ""}
-          mode="write"
-        />
-        {audioEnabled && (
-          <AudioRecorder
-            audioUrl={audioUrl}
-            setAudioUrl={setAudioUrl}
-            metadata={metadata}
-            obs={obs}
-          />
-        )}
-      </Stack>
-    </Stack>
+    </>
   );
 }
 
