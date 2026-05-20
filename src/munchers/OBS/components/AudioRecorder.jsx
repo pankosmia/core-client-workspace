@@ -79,7 +79,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
       audioCtxRef.current.currentTime - playStartedAtRef.current,
     );
     if (elapsed >= playEndsAtRef.current) {
-      // Fixe le curseur à la fin de la piste
+      // Met le curseur à la fin de la piste
       const trackId = playingFromRef.current?.trackId;
       const startTime = playingFromRef.current?.startTime ?? 0;
       if (trackId != null) {
@@ -310,32 +310,46 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
         </IconButton>
       </Stack>
       {/* <Timeline projectDuration={projectDuration} /> */}
-      {tracks.map((t) => {
-        const isSel = selection?.trackId === t.id;
-        // Le playhead suit la piste qu'on a *réellement* lancée,
-        // pas la sélection en cours (qui peut changer pendant la lecture).
-        const isLivePlay =
-          isPlaying && playingFromRef.current?.trackId === t.id;
-        const playheadTime = isLivePlay
-          ? (playingFromRef.current?.startTime ?? 0) + playerHeadTime
-          : selection?.trackId === t.id
-            ? selection.time
-            : null;
-        return (
-          <TrackView
-            key={t.id}
-            track={t}
-            projectDuration={projectDuration}
-            isSelected={isSel}
-            onSeek={handleSeek}
-            onDelete={() => deleteTrack(t.id)}
-            playheadTime={playheadTime}
-            regionSelection={regionSelection}
-            onRegionChange={setRegionSelection}
-            onRename={renameTrack}
-          />
-        );
-      })}
+      {tracks.length > 0 ? (
+        tracks.map((t) => {
+          const isSel = selection?.trackId === t.id;
+          // Le playhead suit la piste qu'on a *réellement* lancée,
+          // pas la sélection en cours (qui peut changer pendant la lecture).
+          const isLivePlay =
+            isPlaying && playingFromRef.current?.trackId === t.id;
+          const playheadTime = isLivePlay
+            ? (playingFromRef.current?.startTime ?? 0) + playerHeadTime
+            : selection?.trackId === t.id
+              ? selection.time
+              : null;
+          return (
+            <TrackView
+              key={t.id}
+              track={t}
+              projectDuration={projectDuration}
+              isSelected={isSel}
+              onSeek={handleSeek}
+              onDelete={() => deleteTrack(t.id)}
+              playheadTime={playheadTime}
+              regionSelection={regionSelection}
+              onRegionChange={setRegionSelection}
+              onRename={renameTrack}
+            />
+          );
+        })
+      ) : (
+        <Box
+          sx={{
+            color: "#666",
+            p: 4,
+            borderBottom: "1px solid #777",
+            borderLeft: "1px solid #777",
+            borderRight: "1px solid #777",
+          }}
+        >
+          No tracks to display
+        </Box>
+      )}
     </Box>
   );
 }

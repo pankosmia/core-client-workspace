@@ -192,7 +192,7 @@ export default function TrackView({
         borderTop: isSelected ? "0.1px solid #1565c0" : "0px solid #fff",
       }}
     >
-      <Stack direction="row" alignItems="center" spacing={5}>
+      <Stack direction="row" alignItems="center" spacing={1}>
         {/* Conteneur "rail temporel" : prend toute la place restante, identique sur chaque piste.
                     widthPct% est ensuite appliqué sur cette largeur stable -> px/sec aligné inter-pistes. */}
         <Box sx={{ flex: 1, minWidth: 0, position: "relative" }}>
@@ -226,71 +226,69 @@ export default function TrackView({
           flexItem
           sx={{ alignSelf: "stretch" }}
         />
-        <Stack direction="row" overflow="visible" flexShrink={0}>
-          <Stack
-            spacing={0}
-            paddingRight={7}
-            paddingLeft={1}
-            justifyContent="center"
-            overflow="visible"
+        <Stack
+          spacing={0}
+          paddingRight={7}
+          paddingLeft={0}
+          alignItems="left"
+          margin={0}
+          top={0}
+        >
+          <Box
+            minWidth={60}
+            maxWidth={60}
+            display="flex"
+            justifyContent="left"
+            alignItems="center"
+            sx={{ position: "relative", overflow: "visible" }}
           >
-            <Box
-              marginLeft={0.7}
-              minWidth={60}
-              maxWidth={60}
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              sx={{ position: "relative", overflow: "visible" }}
-            >
-              {isRenaming ? (
-                <TextField
-                  size="small"
-                  value={draftName}
-                  autoFocus
-                  onChange={(e) => setDraftName(e.target.value)}
-                  onBlur={() => {
+            {isRenaming ? (
+              <TextField
+                size="small"
+                value={draftName}
+                autoFocus
+                onChange={(e) => setDraftName(e.target.value)}
+                onBlur={() => {
+                  onRename?.(track.id, draftName.trim() || track.name);
+                  setIsRenaming(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
                     onRename?.(track.id, draftName.trim() || track.name);
                     setIsRenaming(false);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      onRename?.(track.id, draftName.trim() || track.name);
-                      setIsRenaming(false);
-                    } else if (e.key === "Escape") {
-                      setDraftName(track.name);
-                      setIsRenaming(false);
-                    }
-                  }}
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: 200,
-                    zIndex: 3,
-                    backgroundColor: "background.paper",
-                  }}
-                />
-              ) : (
-                track.name
-              )}
-            </Box>
-            <Stack direction="row" margin={0}>
-              <IconButton
-                size="small"
-                onClick={() => {
-                  setDraftName(track.name);
-                  setIsRenaming(true);
+                  } else if (e.key === "Escape") {
+                    setDraftName(track.name);
+                    setIsRenaming(false);
+                  }
                 }}
-                title="Rename track"
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-              <IconButton size="small" onClick={onDelete} title="Delete track">
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Stack>
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: 200,
+                  zIndex: 3,
+                  backgroundColor: "background.paper",
+                }}
+              />
+            ) : (
+              track.name
+            )}
+          </Box>
+          <Stack direction="row" margin={-0.7}>
+            <IconButton
+              size="small"
+              onClick={() => {
+                setDraftName(track.name);
+                setIsRenaming(true);
+              }}
+              title="Rename track"
+            >
+              <EditIcon fontSize="small" />
+            </IconButton>
+            <IconButton size="small" onClick={onDelete} title="Delete track">
+              <DeleteIcon fontSize="small" />
+            </IconButton>
           </Stack>
         </Stack>
       </Stack>
