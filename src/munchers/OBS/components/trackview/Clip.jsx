@@ -17,6 +17,7 @@ export default function Clip({
   pxPerSec,
   isSelected,
   onMove,
+  onMoveAcrossTracks,
   onClipTrim,
   bounds,
 }) {
@@ -43,6 +44,9 @@ export default function Clip({
   const vStartRef = useRef(segment.vStart);
   vStartRef.current = segment.vStart;
 
+  const dragDyRef = useRef(0);
+  const hoveredTrackIdRef = useRef(trackId);
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -50,27 +54,75 @@ export default function Clip({
       listeners: {
         start() {
           el.classList.add("dragging");
+          // Élève le clip au-dessus des autres pendant le drag pour qu'il
+          // passe visuellement par-dessus les autres lanes.
+          el.style.zIndex = "10";
+          el.style.pointerEvents = "none"; // pour que elementFromPoint voie la lane sous le clip
         },
         move(e) {
           dragDxRef.current += e.dx;
-          const b = boundsRef.current;
-          if (b && pxPerSec > 0) {
-            const newVStart = vStartRef.current + dragDxRef.current / pxPerSec;
-            const clamped = Math.max(
-              b.minVStart,
-              Math.min(b.maxVStart, newVStart),
-            );
-            dragDxRef.current = (clamped - vStartRef.current) * pxPerSec;
+          dragDyRef.current += e.dy;
+
+          // Hit-test : trouve la lane sous le pointeur.
+          const under = document.elementFromPoint(e.client.x, e.client.y);
+          const laneEl = under?.closest("[data-lane-id]");
+          const overTrackId =
+            laneEl?.dataset.laneId ?? hoveredTrackIdRef.current;
+          const sameTrack = overTrackId === trackId;
+          hoveredTrackIdRef.current = overTrackId;
+
+          // Clamp X seulement quand on est encore sur la piste source.
+          // Sur une autre piste, on autorise tout (la validation se fait à end).
+          if (sameTrack) {
+            const b = boundsRef.current;
+            if (b && pxPerSec > 0) {
+              const newVStart =
+                vStartRef.current + dragDxRef.current / pxPerSec;
+              const clamped = Math.max(
+                b.minVStart,
+                Math.min(b.maxVStart, newVStart),
+              );
+              dragDxRef.current = (clamped - vStartRef.current) * pxPerSec;
+            }
           }
-          el.style.transform = `translateX(${dragDxRef.current}px)`;
+
+          el.style.transform = `translate(${dragDxRef.current}px, ${dragDyRef.current}px)`;
+
+          // Highlight de la lane cible (sauf si c'est la source).
+          document
+            .querySelectorAll("[data-lane-id].drop-target")
+            .forEach((n) => n.classList.remove("drop-target"));
+          if (!sameTrack && laneEl) {
+            laneEl.classList.add("drop-target");
+          }
         },
-        end() {
+        end(e) {
+          const dstTrackId = hoveredTrackIdRef.current;
           const deltaSec = pxPerSec > 0 ? dragDxRef.current / pxPerSec : 0;
+
+          // Reset visuel.
           el.style.transform = "";
+          el.style.zIndex = "";
+          el.style.pointerEvents = "";
           el.classList.remove("dragging");
+          document
+            .querySelectorAll("[data-lane-id].drop-target")
+            .forEach((n) => n.classList.remove("drop-target"));
           dragDxRef.current = 0;
-          if (Math.abs(deltaSec) > 0.001) {
-            onMove?.(trackId, segment.id, deltaSec);
+          dragDyRef.current = 0;
+          hoveredTrackIdRef.current = trackId;
+
+          if (dstTrackId === trackId) {
+            // Drag intra-piste : chemin actuel.
+            if (Math.abs(deltaSec) > 0.001) {
+              onMove?.(trackId, segment.id, deltaSec);
+            }
+          } else {
+            // Drag inter-piste : nouveau vStart = position absolue dans la cible.
+            // Le X-pixel courant du clip à end() = segment.vStart * pxPerSec + dragDx
+            // (interact.js a remis le rect d'origine à end, donc on recalcule depuis vStart).
+            const newVStart = Math.max(0, segment.vStart + deltaSec);
+            onMoveAcrossTracks?.(trackId, dstTrackId, segment.id, newVStart);
           }
         },
       },
@@ -114,7 +166,7 @@ export default function Clip({
       },
     });
     return () => interact(el).unset();
-  }, [pxPerSec, onMove, onClipTrim, trackId, segment.id]);
+  }, [pxPerSec, onMove, onMoveAcrossTracks, onClipTrim, trackId, segment.id]);
 
   return (
     <Box

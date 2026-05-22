@@ -26,6 +26,7 @@ export default function TrackView({
   onRegionChange,
   onRename,
   onClipMove,
+  onClipMoveAcrossTracks,
   onClipTrim,
 }) {
   const laneRef = useRef(null);
@@ -158,14 +159,15 @@ export default function TrackView({
   return (
     <Box
       sx={{
-        border: isSelected ? "1px solid #1565c0" : "1px solid #777",
-        borderTop: isSelected ? "0.1px solid #1565c0" : "0px solid #fff",
+        border: "1px solid #777",
+        borderTop: "0px solid #fff",
       }}
     >
       <Stack direction="row" alignItems="stretch" spacing={1}>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Box
             ref={laneRef}
+            data-lane-id={track.id}
             onPointerDown={onLanePointerDown}
             onPointerMove={onLanePointerMove}
             onPointerUp={onLanePointerUp}
@@ -173,8 +175,8 @@ export default function TrackView({
               position: "relative",
               width: "100%",
               height: LANE_HEIGHT,
-              background: "#fafafa",
-              overflow: "hidden",
+              background: isSelected ? "#e9e9e9" : "#fafafa",
+              overflow: "visible",
               touchAction: "none",
               userSelect: "none",
               cursor: "crosshair",
@@ -195,6 +197,7 @@ export default function TrackView({
                   trackBuffer={track.buffer}
                   pxPerSec={pxPerSec}
                   onMove={onClipMove}
+                  onMoveAcrossTracks={onClipMoveAcrossTracks}
                   onClipTrim={onClipTrim}
                   bounds={clipBounds[seg.id]}
                 />
