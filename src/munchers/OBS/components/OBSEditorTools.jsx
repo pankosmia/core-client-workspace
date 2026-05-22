@@ -121,9 +121,8 @@ function OBSEditorTools({
             )}
           >
             <IconButton
-              disabled={
-                md5sum(JSON.stringify(obs)) !== md5sum(JSON.stringify(obs))
-              }
+              disabled={isModified(obs[0])}
+              sx={{ transition: "color 0.3s ease" }}
               /* enables redirection based on the page */
               onClick={() =>
                 navigate({
