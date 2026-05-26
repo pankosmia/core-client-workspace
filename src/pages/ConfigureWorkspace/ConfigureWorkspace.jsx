@@ -249,10 +249,10 @@ function ConfigureWorkspace({
   useEffect(() => {
     if (rows) {
       setSelectedResourcesIndexes(
-        rows.filter((r) => selectedResources.has(r.path)).map((r) => r.id),
+        ...rows.filter((r) => selectedResources.has(r.path)).map((r) => r.id),
       );
     }
-  }, [rows]);
+  }, [selectedResources, rows]);
 
   /**
    * Important: These are precise calculations given the state of this component at the time this was set up.

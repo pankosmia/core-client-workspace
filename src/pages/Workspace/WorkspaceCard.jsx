@@ -20,6 +20,7 @@ import OBSArticlesViewerMuncher from "../../munchers/OBSArticles/OBSArticlesView
 import JuxtalinearViewerMuncher from "../../munchers/Juxtalinear/JuxtalinearViewer";
 import TranslationPlanViewerMuncher from "../../munchers/TranslationPlan/TranslationPlanViewerMuncher";
 import JuxtalinearEditorMuncher from "../../munchers/Juxtalinear/JuxtalinearEditorMuncher";
+import TranslationPlanEditorMuncher from "../../munchers/TranslationPlan/TranslationPlanEditorMuncher";
 
 function WorkspaceCard({ metadata, style, distractionModeCount }) {
   const sbScriptDir = metadata?.script_direction
@@ -213,6 +214,16 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
         <BcvVideosViewerMuncher metadata={metadata} />
+      </div>
+    );
+  }
+  if (metadata.primary && metadata.flavor === "x-translationplan") {
+    return (
+      <div
+        style={{ ...style, lineHeight: "normal" }}
+        dir={sbScriptDirSet ? sbScriptDir : undefined}
+      >
+        <TranslationPlanEditorMuncher metadata={metadata} />
       </div>
     );
   }
