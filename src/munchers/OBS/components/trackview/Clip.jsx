@@ -19,7 +19,7 @@ export default function Clip({
   onMove,
   onMoveAcrossTracks,
   onClipTrim,
-  bounds,
+  onSelect,
 }) {
   const dur = segment.srcEnd - segment.srcStart;
   const left = segment.vStart * pxPerSec + INSET_X;
@@ -37,22 +37,24 @@ export default function Clip({
   // re-render React → animation 60fps sans tremblement.
   const waveformRef = useRef(null);
 
-  // Bornes voisines et vStart courant : refs pour que le clamp reste juste
-  // si l'edl change pendant qu'on drag, sans réattacher interact.js.
-  const boundsRef = useRef(bounds);
-  boundsRef.current = bounds;
-  const vStartRef = useRef(segment.vStart);
-  vStartRef.current = segment.vStart;
-
   const dragDyRef = useRef(0);
   const hoveredTrackIdRef = useRef(trackId);
+
+  // Suppression du clic (sélection) si un drag interact.js a réellement eu lieu.
+  // interact.js intercepte la propagation après le seuil, mais on garde un
+  // garde-fou explicite via cette ref consultée dans onHeaderClick.
+  const draggedRef = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     interact(el).draggable({
+      // Le drag-move ne s'arme qu'à partir du header. Un drag sur le corps
+      // bubble vers la lane pour devenir une sélection de région intra-clip.
+      allowFrom: "[data-clip-header]",
       listeners: {
         start() {
+          draggedRef.current = true;
           el.classList.add("dragging");
           // Élève le clip au-dessus des autres pendant le drag pour qu'il
           // passe visuellement par-dessus les autres lanes.
@@ -71,21 +73,8 @@ export default function Clip({
           const sameTrack = overTrackId === trackId;
           hoveredTrackIdRef.current = overTrackId;
 
-          // Clamp X seulement quand on est encore sur la piste source.
-          // Sur une autre piste, on autorise tout (la validation se fait à end).
-          if (sameTrack) {
-            const b = boundsRef.current;
-            if (b && pxPerSec > 0) {
-              const newVStart =
-                vStartRef.current + dragDxRef.current / pxPerSec;
-              const clamped = Math.max(
-                b.minVStart,
-                Math.min(b.maxVStart, newVStart),
-              );
-              dragDxRef.current = (clamped - vStartRef.current) * pxPerSec;
-            }
-          }
-
+          // Pas de clamp : on autorise l'overlap visuel. Au drop, la cible
+          // (même piste ou non) fait un punch-in via insertSegmentAt.
           el.style.transform = `translate(${dragDxRef.current}px, ${dragDyRef.current}px)`;
 
           // Highlight de la lane cible (sauf si c'est la source).
@@ -96,7 +85,7 @@ export default function Clip({
             laneEl.classList.add("drop-target");
           }
         },
-        end(e) {
+        end() {
           const dstTrackId = hoveredTrackIdRef.current;
           const deltaSec = pxPerSec > 0 ? dragDxRef.current / pxPerSec : 0;
 
@@ -112,16 +101,13 @@ export default function Clip({
           dragDyRef.current = 0;
           hoveredTrackIdRef.current = trackId;
 
+          if (Math.abs(deltaSec) < 0.001 && dstTrackId === trackId) return;
+          // Position absolue dans la piste cible. Vrai pour same-track et
+          // cross-track : le drop "remplace" la zone d'arrivée (punch-in).
+          const newVStart = Math.max(0, segment.vStart + deltaSec);
           if (dstTrackId === trackId) {
-            // Drag intra-piste : chemin actuel.
-            if (Math.abs(deltaSec) > 0.001) {
-              onMove?.(trackId, segment.id, deltaSec);
-            }
+            onMove?.(trackId, segment.id, newVStart);
           } else {
-            // Drag inter-piste : nouveau vStart = position absolue dans la cible.
-            // Le X-pixel courant du clip à end() = segment.vStart * pxPerSec + dragDx
-            // (interact.js a remis le rect d'origine à end, donc on recalcule depuis vStart).
-            const newVStart = Math.max(0, segment.vStart + deltaSec);
             onMoveAcrossTracks?.(trackId, dstTrackId, segment.id, newVStart);
           }
         },
@@ -168,6 +154,21 @@ export default function Clip({
     return () => interact(el).unset();
   }, [pxPerSec, onMove, onMoveAcrossTracks, onClipTrim, trackId, segment.id]);
 
+  const onHeaderClick = (e) => {
+    // Si un drag interact.js a eu lieu, on n'enclenche pas la sélection.
+    // Pas de stopPropagation : interact.js (attaché au parent) doit pouvoir
+    // recevoir le pointerdown. La lane ignore déjà les pointerdown issus
+    // du header via [data-clip-header].
+    if (draggedRef.current) {
+      draggedRef.current = false;
+      return;
+    }
+    onSelect?.(trackId, segment.id, {
+      ctrlKey: e.ctrlKey || e.metaKey,
+      shiftKey: e.shiftKey,
+    });
+  };
+
   return (
     <Box
       ref={ref}
@@ -189,7 +190,6 @@ export default function Clip({
           ? "0 0 0 1px #1565c0, 0 2px 4px rgba(0, 0, 0, 0.22)"
           : "0 1px 2px rgba(0, 0, 0, 0.18)",
         overflow: "hidden",
-        cursor: "grab",
         transition: "box-shadow 120ms ease, background 120ms ease",
         display: "flex",
         flexDirection: "column",
@@ -198,12 +198,11 @@ export default function Clip({
             "0 0 0 1px rgba(34, 173, 197, 0.7), 0 1px 2px rgba(0, 0, 0, 0.22)",
           background: "rgba(34, 173, 197, 0.28)",
         },
-        "&:active": {
-          cursor: "grabbing",
-        },
       }}
     >
       <Box
+        data-clip-header={segment.id}
+        onClick={onHeaderClick}
         sx={{
           height: HEADER_HEIGHT,
           background: isSelected
@@ -211,6 +210,8 @@ export default function Clip({
             : "linear-gradient(180deg, rgba(21,119,137,0.85), rgba(21,119,137,0.55))",
           borderBottom: "1px solid rgba(0, 0, 0, 0.15)",
           flexShrink: 0,
+          cursor: "grab",
+          "&:active": { cursor: "grabbing" },
         }}
       />
       <Box sx={{ flex: 1, minHeight: 0, position: "relative" }}>
