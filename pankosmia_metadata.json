@@ -70,6 +70,10 @@
       "fr": "Sélectionner des ressources",
       "id": "Pilih Sumber Daya"
     },
+    "configure_workspace": {
+      "en": "Configure Workspace",
+      "fr": "Configurer plan de travail"
+    },
     "summary": {
       "ar": "@تسييير و تغيير الموارد المحلية",
       "en": "Edit your document",
@@ -840,6 +844,18 @@
     "no_resources_chosen": {
       "en": "No resources selected",
       "fr": "Aucune ressource choisie"
+    },
+    "offline_AI": {
+      "en": "Offline AI asistant",
+      "fr": "Assistant IA hors-ligne"
+    },
+    "layout": {
+      "en": "Layout",
+      "fr": "Disposition"
+    },
+    "tools": {
+      "en": "Tools",
+      "fr": "Outils"
     },
     "no_notes": {
       "en": "No notes found",
