@@ -50,8 +50,8 @@ function BcvNotesEditorMuncher({ metadata }) {
     const chapter = newCurrentRowCV[0];
     const verseRange = newCurrentRowCV[1];
     const startVerse = verseRange.split("-")[0];
-    const endVerseNum = verseRange.includes("-") 
-      ? verseRange.split("-")[1] 
+    const endVerseNum = verseRange.includes("-")
+      ? verseRange.split("-")[1]
       : startVerse;
     const rowData = ingredient[rowN];
     const alignment = rowData[6] || "";
@@ -63,8 +63,11 @@ function BcvNotesEditorMuncher({ metadata }) {
         );
         postEmptyJson(
           `/navigation/bcv/${systemBcv["bookCode"]}/${chapter}/${startVerse}/${endVerseNum}`,
-          debugRef.current,
-          alignment ? { alignment } : undefined
+          debugRef.current /* ,
+          alignment ? { alignment } : undefined */,
+        );
+        console.log(
+          `/navigation/bcv/${systemBcv["bookCode"]}/${chapter}/${startVerse}/${endVerseNum}`,
         );
       }
     }
@@ -124,8 +127,6 @@ function BcvNotesEditorMuncher({ metadata }) {
       setResourceType("new_bcv_note");
     }
   }, [ingredient]);
-
-  console.log(systemBcv);
 
   return (
     <Stack
