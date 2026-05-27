@@ -622,84 +622,101 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
       <Stack
         direction="row"
         spacing={1}
-        sx={{ border: "2px solid #777", alignItems: "center" }}
+        sx={{
+          border: "2px solid #777",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
       >
+        <Stack direction="row" spacing={1}>
+          <Box
+            sx={{
+              color: "#666",
+              paddingLeft: 2,
+              fontWeight: "bold",
+              fontSize: 14,
+              alignSelf: "center",
+            }}
+          >
+            {formatTime(displayTime, true)}
+          </Box>
+
+          <IconButton
+            size="small"
+            onClick={isPlaying ? stop : play}
+            disabled={tracks.length === 0}
+            title={isPlaying ? "Stop (space)" : "Play (space)"}
+          >
+            {isPlaying ? <StopIcon /> : <PlayArrowIcon />}
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={isRecording ? stopRecording : startRecording}
+            color={isRecording ? "error" : "default"}
+            disabled={!paths}
+            title={isRecording ? "Stop recording (R)" : "Record (R)"}
+          >
+            {isRecording ? <StopIcon /> : <MicIcon />}
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={copySelection}
+            disabled={!regionSelection}
+            title={`Copy ( ${ctrlKeyTitle} + C)`}
+          >
+            <ContentCopyIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={pasteAtCursor}
+            disabled={!clipboard || !selection}
+            title="Paste ( Ctrl + V)"
+          >
+            <ContentPasteIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={cutSelection}
+            disabled={!regionSelection}
+            title="Cut ( Ctrl + X)"
+          >
+            <ContentCutIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={splitAtPlayhead}
+            disabled={!selection && !isPlaying}
+            title="Split at cursor (S)"
+          >
+            <SplitIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={undo}
+            disabled={past.length === 0}
+            title="Undo ( Ctrl + Z)"
+          >
+            <UndoIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={redo}
+            disabled={future.length === 0}
+            title="Redo ( Ctrl + Y)"
+          >
+            <RedoIcon fontSize="small" />
+          </IconButton>
+        </Stack>
         <Box
           sx={{
+            marginLeft: "auto",
+            paddingRight: 4,
             color: "#666",
-            paddingLeft: 2,
-            fontWeight: "bold",
             fontSize: 14,
           }}
         >
-          {formatTime(displayTime, true)}
+          Ctrl to multiple select, ← and → to move selection
         </Box>
-
-        <IconButton
-          size="small"
-          onClick={isPlaying ? stop : play}
-          disabled={tracks.length === 0}
-          title={isPlaying ? "Stop (space)" : "Play (space)"}
-        >
-          {isPlaying ? <StopIcon /> : <PlayArrowIcon />}
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={isRecording ? stopRecording : startRecording}
-          color={isRecording ? "error" : "default"}
-          disabled={!paths}
-          title={isRecording ? "Stop recording (R)" : "Record (R)"}
-        >
-          {isRecording ? <StopIcon /> : <MicIcon />}
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={copySelection}
-          disabled={!regionSelection}
-          title={`Copy ( ${ctrlKeyTitle} + C)`}
-        >
-          <ContentCopyIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={pasteAtCursor}
-          disabled={!clipboard || !selection}
-          title="Paste ( Ctrl + V)"
-        >
-          <ContentPasteIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={cutSelection}
-          disabled={!regionSelection}
-          title="Cut ( Ctrl + X)"
-        >
-          <ContentCutIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={splitAtPlayhead}
-          disabled={!selection && !isPlaying}
-          title="Split at cursor (S)"
-        >
-          <SplitIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={undo}
-          disabled={past.length === 0}
-          title="Undo ( Ctrl + Z)"
-        >
-          <UndoIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={redo}
-          disabled={future.length === 0}
-          title="Redo ( Ctrl + Y)"
-        >
-          <RedoIcon fontSize="small" />
-        </IconButton>
       </Stack>
 
       <Box sx={{ border: "2px solid #777", borderTop: "0px solid #777" }}>
