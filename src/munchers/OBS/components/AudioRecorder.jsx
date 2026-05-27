@@ -32,6 +32,7 @@ import {
 } from "./lib/edl";
 import { pickTickInterval } from "./lib/snap";
 import SplitIcon from "./SplitIcon";
+// import GestureIcon from "./GestureIcon";
 
 export default function AudioRecorder({ audioUrl, obs, metadata }) {
   const audioCtxRef = useRef(null);
@@ -441,7 +442,6 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
           !e.repeat,
         );
       }
-      // console.log("e.key", e.key);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -456,6 +456,36 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
     isPlaying,
     playerHeadTime,
   ]);
+
+  // Affiche le GestureIcon à côté du curseur tant que Ctrl/Cmd est maintenu.
+  const [ctrlHeld, setCtrlHeld] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const onDown = (e) => {
+      if (e.key === "Control" || e.key === "Meta") setCtrlHeld(true);
+    };
+    const onUp = (e) => {
+      if (e.key === "Control" || e.key === "Meta") setCtrlHeld(false);
+    };
+    // Au cas où la fenêtre perd le focus pendant qu'on maintient la touche.
+    const onBlur = () => setCtrlHeld(false);
+    window.addEventListener("keydown", onDown);
+    window.addEventListener("keyup", onUp);
+    window.addEventListener("blur", onBlur);
+    return () => {
+      window.removeEventListener("keydown", onDown);
+      window.removeEventListener("keyup", onUp);
+      window.removeEventListener("blur", onBlur);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!ctrlHeld) return;
+    const onMove = (e) => setCursorPos({ x: e.clientX, y: e.clientY });
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [ctrlHeld]);
 
   const undo = () => {
     if (past.length === 0) return;
@@ -585,7 +615,6 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
   };
 
   const platform = navigator.userAgentData?.platform;
-  console.log(platform);
   const ctrlKeyTitle = platform.includes("Mac") ? "Cmd" : "Ctrl";
 
   return (
@@ -597,7 +626,6 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
       >
         <Box
           sx={{
-            fontSize: 12,
             color: "#666",
             paddingLeft: 2,
             fontWeight: "bold",
@@ -636,7 +664,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
           size="small"
           onClick={pasteAtCursor}
           disabled={!clipboard || !selection}
-          title={`Paste ( ${ctrlKeyTitle} + V)`}
+          title="Paste ( Ctrl + V)"
         >
           <ContentPasteIcon fontSize="small" />
         </IconButton>
@@ -697,8 +725,8 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
             flexItem
             sx={{ alignSelf: "stretch", borderColor: "transparent" }}
           />
-          <Stack spacing={0} paddingRight={7} paddingLeft={0} margin={0}>
-            <Box minWidth={60} maxWidth={60} />
+          <Stack spacing={0} paddingRight={4} paddingLeft={0} margin={0}>
+            <Box minWidth={110} maxWidth={110} />
           </Stack>
         </Stack>
 
@@ -762,6 +790,21 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
           trackNumber={tracks.length + 1}
         />
       )}
+
+      {/* {ctrlHeld && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        top: cursorPos.y + 12,
+                        left: cursorPos.x + 12,
+                        pointerEvents: "none",
+                        zIndex: 9999,
+                        color: "#555",
+                    }}
+                >
+                    <GestureIcon />
+                </Box>
+            )} */}
     </Box>
   );
 }
