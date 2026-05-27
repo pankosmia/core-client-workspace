@@ -1,4 +1,5 @@
 import Box from "@mui/material/Box";
+import { pickTickInterval } from "../lib/snap";
 
 // Axe de graduations en fond de la lane d'une piste.
 // Les ticks s'étendent sur toute la hauteur de la lane et passent derrière les clips
@@ -25,24 +26,31 @@ export default function TimelineAxis({
         inset: 0,
         pointerEvents: "none",
         zIndex: 0,
-        borderLeft: "1px solid #777",
+        borderLeft: isTopAxis ? "1px solid #777" : "0",
         borderRight: "1px solid #777",
         marginBottom: -0.1,
         marginTop: -0.1,
+        marginLeft: !isTopAxis ? 0 : -0.1,
       }}
     >
       {ticks.map((t) => {
         const showLabel =
           Math.abs(Math.round(t / labelEvery) * labelEvery - t) < 1e-3;
+        // console.log(t == Math.max(...ticks), t, Math.max(...ticks));
+
         return (
           <Box
             key={t.toFixed(3)}
             sx={{
               position: "absolute",
-              left: `${t * pxPerSec}px`,
+              left: `${Math.round(t * pxPerSec)}px`,
               top: 0,
               bottom: 0,
-              borderLeft: showLabel ? "1px solid #aaa" : "1px solid #ccc",
+              borderLeft: showLabel
+                ? t === 0
+                  ? "1px transparent"
+                  : "1px solid #aaa"
+                : "1px solid #ccc",
               paddingLeft: "2px",
               fontSize: 9,
               color: "#888",
@@ -56,14 +64,6 @@ export default function TimelineAxis({
       })}
     </Box>
   );
-}
-
-function pickTickInterval(duration) {
-  if (duration < 5) return 0.2;
-  if (duration < 20) return 0.5;
-  if (duration < 60) return 1;
-  if (duration < 300) return 5;
-  return 30;
 }
 
 function formatTick(s) {

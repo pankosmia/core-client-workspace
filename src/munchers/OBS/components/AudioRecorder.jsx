@@ -30,6 +30,7 @@ import {
   insertSegmentAt,
   virtualDuration,
 } from "./lib/edl";
+import { pickTickInterval } from "./lib/snap";
 import SplitIcon from "./SplitIcon";
 
 export default function AudioRecorder({ audioUrl, obs, metadata }) {
@@ -55,6 +56,26 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
   const playingFromRef = useRef(null); // { trackId, startTime } figé au play()
   const rafRef = useRef(null);
   const sourcesRef = useRef([]);
+
+  // Snap
+  const [snapEnabled, setSnapEnabled] = useState(
+    () => localStorage.getItem("snapEnabled") !== "false",
+  );
+
+  const getSnapCandidates = (trackId, excludeSegId) => {
+    const t = tracks.find((x) => x.id === trackId);
+    if (!t) return [];
+    const out = [];
+    for (const s of t.edl) {
+      if (s.id === excludeSegId) continue;
+      out.push(s.vStart);
+      out.push(s.vStart + (s.srcEnd - s.srcStart));
+    }
+    if (selection?.trackId === trackId && selection.time != null) {
+      out.push(selection.time);
+    }
+    return out;
+  };
 
   const paths = useMemo(
     () =>
@@ -95,6 +116,10 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
     const liveWindow = Math.max(10, Math.ceil(recordingDuration / 5) * 5 + 5);
     return Math.max(trackMax, liveWindow);
   }, [tracks, recordingDuration]);
+
+  // snapStep = même intervalle que les ticks affichés par TimelineAxis.
+  // Quand on zoome/dézoome (projectDuration change), le snap suit la grille.
+  const snapStep = pickTickInterval(projectDuration);
 
   const laneRef = useRef(null);
   const [laneWidth, setLaneWidth] = useState(0);
@@ -491,7 +516,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
       <Stack
         direction="row"
         spacing={1}
-        sx={{ border: "1px solid #777", alignItems: "center" }}
+        sx={{ border: "2px solid #777", alignItems: "center" }}
       >
         <Box sx={{ fontSize: 12, color: "#666", paddingLeft: 2 }}>
           {formatTime(displayTime, true)}
@@ -562,7 +587,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
         </IconButton>
       </Stack>
 
-      <Box sx={{ border: "1px solid transparent" }}>
+      <Box sx={{ border: "2px solid #777", borderTop: "0px solid #777" }}>
         <Stack direction="row" alignItems="stretch" spacing={1}>
           <Box
             ref={laneRef}
@@ -583,61 +608,64 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
           <Divider
             orientation="vertical"
             flexItem
-            sx={{ alignSelf: "stretch" }}
+            sx={{ alignSelf: "stretch", borderColor: "transparent" }}
           />
           <Stack spacing={0} paddingRight={7} paddingLeft={0} margin={0}>
             <Box minWidth={60} maxWidth={60} />
           </Stack>
         </Stack>
-      </Box>
 
-      {tracks.length > 0 ? (
-        tracks.map((t) => {
-          const isSel = selection?.trackId === t.id;
-          // Le playhead suit la piste qu'on a *réellement* lancée,
-          // pas la sélection en cours (qui peut changer pendant la lecture).
-          const isLivePlay =
-            isPlaying && playingFromRef.current?.trackId === t.id;
-          const playheadTime = isLivePlay
-            ? (playingFromRef.current?.startTime ?? 0) + playerHeadTime
-            : selection?.trackId === t.id
-              ? selection.time
-              : null;
-          return (
-            <TrackView
-              key={t.id}
-              track={t}
-              projectDuration={projectDuration}
-              isSelected={isSel}
-              onSeek={handleSeek}
-              onDelete={() => deleteTrack(t.id)}
-              playheadTime={playheadTime}
-              regionSelection={regionSelection}
-              onRegionChange={setRegionSelection}
-              onRename={renameTrack}
-              pxPerSec={pxPerSec}
-              onClipMove={moveClip}
-              onClipMoveAcrossTracks={moveClipAcrossTracks}
-              onClipTrim={trimClip}
-              clipSelection={clipSelection}
-              onClipSelect={handleClipSelect}
-              onClearClipSelection={clearClipSelection}
-            />
-          );
-        })
-      ) : !isRecording ? (
-        <Box
-          sx={{
-            color: "#666",
-            p: 4,
-            borderBottom: "1px solid #777",
-            borderLeft: "1px solid #777",
-            borderRight: "1px solid #777",
-          }}
-        >
-          No tracks to display
-        </Box>
-      ) : null}
+        {tracks.length > 0 ? (
+          tracks.map((t) => {
+            const isSel = selection?.trackId === t.id;
+            // Le playhead suit la piste qu'on a *réellement* lancée,
+            // pas la sélection en cours (qui peut changer pendant la lecture).
+            const isLivePlay =
+              isPlaying && playingFromRef.current?.trackId === t.id;
+            const playheadTime = isLivePlay
+              ? (playingFromRef.current?.startTime ?? 0) + playerHeadTime
+              : selection?.trackId === t.id
+                ? selection.time
+                : null;
+            return (
+              <TrackView
+                key={t.id}
+                track={t}
+                projectDuration={projectDuration}
+                isSelected={isSel}
+                onSeek={handleSeek}
+                onDelete={() => deleteTrack(t.id)}
+                playheadTime={playheadTime}
+                regionSelection={regionSelection}
+                onRegionChange={setRegionSelection}
+                onRename={renameTrack}
+                pxPerSec={pxPerSec}
+                onClipMove={moveClip}
+                onClipMoveAcrossTracks={moveClipAcrossTracks}
+                onClipTrim={trimClip}
+                clipSelection={clipSelection}
+                onClipSelect={handleClipSelect}
+                onClearClipSelection={clearClipSelection}
+                getSnapCandidates={getSnapCandidates}
+                snapEnabled={snapEnabled}
+                snapStep={snapStep}
+              />
+            );
+          })
+        ) : !isRecording ? (
+          <Box
+            sx={{
+              color: "#666",
+              p: 4,
+              borderBottom: "1px solid #777",
+              borderLeft: "1px solid #777",
+              borderRight: "1px solid #777",
+            }}
+          >
+            No tracks to display
+          </Box>
+        ) : null}
+      </Box>
 
       {isRecording && (
         <LiveRecordingLane
