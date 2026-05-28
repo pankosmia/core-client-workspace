@@ -59,6 +59,9 @@ export default function Clip({
   const getSnapCandidatesRef = useRef(getSnapCandidates);
   getSnapCandidatesRef.current = getSnapCandidates;
 
+  // Snap vertical
+  const dragStartTopRef = useRef(null);
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -109,6 +112,9 @@ export default function Clip({
       allowFrom: "[data-clip-header]",
       listeners: {
         start() {
+          const clipRect = el.getBoundingClientRect();
+          dragStartTopRef.current = clipRect.top;
+
           draggedRef.current = true;
           el.classList.add("dragging");
           // Élève le clip au-dessus des autres pendant le drag pour qu'il
@@ -138,7 +144,13 @@ export default function Clip({
             overTrackId,
           );
 
-          el.style.transform = `translate(${displayDx}px, ${dragDyRef.current}px)`;
+          let displayDy = dragDyRef.current; // fallback
+          if (laneEl) {
+            const laneRect = laneEl.getBoundingClientRect();
+            displayDy = laneRect.top - dragStartTopRef.current + INSET_Y;
+          }
+
+          el.style.transform = `translate(${displayDx}px, ${displayDy}px)`;
         },
         end(e) {
           const dstTrackId = hoveredTrackIdRef.current;
