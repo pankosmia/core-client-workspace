@@ -33,12 +33,13 @@ export default function ViewableBibleBlock({
         const isDuplicate = currentVerse === lastPrintedVerseRef.current;
         if (!isDuplicate) lastPrintedVerseRef.current = currentVerse;
         const verseRange = currentVerse.split("-").map(Number);
-        const systemVerseNum = Number(systemBcv.verseNum);
-        const isSelected =
-          verseRange.length === 1
-            ? systemVerseNum === verseRange[0]
-            : systemVerseNum >= verseRange[0] &&
-              systemVerseNum <= verseRange[verseRange.length - 1];
+        const blockStart = verseRange[0];
+        const blockEnd = verseRange[verseRange.length - 1];
+        const selectStart = Number(systemBcv.verseNum);
+        const selectEnd = systemBcv.endVerseNum
+          ? Number(systemBcv.endVerseNum)
+          : selectStart;
+        const isSelected = blockStart <= selectEnd && blockEnd >= selectStart;
 
         return (
           <span
