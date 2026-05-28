@@ -72,12 +72,14 @@ export default function Clip({
     // Snap aux deux bords (left/right) ; si les deux snappent, on prend
     // le plus proche du curseur ; si un seul snappe, on prend celui-là.
     const computeSnappedDx = (rawDx, altKey, dstTrackId) => {
-      const sameTrack = dstTrackId === trackId;
-      if (!sameTrack || !snapEnabledRef.current || altKey || pxPerSec <= 0) {
+      if (!snapEnabledRef.current || altKey || pxPerSec <= 0) {
         return rawDx;
       }
+
+      const sameTrack = dstTrackId === trackId;
+      const excludeId = sameTrack ? segment.id : null;
       const rawCandidates =
-        getSnapCandidatesRef.current?.(trackId, segment.id) ?? [];
+        getSnapCandidatesRef.current?.(dstTrackId, excludeId) ?? [];
       const segDur = segment.srcEnd - segment.srcStart;
       const rawV = segment.vStart + rawDx / pxPerSec;
       const snapStepCur = snapStepRef.current;
