@@ -614,8 +614,8 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
     );
   };
 
-  const platform = navigator.userAgentData?.platform;
-  const ctrlKeyTitle = platform.includes("Mac") ? "Cmd" : "Ctrl";
+  const platform = navigator.userAgentData?.platform || navigator.platform;
+  const ctrlKeyTitle = platform?.includes("Mac") ? "Cmd" : "Ctrl";
 
   return (
     <Box sx={{ width: "100%", p: 2 }}>
