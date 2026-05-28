@@ -54,7 +54,9 @@ function SearchWithVerses({
     const index = ingredient.findIndex((l) => l[1] === id);
     if (index !== -1) {
       setCurrentRowN(index);
-      updateBcv(index);
+      setTimeout(() => {
+        updateBcv(index);
+      }, 100);
     }
   };
 

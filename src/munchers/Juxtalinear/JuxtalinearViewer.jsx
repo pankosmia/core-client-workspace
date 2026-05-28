@@ -1,6 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Grid2, Stack } from "@mui/material";
-import Markdown from "react-markdown";
+import { Box, Grid2, Popover, Stack, Typography } from "@mui/material";
 
 import {
   i18nContext as I18nContext,
@@ -8,12 +7,16 @@ import {
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
 import { doI18n, getJson } from "pithekos-lib";
+import Juxta2Verbs from "./components/juxta2verbs";
 
 function JuxtalinearViewerMuncher({ metadata }) {
   const [ingredient, setIngredient] = useState([]);
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
   const { i18nRef } = useContext(I18nContext);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedWordJuxta, setSelectedWordJuxta] = useState(null);
+  const [selectedMorph, setSelectedMorph] = useState([]);
 
   const getAllData = async () => {
     const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.json`;
@@ -77,6 +80,7 @@ function JuxtalinearViewerMuncher({ metadata }) {
                       spacing={0}
                       sx={{ p: 0, m: 0 }}
                       justifyContent="flex-end"
+                      alignItems="flex-end"
                     >
                       <Box
                         display="flex"
@@ -85,7 +89,44 @@ function JuxtalinearViewerMuncher({ metadata }) {
                         alignItems="flex-end"
                         sx={{ fontSize: "small", pr: 1, textAlign: "right" }}
                       >
-                        {c.source.map((s) => s.content).join(" ")}
+                        {c.source.map((s, idx) => {
+                          const popoverId = `${s.content}-${idx}`;
+                          return (
+                            <>
+                              <Typography
+                                sx={{
+                                  paddingRight: 1,
+                                  mb: 0,
+                                  cursor: "pointer",
+                                }}
+                                onClick={(event) => {
+                                  setAnchorEl(event.currentTarget);
+                                  setSelectedWordJuxta(popoverId);
+                                  setSelectedMorph(s.morph);
+                                }}
+                              >
+                                {s.content}
+                              </Typography>
+                              <Popover
+                                open={selectedWordJuxta === popoverId}
+                                anchorEl={anchorEl}
+                                onClose={() => {
+                                  setSelectedWordJuxta(null);
+                                  setAnchorEl(null);
+                                }}
+                                anchorOrigin={{
+                                  vertical: "bottom",
+                                  horizontal: "left",
+                                }}
+                              >
+                                <Juxta2Verbs
+                                  morphArray={selectedMorph}
+                                  lemma={s.lemma}
+                                />
+                              </Popover>
+                            </>
+                          );
+                        })}
                       </Box>
                     </Grid2>
                     <Grid2
