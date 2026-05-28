@@ -53,21 +53,14 @@ function BcvNotesEditorMuncher({ metadata }) {
     const endVerseNum = verseRange.includes("-")
       ? verseRange.split("-")[1]
       : startVerse;
-    const rowData = ingredient[rowN];
-    const alignment = rowData[6] || "";
+    //const rowData = ingredient[rowN];
+    //const alignment = rowData[6] || "";
     if (newCurrentRow[0]) {
       if (newCurrentRowCV.length === 2) {
-        postEmptyJson(
-          `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1].split("-")[0]}`,
-          debugRef.current,
-        );
         postEmptyJson(
           `/navigation/bcv/${systemBcv["bookCode"]}/${chapter}/${startVerse}/${endVerseNum}`,
           debugRef.current /* ,
           alignment ? { alignment } : undefined */,
-        );
-        console.log(
-          `/navigation/bcv/${systemBcv["bookCode"]}/${chapter}/${startVerse}/${endVerseNum}`,
         );
       }
     }
