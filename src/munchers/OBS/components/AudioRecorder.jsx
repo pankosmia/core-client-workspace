@@ -362,6 +362,45 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
     );
   };
 
+  // Récupérer les bords des clips qui se font resize
+  const getResizeBounds = (trackId, segId) => {
+    const t = tracks.find((x) => x.id === trackId);
+    if (!t) return { minVStart: 0, maxVEnd: Infinity };
+    const sorted = [...t.edl].sort((a, b) => a.vStart - b.vStart);
+    const idx = sorted.findIndex((s) => s.id === segId);
+    if (idx < 0) return { minVStart: 0, maxVEnd: Infinity };
+    const prev = sorted[idx - 1];
+    const next = sorted[idx + 1];
+    return {
+      minVStart: prev ? prev.vStart + (prev.srcEnd - prev.srcStart) : 0,
+      maxVEnd: next ? next.vStart : Infinity,
+    };
+  };
+
+  const getMoveBounds = (trackId, segId, excludeIds = new Set()) => {
+    const t = tracks.find((x) => x.id === trackId);
+    if (!t) return { minVStart: 0, maxVStart: Infinity };
+    const seg = t.edl.find((s) => s.id === segId);
+    if (!seg) return { minVStart: 0, maxVStart: Infinity };
+
+    const dur = seg.srcEnd - seg.srcStart;
+    const others = t.edl
+      .filter((s) => s.id !== segId && !excludeIds.has(s.id))
+      .sort((a, b) => a.vStart - b.vStart);
+
+    const prev = others
+      .filter((s) => s.vStart + (s.srcEnd - s.srcStart) <= seg.vStart)
+      .sort((a, b) => b.vStart - a.vStart)[0];
+    const next = others
+      .filter((s) => s.vStart >= seg.vStart + dur)
+      .sort((a, b) => a.vStart - b.vStart)[0];
+
+    return {
+      minVStart: prev ? prev.vStart + (prev.srcEnd - prev.srcStart) : 0,
+      maxVEnd: next ? next.vStart : Infinity,
+    };
+  };
+
   // Raccourci clavier
   useEffect(() => {
     const onKey = (e) => {
@@ -781,6 +820,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
                 getSnapCandidates={getSnapCandidates}
                 snapEnabled={snapEnabled}
                 snapStep={snapStep}
+                resizeBounds={getResizeBounds}
               />
             );
           })

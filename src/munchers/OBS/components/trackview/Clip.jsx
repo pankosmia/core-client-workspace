@@ -24,6 +24,7 @@ export default function Clip({
   getSnapCandidates,
   snapEnabled,
   snapStep,
+  resizeBounds,
 }) {
   const dur = segment.srcEnd - segment.srcStart;
   const left = segment.vStart * pxPerSec + INSET_X;
@@ -61,6 +62,11 @@ export default function Clip({
 
   // Snap vertical
   const dragStartTopRef = useRef(null);
+
+  // Resize bounds
+  const resizeBoundsRef = useRef(resizeBounds);
+  resizeBoundsRef.current = resizeBounds;
+  const clampedRectRef = useRef(null);
 
   useEffect(() => {
     const el = ref.current;
@@ -200,13 +206,39 @@ export default function Clip({
         move(e) {
           const start = resizeStartRectRef.current;
           if (!start || pxPerSec <= 0) return;
-          const dxLeft = e.rect.left - start.left;
+
+          const { minVStart, maxVEnd } = resizeBoundsRef.current?.(
+            trackId,
+            segment.id,
+          ) ?? { minVStart: 0, maxVEnd: Infinity };
+
+          // Convertit les bornes (en secondes vTime) → en pixels relatifs au clip
+          const segLeftPx0 = segment.vStart * pxPerSec + INSET_X; // position d'origine
+          const minLeftPx = minVStart * pxPerSec + INSET_X;
+          const maxRightPx =
+            (maxVEnd === Infinity
+              ? Number.MAX_SAFE_INTEGER
+              : maxVEnd * pxPerSec) - INSET_X;
+
+          // Clamp e.rect.left / e.rect.right (en coordonnées viewport)
+          // Utiliser laneEl.getBoundingClientRect().left pour convertir
+          const laneEl = el.parentElement; // ou via data-lane-id
+          const laneLeft = laneEl.getBoundingClientRect().left;
+          const clampedLeft = Math.max(laneLeft + minLeftPx, e.rect.left);
+          const clampedRight = Math.min(laneLeft + maxRightPx, e.rect.right);
+
+          // Largeur minimale = 1px pour ne pas inverser le clip
+          if (clampedRight - clampedLeft < 1) return;
+
+          const dxLeft = clampedLeft - start.left;
           el.style.transform = `translateX(${dxLeft}px)`;
-          el.style.width = `${e.rect.width}px`;
-          // Translate la waveform pour que la portion visible
-          // corresponde à [srcStart + dxLeft/pxPerSec, srcEnd + dxRight/pxPerSec].
-          // Seul srcStart influe sur la translation ; srcEnd est
-          // implicitement géré par le crop (overflow:hidden).
+          el.style.width = `${clampedRight - clampedLeft}px`;
+
+          clampedRectRef.current = {
+            left: clampedLeft,
+            right: clampedRight,
+          };
+
           const newSrcStartPx = segment.srcStart * pxPerSec + dxLeft;
           waveformRef.current?.setSrcStartPx(newSrcStartPx);
         },
@@ -216,8 +248,12 @@ export default function Clip({
           el.style.width = "";
           resizeStartRectRef.current = null;
           if (!start || pxPerSec <= 0) return;
-          const deltaLeft = (e.rect.left - start.left) / pxPerSec;
-          const deltaRight = (e.rect.right - start.right) / pxPerSec;
+          const finalRect = clampedRectRef.current ?? {
+            left: e.rect.left,
+            right: e.rect.right,
+          };
+          const deltaLeft = (finalRect.left - start.left) / pxPerSec;
+          const deltaRight = (finalRect.right - start.right) / pxPerSec;
           if (Math.abs(deltaLeft) > 0.001 || Math.abs(deltaRight) > 0.001) {
             onClipTrim?.(trackId, segment.id, deltaLeft, deltaRight);
           }

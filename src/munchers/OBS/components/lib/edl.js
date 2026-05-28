@@ -298,14 +298,31 @@ export function moveSegment(edl, segId, deltaSec) {
 
 // Trim des bords d'un clip
 export function trimSegment(edl, segId, deltaLeft, deltaRight) {
+  const target = edl.find((s) => s.id === segId);
+  if (!target) return edl;
+  const sorted = [...edl].sort((a, b) => a.vStart - b.vStart);
+  const idx = sorted.findIndex((s) => s.id === segId);
+  const prev = sorted[idx - 1];
+  const next = sorted[idx + 1];
+  const minVStart = prev ? prev.vStart + (prev.srcEnd - prev.srcStart) : 0;
+  const maxVEnd = next ? next.vStart : Infinity;
+
   return edl.map((s) => {
     if (s.id !== segId) return s;
-    const newSrcStart = Math.max(0, s.srcStart + deltaLeft);
-    const newVStart = Math.max(0, s.vStart + deltaLeft);
-    const newSrcEnd = Math.min(
-      /* buffer.duration */ Infinity,
-      s.srcEnd + deltaRight,
-    );
+    let newSrcStart = Math.max(0, s.srcStart + deltaLeft);
+    let newVStart = Math.max(minVStart, s.vStart + deltaLeft);
+    let newSrcEnd = s.srcEnd + deltaRight;
+
+    // Clamp gauche : si on a tronqué newVStart, ajuster newSrcStart en conséquence
+    const leftCorrection = newVStart - (s.vStart + deltaLeft);
+    if (leftCorrection > 0) newSrcStart += leftCorrection;
+
+    // Clamp droit
+    const newVEnd = newVStart + (newSrcEnd - newSrcStart);
+    if (newVEnd > maxVEnd) {
+      newSrcEnd -= newVEnd - maxVEnd;
+    }
+
     if (newSrcEnd <= newSrcStart) return s;
     return {
       ...s,

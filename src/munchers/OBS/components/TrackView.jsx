@@ -38,6 +38,7 @@ export default function TrackView({
   getSnapCandidates,
   snapEnabled,
   snapStep,
+  resizeBounds,
 }) {
   const laneRef = useRef(null);
   const [laneWidth, setLaneWidth] = useState(0);
@@ -232,6 +233,7 @@ export default function TrackView({
                     getSnapCandidates={getSnapCandidates}
                     snapEnabled={snapEnabled}
                     snapStep={snapStep}
+                    resizeBounds={resizeBounds}
                   />
                 );
               })}
