@@ -56,7 +56,7 @@ function PreviewText({ open, setOpenModalPreviewText, metadata, systemBcv }) {
     let pdfHtml;
     if (metadata) {
       const pdfTemplate = `<section style="page-break-inside: avoid"> %%BODY%% </section>`;
-      const bookUrl = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`;
+      const bookUrl = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`;
       const bookUsfmResponse = await getText(bookUrl, debugRef.current);
       if (!bookUsfmResponse.ok) {
         enqueueSnackbar(
@@ -112,12 +112,12 @@ function PreviewText({ open, setOpenModalPreviewText, metadata, systemBcv }) {
     const cssFile = () => {
       if (pdfType === "para") {
         return textDir === "ltr"
-          ? "/app-resources/pdf/para_bible_page_styles.css"
-          : "/app-resources/pdf/para_bible_page_styles_rtl.css";
+          ? "/api/app-resources/pdf/para_bible_page_styles.css"
+          : "/api/app-resources/pdf/para_bible_page_styles_rtl.css";
       } else {
         return textDir === "ltr"
-          ? "/app-resources/pdf/bcv_bible_page_styles.css"
-          : "/app-resources/pdf/bcv_bible_page_styles_rtl.css";
+          ? "/api/app-resources/pdf/bcv_bible_page_styles.css"
+          : "/api/app-resources/pdf/bcv_bible_page_styles_rtl.css";
       }
     };
 
@@ -133,7 +133,9 @@ function PreviewText({ open, setOpenModalPreviewText, metadata, systemBcv }) {
     const fontUrlFilenames = parts
       .map((part) => {
         const formattedPart = formatPart(part);
-        return formattedPart ? `/webfonts/pankosmia-${formattedPart}.css` : "";
+        return formattedPart
+          ? `/api/webfonts/pankosmia-${formattedPart}.css`
+          : "";
       })
       .filter(Boolean); // Remove empty values
 

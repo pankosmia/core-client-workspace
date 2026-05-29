@@ -25,7 +25,7 @@ function OBSArticlesViewerMuncher({ metadata }) {
   const { i18nRef } = useContext(I18nContext);
 
   const getAllData = async () => {
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=OBS.tsv`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=OBS.tsv`;
     let response = await getText(ingredientLink, debugRef.current);
     if (response.ok) {
       setIngredient(
@@ -51,7 +51,7 @@ function OBSArticlesViewerMuncher({ metadata }) {
         let payloadLink = row[5];
         // console.log('payloadLink', payloadLink);
         let payloadResponse = await getText(
-          `/burrito/ingredient/raw/git.door43.org/uW/en_tw?ipath=${payloadLink.slice(2)}.md`,
+          `/api/burrito/ingredient/raw/git.door43.org/uW/en_tw?ipath=${payloadLink.slice(2)}.md`,
         );
         // console.log('payloadResponse', payloadResponse);
         if (payloadResponse.ok) {

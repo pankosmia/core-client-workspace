@@ -99,7 +99,7 @@ const Waveform = ({
   ) => {
     let chapterString = chapter < 10 ? `0${chapter}` : chapter;
     let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
-    let url = `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${prise}.wav&_v=${cacheBust}`;
+    let url = `/api/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${prise}.wav&_v=${cacheBust}`;
     return url;
   };
 

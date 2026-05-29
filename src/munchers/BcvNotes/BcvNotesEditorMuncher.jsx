@@ -28,7 +28,7 @@ function BcvNotesEditorMuncher({ metadata }) {
 
   // Récupération des données du tsv
   const getAllData = async () => {
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
     let response = await getText(ingredientLink, debugRef.current);
     if (response.ok) {
       const newIngredient = response.text
@@ -58,7 +58,7 @@ function BcvNotesEditorMuncher({ metadata }) {
     if (newCurrentRow[0]) {
       if (newCurrentRowCV.length === 2) {
         postEmptyJson(
-          `/navigation/bcv/${systemBcv["bookCode"]}/${chapter}/${startVerse}/${endVerseNum}`,
+          `/api/navigation/bcv/${systemBcv["bookCode"]}/${chapter}/${startVerse}/${endVerseNum}`,
           debugRef.current /* ,
           alignment ? { alignment } : undefined */,
         );
