@@ -66,7 +66,7 @@ function BcvImagesViewerMuncher({ metadata }) {
   };
 
   const getAllData = async () => {
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
     let response = await getText(ingredientLink, debugRef.current);
     if (response.ok) {
       setIngredient(
@@ -119,7 +119,7 @@ function BcvImagesViewerMuncher({ metadata }) {
           let captions = [];
           for (const v of verseNotes) {
             let response = await getText(
-              `/burrito/ingredient/raw/${metadata.local_path}?ipath=${v.slice(2)}.txt`,
+              `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${v.slice(2)}.txt`,
               debugRef.current,
             );
             if (response.ok) {
@@ -161,7 +161,7 @@ function BcvImagesViewerMuncher({ metadata }) {
   ]);
 
   const get = async () => {
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
     let response = await getText(ingredientLink, debugRef.current);
     if (response.ok) {
       setIngredient(

@@ -59,7 +59,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
         return;
       }
       try {
-        const url = `/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`;
+        const url = `/api/burrito/ingredient/raw/${selectedBurrito.path}?ipath=${systemBcv.bookCode}.usfm`;
         const usfmResponse = await getText(url, debugRef.current);
 
         if (usfmResponse?.ok) {
@@ -119,8 +119,8 @@ function TranslationPlanViewerMuncher({ metadata }) {
     async function loadCSS() {
       const url =
         selectedBurritoTextDir === "ltr"
-          ? "/app-resources/usfm/bible_page_styles.css"
-          : "/app-resources/usfm/bible_page_styles_rtl.css";
+          ? "/api/app-resources/usfm/bible_page_styles.css"
+          : "/api/app-resources/usfm/bible_page_styles_rtl.css";
       const response = await fetch(url);
       if (!response.ok) {
         console.error(response.status);
@@ -137,7 +137,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
 
   useEffect(() => {
     const getAllData = async () => {
-      const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=plan.json`;
+      const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=plan.json`;
       const response = await fetch(ingredientLink);
       if (response.ok) {
         const data = await response.json();

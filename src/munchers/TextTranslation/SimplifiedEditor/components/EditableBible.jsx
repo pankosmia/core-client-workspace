@@ -13,7 +13,7 @@ export default function EditableBible({
 
   useEffect(() => {
     async function loadCSS() {
-      const url = "/app-resources/usfm/bible_page_styles.css";
+      const url = "/api/app-resources/usfm/bible_page_styles.css";
       const response = await fetch(url);
       if (!response.ok) {
         console.error("Erreur de chargement du CSS :", response.status);

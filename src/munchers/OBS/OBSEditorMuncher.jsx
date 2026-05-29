@@ -36,7 +36,7 @@ function OBSEditorMuncher({ metadata }) {
       return;
     }
     let fileName = obs[0] <= 9 ? `0${obs[0]}` : obs[0];
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`;
     let response = await getText(ingredientLink, debugRef.current);
     if (response.ok) {
       const chapterContent = response.text
@@ -128,7 +128,7 @@ function OBSEditorMuncher({ metadata }) {
     const obsString = await getStringifyIngredient(ingredientItem, fileName);
     const payload = JSON.stringify({ payload: obsString });
     const response = await postText(
-      `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
+      `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
       payload,
       debugRef,
       "application/json",
@@ -148,7 +148,7 @@ function OBSEditorMuncher({ metadata }) {
   };
   const getStringifyIngredient = async (ingredientItem, fileName) => {
     const response = await getText(
-      `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
+      `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
       debugRef,
     );
     if (response.ok) {
@@ -212,7 +212,7 @@ function OBSEditorMuncher({ metadata }) {
   const chapterTitle = (currentChapter[0] || "").replace(/^#+\s*/, "").trim();
 
   const getMainTrack = async () => {
-    const url = `/burrito/paths/${metadata.local_path}`;
+    const url = `/api/burrito/paths/${metadata.local_path}`;
     const response = await fetch(url, {
       method: "GET",
     });
@@ -230,7 +230,7 @@ function OBSEditorMuncher({ metadata }) {
 
   const handleExportVideoParagraph = async () => {
     setMenuAnchorEl(null);
-    const videoUrl = `/video/obs-para/${metadata.local_path}`;
+    const videoUrl = `/api/video/obs-para/${metadata.local_path}`;
     const json = {
       story_n: obs[0],
       para_n: obs[1],
@@ -250,7 +250,7 @@ function OBSEditorMuncher({ metadata }) {
   const handleExportVideoStory = async () => {
     setMenuAnchorEl(null);
 
-    const videoUrl = `/video/obs-story/${metadata.local_path}`;
+    const videoUrl = `/api/video/obs-story/${metadata.local_path}`;
     const json = {
       story_n: obs[0],
     };

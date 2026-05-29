@@ -14,7 +14,7 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
   const { debugRef } = useContext(debugContext);
   const projectScriptDirection = async () => {
     const summariesResponse = await getJson(
-      `/burrito/metadata/summary/${repoMetadata.local_path}`,
+      `/api/burrito/metadata/summary/${repoMetadata.local_path}`,
     );
     if (summariesResponse.ok) {
       const data = summariesResponse.json;
@@ -33,7 +33,7 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
     if (currentPosition > 0) {
       setCurrentPosition(currentPosition - 1);
       postEmptyJson(
-        `/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[currentPosition - 1]}/1`,
+        `/api/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[currentPosition - 1]}/1`,
         debugRef.current,
       );
     }
@@ -44,7 +44,7 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
     if (currentPosition < chapterNumbers.length - 1) {
       setCurrentPosition(currentPosition + 1);
       postEmptyJson(
-        `/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[currentPosition + 1]}/1`,
+        `/api/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[currentPosition + 1]}/1`,
         debugRef.current,
       );
     }
@@ -53,7 +53,7 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
   const handleClickMenuChapter = (i) => {
     setCurrentPosition(i);
     postEmptyJson(
-      `/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[i]}/1`,
+      `/api/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[i]}/1`,
       debugRef.current,
     );
   };

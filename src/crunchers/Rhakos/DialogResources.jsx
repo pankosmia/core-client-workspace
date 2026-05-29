@@ -27,7 +27,7 @@ export default function DialogResources({
   useEffect(() => {
     const getResourceOptions = async () => {
       getAndSetJson({
-        url: "/burrito/metadata/summaries",
+        url: "/api/burrito/metadata/summaries",
         setter: setSummaries,
         debug: debugRef.current,
       });
@@ -38,7 +38,7 @@ export default function DialogResources({
   useEffect(() => {
     const getLanguage = async () => {
       const gotLanguages = await getJson(
-        "/settings/languages",
+        "/api/settings/languages",
         debugRef.current,
       );
       setLanguage(gotLanguages.json[0]);

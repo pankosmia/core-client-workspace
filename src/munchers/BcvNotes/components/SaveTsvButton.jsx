@@ -30,7 +30,7 @@ function SaveTsvButton({
       .join("\n");
     const payload = JSON.stringify({ payload: tsvString });
     const response = await postJson(
-      `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`,
+      `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`,
       payload,
       debugBool,
     );

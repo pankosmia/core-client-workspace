@@ -106,7 +106,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
   ) => {
     let chapterString = chapter < 10 ? `0${chapter}` : chapter;
     let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
-    return `/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newPrise}.${ext}`;
+    return `/api/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newPrise}.${ext}`;
   };
 
   const fileExists = async (newAudioUrl) => {
@@ -117,7 +117,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
   };
 
   const listPrises = async (chapter, paragraph) => {
-    const url = `/burrito/paths/${metadata.local_path}`;
+    const url = `/api/burrito/paths/${metadata.local_path}`;
     const response = await fetch(url, {
       method: "GET",
     });
@@ -257,7 +257,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
   };
 
   const getOldPriseNumber = useCallback(async () => {
-    const url = `/burrito/paths/${metadata.local_path}`;
+    const url = `/api/burrito/paths/${metadata.local_path}`;
     const response = await fetch(url, {
       method: "GET",
     });
@@ -497,7 +497,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
   const refreshMainTrackScale = useCallback(() => {
     const mainDuration = wavesurfer?.getDuration?.() || 0;
     const trackDurationsList = Object.values(trackDurations || []).filter(
-        (value) => typeof value === "number" && value > 0,
+      (value) => typeof value === "number" && value > 0,
     );
     const nextMaxDuration = Math.max(mainDuration, ...trackDurationsList, 0);
 
@@ -505,7 +505,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
       setMaxDuration(nextMaxDuration);
       updateMainTrackWidth(mainDuration || undefined, nextMaxDuration);
     }
-  }, [wavesurfer, trackDurations, updateMainTrackWidth])
+  }, [wavesurfer, trackDurations, updateMainTrackWidth]);
 
   useEffect(() => {
     if (!waveformRef.current) return;
@@ -742,7 +742,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
   // Préserver un maxDuration cohérent quand les durées de pistes changent
   useEffect(() => {
     const durations = Object.values(trackDurations || {}).filter(
-        (value) => typeof value === "number" &&!isNaN(value) && value > 0
+      (value) => typeof value === "number" && !isNaN(value) && value > 0,
     );
     const mainDuration = wavesurfer?.getDuration?.() || 0;
     const nextMaxDuration = Math.max(mainDuration, ...durations, 0);
@@ -920,7 +920,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
 
     const srcPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName}.wav`;
     const targetPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName.split("_")[0]}_${newName}.wav`;
-    let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${srcPath}&target_path=${targetPath}&delete_src=true`;
+    let url = `/api/burrito/ingredient/copy/${metadata.local_path}?src_path=${srcPath}&target_path=${targetPath}&delete_src=true`;
     await fetch(url, {
       method: "POST",
     });
@@ -1065,7 +1065,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
     const trackPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newTrackNumber}.wav`;
     const mainTrack = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_0_${newTrackNumber.split("_")[0]}.wav`;
 
-    let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${trackPath}&target_path=${mainTrack}`;
+    let url = `/api/burrito/ingredient/copy/${metadata.local_path}?src_path=${trackPath}&target_path=${mainTrack}`;
     await fetch(url, {
       method: "POST",
     });
@@ -1096,7 +1096,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
       const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
       const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
       const savePath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${track}.wav`;
-      let url = `/burrito/ingredient/copy/${metadata.local_path}?src_path=${mainTrack}&target_path=${savePath}&delete_src=true`;
+      let url = `/api/burrito/ingredient/copy/${metadata.local_path}?src_path=${mainTrack}&target_path=${savePath}&delete_src=true`;
       await fetch(url, {
         method: "POST",
       });
@@ -1104,7 +1104,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
   };
 
   const getMainTrack = async () => {
-    const url = `/burrito/paths/${metadata.local_path}`;
+    const url = `/api/burrito/paths/${metadata.local_path}`;
     const response = await fetch(url, {
       method: "GET",
     });
@@ -1121,7 +1121,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
   };
 
   const getTrackByNumber = async (number) => {
-    const url = `/burrito/paths/${metadata.local_path}`;
+    const url = `/api/burrito/paths/${metadata.local_path}`;
     const response = await fetch(url, {
       method: "GET",
     });
@@ -1280,8 +1280,11 @@ const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
                 sx={{ color: "white" }}
               >
                 {" "}
-                {isRecording ? <StopIcon sx={{ color: "red" }} /> : <MicIcon />}
-                {" "}
+                {isRecording ? (
+                  <StopIcon sx={{ color: "red" }} />
+                ) : (
+                  <MicIcon />
+                )}{" "}
               </IconButton>
             </Tooltip>
             {/* Restore Button */}
