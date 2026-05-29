@@ -15,6 +15,7 @@ export default function EditableSpan({
   position,
   chapter,
   verse,
+  endVerse,
 }) {
   const incomingBlock = scriptureJson.blocks[position[0]];
   const incomingContent =
@@ -33,8 +34,11 @@ export default function EditableSpan({
       setScriptureJson(updateUnitContent(scriptureJson, position, value));
     }, 100);
 
-  const updateBcv = (b, c, v) => {
-    postEmptyJson(`/navigation/bcv/${b}/${c}/${v}`, debugRef.current);
+  const updateBcv = (b, c, v, ev) => {
+    postEmptyJson(
+      `/navigation/bcv/${b}/${c}/${v}/${ev ? ev : v}`,
+      debugRef.current,
+    );
   };
 
   if (incomingContent === null) {
@@ -62,7 +66,7 @@ export default function EditableSpan({
       }}
       onFocus={(e) => {
         //console.log("FOCUS", position)
-        updateBcv(systemBcv.bookCode, chapter, verse);
+        updateBcv(systemBcv.bookCode, chapter, verse, endVerse);
         return false;
       }}
     >
