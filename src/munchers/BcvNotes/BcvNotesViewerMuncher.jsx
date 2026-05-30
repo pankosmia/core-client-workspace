@@ -1,5 +1,13 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Grid2, Typography } from "@mui/material";
+import {
+  Box,
+  Grid2,
+  Typography,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Markdown from "react-markdown";
 
 import {
@@ -59,20 +67,35 @@ function BcvNotesViewerMuncher({ metadata }) {
     if (cvC !== rangeC) {
       return false;
     }
-    if (rangeV.includes("-")) {
+    /*  if (rangeV.includes("-")) {
       const [fromV, toV] = rangeV.split("-").map((v) => parseInt(v));
+      console.log (cvV, fromV, cvV, toV);
       return cvV >= fromV && cvV <= toV;
     } else {
       return cvV === rangeV;
-    }
+    } */
+    const parseVals = (str) => str.split("-").map(Number);
+
+    const [cvFrom, cvTo = cvFrom] = parseVals(cvV);
+    const [rangeFrom, rangeTo = rangeFrom] = parseVals(rangeV);
+
+    return cvFrom <= rangeTo && cvTo >= rangeFrom;
   };
 
-  const filteredIngredient = ingredient.filter((l) =>
-    cvInRange(`${systemBcv.chapterNum}:${systemBcv.verseNum}`, l[0]),
+  const filteredIngredient = ingredient.filter((l) => {
+    return cvInRange(
+      `${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""}`,
+      l[0],
+    );
+  });
+  console.log(
+    `${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""}`,
   );
+
   const verseNotes = filteredIngredient.map((l) => l[6] || l[5]);
   const verseIds = filteredIngredient.map((l) => l[1]);
   const verseSupReferences = filteredIngredient.map((l) => l[3]);
+  console.log("filteredIngredient: ", filteredIngredient);
 
   // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
   return (
@@ -86,36 +109,45 @@ function BcvNotesViewerMuncher({ metadata }) {
           alignItems: "center",
         }}
       >
-        <Grid2
-          item
-          size={3}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</Typography>
-        </Grid2>
-        <Grid2 item size={12} sx={{ paddingRight: "5%" }}>
-          {ingredient && (
-            <Markdown className="markdown">
-              {verseNotes.length > 0 ? (
-                verseNotes
-                  .map((v, n) => {
-                    return `* (**${verseIds[n]}**) ${v.replace(". \n\n\n\n ", ". \n\n * ")}${!(verseSupReferences[n] === "") ? ` (${verseSupReferences[n].replace("rc://*/ta/man/translate/", "")})` : ""}`;
-                  })
-                  .join("\n")
-              ) : (
-                <Typography>
-                  {doI18n(
-                    "pages:core-local-workspace:no_verse",
-                    i18nRef.current,
-                  )}
-                </Typography>
-              )}
-            </Markdown>
-          )}
+        <Grid2 item size={12}>
+          {verseNotes.length > 0 &&
+            [...new Set(verseNotes)].map((v, n) => {
+              const currentVerse = verseIds[n];
+
+              return (
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1-content"
+                    id={`tword-${n}`}
+                  >
+                    <Typography component="span" sx={{ fontWeight: "bold" }}>
+                      {`${systemBcv.chapterNum}:${currentVerse}`}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {ingredient && (
+                      <Markdown className="markdown">
+                        {verseNotes.length > 0 ? (
+                          verseNotes
+                            .map((v, n) => {
+                              return `* (**${verseIds[n]}**) ${v.replace(". \n\n\n\n ", ". \n\n * ")}${!(verseSupReferences[n] === "") ? ` (${verseSupReferences[n].replace("rc://*/ta/man/translate/", "")})` : ""}`;
+                            })
+                            .join("\n")
+                        ) : (
+                          <Typography>
+                            {doI18n(
+                              "pages:core-local-workspace:no_verse",
+                              i18nRef.current,
+                            )}
+                          </Typography>
+                        )}
+                      </Markdown>
+                    )}
+                  </AccordionDetails>
+                </Accordion>
+              );
+            })}
         </Grid2>
       </Grid2>
     </Box>
