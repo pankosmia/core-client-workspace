@@ -29,6 +29,7 @@ import {
   removeSegment,
   insertSegmentAt,
   virtualDuration,
+  segmentBuffer,
 } from "./lib/edl";
 import { pickTickInterval } from "./lib/snap";
 import SplitIcon from "./SplitIcon";
@@ -369,11 +370,30 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
     const sorted = [...t.edl].sort((a, b) => a.vStart - b.vStart);
     const idx = sorted.findIndex((s) => s.id === segId);
     if (idx < 0) return { minVStart: 0, maxVEnd: Infinity };
+    const seg = sorted[idx];
     const prev = sorted[idx - 1];
     const next = sorted[idx + 1];
+
+    // Bornes voisines (anti-collision).
+    const neighborMinVStart = prev
+      ? prev.vStart + (prev.srcEnd - prev.srcStart)
+      : 0;
+    const neighborMaxVEnd = next ? next.vStart : Infinity;
+
+    // Bornes audio : le segment ne peut pas montrer plus que le buffer source.
+    // À gauche, srcStart ≥ 0 → vStart ne peut reculer que de srcStart secondes.
+    // À droite, srcEnd ≤ buffer.duration → vEnd ne peut avancer que du reste.
+    const buf = segmentBuffer(seg, t.buffer);
+    const vEnd = seg.vStart + (seg.srcEnd - seg.srcStart);
+    const audioMinVStart = seg.vStart - seg.srcStart;
+    const audioMaxVEnd =
+      typeof buf?.duration === "number"
+        ? vEnd + (buf.duration - seg.srcEnd)
+        : Infinity;
+
     return {
-      minVStart: prev ? prev.vStart + (prev.srcEnd - prev.srcStart) : 0,
-      maxVEnd: next ? next.vStart : Infinity,
+      minVStart: Math.max(neighborMinVStart, audioMinVStart),
+      maxVEnd: Math.min(neighborMaxVEnd, audioMaxVEnd),
     };
   };
 
