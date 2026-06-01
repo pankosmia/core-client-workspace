@@ -28,7 +28,10 @@ export default function Clip({
 }) {
   const dur = segment.srcEnd - segment.srcStart;
   const left = segment.vStart * pxPerSec + INSET_X;
-  const width = Math.max(0, dur * pxPerSec - INSET_X * 2);
+  // -1 supplémentaire à droite : la lane a une bordure de séparation de 1px
+  // à son bord droit. Sans ce pixel, la bordure (hover/sélection) du clip de
+  // fin de timeline se superpose à cette séparation.
+  const width = Math.max(0, dur * pxPerSec - INSET_X * 2 - 1);
 
   // Interact.js pour le draggable
   const ref = useRef(null);
@@ -288,6 +291,7 @@ export default function Clip({
       data-clip-id={segment.id}
       sx={{
         position: "absolute",
+        boxSizing: "border-box",
         left: `${left}px`,
         width: `${width}px`,
         top: INSET_Y,
