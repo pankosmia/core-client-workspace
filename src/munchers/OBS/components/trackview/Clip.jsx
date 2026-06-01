@@ -125,6 +125,7 @@ export default function Clip({
 
           draggedRef.current = true;
           el.classList.add("dragging");
+          document.body.classList.add("clip-dragging");
           // Élève le clip au-dessus des autres pendant le drag pour qu'il
           // passe visuellement par-dessus les autres lanes.
           el.style.zIndex = "10";
@@ -175,6 +176,7 @@ export default function Clip({
           el.style.zIndex = "";
           el.style.pointerEvents = "";
           el.classList.remove("dragging");
+          document.body.classList.remove("clip-dragging");
           document
             .querySelectorAll("[data-lane-id].drop-target")
             .forEach((n) => n.classList.remove("drop-target"));
