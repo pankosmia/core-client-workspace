@@ -16,7 +16,7 @@ import TrackView from "./TrackView";
 import { scheduleTrackFrom, stopSources } from "./lib/playback";
 import TimelineAxis from "./trackview/TimelineAxis";
 import LiveRecordingLane from "./trackview/LiveRecordingLane";
-import { projectPaths, deleteAudioFile } from "./lib/storageUtil";
+import { projectPaths } from "./lib/storageUtil";
 import { useProjectPersistence } from "./hooks/useProjectPersistence";
 import { useRecorder } from "./hooks/useRecorder";
 import { formatTime } from "./Timeline";
@@ -310,10 +310,12 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
     setTracks(updater);
   };
 
-  const deleteTrack = async (id) => {
+  const deleteTrack = (id) => {
+    // On retire la piste de l'état mais on NE supprime PAS le fichier .webm :
+    // d'autres pistes peuvent référencer ce buffer via bufferTrackId (clip
+    // copié/déplacé), et le projet doit rester réimportable.
     setTracksWithHistory((ts) => ts.filter((t) => t.id !== id));
     if (selection?.trackId === id) setSelection(null);
-    if (paths) await deleteAudioFile(paths, id).catch(() => {});
   };
 
   const cutSelection = () => {
