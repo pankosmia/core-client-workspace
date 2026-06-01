@@ -77,15 +77,17 @@ export default function TrackView({
 
     const clipEl = e.target.closest("[data-clip-id]");
     // Si le pointerdown est dans la zone de resize (bord gauche/droit du
-    // clip), interact.js gère le resize → on n'arme rien côté lane sinon
-    // une région se dessinerait par-dessus le resize.
+    // clip), interact.js gère le resize. On arme quand même l'état côté lane
+    // mais avec un flag : on ne dessinera pas de région par-dessus le resize,
+    // tandis qu'un clic SIMPLE (sans resize) pose quand même le playhead.
+    let inResizeZone = false;
     if (clipEl) {
       const rect = clipEl.getBoundingClientRect();
       if (
         e.clientX < rect.left + CLIP_RESIZE_MARGIN ||
         e.clientX > rect.right - CLIP_RESIZE_MARGIN
       ) {
-        return;
+        inResizeZone = true;
       }
     }
     const clipSeg = clipEl
@@ -97,8 +99,13 @@ export default function TrackView({
       startX: e.clientX,
       dragged: false,
       clipSeg, // segment ciblé si le drag commence dans le body d'un clip
+      inResizeZone,
     };
-    e.currentTarget.setPointerCapture?.(e.pointerId);
+    // Pas de pointer capture dans la zone de resize : il redirigerait les
+    // pointermove vers la lane et empêcherait interact.js de gérer le resize.
+    if (!inResizeZone) {
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+    }
   };
 
   // Clamp [start,end] aux bornes d'un segment (drag intra-clip).
@@ -118,6 +125,9 @@ export default function TrackView({
     if (!st.dragged && Math.abs(e.clientX - st.startX) <= DRAG_THRESHOLD)
       return;
     st.dragged = true;
+    // Dans la zone de resize, interact.js dessine le resize : on ne trace pas
+    // de région par-dessus. Le flag `dragged` empêchera le seek au pointerup.
+    if (st.inResizeZone) return;
     const t = xToTime(e.clientX);
     const raw = {
       start: Math.min(st.startTime, t),
@@ -132,9 +142,16 @@ export default function TrackView({
     if (!st) return;
 
     if (!st.dragged) {
-      // Clic simple (body d'un clip ou fond de la lane) → playhead.
+      // Clic simple (body d'un clip, bord de resize, ou fond de la lane) →
+      // playhead.
       onSeek?.(track.id, st.startTime);
       onRegionChange?.(null);
+      return;
+    }
+
+    // Resize en cours géré par interact.js → rien à committer côté lane.
+    if (st.inResizeZone) {
+      setDragSel(null);
       return;
     }
 
