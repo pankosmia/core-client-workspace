@@ -39,7 +39,7 @@ function BcvArticlesViewerMuncher({ metadata }) {
   const sbScriptDirSet = sbScriptDir === "ltr" || sbScriptDir === "rtl";
 
   const getAllData = async () => {
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
     let response = await getText(ingredientLink, debugRef.current);
     if (response.ok) {
       setIngredient(
@@ -80,7 +80,7 @@ function BcvArticlesViewerMuncher({ metadata }) {
         for (const row of filteredRows) {
           let payloadLink = row[5];
           let payloadResponse = await getText(
-            `/burrito/ingredient/raw/${metadata.local_path}?ipath=${payloadLink.slice(2)}.md`,
+            `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${payloadLink.slice(2)}.md`,
           );
           if (payloadResponse.ok) {
             ret.push(payloadResponse.text);

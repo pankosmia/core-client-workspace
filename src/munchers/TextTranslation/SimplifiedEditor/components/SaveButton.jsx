@@ -1,5 +1,5 @@
 import { IconButton } from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import md5sum from "md5";
 import { doI18n, postJson } from "pithekos-lib";
 import { enqueueSnackbar } from "notistack";
@@ -33,7 +33,7 @@ function SaveButton({
     let usfm = draftJson2usfm(scriptureJson);
     const payload = JSON.stringify({ payload: usfm });
     const response = await postJson(
-      `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
+      `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
       payload,
       debugBool,
     );
@@ -60,7 +60,7 @@ function SaveButton({
       }}
       disabled={md5sum(JSON.stringify(scriptureJson)) === md5sumScriptureJson}
     >
-      <SaveIcon size="large" />
+      <SaveOutlinedIcon size="large" />
     </IconButton>
   );
 }

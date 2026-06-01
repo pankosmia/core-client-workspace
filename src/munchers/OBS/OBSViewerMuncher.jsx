@@ -19,7 +19,7 @@ function OBSViewerMuncher({ metadata }) {
 
   const getAllData = async () => {
     let fileName = obs[0] <= 9 ? `0${obs[0]}` : obs[0];
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`;
     let response = await getText(ingredientLink, debugRef.current);
     if (response.ok) {
       let lines = response.text.split(/\n\r?\n\r?/); // Récupérer seulement le texte et les images
@@ -32,7 +32,7 @@ function OBSViewerMuncher({ metadata }) {
       }
 
       let imageName = `${obs[0] <= 9 ? `0${obs[0]}` : obs[0]}-${obs[1] <= 9 ? `0${obs[1]}` : obs[1]}`;
-      const obsImageLink = `/burrito/ingredient/bytes/git.door43.org/uW/obs_images_360?ipath=360px/obs-en-${imageName}.jpg`;
+      const obsImageLink = `/api/burrito/ingredient/bytes/git.door43.org/uW/obs_images_360?ipath=360px/obs-en-${imageName}.jpg`;
       ingredient = ingredient.replace(
         /!\[OBS Image\]\([^)]+\)/g,
         `![OBS Image not found](${obsImageLink})`,

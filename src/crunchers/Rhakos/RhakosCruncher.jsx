@@ -42,7 +42,7 @@ function RhakosCruncher({ metadata, style }) {
 
   useEffect(() => {
     const getModels = async () => {
-      const result = await getJson("/llm/model", debugRef.current);
+      const result = await getJson("/api/llm/model", debugRef.current);
       if (result.ok) {
         setModels(result.json);
       }
@@ -60,7 +60,7 @@ function RhakosCruncher({ metadata, style }) {
     for (const t of selectedResources("translations")) {
       // Load USFM of correct book
       let usfmResponse = await getText(
-        `/burrito/ingredient/raw/${t.path}?ipath=${bcvRef.current.bookCode}.usfm`,
+        `/api/burrito/ingredient/raw/${t.path}?ipath=${bcvRef.current.bookCode}.usfm`,
         debugRef.current,
       );
       if (usfmResponse.ok) {
@@ -112,7 +112,7 @@ function RhakosCruncher({ metadata, style }) {
     for (const t of selectedResources("notes")) {
       // Load TSV of correct book
       let tsvResponse = await getText(
-        `/burrito/ingredient/raw/${t.path}?ipath=${bcvRef.current.bookCode}.tsv`,
+        `/api/burrito/ingredient/raw/${t.path}?ipath=${bcvRef.current.bookCode}.tsv`,
         debugRef.current,
       );
       if (tsvResponse.ok) {
@@ -161,7 +161,7 @@ function RhakosCruncher({ metadata, style }) {
     if (juxtaResource) {
       // Load JSON of correct book
       let juxtaResponse = await getJson(
-        `/burrito/ingredient/raw/${juxtaResource.path}?ipath=${bcvRef.current.bookCode}.json`,
+        `/api/burrito/ingredient/raw/${juxtaResource.path}?ipath=${bcvRef.current.bookCode}.json`,
         debugRef.current,
       );
       if (juxtaResponse.ok) {
@@ -370,7 +370,7 @@ function RhakosCruncher({ metadata, style }) {
               let contextElapsed = Date.now() - beforeContextTime;
               setProcessing("model");
               let result = await postJson(
-                "/llm/rag-prompt",
+                "/api/llm/rag-prompt",
                 JSON.stringify(rag_context),
                 debugRef.current,
               );

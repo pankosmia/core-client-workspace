@@ -33,7 +33,7 @@ function JuxtaEditorTools({
   const navigate = useNavigate();
   useEffect(() => {
     postEmptyJson(
-      `/navigation/bcv/${currentBookCode}/${currentChapter()}/${startVerse()}`,
+      `/api/navigation/bcv/${currentBookCode}/${currentChapter()}/${startVerse()}`,
       debugRef.current,
     );
   }, [curIndex]);
@@ -84,7 +84,7 @@ function JuxtaEditorTools({
     const doChapterNumbers = async () => {
       if (systemBcv?.bookCode && systemBcv.bookCode !== currentBookCode) {
         let jsonResponse = await getJson(
-          `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.json`,
+          `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.json`,
           debugRef.current,
         );
         if (jsonResponse.ok) {

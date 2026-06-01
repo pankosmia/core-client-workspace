@@ -13,7 +13,7 @@ export default function RequireResources({
 
   useEffect(() => {
     getAndSetJson({
-      url: "/git/list-local-repos",
+      url: "/api/git/list-local-repos",
       setter: setResources,
     });
   }, []);

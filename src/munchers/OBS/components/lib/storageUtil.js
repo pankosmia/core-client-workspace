@@ -10,9 +10,9 @@ export function projectPaths({ localPath, chapter, paragraph }) {
     audio: (id) => `${dir}/${cc}-${pp}_${id}.webm`,
     project: `${dir}/${cc}-${pp}_project.json`,
     bytesUrl: (ipath) =>
-      `/burrito/ingredient/bytes/${localPath}?ipath=${ipath}`,
+      `/api/burrito/ingredient/bytes/${localPath}?ipath=${ipath}`,
     deleteUrl: (ipath) =>
-      `/burrito/ingredient/delete/${localPath}?ipath=${ipath}`,
+      `/api/burrito/ingredient/delete/${localPath}?ipath=${ipath}`,
   };
 }
 

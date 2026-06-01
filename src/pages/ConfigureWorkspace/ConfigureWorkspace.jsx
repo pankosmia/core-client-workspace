@@ -46,7 +46,7 @@ function ConfigureWorkspace({
 
   const getProjectSummaries = async () => {
     const summariesResponse = await getJson(
-      "/burrito/metadata/summaries",
+      "/api/burrito/metadata/summaries",
       debugRef.current,
     );
     if (summariesResponse.ok) {
@@ -55,7 +55,7 @@ function ConfigureWorkspace({
   };
   useEffect(() => {
     const getModels = async () => {
-      const result = await getJson("/llm/model", debugRef.current);
+      const result = await getJson("/api/llm/model", debugRef.current);
       if (result.ok) {
         setShowRhakos(result.json.length > 0);
       } else {
@@ -86,13 +86,13 @@ function ConfigureWorkspace({
   };
 
   useEffect(() => {
-    fetch("/app-resources/lookups/iso639-1-to-3.json") // ISO_639-1 codes mapped to ISO_639-3 codes
+    fetch("/api/app-resources/lookups/iso639-1-to-3.json") // ISO_639-1 codes mapped to ISO_639-3 codes
       .then((r) => r.json())
       .then((data) => setIsoOneToThreeLookup(data));
   }, []);
 
   useEffect(() => {
-    fetch("/app-resources/lookups/iso639-3.json") // ISO_639-3 2025-02-21 from https://hisregistries.org/rol/ plus zht, zhs, nep
+    fetch("/api/app-resources/lookups/iso639-3.json") // ISO_639-3 2025-02-21 from https://hisregistries.org/rol/ plus zht, zhs, nep
       .then((r) => r.json())
       .then((data) => setIsoThreeLookup(data));
   }, []);
@@ -102,7 +102,7 @@ function ConfigureWorkspace({
       if (currentProjectRef.current) {
         const projectPath = `${currentProjectRef.current.source}/${currentProjectRef.current.organization}/${currentProjectRef.current.project}`;
         const fullMetadataResponse = await getJson(
-          `/burrito/metadata/summary/${projectPath}`,
+          `/api/burrito/metadata/summary/${projectPath}`,
           debugRef.current,
         );
         if (fullMetadataResponse.ok) {
@@ -301,7 +301,7 @@ function ConfigureWorkspace({
         backgroundPosition: "center",
         zIndex: -1,
         backgroundImage:
-          'url("/app-resources/pages/content/background_blur.png")',
+          'url("/api/app-resources/pages/content/background_blur.png")',
         backgroundRepeat: "no-repeat",
         backdropFilter: "blur(3px)",
       }}

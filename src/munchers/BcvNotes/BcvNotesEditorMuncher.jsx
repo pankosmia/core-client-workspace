@@ -28,7 +28,7 @@ function BcvNotesEditorMuncher({ metadata }) {
 
   // Récupération des données du tsv
   const getAllData = async () => {
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
     let response = await getText(ingredientLink, debugRef.current);
     if (response.ok) {
       const newIngredient = response.text
@@ -46,12 +46,21 @@ function BcvNotesEditorMuncher({ metadata }) {
 
   const updateBcv = (rowN) => {
     const newCurrentRow = ingredient[rowN][0];
+    const newCurrentRowCV = newCurrentRow.split(":");
+    const chapter = newCurrentRowCV[0];
+    const verseRange = newCurrentRowCV[1];
+    const startVerse = verseRange.split("-")[0];
+    const endVerseNum = verseRange.includes("-")
+      ? verseRange.split("-")[1]
+      : startVerse;
+    //const rowData = ingredient[rowN];
+    //const alignment = rowData[6] || "";
     if (newCurrentRow[0]) {
-      const newCurrentRowCV = newCurrentRow.split(":");
       if (newCurrentRowCV.length === 2) {
         postEmptyJson(
-          `/navigation/bcv/${systemBcv["bookCode"]}/${newCurrentRowCV[0]}/${newCurrentRowCV[1].split("-")[0]}`,
-          debugRef.current,
+          `/api/navigation/bcv/${systemBcv["bookCode"]}/${chapter}/${startVerse}/${endVerseNum}`,
+          debugRef.current /* ,
+          alignment ? { alignment } : undefined */,
         );
       }
     }
