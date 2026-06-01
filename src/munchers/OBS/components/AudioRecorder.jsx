@@ -579,6 +579,42 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
       if (!byTrack.has(trackId)) byTrack.set(trackId, new Set());
       byTrack.get(trackId).add(segId);
     }
+
+    // Les clips sélectionnés se déplacent tous du même delta. On clampe ce
+    // delta pour qu'aucun clip n'empiète sur un voisin NON sélectionné (les
+    // voisins sélectionnés bougent ensemble, donc ne contraignent pas).
+    // maxRight / maxLeft = marge disponible avant de toucher un voisin.
+    const vEnd = (s) => s.vStart + (s.srcEnd - s.srcStart);
+    let maxRight = Infinity;
+    let maxLeft = Infinity;
+    for (const t of tracks) {
+      const ids = byTrack.get(t.id);
+      if (!ids) continue;
+      const sorted = [...t.edl].sort((a, b) => a.vStart - b.vStart);
+      sorted.forEach((s, i) => {
+        if (!ids.has(s.id)) return;
+        const rightNb = sorted[i + 1];
+        if (rightNb && !ids.has(rightNb.id)) {
+          maxRight = Math.min(maxRight, rightNb.vStart - vEnd(s));
+        }
+        const leftNb = sorted[i - 1];
+        if (leftNb && !ids.has(leftNb.id)) {
+          maxLeft = Math.min(maxLeft, s.vStart - vEnd(leftNb));
+        } else if (!leftNb) {
+          // Pas de voisin gauche : limite au début de la piste (0).
+          maxLeft = Math.min(maxLeft, s.vStart);
+        }
+      });
+    }
+
+    const clampedDelta =
+      deltaSec > 0
+        ? Math.max(0, Math.min(deltaSec, maxRight))
+        : Math.min(0, Math.max(deltaSec, -maxLeft));
+    // Déjà collé à la limite : ne rien faire (évite d'empiler des undos vides).
+    if (clampedDelta === 0) return;
+    deltaSec = clampedDelta;
+
     const updater = (ts) =>
       ts.map((t) => {
         const ids = byTrack.get(t.id);
