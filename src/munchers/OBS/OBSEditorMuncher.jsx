@@ -283,7 +283,6 @@ function OBSEditorMuncher({ metadata }) {
         <Stack>
           <MarkdownField
             currentRow={obs[1]}
-            columnNames={currentChapter}
             onChangeNote={handleChange}
             value={currentChapter[obs[1]] || ""}
             mode="write"
