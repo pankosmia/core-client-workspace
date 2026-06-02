@@ -36,7 +36,7 @@ export default function EditableSpan({
 
   const updateBcv = (b, c, v, ev) => {
     postEmptyJson(
-      `/navigation/bcv/${b}/${c}/${v}/${ev ? ev : v}`,
+      `/api/navigation/bcv/${b}/${c}/${v}/${ev ? ev : v}`,
       debugRef.current,
     );
   };
