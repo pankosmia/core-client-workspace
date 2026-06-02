@@ -20,7 +20,7 @@ function BookPicker({ setFirstChapter, disable = false }) {
       if (currentProjectRef.current) {
         const projectPath = `${currentProjectRef.current.source}/${currentProjectRef.current.organization}/${currentProjectRef.current.project}`;
         const fullMetadataResponse = await getJson(
-          `/burrito/metadata/summary/${projectPath}`,
+          `/api/burrito/metadata/summary/${projectPath}`,
           debugRef.current,
         );
         if (fullMetadataResponse.ok) {

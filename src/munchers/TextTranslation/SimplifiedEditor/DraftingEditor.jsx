@@ -48,7 +48,7 @@ function DraftingEditor({ metadata, modified, setModified }) {
     if (systemBcv.bookCode !== currentBookCode) {
       const doScriptureJson = async () => {
         let usfmResponse = await getText(
-          `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
+          `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
           debugRef.current,
         );
         if (usfmResponse.ok) {

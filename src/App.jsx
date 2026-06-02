@@ -49,7 +49,7 @@ function Router({
       themeSpec.palette.primary.main === "#666"
     ) {
       getAndSetJson({
-        url: "/app-resources/themes/default.json",
+        url: "/api/app-resources/themes/default.json",
         setter: setThemeSpec,
       }).then();
     }

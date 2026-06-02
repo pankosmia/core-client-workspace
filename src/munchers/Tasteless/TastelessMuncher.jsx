@@ -15,7 +15,7 @@ function TastelessMuncher({ metadata }) {
   const { i18nRef } = useContext(I18nContext);
 
   const getAllData = async () => {
-    const sbMetadataLink = `/burrito/metadata/raw/${metadata.local_path}`;
+    const sbMetadataLink = `/api/burrito/metadata/raw/${metadata.local_path}`;
     let response = await getJson(sbMetadataLink, debugRef.current);
     if (response.ok) {
       setSbMetadata(response.json);

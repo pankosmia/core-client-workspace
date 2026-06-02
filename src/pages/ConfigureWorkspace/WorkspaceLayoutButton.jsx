@@ -39,7 +39,7 @@ export default function LayoutPicker({
 
   useEffect(() => {
     const getModels = async () => {
-      const result = await getJson("/llm/model", debugRef.current);
+      const result = await getJson("/api/llm/model", debugRef.current);
       if (result.ok) {
         setShowRhakos(result.json.length > 0);
       } else {

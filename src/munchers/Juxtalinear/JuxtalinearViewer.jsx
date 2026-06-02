@@ -19,7 +19,7 @@ function JuxtalinearViewerMuncher({ metadata }) {
   const [selectedMorph, setSelectedMorph] = useState([]);
 
   const getAllData = async () => {
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.json`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.json`;
     let response = await getJson(ingredientLink, debugRef.current);
     if (response.ok) {
       setIngredient(response.json);

@@ -20,7 +20,7 @@ function WorkspaceCruncherCard({ metadata, style, distractionModeCount }) {
         style={{
           ...style,
           backgroundImage:
-            'url("/app-resources/pages/workspace/tile_blur.png")',
+            'url("/api/app-resources/pages/workspace/tile_blur.png")',
           filter: "blur(1px)",
         }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}

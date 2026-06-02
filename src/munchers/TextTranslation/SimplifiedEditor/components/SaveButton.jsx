@@ -33,7 +33,7 @@ function SaveButton({
     let usfm = draftJson2usfm(scriptureJson);
     const payload = JSON.stringify({ payload: usfm });
     const response = await postJson(
-      `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
+      `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
       payload,
       debugBool,
     );
