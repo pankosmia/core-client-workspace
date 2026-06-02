@@ -67,13 +67,6 @@ function BcvNotesViewerMuncher({ metadata }) {
     if (cvC !== rangeC) {
       return false;
     }
-    /*  if (rangeV.includes("-")) {
-      const [fromV, toV] = rangeV.split("-").map((v) => parseInt(v));
-      console.log (cvV, fromV, cvV, toV);
-      return cvV >= fromV && cvV <= toV;
-    } else {
-      return cvV === rangeV;
-    } */
     const parseVals = (str) => str.split("-").map(Number);
 
     const [cvFrom, cvTo = cvFrom] = parseVals(cvV);
@@ -88,14 +81,10 @@ function BcvNotesViewerMuncher({ metadata }) {
       l[0],
     );
   });
-  console.log(
-    `${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""}`,
-  );
 
   const verseNotes = filteredIngredient.map((l) => l[6] || l[5]);
   const verseIds = filteredIngredient.map((l) => l[1]);
-  const verseSupReferences = filteredIngredient.map((l) => l[3]);
-  console.log("filteredIngredient: ", filteredIngredient);
+  /* const verseSupReferences = filteredIngredient.map((l) => l[3]); */
 
   // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
   return (
@@ -112,28 +101,34 @@ function BcvNotesViewerMuncher({ metadata }) {
         <Grid2 item size={12}>
           {verseNotes.length > 0 &&
             [...new Set(verseNotes)].map((v, n) => {
-              const currentVerse = verseIds[n];
+              const currentIngredient = filteredIngredient.filter((v) =>
+                v.includes(verseIds[n]),
+              )[0];
+              const currentTitle = currentIngredient[0];
+              const currentNote =
+                currentIngredient[6] || currentIngredient[5] || "";
+              const currentId = currentIngredient[1];
+              const currentSupReference = currentIngredient[3] || "";
 
               return (
-                <Accordion>
+                <Accordion
+                  key={`${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""}-${n}`}
+                  defaultExpanded={n === 0}
+                >
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1-content"
-                    id={`tword-${n}`}
+                    id={`tnote-${n}`}
                   >
                     <Typography component="span" sx={{ fontWeight: "bold" }}>
-                      {`${systemBcv.chapterNum}:${currentVerse}`}
+                      {currentTitle}
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     {ingredient && (
                       <Markdown className="markdown">
                         {verseNotes.length > 0 ? (
-                          verseNotes
-                            .map((v, n) => {
-                              return `* (**${verseIds[n]}**) ${v.replace(". \n\n\n\n ", ". \n\n * ")}${!(verseSupReferences[n] === "") ? ` (${verseSupReferences[n].replace("rc://*/ta/man/translate/", "")})` : ""}`;
-                            })
-                            .join("\n")
+                          `* (**${currentId}**) ${currentNote.replace(". \n\n\n\n ", ". \n\n * ")}${!(currentSupReference === "") ? ` (${currentSupReference.replace("rc://*/ta/man/translate/", "")})` : ""}`
                         ) : (
                           <Typography>
                             {doI18n(
