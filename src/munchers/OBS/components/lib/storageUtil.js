@@ -16,14 +16,14 @@ export function projectPaths({ localPath, chapter, paragraph }) {
   };
 }
 
+// Renvoie le projet, ou null si le fichier n'existe pas (404).
+// Lève une erreur si le serveur est injoignable ou répond une autre erreur :
+// l'appelant doit alors s'abstenir de sauvegarder pour ne pas écraser un projet existant.
 export async function loadProject(paths) {
-  try {
-    const r = await fetch(paths.bytesUrl(paths.project));
-    if (!r.ok) return null;
-    return await r.json();
-  } catch {
-    return null;
-  }
+  const r = await fetch(paths.bytesUrl(paths.project));
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`loadProject: HTTP ${r.status}`);
+  return await r.json();
 }
 
 export async function saveProject(paths, state) {

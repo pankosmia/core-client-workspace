@@ -34,7 +34,15 @@ export function useProjectPersistence({
     setTracks([]);
     (async () => {
       audioCtxRef.current ??= new AudioContext();
-      const proj = await loadProject(paths);
+      let proj;
+      try {
+        proj = await loadProject(paths);
+      } catch {
+        // Serveur injoignable / erreur de chargement : on ne sait pas s'il existe
+        // un projet à préserver. On laisse projectLoaded=false pour bloquer toute
+        // sauvegarde, afin de ne pas écraser un projet existant par un état vide.
+        return;
+      }
       if (cancelled) return;
 
       if (proj?.tracks?.length) {
