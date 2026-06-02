@@ -15,7 +15,10 @@ export async function getFirstChapterTextTranslation(
     const match = usfmString.match(re);
     if (match) {
       const chapter = match[1];
-      postEmptyJson(`/navigation/bcv/${bookCode}/${chapter}/1`, debugRefCurr);
+      postEmptyJson(
+        `/api/navigation/bcv/${bookCode}/${chapter}/1`,
+        debugRefCurr,
+      );
     }
   }
 }
