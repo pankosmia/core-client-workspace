@@ -7,15 +7,23 @@ import { snapTime } from "../lib/snap";
 
 // Un clip = un bloc visuel positionné en absolu sur la lane.
 // left/width sont calculés depuis (seg.vStart, durée) et pxPerSec.
-const INSET_X = 1;
+// INSET_X = 0 : les clips occupent leur largeur réelle, donc deux clips
+// adjacents se touchent sans gap. L'espace de respiration n'existe plus
+// par clip mais UNIQUEMENT au bord droit de la piste (RIGHT_EDGE_GAP).
+const INSET_X = 0;
 const INSET_Y = 2;
 const HEADER_HEIGHT = 12;
+// Marge réservée au bord droit de la lane : empêche le dernier clip (dont
+// vEnd == projectDuration) de coller / déborder sur la bordure de séparation
+// droite de la piste. Appliquée seulement à l'extrémité, pas entre les clips.
+const RIGHT_EDGE_GAP = 3;
 
 export default function Clip({
   segment,
   trackId,
   trackBuffer,
   pxPerSec,
+  projectDuration,
   isSelected,
   onMove,
   onMoveAcrossTracks,
@@ -28,10 +36,16 @@ export default function Clip({
 }) {
   const dur = segment.srcEnd - segment.srcStart;
   const left = segment.vStart * pxPerSec + INSET_X;
-  // -1 supplémentaire à droite : la lane a une bordure de séparation de 1px
-  // à son bord droit. Sans ce pixel, la bordure (hover/sélection) du clip de
-  // fin de timeline se superpose à cette séparation.
-  const width = Math.max(0, dur * pxPerSec - INSET_X * 2 - 1);
+  // Largeur réelle → clips adjacents jointifs (pas de gap entre eux).
+  let width = Math.max(0, dur * pxPerSec - INSET_X * 2);
+  // On ne rogne qu'à l'extrémité droite de la piste : si le bord droit du clip
+  // atteindrait (ou dépasserait) le bord de la lane, on le recule de
+  // RIGHT_EDGE_GAP. Les clips internes ne sont jamais touchés.
+  const laneWidth = projectDuration * pxPerSec;
+  if (laneWidth > 0) {
+    const maxRight = laneWidth - RIGHT_EDGE_GAP;
+    if (left + width > maxRight) width = Math.max(0, maxRight - left);
+  }
 
   // Interact.js pour le draggable
   const ref = useRef(null);

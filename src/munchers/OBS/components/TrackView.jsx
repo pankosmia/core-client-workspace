@@ -242,6 +242,7 @@ export default function TrackView({
                     trackId={track.id}
                     trackBuffer={track.buffer}
                     pxPerSec={pxPerSec}
+                    projectDuration={projectDuration}
                     isSelected={isClipSelected}
                     onMove={onClipMove}
                     onMoveAcrossTracks={onClipMoveAcrossTracks}
