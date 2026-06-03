@@ -30,6 +30,7 @@ import {
   insertSegmentAt,
   virtualDuration,
   segmentBuffer,
+  makeSegment,
 } from "./lib/edl";
 import { pickTickInterval } from "./lib/snap";
 import SplitIcon from "./SplitIcon";
@@ -319,6 +320,12 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
   };
 
   const cutSelection = () => {
+    // Priorité à la sélection de clips : copier puis supprimer les clips choisis.
+    if (clipSelection.length > 0) {
+      copyClipSelection();
+      deleteSelectedClips();
+      return;
+    }
     if (!regionSelection) return;
     const { trackId, start, end } = regionSelection;
     // setTracks(ts => ts.map(t =>
@@ -335,6 +342,11 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
   };
 
   const copySelection = () => {
+    // Priorité à la sélection de clips si présente.
+    if (clipSelection.length > 0) {
+      copyClipSelection();
+      return;
+    }
     if (!regionSelection) return;
     const { trackId, start, end } = regionSelection;
     const track = tracks.find((t) => t.id === trackId);
@@ -345,6 +357,35 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
     const segs = extractRange(track.edl, start, end, track.buffer, track.id);
     if (!segs.length) return;
     setClipboard({ segments: segs });
+  };
+
+  // Copie les clips actuellement sélectionnés vers le presse-papier.
+  // Les positions vStart sont normalisées par rapport au clip le plus à gauche
+  // pour préserver les écarts relatifs entre clips lors du collage.
+  const copyClipSelection = () => {
+    if (clipSelection.length === 0) return;
+    const segs = [];
+    for (const { trackId, segId } of clipSelection) {
+      const track = tracks.find((t) => t.id === trackId);
+      if (!track) continue;
+      const seg = track.edl.find((s) => s.id === segId);
+      if (!seg) continue;
+      // makeSegment génère de nouveaux ids et tague le buffer/track source
+      // (réf runtime + id sérialisable) comme le fait extractRange.
+      segs.push(
+        makeSegment(
+          seg.vStart,
+          seg.srcStart,
+          seg.srcEnd,
+          seg.buffer || track.buffer,
+          seg.bufferTrackId || track.id,
+        ),
+      );
+    }
+    if (!segs.length) return;
+    const minV = Math.min(...segs.map((s) => s.vStart));
+    const normalized = segs.map((s) => ({ ...s, vStart: s.vStart - minV }));
+    setClipboard({ segments: normalized });
   };
 
   const pasteAtCursor = () => {
@@ -758,7 +799,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
           <IconButton
             size="small"
             onClick={copySelection}
-            disabled={!regionSelection}
+            disabled={!regionSelection && clipSelection.length === 0}
             title={`Copy ( ${ctrlKeyTitle} + C)`}
           >
             <ContentCopyIcon fontSize="small" />
@@ -774,7 +815,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
           <IconButton
             size="small"
             onClick={cutSelection}
-            disabled={!regionSelection}
+            disabled={!regionSelection && clipSelection.length === 0}
             title="Cut ( Ctrl + X)"
           >
             <ContentCutIcon fontSize="small" />
