@@ -214,7 +214,17 @@ export default function Clip({
       },
     });
     interact(el).resizable({
-      edges: { left: true, right: true, top: false, bottom: false },
+      // Bords détectés via des poignées explicites (et non la marge automatique).
+      // La marge par défaut (20px) recouvre tout un clip étroit, header compris :
+      // le resizeChecker réclamait alors l'action et, le header étant réservé au
+      // drag, plus rien ne se déclenchait. Avec des poignées limitées au corps du
+      // clip, le header n'est jamais une zone de resize → le drag prend le relais.
+      edges: {
+        left: "[data-resize-left]",
+        right: "[data-resize-right]",
+        top: false,
+        bottom: false,
+      },
       listeners: {
         start(e) {
           resizeStartRectRef.current = {
@@ -351,6 +361,33 @@ export default function Clip({
           segment={segment}
           trackBuffer={trackBuffer}
           pxPerSec={pxPerSec}
+        />
+        {/* Poignées de resize : limitées au corps du clip (jamais le header,
+            réservé au drag). interact.js arme le resize uniquement quand le
+            pointeur tombe sur l'une d'elles. */}
+        <Box
+          data-resize-left
+          sx={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            width: 8,
+            cursor: "ew-resize",
+            zIndex: 2,
+          }}
+        />
+        <Box
+          data-resize-right
+          sx={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            right: 0,
+            width: 8,
+            cursor: "ew-resize",
+            zIndex: 2,
+          }}
         />
       </Box>
     </Box>

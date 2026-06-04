@@ -21,7 +21,11 @@ export function projectPaths({ localPath, chapter, paragraph }) {
 // l'appelant doit alors s'abstenir de sauvegarder pour ne pas écraser un projet existant.
 export async function loadProject(paths) {
   const r = await fetch(paths.bytesUrl(paths.project));
-  if (r.status === 404) return null;
+  // Le backend burrito répond 400 (et non 404) quand l'ingrédient/ipath
+  // n'existe pas encore : pour un chapitre jamais enregistré, c'est un cas
+  // normal "pas de projet", pas une erreur serveur. On le traite comme absent
+  // pour ne pas bloquer la première sauvegarde (projectLoaded resterait false).
+  if (r.status === 404 || r.status === 400) return null;
   if (!r.ok) throw new Error(`loadProject: HTTP ${r.status}`);
   return await r.json();
 }
