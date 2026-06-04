@@ -26,7 +26,7 @@ function OBSQuestionsViewerMuncher({ metadata }) {
   const { i18nRef } = useContext(I18nContext);
 
   const getAllData = async () => {
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=OBS.tsv`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=OBS.tsv`;
     let response = await getText(ingredientLink, debugRef.current);
     if (response.ok) {
       setIngredient(

@@ -1,20 +1,16 @@
 import { useState, useContext, useEffect } from "react";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
-import ImportExportIcon from "@mui/icons-material/ImportExport";
 import OBSContext from "../../contexts/obsContext";
-import OBSNavigator from "./components/OBSNavigator";
-import SaveOBSButton from "./components/SaveOBSButton";
 import AudioRecorder from "./components/AudioRecorder";
 import MarkdownField from "../../components/MarkdownField";
-import { IconButton, Menu, MenuItem } from "@mui/material";
 
 import "./OBSMuncher.css";
 
 import { debugContext as DebugContext } from "pankosmia-rcl";
 import { getText, postText } from "pithekos-lib";
 import md5 from "md5";
-import Switch from "@mui/material/Switch";
+import OBSEditorTools from "./components/OBSEditorTools";
 
 function OBSEditorMuncher({ metadata }) {
   const { obs, setObs } = useContext(OBSContext);
@@ -36,7 +32,7 @@ function OBSEditorMuncher({ metadata }) {
       return;
     }
     let fileName = obs[0] <= 9 ? `0${obs[0]}` : obs[0];
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`;
     let response = await getText(ingredientLink, debugRef.current);
     if (response.ok) {
       const chapterContent = response.text
@@ -128,7 +124,7 @@ function OBSEditorMuncher({ metadata }) {
     const obsString = await getStringifyIngredient(ingredientItem, fileName);
     const payload = JSON.stringify({ payload: obsString });
     const response = await postText(
-      `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
+      `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
       payload,
       debugRef,
       "application/json",
@@ -148,7 +144,7 @@ function OBSEditorMuncher({ metadata }) {
   };
   const getStringifyIngredient = async (ingredientItem, fileName) => {
     const response = await getText(
-      `/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
+      `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=content/${fileName}.md`,
       debugRef,
     );
     if (response.ok) {
@@ -212,7 +208,7 @@ function OBSEditorMuncher({ metadata }) {
   const chapterTitle = (currentChapter[0] || "").replace(/^#+\s*/, "").trim();
 
   const getMainTrack = async () => {
-    const url = `/burrito/paths/${metadata.local_path}`;
+    const url = `/api/burrito/paths/${metadata.local_path}`;
     const response = await fetch(url, {
       method: "GET",
     });
@@ -230,7 +226,7 @@ function OBSEditorMuncher({ metadata }) {
 
   const handleExportVideoParagraph = async () => {
     setMenuAnchorEl(null);
-    const videoUrl = `/video/obs-para/${metadata.local_path}`;
+    const videoUrl = `/api/video/obs-para/${metadata.local_path}`;
     const json = {
       story_n: obs[0],
       para_n: obs[1],
@@ -250,7 +246,7 @@ function OBSEditorMuncher({ metadata }) {
   const handleExportVideoStory = async () => {
     setMenuAnchorEl(null);
 
-    const videoUrl = `/video/obs-story/${metadata.local_path}`;
+    const videoUrl = `/api/video/obs-story/${metadata.local_path}`;
     const json = {
       story_n: obs[0],
     };
@@ -266,78 +262,42 @@ function OBSEditorMuncher({ metadata }) {
   };
 
   return (
-    <Stack sx={{ p: 2 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "left",
-          alignItems: "center",
-          mb: 1,
-        }}
-      >
-        {/* <Box /> */}
-        <Box>
-          <SaveOBSButton
-            obs={obs}
-            isModified={isModified}
-            handleSave={handleSaveOBS}
+    <>
+      <OBSEditorTools
+        obs={obs}
+        setObs={setObs}
+        isModified={isModified}
+        handleSaveOBS={handleSaveOBS}
+        audioEnabled={audioEnabled}
+        setAudioEnabled={setAudioEnabled}
+        currentChapter={currentChapter}
+        chapterTitle={chapterTitle}
+        handleExportVideoParagraph={handleExportVideoParagraph}
+        isExportingParaEnabled={isExportingParaEnabled}
+        handleExportVideoStory={handleExportVideoStory}
+        isMenuOpen={isMenuOpen}
+        menuAnchorEl={menuAnchorEl}
+        setMenuAnchorEl={setMenuAnchorEl}
+      />
+      <Box sx={{ mt: "120px", padding: 2 }}>
+        <Stack>
+          <MarkdownField
+            currentRow={obs[1]}
+            onChangeNote={handleChange}
+            value={currentChapter[obs[1]] || ""}
+            mode="write"
           />
-        </Box>
-        <Box sx={{ ml: 2 }}>
-          Audio
-          <Switch
-            checked={audioEnabled}
-            onChange={() => setAudioEnabled(!audioEnabled)}
-          />
-        </Box>
-        <Box>
-          <IconButton
-            id="obs-export-button"
-            aria-controls={isMenuOpen ? "obs-export-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={isMenuOpen ? "true" : undefined}
-            onClick={(event) => setMenuAnchorEl(event.currentTarget)}
-          >
-            <ImportExportIcon />
-          </IconButton>
-          <Menu
-            id="obs-export-menu"
-            anchorEl={menuAnchorEl}
-            open={isMenuOpen}
-            onClose={() => setMenuAnchorEl(null)}
-            slotProps={{ list: { "aria-labelledby": "obs-export-button" } }}
-          >
-            <MenuItem
-              onClick={() => handleExportVideoParagraph()}
-              disabled={!isExportingParaEnabled}
-            >
-              Export video paragraph
-            </MenuItem>
-            <MenuItem onClick={() => handleExportVideoStory()}>
-              Export video story
-            </MenuItem>
-          </Menu>
-        </Box>
+          {audioEnabled && (
+            <AudioRecorder
+              audioUrl={audioUrl}
+              setAudioUrl={setAudioUrl}
+              metadata={metadata}
+              obs={obs}
+            />
+          )}
+        </Stack>
       </Box>
-      <OBSNavigator max={currentChapter.length - 1} title={chapterTitle} />
-      <Stack>
-        <MarkdownField
-          currentRow={obs[1]}
-          columnNames={currentChapter}
-          onChangeNote={handleChange}
-          value={currentChapter[obs[1]] || ""}
-          mode="write"
-        />
-        {audioEnabled && (
-          <AudioRecorder
-            audioUrl={audioUrl}
-            setAudioUrl={setAudioUrl}
-            metadata={metadata}
-            obs={obs}
-          />
-        )}
-      </Stack>
-    </Stack>
+    </>
   );
 }
 

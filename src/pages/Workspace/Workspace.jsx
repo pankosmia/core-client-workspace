@@ -27,7 +27,7 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
 
   const getProjectSummaries = async () => {
     const summariesResponse = await getJson(
-      "/burrito/metadata/summaries",
+      "/api/burrito/metadata/summaries",
       debugRef.current,
     );
     if (summariesResponse.ok) {

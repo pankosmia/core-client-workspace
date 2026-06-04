@@ -28,7 +28,7 @@ function BNotesViewerMuncher({ metadata }) {
   const sbScriptDirSet = sbScriptDir === "ltr" || sbScriptDir === "rtl";
 
   const getAllData = async () => {
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.md`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.md`;
     let response = await getText(ingredientLink, debugRef.current);
     if (response.ok) {
       setIngredient(response.text);

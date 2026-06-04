@@ -119,7 +119,7 @@ function JuxtaDraftingEditor({ metadata, modified, setModified }) {
     const getAllData = async () => {
       if (currentBookCode) {
         setCurIndex(0);
-        const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${currentBookCode}.json`;
+        const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${currentBookCode}.json`;
         let response = await getJson(ingredientLink, debugRef.current);
         if (response.ok) {
           setIngredient(response.json);

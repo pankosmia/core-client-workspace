@@ -18,7 +18,7 @@ function VideoLinksViewerMuncher({ metadata }) {
   const { i18nRef } = useContext(I18nContext);
 
   const getAllData = async () => {
-    const ingredientLink = `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
+    const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
     let response = await getText(ingredientLink, debugRef.current);
     if (response.ok) {
       setIngredient(

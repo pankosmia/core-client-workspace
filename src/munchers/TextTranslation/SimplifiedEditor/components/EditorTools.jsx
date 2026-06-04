@@ -53,7 +53,7 @@ function EditorTools({
     if (systemBcv.bookCode !== currentBookCode) {
       const doChapterNumbers = async () => {
         let usfmResponse = await getText(
-          `/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
+          `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
           debugRef.current,
         );
         if (usfmResponse.ok) {
