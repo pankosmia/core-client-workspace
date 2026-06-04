@@ -1,1834 +1,966 @@
-import {
-  useRef,
-  useState,
-  useMemo,
-  useEffect,
-  useCallback,
-  useContext,
-} from "react";
-import MicIcon from "@mui/icons-material/Mic";
-import StopIcon from "@mui/icons-material/Stop";
-import PauseIcon from "@mui/icons-material/Pause";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import ContentPasteIcon from "@mui/icons-material/ContentPaste";
-import DeleteIcon from "@mui/icons-material/Delete";
-import RestoreIcon from "@mui/icons-material/Restore";
-import EditIcon from "@mui/icons-material/Edit";
+import { useState, useRef, useMemo, useEffect } from "react";
 import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
-import { useWavesurfer } from "@wavesurfer/react";
-import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
-import RecordPlugin from "wavesurfer.js/dist/plugins/record.esm.js";
-import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js";
-import Tooltip from "@mui/material/Tooltip";
-import Waveform from "./Waveform";
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
-import AutorenewIcon from "@mui/icons-material/Autorenew";
-import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import MicIcon from "@mui/icons-material/MicNoneOutlined";
+import StopIcon from "@mui/icons-material/StopOutlined";
+import PlayArrowIcon from "@mui/icons-material/PlayArrowOutlined";
+import ContentCopyIcon from "@mui/icons-material/ContentCopyOutlined";
+import ContentPasteIcon from "@mui/icons-material/ContentPasteOutlined";
+import ContentCutIcon from "@mui/icons-material/ContentCutOutlined";
+import UndoIcon from "@mui/icons-material/UndoOutlined";
+import RedoIcon from "@mui/icons-material/RedoOutlined";
+import Divider from "@mui/material/Divider";
 
-import { doI18n } from "pithekos-lib";
-import { i18nContext as I18nContext } from "pankosmia-rcl";
+import TrackView from "./TrackView";
+import { scheduleTrackFrom, stopSources } from "./lib/playback";
+import TimelineAxis from "./trackview/TimelineAxis";
+import LiveRecordingLane from "./trackview/LiveRecordingLane";
+import { projectPaths } from "./lib/storageUtil";
+import { useProjectPersistence } from "./hooks/useProjectPersistence";
+import { useRecorder } from "./hooks/useRecorder";
+import { formatTime } from "./Timeline";
+import {
+  cutRange,
+  extractRange,
+  insertAt,
+  splitAt,
+  trimSegment,
+  removeSegment,
+  insertSegmentAt,
+  virtualDuration,
+  segmentBuffer,
+  makeSegment,
+} from "./lib/edl";
+import { pickTickInterval } from "./lib/snap";
+import SplitIcon from "./SplitIcon";
+// import GestureIcon from "./GestureIcon";
 
-const AudioRecorder = ({ audioUrl, setAudioUrl, obs, metadata }) => {
-  const { i18nRef } = useContext(I18nContext);
-  const [isRecording, setIsRecording] = useState(false);
-  const waveformRef = useRef(null);
-  const regionsPlugin = useMemo(() => RegionsPlugin.create(), []);
-  const recordPlugin = useMemo(
+export default function AudioRecorder({ audioUrl, obs, metadata }) {
+  const audioCtxRef = useRef(null);
+  const [tracks, setTracks] = useState([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playerHeadTime, setPlayerHeadTime] = useState(0);
+  // Region/selection
+  const [selection, setSelection] = useState(null); // { trackId, time }
+  const [regionSelection, setRegionSelection] = useState(null); // { trackId, start, end }
+  // Sélection de clip(s) : tableau d'entrées {trackId, segId}. Permet multi-sélection
+  // cross-tracks via Ctrl/Cmd. Le ref `clipSelectionAnchor` retient le pivot pour
+  // l'extension Shift-clic (range sur la même piste).
+  const [clipSelection, setClipSelection] = useState([]);
+  const clipSelectionAnchorRef = useRef(null);
+  const [clipboard, setClipboard] = useState(null); // { buffer, segments }
+  // undo/redo
+  const [future, setFuture] = useState([]); // historique des actions apres le undo
+  const [past, setPast] = useState([]); // historique des actions
+
+  const playStartedAtRef = useRef(0);
+  const playEndsAtRef = useRef(0);
+  const playingFromRef = useRef(null); // { trackId, startTime } figé au play()
+  const rafRef = useRef(null);
+  const sourcesRef = useRef([]);
+
+  // Snap
+  const [snapEnabled, setSnapEnabled] = useState(
+    () => localStorage.getItem("snapEnabled") !== "false",
+  );
+
+  const getSnapCandidates = (trackId, excludeSegId) => {
+    const t = tracks.find((x) => x.id === trackId);
+    if (!t) return [];
+    const out = [];
+    for (const s of t.edl) {
+      if (s.id === excludeSegId) continue;
+      out.push(s.vStart);
+      out.push(s.vStart + (s.srcEnd - s.srcStart));
+    }
+    if (selection?.trackId === trackId && selection.time != null) {
+      out.push(selection.time);
+    }
+    return out;
+  };
+
+  const paths = useMemo(
     () =>
-      RecordPlugin.create({
-        renderRecordedAudio: true,
-        scrollingWaveform: false,
-        audioBitsPerSecond: 128000,
-      }),
-    [],
-  );
-  const timelinePlugin = useMemo(
-    () =>
-      TimelinePlugin.create({
-        height: 25,
-        insertPosition: "beforebegin",
-        timeInterval: 0.2,
-        primaryLabelInterval: 5,
-        secondaryLabelInterval: 1,
-      }),
-    [],
-  );
-  const plugins = useMemo(
-    () => [regionsPlugin, recordPlugin, timelinePlugin],
-    [regionsPlugin, recordPlugin, timelinePlugin],
-  );
-  const [prise, setPrise] = useState(null);
-  const [bakExists, setBakExists] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showOtherTracks, setShowOtherTracks] = useState(true);
-  const [cursorTime, setCursorTime] = useState(0);
-  const [currentTrack, setCurrentTrack] = useState(0);
-  const [trackDurations, setTrackDurations] = useState({});
-  const [maxDuration, setMaxDuration] = useState(0);
-  const [selectedRegion, setSelectedRegion] = useState([]);
-  const [copiedRegion, setCopiedRegion] = useState(null);
-  const recordingWaveformRef = useRef(null);
-  const recordingCanvasRef = useRef(null);
-  const [nextPriseNumber, setNextPriseNumber] = useState(null);
-  const [otherPrises, setOtherPrises] = useState([]);
-  const mediaRecorderRef = useRef(null);
-  const mediaStreamRef = useRef(null);
-  const chunksRef = useRef([]);
-  const analyserRef = useRef(null);
-  const animationFrameRef = useRef(null);
-  const isRecordingRef = useRef(false);
-  const lastCursorTimeRef = useRef(0);
-  const [waveformRefs, setWaveformRefs] = useState({});
-  const [secondaryIsPlaying, setSecondaryIsPlaying] = useState({});
-  const [editingPrise, setEditingPrise] = useState(null);
-  const [editingName, setEditingName] = useState("");
-  const [mainTrack, setMainTrack] = useState(null);
-
-  // Grille de timeline
-  const [gridSeconds, setGridSeconds] = useState(0.1);
-  const [snapEnabled, setSnapEnabled] = useState(true);
-  const tracksContainerRef = useRef(null);
-  const [waveformWidth, setWaveformWidth] = useState(0);
-
-  const getUrl = (
-    segment = "bytes",
-    chapter = obs[0],
-    paragraph = obs[1],
-    newPrise = prise,
-    ext = "wav",
-  ) => {
-    let chapterString = chapter < 10 ? `0${chapter}` : chapter;
-    let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
-    return `/api/burrito/ingredient/${segment}/${metadata.local_path}?ipath=audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newPrise}.${ext}`;
-  };
-
-  const fileExists = async (newAudioUrl) => {
-    const response = await fetch(`/burrito/paths/${metadata.local_path}`);
-    const data = await response.json();
-    const ipath = newAudioUrl.split("?ipath=")[1];
-    return data.some((item) => item.includes(ipath));
-  };
-
-  const listPrises = async (chapter, paragraph) => {
-    const url = `/api/burrito/paths/${metadata.local_path}`;
-    const response = await fetch(url, {
-      method: "GET",
-    });
-    const data = await response.json();
-    let chapterString = chapter < 10 ? `0${chapter}` : chapter;
-    let paragraphString = paragraph < 10 ? `0${paragraph}` : paragraph;
-    return data.filter(
-      (item) =>
-        item.includes(`audio_content/${chapterString}-${paragraphString}`) &&
-        !item.includes(".bak"),
-    );
-  };
-
-  // Attend que le fichier soit présent côté serveur avant de l'utiliser
-  const waitForFileByUrl = useCallback(
-    async (urlToCheck, { timeoutMs = 8000, intervalMs = 250 } = {}) => {
-      const start = Date.now();
-      while (Date.now() - start < timeoutMs) {
-        try {
-          const exists = await fileExists(urlToCheck);
-          if (exists) return true;
-        } catch (_) {}
-        await new Promise((r) => setTimeout(r, intervalMs));
-      }
-      return false;
-    },
-    [],
+      metadata?.local_path && obs
+        ? projectPaths({
+            localPath: metadata.local_path,
+            chapter: obs[0],
+            paragraph: obs[1],
+          })
+        : null,
+    [metadata?.local_path, obs],
   );
 
-  const audioBufferToWav = (buffer) => {
-    const length = buffer.length;
-    const arrayBuffer = new ArrayBuffer(44 + length * 2);
-    const view = new DataView(arrayBuffer);
-
-    "RIFF".split("").forEach((char, i) => view.setUint8(i, char.charCodeAt(0)));
-    view.setUint32(4, 36 + length * 2, true);
-    "WAVEfmt "
-      .split("")
-      .forEach((char, i) => view.setUint8(8 + i, char.charCodeAt(0)));
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, 1, true);
-    view.setUint32(24, buffer.sampleRate, true);
-    view.setUint32(28, buffer.sampleRate * 2, true);
-    view.setUint16(32, 2, true);
-    view.setUint16(34, 16, true);
-    "data"
-      .split("")
-      .forEach((char, i) => view.setUint8(36 + i, char.charCodeAt(0)));
-    view.setUint32(40, length * 2, true);
-
-    const samples = buffer.getChannelData(0);
-    let offset = 44;
-    for (let i = 0; i < length; i++) {
-      view.setInt16(offset, samples[i] * 0x7fff, true);
-      offset += 2;
-    }
-
-    return new Blob([arrayBuffer], { type: "audio/wav" });
-  };
-
-  // ça insert l'audio B a un endroit dans l'audio A
-  const insertAudio = async (A, B, insertTime, startTimeB, endTimeB) => {
-    const urlA = getUrl().replace(`_${prise}.wav`, `_${A}.wav`);
-    const urlB = getUrl().replace(`_${prise}.wav`, `_${B}.wav`);
-
-    const audioContext = new AudioContext();
-
-    try {
-      const [responseA, responseB] = await Promise.all([
-        fetch(urlA),
-        fetch(urlB),
-      ]);
-
-      if (responseA.ok && responseB.ok) {
-        const [bufferA, bufferB] = await Promise.all([
-          audioContext.decodeAudioData(
-            await (await responseA.blob()).arrayBuffer(),
-          ),
-          audioContext.decodeAudioData(
-            await (await responseB.blob()).arrayBuffer(),
-          ),
-        ]);
-
-        const sampleRate = bufferA.sampleRate;
-
-        // Débyt del'audio A
-        const segmentA1 = bufferA
-          .getChannelData(0)
-          .slice(0, insertTime * sampleRate);
-        // Fin de l'audio A
-        const segmentA2 = bufferA
-          .getChannelData(0)
-          .slice(insertTime * sampleRate, bufferA.getChannelData(0).length);
-
-        // Début de l'audio B
-        const segmentB = bufferB
-          .getChannelData(0)
-          .slice(startTimeB * sampleRate, endTimeB * sampleRate);
-
-        const totalSamples =
-          segmentA1.length + segmentB.length + segmentA2.length;
-        const newBuffer = audioContext.createBuffer(
-          1,
-          totalSamples,
-          sampleRate,
-        );
-        const channel = newBuffer.getChannelData(0);
-
-        channel.set(segmentA1, 0);
-        channel.set(segmentB, segmentA1.length);
-        channel.set(segmentA2, segmentA1.length + segmentB.length);
-
-        const wav = audioBufferToWav(newBuffer);
-        const newUrl = URL.createObjectURL(wav);
-        const newMaxDuration =
-          endTimeB - startTimeB + bufferA.getChannelData(0).length / sampleRate;
-        if (newMaxDuration > maxDuration) {
-          setMaxDuration(newMaxDuration);
-        }
-
-        const formData = new FormData();
-        formData.append("file", wav);
-        const response = await fetch(getUrl("bytes", obs[0], obs[1], prise), {
-          method: "POST",
-          body: formData,
-        });
-        const data = await response.json();
-        // console.log(data);
-        refreshMainTrackScale();
-        return newUrl;
-      }
-    } catch (error) {
-      console.error("Error in insertAudio:", error);
-    }
-    return null;
-  };
-
-  const getOldPriseNumber = useCallback(async () => {
-    const url = `/api/burrito/paths/${metadata.local_path}`;
-    const response = await fetch(url, {
-      method: "GET",
-    });
-    const data = await response.json();
-    const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
-    const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-    const prises = data.filter(
-      (item) =>
-        item.includes(`audio_content/${chapterString}-${paragraphString}`) &&
-        !item.includes(".bak"),
-    );
-    const priseNumbers = prises.map((prise) =>
-      prise
-        .split(`${chapterString}-${paragraphString}_`)[1]
-        .split("_")[0]
-        .replace(".wav", ""),
-    );
-    const newPrise = priseNumbers
-      .map((prise) => parseInt(prise))
-      .filter((prise) => !isNaN(prise))
-      .sort((a, b) => b - a)[0];
-
-    return isNaN(newPrise) ? 0 : newPrise;
-  }, [metadata.local_path, obs]);
-
-  const refreshEmptyTrackOnly = useCallback(async () => {
-    const next = (await getOldPriseNumber()) + 1;
-    setNextPriseNumber(next);
-  }, [getOldPriseNumber]);
-
-  const startWaveformAnimation = useCallback(() => {
-    if (!recordingCanvasRef.current || !analyserRef.current) return;
-
-    const canvas = recordingCanvasRef.current;
-    const canvasCtx = canvas.getContext("2d");
-    const analyser = analyserRef.current;
-
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-
-    const draw = () => {
-      if (!isRecordingRef.current) return;
-
-      analyser.getByteTimeDomainData(dataArray);
-
-      canvasCtx.fillStyle = "rgb(245, 245, 245)";
-      canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-      canvasCtx.lineWidth = 2;
-      canvasCtx.strokeStyle = "rgb(255, 107, 107)";
-      canvasCtx.beginPath();
-
-      const sliceWidth = (canvas.width * 1.0) / bufferLength;
-      let x = 0;
-
-      for (let i = 0; i < bufferLength; i++) {
-        const v = dataArray[i] / 128.0;
-        const y = (v * canvas.height) / 2;
-
-        if (i === 0) {
-          canvasCtx.moveTo(x, y);
-        } else {
-          canvasCtx.lineTo(x, y);
-        }
-
-        x += sliceWidth;
-      }
-
-      canvasCtx.lineTo(canvas.width, canvas.height / 2);
-      canvasCtx.stroke();
-
-      animationFrameRef.current = requestAnimationFrame(draw);
-    };
-
-    draw();
-  }, []);
-
-  const startRecording = async () => {
-    if (isRecordingRef.current) return;
-    isRecordingRef.current = true;
-    try {
-      // Calculer le numéro de la prochaine prise
-      const nextPrise = (await getOldPriseNumber()) + 1;
-      setNextPriseNumber(nextPrise);
-
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaStreamRef.current = stream;
-
-      // Créer l'analyseur audio pour la visualisation
-      const audioContext = new AudioContext();
-      const analyser = audioContext.createAnalyser();
-      const source = audioContext.createMediaStreamSource(stream);
-      source.connect(analyser);
-
-      analyser.fftSize = 2048;
-      analyserRef.current = analyser;
-
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      chunksRef.current = [];
-
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorderRef.current.onstop = async () => {
-        // Convertir l'enregistrement en WAV avant upload
-        const recordedBlob = new Blob(chunksRef.current, {
-          type: "audio/webm",
-        });
-
-        // Décoder puis ré-encoder en WAV
-        const audioContext = new AudioContext();
-        const arrayBuffer = await recordedBlob.arrayBuffer();
-        const sourceBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        const wavBlob = audioBufferToWav(sourceBuffer);
-
-        // Sauvegarder l'enregistrement
-        const formData = new FormData();
-        formData.append("file", wavBlob);
-
-        const postUrl = getUrl("bytes", obs[0], obs[1], nextPrise);
-        await fetch(postUrl, {
-          method: "POST",
-          body: formData,
-        });
-        const createdUrl = getUrl("bytes", obs[0], obs[1], nextPrise);
-        await waitForFileByUrl(createdUrl);
-
-        // Calculer la durée et mettre à jour l'interface
-        const audioBuffer = sourceBuffer;
-        const duration =
-          audioBuffer.getChannelData(0).length / audioBuffer.sampleRate;
-        if (duration > maxDuration) {
-          setMaxDuration(duration);
-          updateMainTrackWidth(undefined, duration);
-        }
-
-        setNextPriseNumber(null);
-        chunksRef.current = [];
-
-        checkIfPriseExists();
-        refreshEmptyTrackOnly();
-        setOtherPrises((prev) => {
-          const nextKey = String(nextPrise);
-          const exists = (prev || []).some((p) => p.split("_")[0] === nextKey);
-          if (exists) return prev;
-          const updated = [...(prev || []), nextKey];
-          return updated.sort(
-            (a, b) => parseInt(a.split("_")[0]) - parseInt(b.split("_")[0]),
-          );
-        });
-      };
-
-      // Démarrer l'enregistrement et la visualisation
-      mediaRecorderRef.current.start(250);
-      setIsRecording(true);
-
-      setTimeout(() => {
-        startWaveformAnimation();
-      }, 100);
-    } catch (error) {
-      isRecordingRef.current = false;
-      console.error("Error in recording", error);
-    }
-  };
-
-  const stopRecording = async () => {
-    try {
-      if (mediaRecorderRef.current && isRecording) {
-        // Arrêter l'enregistrement
-        isRecordingRef.current = false;
-        mediaRecorderRef.current.stop();
-        setIsRecording(false);
-
-        // Arrêter l'animation
-        if (animationFrameRef.current) {
-          cancelAnimationFrame(animationFrameRef.current);
-        }
-
-        // Arrêter le stream
-        if (mediaStreamRef.current) {
-          mediaStreamRef.current.getTracks().forEach((track) => {
-            track.stop();
-          });
-          mediaStreamRef.current = null;
-        }
-
-        // Nettoyer le canvas
-        if (recordingCanvasRef.current) {
-          const canvas = recordingCanvasRef.current;
-          const canvasCtx = canvas.getContext("2d");
-          canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        analyserRef.current = null;
-      }
-    } catch (error) {
-      console.error("Error in stopping recording", error);
-    }
-  };
-
-  const formatTime = (time) => {
-    const seconds = Math.floor(time % 60);
-    const minutes = Math.floor(time / 60);
-    return minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
-  };
-
-  const { wavesurfer, currentTime, isPlaying } = useWavesurfer({
-    container: waveformRef,
-    height: 100,
-    waveColor: "rgb(34, 173, 197)",
-    progressColor: "rgb(64, 107, 114)",
-    url: audioUrl,
-    plugins: plugins,
-    barWidth: 2,
-    barGap: 1,
-    barRadius: 2,
-    cursorWidth: 1,
-    cursorColor: "rgb(197, 34, 34)",
-    interact: false,
+  useProjectPersistence({ paths, audioCtxRef, audioUrl, tracks, setTracks });
+  const {
+    isRecording,
+    startRecording,
+    stopRecording,
+    recordingDuration,
+    peaksRef,
+    sampleHz,
+  } = useRecorder({
+    paths,
+    audioCtxRef,
+    setTracks,
   });
 
-  const updateMainTrackWidth = useCallback(
-    (duration, newMaxDuration = maxDuration) => {
-      if (!waveformRef.current || !wavesurfer) return;
-      if (!duration) duration = wavesurfer.getDuration();
-      if (!duration || !newMaxDuration) return;
-      wavesurfer.setOptions({
-        width: (waveformRef.current.clientWidth / newMaxDuration) * duration,
-      });
-    },
-    [wavesurfer, maxDuration],
-  );
-
-  const refreshMainTrackScale = useCallback(() => {
-    const mainDuration = wavesurfer?.getDuration?.() || 0;
-    const trackDurationsList = Object.values(trackDurations || []).filter(
-      (value) => typeof value === "number" && value > 0,
+  const projectDuration = useMemo(() => {
+    const trackMax = tracks.reduce(
+      (max, t) => Math.max(max, virtualDuration(t)),
+      0,
     );
-    const nextMaxDuration = Math.max(mainDuration, ...trackDurationsList, 0);
+    if (recordingDuration <= 0) return trackMax;
+    // Pendant l'enregistrement, élargit la timeline par paliers de 5s
+    // avec ~5s de marge à droite. Donne de la place au clip live pour
+    // grandir visuellement, et évite que pxPerSec change à chaque tick
+    // d'update de recordingDuration (saut tous les 5s seulement).
+    const liveWindow = Math.max(10, Math.ceil(recordingDuration / 5) * 5 + 5);
+    return Math.max(trackMax, liveWindow);
+  }, [tracks, recordingDuration]);
 
-    if (nextMaxDuration > 0) {
-      setMaxDuration(nextMaxDuration);
-      updateMainTrackWidth(mainDuration || undefined, nextMaxDuration);
-    }
-  }, [wavesurfer, trackDurations, updateMainTrackWidth]);
+  // snapStep = même intervalle que les ticks affichés par TimelineAxis.
+  // Quand on zoome/dézoome (projectDuration change), le snap suit la grille.
+  const snapStep = pickTickInterval(projectDuration);
 
-  useEffect(() => {
-    if (!waveformRef.current) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setWaveformWidth(entry.contentRect.width);
-      }
-    });
-    observer.observe(waveformRef.current);
-    // init
-    setWaveformWidth(waveformRef.current.clientWidth);
-    return () => observer.disconnect();
-  }, [waveformRef]);
+  const laneRef = useRef(null);
+  const [laneWidth, setLaneWidth] = useState(0);
+  const pxPerSec = projectDuration > 0 ? laneWidth / projectDuration : 0;
 
   useEffect(() => {
-    let cancelled = false;
-    const ensureWidth = () => {
-      if (cancelled) return;
-      const el = waveformRef.current;
-      if (!el) return;
-      const w = el.clientWidth || 0;
-      if (w > 0) {
-        setWaveformWidth(w);
-        return;
-      }
-      setTimeout(ensureWidth, 60);
-    };
-    ensureWidth();
-    return () => {
-      cancelled = true;
-    };
-  }, [audioUrl]);
-
-  // Adapter dynamiquement la largeur de la waveform principale lors d'un resize du conteneur
-  useEffect(() => {
-    if (!wavesurfer || !waveformRef.current) return;
-    updateMainTrackWidth(undefined, maxDuration);
-  }, [waveformWidth, maxDuration, wavesurfer, updateMainTrackWidth]);
-
-  const effectiveDuration = useMemo(() => {
-    const dur = wavesurfer?.getDuration?.();
-    return maxDuration && maxDuration > 0 ? maxDuration : dur || 0;
-  }, [maxDuration, wavesurfer]);
-
-  const derivedGridSeconds = useMemo(() => {
-    if (!waveformWidth) return gridSeconds;
-    const baseDuration = effectiveDuration || 1;
-    const desiredMinPx = 8;
-    const secondsPerPx = baseDuration / waveformWidth;
-    const minSeconds = desiredMinPx * secondsPerPx;
-    const niceSteps = [
-      0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 5, 10, 15, 20, 30, 60, 120, 300, 600,
-      900, 1200,
-    ];
-    const nice = niceSteps.find((s) => s >= minSeconds) || minSeconds;
-    return Math.max(gridSeconds, nice);
-  }, [waveformWidth, effectiveDuration, gridSeconds]);
-
-  const gridPx = useMemo(() => {
-    if (!waveformWidth || !derivedGridSeconds) return 0;
-    const baseDuration = effectiveDuration || 1;
-    return (waveformWidth / baseDuration) * derivedGridSeconds;
-  }, [waveformWidth, effectiveDuration, derivedGridSeconds]);
-
-  const majorGridPx = useMemo(() => (gridPx ? gridPx * 5 : 0), [gridPx]);
-
-  const onPlayPause = () => {
-    if (!audioUrl) return;
-    wavesurfer && wavesurfer.playPause();
-  };
-
-  const onDelete = () => {
-    setAudioUrl("");
-
-    const deleteUrl = getUrl("delete");
-    fetch(deleteUrl, {
-      method: "POST",
-    }).then(() => {
-      refreshEmptyTrackOnly();
-    });
-  };
-
-  const onRestore = () => {
-    const bakUrl = getUrl("revert");
-    fetch(bakUrl, {
-      method: "POST",
-    }).then(async () => {
-      setBakExists(await fileExists(getUrl() + ".bak"));
-      setAudioUrl("");
-    });
-  };
-
-  const handleReady = useCallback(() => {
-    if (!wavesurfer) return;
-    const duration = wavesurfer.getDuration();
-    refreshMainTrackScale();
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 100);
-  }, [wavesurfer, updateMainTrackWidth, refreshMainTrackScale]);
-
-  const handleLoading = useCallback(() => {
-    setIsLoading(true);
+    const el = laneRef.current;
+    if (!el) return;
+    setLaneWidth(el.clientWidth);
+    const ro = new ResizeObserver(([e]) => setLaneWidth(e.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
   }, []);
 
-  const snapToGrid = useCallback(
-    (time) => {
-      if (!derivedGridSeconds || derivedGridSeconds <= 0) return time;
-      return Math.round(time / derivedGridSeconds) * derivedGridSeconds;
-    },
-    [derivedGridSeconds],
-  );
+  // Pour afficher le temps meme quand on ne joue pas de track
+  const displayTime = isPlaying
+    ? (playingFromRef.current?.startTime ?? 0) + playerHeadTime
+    : (selection?.time ?? 0);
 
-  const updateCursorTime = useCallback(
-    (time, { force = false } = {}) => {
-      const base = snapEnabled && !force ? snapToGrid(time) : time;
-      const clamped = Math.max(0, Math.min(base, maxDuration || base));
-      setCursorTime(clamped);
-    },
-    [snapEnabled, snapToGrid, maxDuration],
-  );
-
-  const handleTimeUpdate = useCallback(() => {
-    if (!wavesurfer) return;
-    const now = wavesurfer.getCurrentTime();
-    updateCursorTime(now, { force: true });
-  }, [wavesurfer, updateCursorTime]);
-
-  const handleMainWaveformClick = useCallback(
-    (e) => {
-      if (!wavesurfer || !waveformRef.current) return;
-      const rect = waveformRef.current.getBoundingClientRect();
-      const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width || 0));
-      const displayedDuration = wavesurfer.getDuration?.() || 0;
-      const baseDuration = displayedDuration || effectiveDuration || 0;
-      if (!baseDuration || !rect.width) return;
-      const rawTime = (x / rect.width) * baseDuration;
-      const targetTime = snapEnabled ? snapToGrid(rawTime) : rawTime;
-      updateCursorTime(targetTime);
-      try {
-        wavesurfer.setTime(targetTime);
-      } catch (_) {}
-    },
-    [
-      wavesurfer,
-      waveformRef,
-      effectiveDuration,
-      snapEnabled,
-      snapToGrid,
-      updateCursorTime,
-    ],
-  );
-
-  // Gestion des événements WaveSurfer pour la track principale
-  useEffect(() => {
-    if (!wavesurfer) return;
-
-    wavesurfer.on("ready", handleReady);
-    wavesurfer.on("loading", handleLoading);
-    wavesurfer.on("timeupdate", handleTimeUpdate);
-  }, [wavesurfer, handleReady, handleLoading, handleTimeUpdate]);
-
-  const disableDragSelectionRef = useRef(null);
-
-  useEffect(() => {
-    // Toujours désactiver avant d'activer
-    if (disableDragSelectionRef.current) {
-      try {
-        disableDragSelectionRef.current();
-      } catch (_) {}
-      disableDragSelectionRef.current = null;
-    }
-    if (regionsPlugin && wavesurfer) {
-      disableDragSelectionRef.current = regionsPlugin.enableDragSelection(
-        {
-          drag: true,
-          color: "rgba(0, 0, 0, 0.2)",
-        },
-        1,
-      );
-      regionsPlugin.on("region-created", handleRegionCreate);
-      regionsPlugin.on("region-updated", handleRegionUpdate);
-      regionsPlugin.on("region-clicked", handleRegionClick);
-    }
-    return () => {
-      if (disableDragSelectionRef.current) {
-        try {
-          disableDragSelectionRef.current();
-        } catch (_) {}
-        disableDragSelectionRef.current = null;
-      }
-    };
-  }, [wavesurfer, regionsPlugin]);
-
-  const handleRegionCreate = (region) => {
-    if (handleRegionSelect) {
-      // Identifie explicitement la piste principale comme "0"
-      handleRegionSelect([region, "0", regionsPlugin]);
-    }
-  };
-
-  const handleRegionUpdate = (region) => {
-    if (handleRegionSelect) {
-      // Identifie explicitement la piste principale comme "0"
-      handleRegionSelect([region, "0", regionsPlugin]);
-    }
-  };
-
-  const handleRegionClick = (region) => {
-    // Identifie explicitement la piste principale comme "0"
-    handleRegionSelect([region, "0", regionsPlugin]);
-  };
-
-  useEffect(() => {
-    const updateAudioUrl = async () => {
-      setIsLoading(true);
-      let url = getUrl("bytes", obs[0], obs[1], prise);
-      if (url.includes("_null.wav")) {
-        const newPrise = await updatePrise();
-        url = getUrl("bytes", obs[0], obs[1], newPrise);
-      }
-      if (await fileExists(url)) {
-        setTimeout(
-          async () => {
-            setAudioUrl(url);
-          },
-          audioUrl != "" ? 200 : 0,
-        );
-      }
-    };
-    updateAudioUrl();
-  }, [obs, prise, bakExists]);
-
-  // Préserver un maxDuration cohérent quand les durées de pistes changent
-  useEffect(() => {
-    const durations = Object.values(trackDurations || {}).filter(
-      (value) => typeof value === "number" && !isNaN(value) && value > 0,
+  const tick = () => {
+    const elapsed = Math.max(
+      0,
+      audioCtxRef.current.currentTime - playStartedAtRef.current,
     );
-    const mainDuration = wavesurfer?.getDuration?.() || 0;
-    const nextMaxDuration = Math.max(mainDuration, ...durations, 0);
-
-    if (nextMaxDuration > 0 && nextMaxDuration !== maxDuration) {
-      setMaxDuration(nextMaxDuration);
-    }
-  }, [trackDurations, wavesurfer, maxDuration]);
-
-  // Mettre à jour le numéro de la prochaine prise
-  useEffect(() => {
-    const updateNextPrise = async () => {
-      if (!isRecording) {
-        const nextPrise = (await getOldPriseNumber()) + 1;
-        setNextPriseNumber(nextPrise);
+    if (elapsed >= playEndsAtRef.current) {
+      // Met le curseur à la fin de la piste
+      const trackId = playingFromRef.current?.trackId;
+      const startTime = playingFromRef.current?.startTime ?? 0;
+      if (trackId != null) {
+        setSelection({ trackId, time: startTime + playEndsAtRef.current });
       }
-    };
-    updateNextPrise();
-  }, [obs, isRecording, getOldPriseNumber]);
-
-  // Réinitialiser l'état lié aux fichiers lorsque l'OBS change pour éviter les 404 transitoires
-  const updatePrise = async () => {
-    const mainTrack = await getMainTrack();
-    const newPrise = mainTrack
-      ?.split("/")
-      ?.pop()
-      .split("_")[2]
-      ?.replace(".wav", "");
-    setPrise(newPrise);
-    return newPrise;
-  };
-  useEffect(() => {
-    setAudioUrl("");
-    setOtherPrises([]);
-    setWaveformRefs({});
-    setSecondaryIsPlaying({});
-    setSelectedRegion([]);
-    setTrackDurations({});
-    setMaxDuration(0);
-
-    updatePrise();
-  }, [obs]);
-  useEffect(() => {
-    updatePrise();
-  }, []);
-
-  useEffect(() => {
-    const updateBakExists = async () => {
-      setBakExists(await fileExists(getUrl() + ".bak"));
-    };
-    updateBakExists();
-  }, [obs, prise, audioUrl]);
-
-  const updateTrackDuration = (trackId, duration) => {
-    setTrackDurations((prev) => {
-      const newDurations = { ...prev, [trackId]: duration };
-      const maxDur = Math.max(...Object.values(newDurations));
-      setMaxDuration(maxDur);
-      return newDurations;
-    });
-  };
-
-  const handleRegionSelect = (regionData) => {
-    const newRegion = regionData?.[0];
-    const oldRegion = selectedRegion?.[0];
-    // Ne pas supprimer la région si c'est la même (cas d'update/resize sur piste secondaire)
-    if (oldRegion && oldRegion !== newRegion) {
-      try {
-        oldRegion.remove();
-      } catch (e) {}
-    }
-    setSelectedRegion(regionData);
-  };
-
-  const pasteRegion = async (regionData) => {
-    if (!copiedRegion) return;
-    const start = copiedRegion[0].start;
-    const end = copiedRegion[0].end;
-    const track = copiedRegion[1];
-    const insertTime = cursorTime;
-
-    if (regionData[1] == "0") {
-      await cutRegion(regionData);
-    }
-
-    const concatenatedUrl = await insertAudio(
-      prise,
-      track,
-      insertTime,
-      start,
-      end,
-    );
-    setAudioUrl(concatenatedUrl);
-    setCopiedRegion(null);
-  };
-
-  const copyRegion = async (regionData) => {
-    setCopiedRegion(regionData);
-  };
-
-  const cutRegion = async (regionData) => {
-    const url = getUrl();
-    const audioContext = new AudioContext();
-    try {
-      const response1 = await fetch(url);
-      if (response1.ok) {
-        const buffer = await audioContext.decodeAudioData(
-          await (await response1.blob()).arrayBuffer(),
-        );
-        const sampleRate = buffer.sampleRate;
-        // Débyt del'audio A
-        const segmentA1 = buffer
-          .getChannelData(0)
-          .slice(0, regionData[0].start * sampleRate);
-        // Fin de l'audio A
-        const segmentA2 = buffer
-          .getChannelData(0)
-          .slice(
-            regionData[0].end * sampleRate,
-            buffer.getChannelData(0).length,
-          );
-
-        const totalSamples = segmentA1.length + segmentA2.length;
-        const newBuffer = audioContext.createBuffer(
-          1,
-          totalSamples,
-          sampleRate,
-        );
-        const channel = newBuffer.getChannelData(0);
-
-        channel.set(segmentA1, 0);
-        channel.set(segmentA2, segmentA1.length);
-
-        const wav = audioBufferToWav(newBuffer);
-        const newUrl = URL.createObjectURL(wav);
-        const newMaxDuration =
-          regionData[0].end -
-          regionData[0].start +
-          buffer.getChannelData(0).length / sampleRate;
-        if (newMaxDuration > maxDuration) {
-          setMaxDuration(newMaxDuration);
-        }
-
-        const formData = new FormData();
-        formData.append("file", wav);
-        const response = await fetch(getUrl("bytes", obs[0], obs[1], prise), {
-          method: "POST",
-          body: formData,
-        });
-        const data = await response.json();
-        // console.log(data);
-        //
-        setAudioUrl(newUrl);
-        refreshMainTrackScale();
-        return newUrl;
-      }
-    } catch (error) {
-      console.error("Error in cutRegion:", error);
-    }
-    return null;
-  };
-
-  const editAudio = async (oldName, newName) => {
-    const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
-    const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-    newName = (newName || "")
-      .trim()
-      .replaceAll("_", "-")
-      .replaceAll(" ", "-")
-      .replaceAll("/", "-")
-      .replaceAll("\\", "-");
-    if ((oldName.split("_")[1] || "") === newName || newName.length === 0) {
+      playingFromRef.current = null;
+      setPlayerHeadTime(0);
+      setIsPlaying(false);
+      rafRef.current = null;
       return;
     }
-
-    const srcPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName}.wav`;
-    const targetPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${oldName.split("_")[0]}_${newName}.wav`;
-    let url = `/api/burrito/ingredient/copy/${metadata.local_path}?src_path=${srcPath}&target_path=${targetPath}&delete_src=true`;
-    await fetch(url, {
-      method: "POST",
-    });
-    refreshEmptyTrackOnly();
-    const newPriseKey = `${oldName.split("_")[0]}_${newName}`;
-    setOtherPrises((prev) =>
-      prev.map((p) => (p === oldName ? newPriseKey : p)),
-    );
-    setWaveformRefs((prev) => {
-      const { [oldName]: oldWs, ...rest } = prev || {};
-      return oldWs ? { ...rest, [newPriseKey]: oldWs } : prev;
-    });
-    setEditingPrise(null);
+    setPlayerHeadTime(elapsed);
+    rafRef.current = requestAnimationFrame(tick);
   };
 
-  const deleteAudio = async (priseNumber) => {
-    const url = getUrl("delete", obs[0], obs[1], priseNumber);
-    await fetch(url, {
-      method: "POST",
-    });
-    refreshEmptyTrackOnly();
-    setOtherPrises((prev) => prev.filter((p) => p !== priseNumber));
-    setWaveformRefs((prev) => {
-      if (!prev) return prev;
-      const { [priseNumber]: _removed, ...rest } = prev;
-      return rest;
-    });
-    setSecondaryIsPlaying((prev) => {
-      if (!prev) return prev;
-      const { [priseNumber]: _removed, ...rest } = prev;
-      return rest;
-    });
-  };
-
-  const playAudio = async (priseNumber) => {
-    const targetWavesurfer = waveformRefs[priseNumber];
-    if (targetWavesurfer) {
-      targetWavesurfer.playPause();
-      const isNowPlaying = targetWavesurfer.isPlaying();
-      setSecondaryIsPlaying((prev) => ({
-        ...prev,
-        [priseNumber]: isNowPlaying,
-      }));
-    } else {
-      console.warn(`Waveform pour la prise ${priseNumber} non trouvé`);
+  // Démarre/redémarre la lecture sur (trackId, time).
+  // Suppose que l'AudioContext est déjà actif.
+  const startPlayback = (trackId, time) => {
+    const track = tracks.find((t) => t.id === trackId);
+    if (!track) return;
+    stopSources(sourcesRef.current);
+    sourcesRef.current = scheduleTrackFrom(audioCtxRef.current, track, time);
+    playStartedAtRef.current = audioCtxRef.current.currentTime + 0.05;
+    playEndsAtRef.current = virtualDuration(track) - time;
+    playingFromRef.current = { trackId, startTime: time };
+    setPlayerHeadTime(0);
+    setIsPlaying(true);
+    if (rafRef.current == null) {
+      rafRef.current = requestAnimationFrame(tick);
     }
   };
 
-  const updateOtherPrises = async () => {
-    if (showOtherTracks) {
-      const prises = await listPrises(obs[0], obs[1]);
+  const play = async () => {
+    if (isPlaying || tracks.length === 0) return;
+    if (audioCtxRef.current.state === "suspended") {
+      await audioCtxRef.current.resume();
+    }
+    const trackId = selection?.trackId ?? tracks[0].id;
+    const time = selection?.time ?? 0;
+    startPlayback(trackId, time);
+  };
 
-      const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
-      const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-      const newPrises = prises.map((prise) =>
-        prise
-          .split(`/${chapterString}-${paragraphString}_`)[1]
-          .replace(".wav", ""),
-      );
-      const sortedPrises = newPrises.sort(
-        (a, b) => a.split("_")[0] - b.split("_")[0],
-      );
-      setOtherPrises(sortedPrises.filter((prise) => !prise.includes(".json")));
+  const stop = () => {
+    // capture la pos du cursuer avant de reset
+    const trackId = playingFromRef.current?.trackId;
+    const startTime = playingFromRef.current?.startTime ?? 0;
+    const currentPos = startTime + playerHeadTime;
 
-      setTrackDurations({});
-      setSelectedRegion([]);
-    } else {
-      setOtherPrises([]);
-      setTrackDurations({});
-      setSelectedRegion([]);
+    stopSources(sourcesRef.current);
+    sourcesRef.current = [];
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+    playingFromRef.current = null;
+    setPlayerHeadTime(0);
+    setIsPlaying(false);
+
+    // remet la pos du curseur
+    if (trackId != null) {
+      setSelection({ trackId, time: currentPos });
     }
   };
 
-  const checkIfPriseExists = async () => {
-    if (!showOtherTracks) return;
-
-    // Si une piste 0 existe (quel que soit son suffixe), l'utiliser telle quelle
-    const existing0 = await getTrackByNumber(0);
-    const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
-    const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-    if (existing0) {
-      const fileName = existing0.split("/").pop() || "";
-      const suffix = fileName
-        .split(`${chapterString}-${paragraphString}_`)[1]
-        ?.replace(".wav", "");
-      if (suffix) {
-        setPrise(suffix);
-        return;
-      }
-    }
-
-    // Rechercher la première prise existante (avec son éventuel nom)
-    const prises = await listPrises(obs[0], obs[1]);
-    const newPrises = prises
-      .map((prise) =>
-        prise
-          .split(`/${chapterString}-${paragraphString}_`)[1]
-          .replace(".wav", ""),
-      )
-      .filter((prise) => !prise.includes(".json"))
-      // Ne pas utiliser une piste déjà 0_* comme source
-      .filter((prise) => !(prise || "").startsWith("0"));
-    if (!newPrises || newPrises.length === 0) return;
-
-    // Trier par numéro croissant et choisir la première
-    const firstPrise = [...newPrises].sort((a, b) => {
-      const aNum = parseInt((a || "").split("_")[0]);
-      const bNum = parseInt((b || "").split("_")[0]);
-      return (aNum || 0) - (bNum || 0);
-    })[0];
-    if (!firstPrise) return;
-
-    try {
-      const sourceUrl = getUrl("bytes", obs[0], obs[1], firstPrise);
-      const newFile = await fetch(sourceUrl);
-      if (!newFile.ok) return;
-      const newFileBlob = await newFile.blob();
-      const formData = new FormData();
-      formData.append("file", newFileBlob);
-      // console.log("First:", firstPrise);
-      const newUrl0 = getUrl(
-        "bytes",
-        obs[0],
-        obs[1],
-        `0_${firstPrise.split("_")[0]}`,
-      );
-      await fetch(newUrl0, {
-        method: "POST",
-        body: formData,
-      });
-      setAudioUrl(newUrl0);
-      setPrise(`0_${firstPrise.split("_")[0]}`);
-    } catch (e) {
-      console.error("Error with audio:", e);
-    }
+  // Clic sur une waveform ->> on retient piste + position, et on relance la lecture depuis ce point si on est en train de jouer.
+  const handleSeek = (trackId, time) => {
+    setSelection({ trackId, time });
+    // Un seek (clic playhead) efface la sélection de clip : seul un clic
+    // sur le header d'un clip doit la maintenir/étendre.
+    setClipSelection([]);
+    clipSelectionAnchorRef.current = null;
+    if (isPlaying) startPlayback(trackId, time);
   };
 
-  const switchMainTrack = async (newTrackNumber) => {
-    await saveMainTrack();
-    const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
-    const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-    const trackPath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${newTrackNumber}.wav`;
-    const mainTrack = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_0_${newTrackNumber.split("_")[0]}.wav`;
-
-    let url = `/api/burrito/ingredient/copy/${metadata.local_path}?src_path=${trackPath}&target_path=${mainTrack}`;
-    await fetch(url, {
-      method: "POST",
-    });
-
-    // Actualiser la liste des pistes
-    updateOtherPrises();
-    setPrise(newTrackNumber);
-    setMainTrack(mainTrack);
-  };
-
-  const saveMainTrack = async () => {
-    const mainTrack = await getMainTrack();
-    const saveTrackNumber = mainTrack
-      .split("/")
-      .pop()
-      .split("_")[2]
-      ?.replace(".wav", "");
-    const saveTrack = await getTrackByNumber(saveTrackNumber);
-    const saveTrackName = saveTrack
-      .split("/")
-      .pop()
-      .split("_")[2]
-      ?.replace(".wav", "");
-
-    const track = `${saveTrackNumber}${saveTrackName ? "_" + saveTrackName : ""}`;
-
-    if (!saveTrackNumber.includes("0_")) {
-      const paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-      const chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
-      const savePath = `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${track}.wav`;
-      let url = `/api/burrito/ingredient/copy/${metadata.local_path}?src_path=${mainTrack}&target_path=${savePath}&delete_src=true`;
-      await fetch(url, {
-        method: "POST",
-      });
-    }
-  };
-
-  const getMainTrack = async () => {
-    const url = `/api/burrito/paths/${metadata.local_path}`;
-    const response = await fetch(url, {
-      method: "GET",
-    });
-    const data = await response.json();
-    let chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
-    let paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-    const dataFiltered = data.filter(
-      (item) =>
-        item.includes(
-          `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_0`,
-        ) && !item.includes(".bak"),
-    );
-    return dataFiltered.length > 0 ? dataFiltered[0] : null;
-  };
-
-  const getTrackByNumber = async (number) => {
-    const url = `/api/burrito/paths/${metadata.local_path}`;
-    const response = await fetch(url, {
-      method: "GET",
-    });
-    const data = await response.json();
-    let chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
-    let paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-    const dataFiltered = data.filter(
-      (item) =>
-        item.includes(
-          `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_${number}`,
-        ) && !item.includes(".bak"),
-    );
-    return dataFiltered.length > 0 ? dataFiltered[0] : null;
-  };
-
-  const getTrackName = async (number) => {
-    const track = await getTrackByNumber(number);
-    if (!track) return null;
-    return track.split("/").pop().split("_")[2]?.replace(".wav", "");
-  };
-
-  useEffect(() => {
-    checkIfPriseExists();
-    updateOtherPrises();
-    updateMainTrackWidth(undefined, maxDuration);
-  }, [showOtherTracks, obs, prise]);
-
-  useEffect(() => {
-    const isPlaying = wavesurfer?.isPlaying();
-    if (!isPlaying) {
-      wavesurfer?.setTime(cursorTime);
-    }
-  }, [maxDuration, cursorTime]);
-
-  useEffect(() => {
-    if (!selectedRegion || selectedRegion.length === 0) return;
-    const [, selectedPrise] = selectedRegion;
-    if (selectedPrise !== "0") return;
-    regionsPlugin.getRegions().forEach((region) => {
-      if (selectedRegion[0] !== region) {
-        region.remove();
-      }
-    });
-  }, [selectedRegion, regionsPlugin]);
-
-  useEffect(() => {
-    const handleKey = (event) => {
-      if (editingPrise) return;
-      if (selectedRegion[1] == "0") {
-        if (event.key === "Backspace") {
-          cutRegion(selectedRegion);
-          return;
-        } else if (event.key === "Delete") {
-          cutRegion(selectedRegion);
-          return;
-        }
-      } else {
-        if (event.key === "c" && event.ctrlKey) {
-          copyRegion(selectedRegion);
-          return;
+  // Sélection clip(s) — appelée depuis le header d'un clip.
+  // mods : { ctrlKey, shiftKey } pour multi/range.
+  const handleClipSelect = (trackId, segId, mods = {}) => {
+    const { ctrlKey, shiftKey } = mods;
+    // Shift-clic : étend depuis l'anchor sur la même piste (range par vStart).
+    if (shiftKey && clipSelectionAnchorRef.current) {
+      const anchor = clipSelectionAnchorRef.current;
+      if (anchor.trackId === trackId) {
+        const track = tracks.find((t) => t.id === trackId);
+        if (track) {
+          const a = track.edl.find((s) => s.id === anchor.segId);
+          const b = track.edl.find((s) => s.id === segId);
+          if (a && b) {
+            const lo = Math.min(a.vStart, b.vStart);
+            const hi = Math.max(a.vStart, b.vStart);
+            const next = track.edl
+              .filter((s) => s.vStart >= lo && s.vStart <= hi)
+              .map((s) => ({ trackId, segId: s.id }));
+            setClipSelection(next);
+            // anchor inchangé
+            setRegionSelection(null);
+            return;
+          }
         }
       }
-      if (event.key === "v" && event.ctrlKey) {
-        pasteRegion(selectedRegion);
-        return;
-      } else if (event.key === "z" && event.ctrlKey) {
-        onRestore();
-        return;
-      } else if (event.key === " ") {
-        onPlayPause();
-        return;
-      } else if (event.key === "ArrowLeft") {
-        updateCursorTime((cursorTime ?? 0) - derivedGridSeconds);
-        return;
-      } else if (event.key === "ArrowRight") {
-        updateCursorTime((cursorTime ?? 0) + derivedGridSeconds);
-        return;
-      } else if (event.key === "r") {
-        return isRecording ? stopRecording() : startRecording();
+      // anchor sur une autre piste -> fallback : sélection simple
+    }
+    // Ctrl/Cmd : toggle ce clip dans la sélection.
+    if (ctrlKey) {
+      setClipSelection((prev) => {
+        const idx = prev.findIndex(
+          (c) => c.trackId === trackId && c.segId === segId,
+        );
+        if (idx >= 0) {
+          const next = prev.slice();
+          next.splice(idx, 1);
+          return next;
+        }
+        return [...prev, { trackId, segId }];
+      });
+      clipSelectionAnchorRef.current = { trackId, segId };
+      setRegionSelection(null);
+      return;
+    }
+    // Clic simple : remplace la sélection par ce seul clip.
+    setClipSelection([{ trackId, segId }]);
+    clipSelectionAnchorRef.current = { trackId, segId };
+    setRegionSelection(null);
+  };
+
+  const clearClipSelection = () => {
+    setClipSelection([]);
+    clipSelectionAnchorRef.current = null;
+  };
+
+  const deleteSelectedClips = () => {
+    if (clipSelection.length === 0) return;
+    // Groupe les segIds par trackId pour faire un seul update par piste.
+    const byTrack = new Map();
+    for (const { trackId, segId } of clipSelection) {
+      if (!byTrack.has(trackId)) byTrack.set(trackId, new Set());
+      byTrack.get(trackId).add(segId);
+    }
+    setTracksWithHistory((ts) =>
+      ts.map((t) => {
+        const ids = byTrack.get(t.id);
+        if (!ids) return t;
+        return { ...t, edl: t.edl.filter((s) => !ids.has(s.id)) };
+      }),
+    );
+    clearClipSelection();
+  };
+
+  const deleteRegionWithoutCopy = () => {
+    if (!regionSelection) return;
+    const { trackId, start, end } = regionSelection;
+    setTracksWithHistory((ts) =>
+      ts.map((t) =>
+        t.id === trackId ? { ...t, edl: cutRange(t.edl, start, end) } : t,
+      ),
+    );
+    setRegionSelection(null);
+  };
+
+  const setTracksWithHistory = (updater) => {
+    setPast((p) => [...p, tracks]);
+    setFuture([]);
+    setTracks(updater);
+  };
+
+  const deleteTrack = (id) => {
+    // On retire la piste de l'état mais on NE supprime PAS le fichier .webm :
+    // d'autres pistes peuvent référencer ce buffer via bufferTrackId (clip
+    // copié/déplacé), et le projet doit rester réimportable.
+    setTracksWithHistory((ts) => ts.filter((t) => t.id !== id));
+    if (selection?.trackId === id) setSelection(null);
+  };
+
+  const cutSelection = () => {
+    // Priorité à la sélection de clips : copier puis supprimer les clips choisis.
+    if (clipSelection.length > 0) {
+      copyClipSelection();
+      deleteSelectedClips();
+      return;
+    }
+    if (!regionSelection) return;
+    const { trackId, start, end } = regionSelection;
+    // setTracks(ts => ts.map(t =>
+    //     t.id === trackId ? { ...t, edl: cutRange(t.edl, start, end) } : t
+    // ));
+    copySelection();
+    setTracksWithHistory((ts) =>
+      ts.map((t) =>
+        t.id === trackId ? { ...t, edl: cutRange(t.edl, start, end) } : t,
+      ),
+    );
+
+    setRegionSelection(null);
+  };
+
+  const copySelection = () => {
+    // Priorité à la sélection de clips si présente.
+    if (clipSelection.length > 0) {
+      copyClipSelection();
+      return;
+    }
+    if (!regionSelection) return;
+    const { trackId, start, end } = regionSelection;
+    const track = tracks.find((t) => t.id === trackId);
+    if (!track) return;
+    // Tag chaque segment extrait avec le buffer source + l'id de la piste source.
+    // - le buffer permet le paste runtime (réf directe)
+    // - l'id permet de ré-attacher le buffer après un reload de projet
+    const segs = extractRange(track.edl, start, end, track.buffer, track.id);
+    if (!segs.length) return;
+    setClipboard({ segments: segs });
+  };
+
+  // Copie les clips actuellement sélectionnés vers le presse-papier.
+  // Les positions vStart sont normalisées par rapport au clip le plus à gauche
+  // pour préserver les écarts relatifs entre clips lors du collage.
+  const copyClipSelection = () => {
+    if (clipSelection.length === 0) return;
+    const segs = [];
+    for (const { trackId, segId } of clipSelection) {
+      const track = tracks.find((t) => t.id === trackId);
+      if (!track) continue;
+      const seg = track.edl.find((s) => s.id === segId);
+      if (!seg) continue;
+      // makeSegment génère de nouveaux ids et tague le buffer/track source
+      // (réf runtime + id sérialisable) comme le fait extractRange.
+      segs.push(
+        makeSegment(
+          seg.vStart,
+          seg.srcStart,
+          seg.srcEnd,
+          seg.buffer || track.buffer,
+          seg.bufferTrackId || track.id,
+        ),
+      );
+    }
+    if (!segs.length) return;
+    const minV = Math.min(...segs.map((s) => s.vStart));
+    const normalized = segs.map((s) => ({ ...s, vStart: s.vStart - minV }));
+    setClipboard({ segments: normalized });
+  };
+
+  const pasteAtCursor = () => {
+    if (!clipboard || !selection) return;
+    const { trackId, time } = selection;
+    setTracksWithHistory((ts) =>
+      ts.map((t) =>
+        t.id === trackId
+          ? { ...t, edl: insertAt(t.edl, time, clipboard.segments) }
+          : t,
+      ),
+    );
+  };
+
+  const renameTrack = (trackId, newName) => {
+    setTracks((ts) =>
+      ts.map((t) => (t.id === trackId ? { ...t, name: newName } : t)),
+    );
+  };
+
+  // Récupérer les bords des clips qui se font resize
+  const getResizeBounds = (trackId, segId) => {
+    const t = tracks.find((x) => x.id === trackId);
+    if (!t) return { minVStart: 0, maxVEnd: Infinity };
+    const sorted = [...t.edl].sort((a, b) => a.vStart - b.vStart);
+    const idx = sorted.findIndex((s) => s.id === segId);
+    if (idx < 0) return { minVStart: 0, maxVEnd: Infinity };
+    const seg = sorted[idx];
+    const prev = sorted[idx - 1];
+    const next = sorted[idx + 1];
+
+    // Bornes voisines (anti-collision).
+    const neighborMinVStart = prev
+      ? prev.vStart + (prev.srcEnd - prev.srcStart)
+      : 0;
+    const neighborMaxVEnd = next ? next.vStart : Infinity;
+
+    // Bornes audio : le segment ne peut pas montrer plus que le buffer source.
+    // À gauche, srcStart ≥ 0 → vStart ne peut reculer que de srcStart secondes.
+    // À droite, srcEnd ≤ buffer.duration → vEnd ne peut avancer que du reste.
+    const buf = segmentBuffer(seg, t.buffer);
+    const vEnd = seg.vStart + (seg.srcEnd - seg.srcStart);
+    const audioMinVStart = seg.vStart - seg.srcStart;
+    const audioMaxVEnd =
+      typeof buf?.duration === "number"
+        ? vEnd + (buf.duration - seg.srcEnd)
+        : Infinity;
+
+    return {
+      minVStart: Math.max(neighborMinVStart, audioMinVStart),
+      maxVEnd: Math.min(neighborMaxVEnd, audioMaxVEnd),
+    };
+  };
+
+  const getMoveBounds = (trackId, segId, excludeIds = new Set()) => {
+    const t = tracks.find((x) => x.id === trackId);
+    if (!t) return { minVStart: 0, maxVStart: Infinity };
+    const seg = t.edl.find((s) => s.id === segId);
+    if (!seg) return { minVStart: 0, maxVStart: Infinity };
+
+    const dur = seg.srcEnd - seg.srcStart;
+    const others = t.edl
+      .filter((s) => s.id !== segId && !excludeIds.has(s.id))
+      .sort((a, b) => a.vStart - b.vStart);
+
+    const prev = others
+      .filter((s) => s.vStart + (s.srcEnd - s.srcStart) <= seg.vStart)
+      .sort((a, b) => b.vStart - a.vStart)[0];
+    const next = others
+      .filter((s) => s.vStart >= seg.vStart + dur)
+      .sort((a, b) => a.vStart - b.vStart)[0];
+
+    return {
+      minVStart: prev ? prev.vStart + (prev.srcEnd - prev.srcStart) : 0,
+      maxVEnd: next ? next.vStart : Infinity,
+    };
+  };
+
+  // Raccourci clavier
+  useEffect(() => {
+    const onKey = (e) => {
+      const isCmd = e.ctrlKey || e.metaKey;
+
+      // Undo shortcut
+      if (isCmd && e.key.toLowerCase() === "z" && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      }
+      // Redo shortcut
+      else if (
+        (isCmd && e.key.toLowerCase() === "y") ||
+        (isCmd && e.shiftKey && e.key.toLowerCase() === "z")
+      ) {
+        e.preventDefault();
+        redo();
+      }
+      // Copy shortcut
+      else if (isCmd && e.key.toLowerCase() === "c") {
+        e.preventDefault();
+        copySelection();
+      }
+      // Paste shortcut
+      else if (isCmd && e.key.toLowerCase() === "v") {
+        e.preventDefault();
+        pasteAtCursor();
+      }
+      // Cut shortcut
+      else if (isCmd && e.key.toLowerCase() === "x") {
+        e.preventDefault();
+        cutSelection();
+      }
+      // Suppr/Backspace : selon le contexte
+      else if (e.key === "Delete" || e.key === "Backspace") {
+        // Ignore quand on tape dans un input (rename, etc.)
+        const tag = e.target?.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
+        if (clipSelection.length > 0) {
+          e.preventDefault();
+          deleteSelectedClips();
+        } else if (regionSelection) {
+          e.preventDefault();
+          deleteRegionWithoutCopy();
+        }
+      }
+      // Echap : efface la sélection de clips
+      else if (e.key === "Escape") {
+        if (clipSelection.length > 0) clearClipSelection();
+      }
+      // Espace : Play / Pause
+      else if (e.key === " ") {
+        console.log("isPlaying", isPlaying);
+        e.preventDefault();
+        if (isPlaying) stop();
+        else play();
+      }
+      // S : Split sur le Playherd
+      else if (e.key === "s") {
+        e.preventDefault();
+        splitAtPlayhead();
+      } else if (isCmd && e.key === "a") {
+        e.preventDefault();
+        selectAllClips();
+      } else if (
+        e.shiftKey &&
+        (e.key === "ArrowLeft" || e.key === "ArrowRight")
+      ) {
+        e.preventDefault();
+        nudgeSelectedClips(
+          e.key === "ArrowLeft" ? -snapStep / 10 : snapStep / 10,
+          !e.repeat,
+        );
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        e.preventDefault();
+        nudgeSelectedClips(
+          e.key === "ArrowLeft" ? -snapStep : snapStep,
+          !e.repeat,
+        );
       }
     };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  });
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [
+    past,
+    future,
+    tracks,
+    selection,
+    regionSelection,
+    clipboard,
+    clipSelection,
+    isPlaying,
+    playerHeadTime,
+  ]);
 
-  const hasAnyTrack = !!audioUrl || otherPrises?.length > 0;
+  // Affiche le GestureIcon à côté du curseur tant que Ctrl/Cmd est maintenu.
+  const [ctrlHeld, setCtrlHeld] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const onDown = (e) => {
+      if (e.key === "Control" || e.key === "Meta") setCtrlHeld(true);
+    };
+    const onUp = (e) => {
+      if (e.key === "Control" || e.key === "Meta") setCtrlHeld(false);
+    };
+    // Au cas où la fenêtre perd le focus pendant qu'on maintient la touche.
+    const onBlur = () => setCtrlHeld(false);
+    window.addEventListener("keydown", onDown);
+    window.addEventListener("keyup", onUp);
+    window.addEventListener("blur", onBlur);
+    return () => {
+      window.removeEventListener("keydown", onDown);
+      window.removeEventListener("keyup", onUp);
+      window.removeEventListener("blur", onBlur);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!ctrlHeld) return;
+    const onMove = (e) => setCursorPos({ x: e.clientX, y: e.clientY });
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [ctrlHeld]);
+
+  const undo = () => {
+    if (past.length === 0) return;
+    const prev = past[past.length - 1];
+    setPast((p) => p.slice(0, -1));
+    setFuture((f) => [tracks, ...f]);
+    setTracks(prev);
+  };
+
+  const redo = () => {
+    if (future.length === 0) return;
+    const next = future[0];
+    setFuture((f) => f.slice(1));
+    setPast((p) => [...p, tracks]);
+    setTracks(next);
+  };
+
+  // Split à la position du playhead (suit le curseur en lecture).
+  const splitAtPlayhead = () => {
+    const trackId = isPlaying
+      ? playingFromRef.current?.trackId
+      : selection?.trackId;
+    if (trackId == null) return;
+    const time = isPlaying
+      ? (playingFromRef.current?.startTime ?? 0) + playerHeadTime
+      : (selection?.time ?? 0);
+    setTracksWithHistory((ts) =>
+      ts.map((t) =>
+        t.id === trackId ? { ...t, edl: splitAt(t.edl, time) } : t,
+      ),
+    );
+  };
+
+  const selectAllClips = () => {
+    const all = [];
+    for (const t of tracks)
+      for (const s of t.edl) all.push({ trackId: t.id, segId: s.id });
+    setClipSelection(all);
+    clipSelectionAnchorRef.current = all[0] ?? null;
+    setRegionSelection(null);
+  };
+
+  // Nudge des clips sélectionnés.
+  // `pushHistory = true` au premier keydown → on push l'état dans `past`
+  // (= une entrée d'undo pour toute la session de touche maintenue).
+  // `pushHistory = false` sur les repeats → on met juste à jour `tracks`
+  // sans empiler de nouvelle entrée. L'undo ramène à l'état pré-session.
+  const nudgeSelectedClips = (deltaSec, pushHistory = true) => {
+    if (clipSelection.length === 0) return;
+    const byTrack = new Map();
+    for (const { trackId, segId } of clipSelection) {
+      if (!byTrack.has(trackId)) byTrack.set(trackId, new Set());
+      byTrack.get(trackId).add(segId);
+    }
+
+    // Les clips sélectionnés se déplacent tous du même delta. On clampe ce
+    // delta pour qu'aucun clip n'empiète sur un voisin NON sélectionné (les
+    // voisins sélectionnés bougent ensemble, donc ne contraignent pas).
+    // maxRight / maxLeft = marge disponible avant de toucher un voisin.
+    const vEnd = (s) => s.vStart + (s.srcEnd - s.srcStart);
+    let maxRight = Infinity;
+    let maxLeft = Infinity;
+    for (const t of tracks) {
+      const ids = byTrack.get(t.id);
+      if (!ids) continue;
+      const sorted = [...t.edl].sort((a, b) => a.vStart - b.vStart);
+      sorted.forEach((s, i) => {
+        if (!ids.has(s.id)) return;
+        const rightNb = sorted[i + 1];
+        if (rightNb && !ids.has(rightNb.id)) {
+          maxRight = Math.min(maxRight, rightNb.vStart - vEnd(s));
+        }
+        const leftNb = sorted[i - 1];
+        if (leftNb && !ids.has(leftNb.id)) {
+          maxLeft = Math.min(maxLeft, s.vStart - vEnd(leftNb));
+        } else if (!leftNb) {
+          // Pas de voisin gauche : limite au début de la piste (0).
+          maxLeft = Math.min(maxLeft, s.vStart);
+        }
+      });
+    }
+
+    const clampedDelta =
+      deltaSec > 0
+        ? Math.max(0, Math.min(deltaSec, maxRight))
+        : Math.min(0, Math.max(deltaSec, -maxLeft));
+    // Déjà collé à la limite : ne rien faire (évite d'empiler des undos vides).
+    if (clampedDelta === 0) return;
+    deltaSec = clampedDelta;
+
+    const updater = (ts) =>
+      ts.map((t) => {
+        const ids = byTrack.get(t.id);
+        if (!ids) return t;
+        return {
+          ...t,
+          edl: t.edl.map((s) =>
+            ids.has(s.id)
+              ? { ...s, vStart: Math.max(0, s.vStart + deltaSec) }
+              : s,
+          ),
+        };
+      });
+    if (pushHistory) {
+      setTracksWithHistory(updater);
+    } else {
+      setTracks(updater);
+    }
+  };
+
+  // Drag intra-piste : punch-in à la nouvelle position absolue.
+  // On retire d'abord le segment source (pour qu'insertSegmentAt ne le
+  // coupe pas avec lui-même), puis on l'insère : cutRange efface ce qui
+  // chevauche [newVStart, newVStart + dur].
+  const moveClip = (trackId, segId, newVStart) => {
+    setTracksWithHistory((ts) =>
+      ts.map((t) => {
+        if (t.id !== trackId) return t;
+        const seg = t.edl.find((s) => s.id === segId);
+        if (!seg) return t;
+        const withoutSrc = removeSegment(t.edl, segId);
+        return { ...t, edl: insertSegmentAt(withoutSrc, seg, newVStart) };
+      }),
+    );
+  };
+
+  const moveClipAcrossTracks = (srcTrackId, dstTrackId, segId, newVStart) => {
+    if (srcTrackId === dstTrackId) return;
+    const srcTrack = tracks.find((t) => t.id === srcTrackId);
+    if (!srcTrack) return;
+    const seg = srcTrack.edl.find((s) => s.id === segId);
+    if (!seg) return;
+
+    // Préserve buffer + bufferTrackId. Si le segment n'en avait pas (= clip "natif" de la piste source), on les remplit maintenant : sinon le segment basculerait sur le buffer de la piste cible et lirait le mauvais son.
+    const portableSeg = {
+      ...seg,
+      buffer: seg.buffer ?? srcTrack.buffer,
+      bufferTrackId: seg.bufferTrackId ?? srcTrack.id,
+    };
+
+    setTracksWithHistory((ts) =>
+      ts.map((t) => {
+        if (t.id === srcTrackId) {
+          return { ...t, edl: removeSegment(t.edl, segId) };
+        }
+        if (t.id === dstTrackId) {
+          const next = insertSegmentAt(t.edl, portableSeg, newVStart);
+          return { ...t, edl: next };
+        }
+        return t;
+      }),
+    );
+  };
+
+  const trimClip = (trackId, segId, deltaLeft, deltaRight) => {
+    setTracksWithHistory((ts) =>
+      ts.map((t) =>
+        t.id === trackId
+          ? { ...t, edl: trimSegment(t.edl, segId, deltaLeft, deltaRight) }
+          : t,
+      ),
+    );
+  };
+
+  const platform = navigator.userAgentData?.platform || navigator.platform;
+  const ctrlKeyTitle = platform?.includes("Mac") ? "Cmd" : "Ctrl";
 
   return (
-    <Box
-      sx={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
-        overflow: "hidden",
-      }}
-    >
+    <Box sx={{ width: "100%", p: 2 }}>
       <Stack
+        direction="row"
+        spacing={1}
         sx={{
-          position: "relative",
-          mt: 5,
-          backgroundColor: "rgb(224, 224, 224)",
-          borderRadius: 1,
-          boxShadow: 1,
-          width: "100%",
-          height: "auto",
-          overflow: "visible",
+          border: "2px solid #777",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        {/* Barre du haut */}
+        <Stack direction="row" spacing={1}>
+          <Box
+            sx={{
+              color: "#666",
+              paddingLeft: 2,
+              fontWeight: "bold",
+              fontSize: 14,
+              alignSelf: "center",
+            }}
+          >
+            {formatTime(displayTime, true)}
+          </Box>
+
+          <IconButton
+            size="small"
+            onClick={isPlaying ? stop : play}
+            disabled={tracks.length === 0}
+            title={isPlaying ? "Stop (space)" : "Play (space)"}
+          >
+            {isPlaying ? <StopIcon /> : <PlayArrowIcon />}
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={isRecording ? stopRecording : startRecording}
+            color={isRecording ? "error" : "default"}
+            disabled={!paths}
+            title={isRecording ? "Stop recording (R)" : "Record (R)"}
+          >
+            {isRecording ? <StopIcon /> : <MicIcon />}
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={copySelection}
+            disabled={!regionSelection && clipSelection.length === 0}
+            title={`Copy ( ${ctrlKeyTitle} + C)`}
+          >
+            <ContentCopyIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={pasteAtCursor}
+            disabled={!clipboard || !selection}
+            title="Paste ( Ctrl + V)"
+          >
+            <ContentPasteIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={cutSelection}
+            disabled={!regionSelection && clipSelection.length === 0}
+            title="Cut ( Ctrl + X)"
+          >
+            <ContentCutIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={splitAtPlayhead}
+            disabled={!selection && !isPlaying}
+            title="Split at cursor (S)"
+          >
+            <SplitIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={undo}
+            disabled={past.length === 0}
+            title="Undo ( Ctrl + Z)"
+          >
+            <UndoIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={redo}
+            disabled={future.length === 0}
+            title="Redo ( Ctrl + Y)"
+          >
+            <RedoIcon fontSize="small" />
+          </IconButton>
+        </Stack>
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            backgroundColor: "rgb(19, 18, 15)",
-            justifyContent: "space-between",
-            zIndex: 4,
+            marginLeft: "auto",
+            paddingRight: 4,
+            color: "#666",
+            fontSize: 14,
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              width: "100%",
-              marginLeft: 2,
-              color: "white",
-            }}
-          >
-            {/*Timer*/}
-            <Box
-              sx={{
-                fontSize: 16,
-                fontWeight: 600,
-                minWidth: "60px",
-                textAlign: "center",
-              }}
-            >
-              {" "}
-              {formatTime(currentTime)}{" "}
-            </Box>
-            {/*Play/Pause Button*/}
-            <Tooltip
-              title={`${doI18n("pages:core-local-workspace:tooltip_play_pause", i18nRef.current)} (space)`}
-            >
-              <IconButton onClick={onPlayPause} sx={{ color: "white" }}>
-                {" "}
-                {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}{" "}
-              </IconButton>
-            </Tooltip>
-            {/*Record Button*/}
-            <Tooltip
-              title={`${doI18n("pages:core-local-workspace:tooltip_record", i18nRef.current)} (r)`}
-            >
-              <IconButton
-                onClick={isRecording ? stopRecording : startRecording}
-                disabled={isRecordingRef.current && !isRecording}
-                sx={{ color: "white" }}
-              >
-                {" "}
-                {isRecording ? (
-                  <StopIcon sx={{ color: "red" }} />
-                ) : (
-                  <MicIcon />
-                )}{" "}
-              </IconButton>
-            </Tooltip>
-            {/* Restore Button */}
-            {bakExists && (
-              <Tooltip
-                title={`${doI18n("pages:core-local-workspace:tooltip_restore", i18nRef.current)} (ctrl+z)`}
-              >
-                <IconButton onClick={onRestore} sx={{ color: "white" }}>
-                  {" "}
-                  <RestoreIcon />{" "}
-                </IconButton>
-              </Tooltip>
-            )}
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              width: "100%",
-              justifyContent: "flex-end",
-              marginRight: 2,
-            }}
-          >
-            {/* Boutons d'édition pour les régions sélectionnées */}
-            {selectedRegion.length > 0 && (
-              <Box sx={{ display: "flex", gap: 1, mr: 2 }}>
-                {copiedRegion && (
-                  <Tooltip
-                    title={`${doI18n("pages:core-local-workspace:tooltip_paste", i18nRef.current)} (ctrl+v)`}
-                  >
-                    <IconButton
-                      size="small"
-                      onClick={() => pasteRegion(selectedRegion)}
-                      sx={{
-                        backgroundColor: "rgb(63, 167, 53)",
-                        color: "white",
-                        "&:hover": { backgroundColor: "rgb(57, 126, 60)" },
-                      }}
-                    >
-                      <ContentPasteIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {selectedRegion[1] != "0" && (
-                  <Tooltip
-                    title={`${doI18n("pages:core-local-workspace:tooltip_copy", i18nRef.current)} (ctrl+c)`}
-                  >
-                    <IconButton
-                      size="small"
-                      onClick={() => copyRegion(selectedRegion)}
-                      sx={{
-                        backgroundColor: "rgb(63, 167, 53)",
-                        color: "white",
-                        "&:hover": { backgroundColor: "rgb(57, 126, 60)" },
-                      }}
-                    >
-                      <ContentCopyIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {selectedRegion && selectedRegion[1] == "0" && (
-                  <Tooltip
-                    title={`${doI18n("pages:core-local-workspace:tooltip_delete", i18nRef.current)} (suppr)`}
-                  >
-                    <IconButton
-                      size="small"
-                      onClick={() => cutRegion(selectedRegion)}
-                      sx={{
-                        backgroundColor: "rgb(168, 85, 85)",
-                        color: "white",
-                        "&:hover": { backgroundColor: "rgb(124, 53, 53)" },
-                      }}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </Box>
-            )}
-          </Box>
-        </Box>
-        <Divider />
-
-        {/* Conteneur des pistes */}
-        <Box ref={tracksContainerRef} sx={{ position: "relative" }}>
-          {/* Track principale */}
-          <Box
-            sx={{
-              p: 1,
-              backgroundColor: "rgb(245, 245, 245)",
-              height: "100%",
-              position: "relative",
-              zIndex: 1,
-            }}
-          >
-            <Box
-              sx={{
-                fontSize: 12,
-                fontWeight: 600,
-                mb: 1,
-                color: "rgb(45, 188, 255)",
-              }}
-            >
-              {doI18n("pages:core-local-workspace:main_track", i18nRef.current)}{" "}
-              {prise?.split("_")[1] ? `- ${prise?.split("_")[1]} ` : ""}
-            </Box>
-            {isRecording && !hasAnyTrack ? (
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "100px",
-                  display: "flex",
-                  flexDirection: "column",
-                  backgroundColor: "rgb(255, 240, 240)",
-                  border: "2px solid rgb(255, 107, 107)",
-                  borderRadius: 1,
-                  overflow: "hidden",
-                  p: 1,
-                }}
-              >
-                <Box
-                  sx={{ fontSize: 11, color: "rgb(255, 107, 107)", mb: 0.5 }}
-                >
-                  {doI18n(
-                    "pages:core-local-workspace:recording_in_progress",
-                    i18nRef.current,
-                  )}{" "}
-                  {nextPriseNumber}
-                </Box>
-                <canvas
-                  ref={recordingCanvasRef}
-                  width={800}
-                  height={80}
-                  style={{
-                    width: "100%",
-                    height: "80px",
-                    overflow: "hidden",
-                  }}
-                />
-              </Box>
-            ) : audioUrl ? (
-              <Box
-                sx={{ position: "relative", width: "100%", height: "100px" }}
-              >
-                {/* Curseur multi track supprimé */}
-                {/* Grille uniquement derrière la waveform principale */}
-                {gridPx > 0 && (
-                  <Box
-                    aria-hidden
-                    sx={{
-                      position: "absolute",
-                      inset: 0,
-                      zIndex: 0,
-                      pointerEvents: "none",
-                      backgroundImage: majorGridPx
-                        ? "linear-gradient(to right, rgba(0,0,0,0.08) 1px, transparent 1px), linear-gradient(to right, rgba(0,0,0,0.15) 1px, transparent 1px)"
-                        : "linear-gradient(to right, rgba(0,0,0,0.08) 1px, transparent 1px)",
-                      backgroundSize: majorGridPx
-                        ? `${gridPx}px 100%, ${majorGridPx}px 100%`
-                        : `${gridPx}px 100%`,
-                      backgroundRepeat: "repeat",
-                    }}
-                  />
-                )}
-                <div
-                  ref={waveformRef}
-                  onClick={handleMainWaveformClick}
-                  className={`audio-waveform ${isLoading ? "loading" : "loaded"}`}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    overflow: "hidden",
-                    position: "relative",
-                    zIndex: 1,
-                  }}
-                />
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "100px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: "rgb(250, 250, 250)",
-                  border: "1px dashed rgb(200, 200, 200)",
-                  borderRadius: 1,
-                  color: "rgb(76, 76, 76)",
-                }}
-              >
-                {doI18n(
-                  "pages:core-local-workspace:click_record_to_start",
-                  i18nRef.current,
-                )}{" "}
-                <MicIcon fontSize="small" />{" "}
-                {doI18n(
-                  "pages:core-local-workspace:or_press_r_to_record",
-                  i18nRef.current,
-                )}
-              </Box>
-            )}
-          </Box>
-          {/* En-tête des pistes supplémentaires */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              backgroundColor: "rgb(235, 235, 235)",
-              px: 1,
-              py: 1,
-              position: "relative",
-              zIndex: 1,
-            }}
-          >
-            <IconButton
-              size="small"
-              onClick={() => setShowOtherTracks((prev) => !prev)}
-              sx={{
-                transition: "transform 0.2s",
-                transform: showOtherTracks ? "rotate(90deg)" : "rotate(0deg)",
-                color: "rgb(76, 76, 76)",
-              }}
-              aria-label={
-                showOtherTracks
-                  ? "Masquer les autres pistes"
-                  : "Afficher les autres pistes"
-              }
-            >
-              <ChevronRightIcon />
-            </IconButton>
-            <Box
-              sx={{ fontSize: 12, fontWeight: 600, color: "rgb(76, 76, 76)" }}
-            >
-              {doI18n(
-                "pages:core-local-workspace:supplementary_tracks",
-                i18nRef.current,
-              )}
-            </Box>
-          </Box>
-
-          {/* Liste des autres pistes audio */}
-          {showOtherTracks && (
-            <Box
-              sx={{
-                p: 1,
-                backgroundColor: "rgb(235, 235, 235)",
-                height: "100%",
-                position: "relative",
-                zIndex: 1,
-              }}
-            >
-              {otherPrises.map(
-                (priseNumber, index) =>
-                  !priseNumber.includes("0_") &&
-                  !priseNumber.includes(
-                    prise?.split("_")[0] == "0"
-                      ? prise?.split("_")[1]
-                      : prise?.split("_")[0] + "_",
-                  ) && (
-                    <Box
-                      key={`${obs[0]}-${obs[1]}-${priseNumber}-${index}`}
-                      sx={{ mb: -1.2 }}
-                      className={`audio-waveform ${isLoading ? "loading" : "loaded"}`}
-                    >
-                      <Box
-                        sx={{
-                          fontSize: 11,
-                          color: "rgb(120, 120, 120)",
-                          mb: 0.5,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                        }}
-                      >
-                        {editingPrise === priseNumber ? (
-                          <>
-                            <Box
-                              sx={{ fontSize: 11, color: "rgb(120, 120, 120)" }}
-                            >
-                              Track {priseNumber.split("_")[0]} -
-                            </Box>
-                            <TextField
-                              size="small"
-                              value={editingName}
-                              autoFocus
-                              onChange={(e) => setEditingName(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  if (editingName?.trim())
-                                    editAudio(priseNumber, editingName);
-                                } else if (e.key === "Escape") {
-                                  setEditingPrise(null);
-                                }
-                              }}
-                              placeholder="Track name"
-                              sx={{ maxWidth: 240, backgroundColor: "white" }}
-                            />
-
-                            <Tooltip
-                              title={`${doI18n("pages:core-local-workspace:tooltip_confirm_renaming", i18nRef.current)}`}
-                            >
-                              <IconButton
-                                size="small"
-                                onClick={() =>
-                                  editingName?.trim() &&
-                                  editAudio(priseNumber, editingName)
-                                }
-                                disabled={!editingName?.trim()}
-                                sx={{ color: "rgb(63, 167, 53)" }}
-                              >
-                                <CheckIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-
-                            <Tooltip
-                              title={`${doI18n("pages:core-local-workspace:tooltip_cancel_renaming", i18nRef.current)}`}
-                            >
-                              <IconButton
-                                size="small"
-                                onClick={() => setEditingPrise(null)}
-                                sx={{ color: "rgb(168, 85, 85)" }}
-                              >
-                                <CloseIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </>
-                        ) : (
-                          <>
-                            <Box sx={{ mr: 1 }}>
-                              Track {priseNumber.split("_")[0]}{" "}
-                              {priseNumber.split("_")[1]
-                                ? `- ${priseNumber.split("_")[1]}`
-                                : ""}
-                            </Box>
-
-                            <Tooltip
-                              title={`${doI18n("pages:core-local-workspace:tooltip_switch_with_maintrack", i18nRef.current)}`}
-                            >
-                              <IconButton
-                                onClick={() => switchMainTrack(priseNumber)}
-                                sx={{ color: "rgb(120, 120, 120)" }}
-                              >
-                                <AutorenewIcon />
-                              </IconButton>
-                            </Tooltip>
-
-                            <Tooltip
-                              title={`${doI18n("pages:core-local-workspace:tooltip_rename_track", i18nRef.current)}`}
-                            >
-                              <IconButton
-                                onClick={() => {
-                                  setEditingPrise(priseNumber);
-                                  setEditingName(
-                                    priseNumber.split("_")[1] || "",
-                                  );
-                                }}
-                                sx={{}}
-                              >
-                                <EditIcon />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip
-                              title={`${doI18n("pages:core-local-workspace:tooltip_delete_track", i18nRef.current)}`}
-                            >
-                              <IconButton
-                                aria-label={`${doI18n("pages:core-local-workspace:delete_track", i18nRef.current)} ${priseNumber}`}
-                                onClick={() => deleteAudio(priseNumber)}
-                                sx={{ color: "rgb(120, 120, 120)" }}
-                              >
-                                {" "}
-                                <DeleteIcon />{" "}
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip
-                              title={`${doI18n("pages:core-local-workspace:tooltip_play_track", i18nRef.current)}`}
-                            >
-                              <IconButton
-                                aria-label={`${doI18n("pages:core-local-workspace:play_track", i18nRef.current)} ${priseNumber}`}
-                                onClick={() => playAudio(priseNumber)}
-                                sx={{ color: "rgb(120, 120, 120)" }}
-                              >
-                                {" "}
-                                {secondaryIsPlaying[priseNumber] ? (
-                                  <PauseIcon />
-                                ) : (
-                                  <PlayArrowIcon />
-                                )}{" "}
-                              </IconButton>
-                            </Tooltip>
-                          </>
-                        )}
-                      </Box>
-                      <Waveform
-                        priseNumber={priseNumber}
-                        obs={obs}
-                        metadata={metadata}
-                        setCursorTime={updateCursorTime}
-                        cursorTime={cursorTime}
-                        setCurrentTrack={setCurrentTrack}
-                        currentTrack={currentTrack}
-                        maxDuration={maxDuration}
-                        enableRegions={true}
-                        onRegionSelect={handleRegionSelect}
-                        onDurationUpdate={updateTrackDuration}
-                        isMainTrack={false}
-                        mainTrackRef={waveformRef}
-                        setMaxDuration={setMaxDuration}
-                        gridPx={gridPx}
-                        majorGridPx={majorGridPx}
-                        selectedRegion={selectedRegion}
-                        onWavesurferReady={(ws) => {
-                          setWaveformRefs((prev) => ({
-                            ...prev,
-                            [priseNumber]: ws,
-                          }));
-                          ws.on("play", () =>
-                            setSecondaryIsPlaying((prev) => ({
-                              ...prev,
-                              [priseNumber]: true,
-                            })),
-                          );
-                          ws.on("pause", () =>
-                            setSecondaryIsPlaying((prev) => ({
-                              ...prev,
-                              [priseNumber]: false,
-                            })),
-                          );
-                          ws.on("finish", () =>
-                            setSecondaryIsPlaying((prev) => ({
-                              ...prev,
-                              [priseNumber]: false,
-                            })),
-                          );
-                        }}
-                        containerWidth={waveformWidth}
-                      />
-                    </Box>
-                  ),
-              )}
-              {/* Piste vide / visualisateur en bas: visuel si des pistes existent, sinon message */}
-              {(!isRecording || hasAnyTrack) && otherPrises.length > 0 && (
-                <Box
-                  sx={{ mb: 1, mt: 4 }}
-                  className={`audio-waveform ${isLoading ? "loading" : "loaded"}`}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      backgroundColor:
-                        isRecording && hasAnyTrack
-                          ? "rgb(255, 240, 240)"
-                          : "rgb(245, 245, 245)",
-                      mb: 1,
-                      borderRadius: 1,
-                      position: "relative",
-                      border:
-                        isRecording && hasAnyTrack
-                          ? "2px solid rgb(255, 107, 107)"
-                          : "1px dashed rgb(200, 200, 200)",
-                      minHeight: "82px",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        flex: 1,
-                        position: "relative",
-                        overflow: "hidden",
-                        p: 1,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          fontSize: 11,
-                          color:
-                            isRecording && hasAnyTrack
-                              ? "rgb(255, 107, 107)"
-                              : "rgb(120, 120, 120)",
-                          mb: 0.5,
-                        }}
-                      >
-                        {isRecording && hasAnyTrack
-                          ? `${doI18n("pages:core-local-workspace:recording_in_progress", i18nRef.current)} - ${nextPriseNumber}`
-                          : `${doI18n("pages:core-local-workspace:empty_track", i18nRef.current)} - ${nextPriseNumber || "..."}`}
-                      </Box>
-                      {isRecording && hasAnyTrack ? (
-                        <canvas
-                          ref={recordingCanvasRef}
-                          width={800}
-                          height={60}
-                          style={{
-                            width: "100%",
-                            height: "60px",
-                            overflow: "hidden",
-                          }}
-                        />
-                      ) : (
-                        <Box
-                          sx={{
-                            height: "60px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "rgb(76, 76, 76)",
-                            mb: 1,
-                          }}
-                        >
-                          {doI18n(
-                            "pages:core-local-workspace:click_record_to_start",
-                            i18nRef.current,
-                          )}{" "}
-                          <MicIcon fontSize="small" />{" "}
-                          {doI18n(
-                            "pages:core-local-workspace:or_press_r_to_record",
-                            i18nRef.current,
-                          )}
-                        </Box>
-                      )}
-                    </Box>
-                  </Box>
-                </Box>
-              )}
-
-              {otherPrises.length === 0 && !isRecording && (
-                <Box
-                  sx={{
-                    textAlign: "center",
-                    py: 2,
-                    color: "rgb(120, 120, 120)",
-                  }}
-                >
-                  {doI18n(
-                    "pages:core-local-workspace:no_other_tracks",
-                    i18nRef.current,
-                  )}
-                </Box>
-              )}
-            </Box>
-          )}
+          Ctrl to multiple select, ← and → to move selection
         </Box>
       </Stack>
+
+      <Box sx={{ border: "2px solid #777", borderTop: "0px solid #777" }}>
+        <Stack direction="row" alignItems="stretch" spacing={1}>
+          <Box
+            ref={laneRef}
+            sx={{
+              flex: 1,
+              minWidth: 0,
+              position: "relative",
+              height: 16,
+              paddingBottom: 0,
+            }}
+          >
+            <TimelineAxis
+              projectDuration={projectDuration}
+              pxPerSec={pxPerSec}
+              isTopAxis={true}
+            />
+          </Box>
+          <Divider
+            orientation="vertical"
+            flexItem
+            sx={{ alignSelf: "stretch", borderColor: "transparent" }}
+          />
+          <Stack spacing={0} paddingRight={4} paddingLeft={0} margin={0}>
+            <Box minWidth={110} maxWidth={110} />
+          </Stack>
+        </Stack>
+
+        {tracks.length > 0 ? (
+          tracks.map((t) => {
+            const isSel = selection?.trackId === t.id;
+            // Le playhead suit la piste qu'on a *réellement* lancée,
+            // pas la sélection en cours (qui peut changer pendant la lecture).
+            const isLivePlay =
+              isPlaying && playingFromRef.current?.trackId === t.id;
+            const playheadTime = isLivePlay
+              ? (playingFromRef.current?.startTime ?? 0) + playerHeadTime
+              : selection?.trackId === t.id
+                ? selection.time
+                : null;
+            return (
+              <TrackView
+                key={t.id}
+                track={t}
+                projectDuration={projectDuration}
+                isSelected={isSel}
+                onSeek={handleSeek}
+                onDelete={() => deleteTrack(t.id)}
+                playheadTime={playheadTime}
+                regionSelection={regionSelection}
+                onRegionChange={setRegionSelection}
+                onRename={renameTrack}
+                pxPerSec={pxPerSec}
+                onClipMove={moveClip}
+                onClipMoveAcrossTracks={moveClipAcrossTracks}
+                onClipTrim={trimClip}
+                clipSelection={clipSelection}
+                onClipSelect={handleClipSelect}
+                onClearClipSelection={clearClipSelection}
+                getSnapCandidates={getSnapCandidates}
+                snapEnabled={snapEnabled}
+                snapStep={snapStep}
+                resizeBounds={getResizeBounds}
+              />
+            );
+          })
+        ) : !isRecording ? (
+          <Box
+            sx={{
+              color: "#666",
+              p: 4,
+              borderBottom: "1px solid #777",
+              borderLeft: "1px solid #777",
+              borderRight: "1px solid #777",
+            }}
+          >
+            No tracks to display
+          </Box>
+        ) : null}
+      </Box>
+
+      {isRecording && (
+        <LiveRecordingLane
+          peaksRef={peaksRef}
+          pxPerSec={pxPerSec}
+          sampleHz={sampleHz}
+          trackNumber={tracks.length + 1}
+        />
+      )}
+
+      {/* {ctrlHeld && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        top: cursorPos.y + 12,
+                        left: cursorPos.x + 12,
+                        pointerEvents: "none",
+                        zIndex: 9999,
+                        color: "#555",
+                    }}
+                >
+                    <GestureIcon />
+                </Box>
+            )} */}
     </Box>
   );
-};
-export default AudioRecorder;
+}

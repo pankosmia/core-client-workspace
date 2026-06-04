@@ -951,6 +951,10 @@
     "morphLookup_p_pres": {
       "en": "pres",
       "fr": "prés"
+    },
+    "text_paragraph": {
+      "en": "Text paragraph",
+      "fr": "Texte du paragraphe"
     }
   }
 }
