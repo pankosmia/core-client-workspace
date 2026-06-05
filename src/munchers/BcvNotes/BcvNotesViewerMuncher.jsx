@@ -82,11 +82,17 @@ function BcvNotesViewerMuncher({ metadata }) {
     );
   });
 
-  const verseNotes = filteredIngredient.map((l) => l[6] || l[5]);
-  const verseIds = filteredIngredient.map((l) => l[1]);
-  /* const verseSupReferences = filteredIngredient.map((l) => l[3]); */
+  const groupedByReference = filteredIngredient.reduce((acc, item) => {
+    const ref = item[0];
+    if (!acc[ref]) {
+      acc[ref] = [];
+    }
+    acc[ref].push(item);
+    return acc;
+  }, {});
 
-  // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
+  const groupedEntries = Object.entries(groupedByReference);
+
   return (
     <Box sx={{ flexGrow: 1 }} dir={!sbScriptDirSet ? textDir : undefined}>
       <Grid2
@@ -99,44 +105,38 @@ function BcvNotesViewerMuncher({ metadata }) {
         }}
       >
         <Grid2 item size={12}>
-          {verseNotes.length > 0 &&
-            [...new Set(verseNotes)].map((v, n) => {
-              const currentIngredient = filteredIngredient.filter((v) =>
-                v.includes(verseIds[n]),
-              )[0];
-              const currentTitle = currentIngredient[0];
-              const currentNote =
-                currentIngredient[6] || currentIngredient[5] || "";
-              const currentId = currentIngredient[1];
-              const currentSupReference = currentIngredient[3] || "";
+          {groupedEntries.length > 0 &&
+            groupedEntries.map(([reference, items], n) => {
+              const notesContent = items
+                .map((item) => {
+                  const noteId = item[1];
+                  const noteText = (item[6] || item[5] || "").trimStart();
+                  const supReference = item[3] || "";
+                  return `* (**${noteId}**) ${noteText.replace(". \n\n\n\n ", ". \n\n * ")}${supReference !== "" ? ` (${supReference.replace("rc://*/ta/man/translate/", "")})` : ""}`.trim();
+                })
+                .join("\n");
 
               return (
-                <Accordion
-                  key={`${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""}-${n}`}
-                  defaultExpanded={n === 0}
-                >
+                <Accordion key={`${reference}-${n}`} defaultExpanded={n === 0}>
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1-content"
+                    aria-controls={`panel${n}-content`}
                     id={`tnote-${n}`}
                   >
                     <Typography component="span" sx={{ fontWeight: "bold" }}>
-                      {currentTitle}
+                      {reference}
+                      {/* Below is the code for showing the id when there's only 1 item, but it looks very weird. */}
+                      {/* {items.length === 1 ? `${reference} ${items[0][1]}` : reference} */}
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     {ingredient && (
                       <Markdown className="markdown">
-                        {verseNotes.length > 0 ? (
-                          `* (**${currentId}**) ${currentNote.replace(". \n\n\n\n ", ". \n\n * ")}${!(currentSupReference === "") ? ` (${currentSupReference.replace("rc://*/ta/man/translate/", "")})` : ""}`
-                        ) : (
-                          <Typography>
-                            {doI18n(
-                              "pages:core-local-workspace:no_verse",
-                              i18nRef.current,
-                            )}
-                          </Typography>
-                        )}
+                        {notesContent ||
+                          doI18n(
+                            "pages:core-local-workspace:no_verse",
+                            i18nRef.current,
+                          )}
                       </Markdown>
                     )}
                   </AccordionDetails>
