@@ -546,6 +546,10 @@
       "en": "No notes found for this verse",
       "fr": "Pas de note pour ce verset"
     },
+    "no_juxta": {
+      "en": "No juxta found for this book",
+      "fr": "Pas de juxta pour ce livre "
+    },
     "book": {
       "en": "Book",
       "fr": "Livre"
