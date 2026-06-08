@@ -19,9 +19,9 @@ import {
   Tooltip,
 } from "@mui/material";
 import { PanDialog, PanTable } from "pankosmia-rcl";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import LayoutPicker from "./WorkspaceLayoutButton";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+import ArrowForwardOutlinedIcon from "@mui/icons-material/ArrowForwardOutlined";
 
 function ConfigureWorkspace({
   layout,
@@ -427,7 +427,7 @@ function ConfigureWorkspace({
                 <Typography variant="body2">
                   {`${doI18n("pages:core-local-workspace:editing", i18nRef.current, debugRef.current)} ${currentProjectRef.current && currentProjectRef.current.project}`}
                 </Typography>
-                <PlayArrowIcon />
+                <ArrowForwardOutlinedIcon />
               </Fab>
             </Grid2>
             <Grid2 item size={12}>
