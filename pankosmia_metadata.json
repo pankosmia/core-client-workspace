@@ -41,6 +41,13 @@
         "url": ""
       }
     },
+    "audioTranslation": {
+      "edit": {
+        "doc": "main page for workspace",
+        "label": "pages:core-client-workspace:main",
+        "url": ""
+      }
+    },
     "workspaceMainPage": {
       "doc": "actual workspace page",
       "label": "pages:core-client-workspace:main-page",
@@ -549,6 +556,24 @@
     "book": {
       "en": "Book",
       "fr": "Livre"
+    },
+    "chapter": {
+      "en": "Chapter",
+      "fr": "Chapitre",
+      "es": "Capítulo",
+      "id": "Pasal"
+    },
+    "segment": {
+      "en": "Segment",
+      "fr": "Segment",
+      "es": "Segmento",
+      "id": "Segmen"
+    },
+    "select_segment": {
+      "en": "Select a segment",
+      "fr": "Sélectionnez un segment",
+      "es": "Seleccione un segmento",
+      "id": "Pilih segmen"
     },
     "usfm_p": {
       "en": "Normal paragraph"

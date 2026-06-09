@@ -2,6 +2,7 @@ import React from "react";
 import TextTranslationEditorMuncher from "../../munchers/TextTranslation/TextTranslationEditorMuncher";
 import TextTranslationViewerMuncher from "../../munchers/TextTranslation/TextTranslationViewerMuncher";
 import BcvAudioTranslationViewerMuncher from "../../munchers/BcvAudio/BcvAudioViewerMuncher";
+import AudioTranslationEditorMuncher from "../../munchers/AudioTranslation/AudioTranslationEditorMuncher";
 import BcvNotesViewerMuncher from "../../munchers/BcvNotes/BcvNotesViewerMuncher";
 import BcvNotesEditorMuncher from "../../munchers/BcvNotes/BcvNotesEditorMuncher";
 import BcvQuestionsViewerMuncher from "../../munchers/BcvQuestions/BcvQuestionsViewerMuncher";
@@ -59,6 +60,13 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
         <TextTranslationViewerMuncher metadata={metadata} />
+      </div>
+    );
+  }
+  if (metadata.primary && metadata.flavor === "audioTranslation") {
+    return (
+      <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
+        <AudioTranslationEditorMuncher metadata={metadata} />
       </div>
     );
   }
