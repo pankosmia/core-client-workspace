@@ -136,7 +136,7 @@ function BcvArticlesViewerMuncher({ metadata }) {
             alignItems: "center",
           }}
         >
-          <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</Typography>
+          <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`}</Typography>
         </Grid2>
         <Grid2 item size={12}>
           {verseNotes.length > 0 &&

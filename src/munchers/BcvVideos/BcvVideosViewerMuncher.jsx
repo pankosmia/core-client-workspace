@@ -88,9 +88,14 @@ function BcvImagesViewerMuncher({ metadata }) {
   useEffect(() => {
     const doVerseNotes = async () => {
       let ret = [];
-      for (const row of ingredient.filter(
-        (l) => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`,
-      )) {
+      const start = systemBcv.verseNum;
+      const end = systemBcv.endVerseNum || systemBcv.verseNum;
+      for (const row of ingredient.filter((l) => {
+        const [chapter, verse] = l[0].split(":").map(Number);
+        return (
+          chapter === systemBcv.chapterNum && verse >= start && verse <= end
+        );
+      })) {
         ret.push(row[6]);
       }
       setVerseNotes(ret);
@@ -106,6 +111,7 @@ function BcvImagesViewerMuncher({ metadata }) {
     systemBcv.bookCode,
     systemBcv.chapterNum,
     systemBcv.verseNum,
+    systemBcv.endVerseNum,
   ]);
 
   const [verseCaptions, setVerseCaptions] = useState([]);
@@ -179,7 +185,7 @@ function BcvImagesViewerMuncher({ metadata }) {
       dir={!sbScriptDirSet ? textDir : undefined}
     >
       <div className="flex flex-col items-center justify-center p-2">
-        <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
+        <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`}</h5>
       </div>
       <div className="flex-1 min-h-0 min-w-0 overflow-hidden p-2">
         {ingredient && verseNotes.length > 0 ? (
