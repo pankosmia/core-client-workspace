@@ -1,5 +1,13 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Grid2, Typography } from "@mui/material";
+import {
+  Box,
+  Grid2,
+  Typography,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Markdown from "react-markdown";
 
 import {
@@ -59,22 +67,32 @@ function BcvNotesViewerMuncher({ metadata }) {
     if (cvC !== rangeC) {
       return false;
     }
-    if (rangeV.includes("-")) {
-      const [fromV, toV] = rangeV.split("-").map((v) => parseInt(v));
-      return cvV >= fromV && cvV <= toV;
-    } else {
-      return cvV === rangeV;
-    }
+    const parseVals = (str) => str.split("-").map(Number);
+
+    const [cvFrom, cvTo = cvFrom] = parseVals(cvV);
+    const [rangeFrom, rangeTo = rangeFrom] = parseVals(rangeV);
+
+    return cvFrom <= rangeTo && cvTo >= rangeFrom;
   };
 
-  const filteredIngredient = ingredient.filter((l) =>
-    cvInRange(`${systemBcv.chapterNum}:${systemBcv.verseNum}`, l[0]),
-  );
-  const verseNotes = filteredIngredient.map((l) => l[6] || l[5]);
-  const verseIds = filteredIngredient.map((l) => l[1]);
-  const verseSupReferences = filteredIngredient.map((l) => l[3]);
+  const filteredIngredient = ingredient.filter((l) => {
+    return cvInRange(
+      `${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""}`,
+      l[0],
+    );
+  });
 
-  // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
+  const groupedByReference = filteredIngredient.reduce((acc, item) => {
+    const ref = item[0];
+    if (!acc[ref]) {
+      acc[ref] = [];
+    }
+    acc[ref].push(item);
+    return acc;
+  }, {});
+
+  const groupedEntries = Object.entries(groupedByReference);
+
   return (
     <Box sx={{ flexGrow: 1 }} dir={!sbScriptDirSet ? textDir : undefined}>
       <Grid2
@@ -86,36 +104,45 @@ function BcvNotesViewerMuncher({ metadata }) {
           alignItems: "center",
         }}
       >
-        <Grid2
-          item
-          size={3}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</Typography>
-        </Grid2>
-        <Grid2 item size={12} sx={{ paddingRight: "5%" }}>
-          {ingredient && (
-            <Markdown className="markdown">
-              {verseNotes.length > 0 ? (
-                verseNotes
-                  .map((v, n) => {
-                    return `* (**${verseIds[n]}**) ${v.replace(". \n\n\n\n ", ". \n\n * ")}${!(verseSupReferences[n] === "") ? ` (${verseSupReferences[n].replace("rc://*/ta/man/translate/", "")})` : ""}`;
-                  })
-                  .join("\n")
-              ) : (
-                <Typography>
-                  {doI18n(
-                    "pages:core-local-workspace:no_verse",
-                    i18nRef.current,
-                  )}
-                </Typography>
-              )}
-            </Markdown>
-          )}
+        <Grid2 item size={12}>
+          {groupedEntries.length > 0 &&
+            groupedEntries.map(([reference, items], n) => {
+              const notesContent = items
+                .map((item) => {
+                  const noteId = item[1];
+                  const noteText = (item[6] || item[5] || "").trimStart();
+                  const supReference = item[3] || "";
+                  return `* (**${noteId}**) ${noteText.replace(". \n\n\n\n ", ". \n\n * ")}${supReference !== "" ? ` (${supReference.replace("rc://*/ta/man/translate/", "")})` : ""}`.trim();
+                })
+                .join("\n");
+
+              return (
+                <Accordion key={`${reference}-${n}`} defaultExpanded={n === 0}>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls={`panel${n}-content`}
+                    id={`tnote-${n}`}
+                  >
+                    <Typography component="span" sx={{ fontWeight: "bold" }}>
+                      {reference}
+                      {/* Below is the code for showing the id when there's only 1 item, but it looks very weird. */}
+                      {/* {items.length === 1 ? `${reference} ${items[0][1]}` : reference} */}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {ingredient && (
+                      <Markdown className="markdown">
+                        {notesContent ||
+                          doI18n(
+                            "pages:core-local-workspace:no_verse",
+                            i18nRef.current,
+                          )}
+                      </Markdown>
+                    )}
+                  </AccordionDetails>
+                </Accordion>
+              );
+            })}
         </Grid2>
       </Grid2>
     </Box>
