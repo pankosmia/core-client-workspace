@@ -435,10 +435,12 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
         ? vEnd + (buf.duration - seg.srcEnd)
         : Infinity;
 
-    return {
-      minVStart: Math.max(neighborMinVStart, audioMinVStart),
-      maxVEnd: Math.min(neighborMaxVEnd, audioMaxVEnd),
-    };
+    const minVStart = Math.max(neighborMinVStart, audioMinVStart);
+    const maxVEnd = Math.max(
+      minVStart,
+      Math.min(neighborMaxVEnd, audioMaxVEnd),
+    );
+    return { minVStart, maxVEnd };
   };
 
   const getMoveBounds = (trackId, segId, excludeIds = new Set()) => {

@@ -245,6 +245,7 @@ export default function Clip({
             left: e.rect.left,
             right: e.rect.right,
           };
+          clampedRectRef.current = null;
         },
         move(e) {
           const start = resizeStartRectRef.current;
@@ -287,14 +288,13 @@ export default function Clip({
         },
         end(e) {
           const start = resizeStartRectRef.current;
+          const finalRect = clampedRectRef.current; // capturer AVANT reset
           el.style.transform = "";
           el.style.width = "";
           resizeStartRectRef.current = null;
+          clampedRectRef.current = null;
           if (!start || pxPerSec <= 0) return;
-          const finalRect = clampedRectRef.current ?? {
-            left: e.rect.left,
-            right: e.rect.right,
-          };
+          if (!finalRect) return;
           const deltaLeft = (finalRect.left - start.left) / pxPerSec;
           const deltaRight = (finalRect.right - start.right) / pxPerSec;
           if (Math.abs(deltaLeft) > 0.001 || Math.abs(deltaRight) > 0.001) {

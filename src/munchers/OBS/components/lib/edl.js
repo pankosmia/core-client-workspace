@@ -52,7 +52,9 @@ export function virtualDuration(track) {
 // éviter de tomber sur un objet résiduel issu d'une sérialisation JSON.
 export function segmentBuffer(seg, trackBuffer) {
   const b = seg.buffer;
-  return b && typeof b.getChannelData === "function" ? b : trackBuffer;
+  if (b && typeof b.getChannelData === "function") return b;
+  if (seg.bufferTrackId) return null;
+  return trackBuffer;
 }
 
 // Peaks pour UN segment uniquement, à dessiner dans son propre canvas.

@@ -55,6 +55,19 @@ export function useProjectPersistence({
         // Drop les pistes dont le buffer n'a pas pu être chargé (fichier manquant/corrompu).
         const valid = loaded.filter((t) => t.buffer);
         const buffersById = new Map(valid.map((t) => [t.id, t.buffer]));
+        const referencedIds = new Set();
+        for (const t of valid)
+          for (const seg of t.edl)
+            if (seg.bufferTrackId && !buffersById.has(seg.bufferTrackId))
+              referencedIds.add(seg.bufferTrackId);
+
+        await Promise.all(
+          [...referencedIds].map(async (id) => {
+            const buf = await loadAudioBuffer(audioCtxRef.current, paths, id);
+            if (buf) buffersById.set(id, buf);
+          }),
+        );
+        if (cancelled) return;
         const resolved = valid.map((t) => ({
           ...t,
           edl: ensureAbsolutePositions(t.edl).map((seg) => ({
