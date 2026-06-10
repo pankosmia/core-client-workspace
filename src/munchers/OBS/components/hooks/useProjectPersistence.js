@@ -1,11 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import { ensureAbsolutePositions, makeTrack } from "../lib/edl";
+import {
+  ensureAbsolutePositions,
+  makeTrack,
+  rehydrateTracks,
+} from "../lib/edl";
 import {
   loadProject,
   saveProject,
   loadAudioBuffer,
   saveAudioBlob,
 } from "../lib/storageUtil";
+import {
+  loadHistory,
+  saveHistory,
+  collectBufferIds,
+} from "../lib/historyStorage";
 
 // Synchronise `tracks` avec le backend :
 //   - au mount : charge `_project.json`, re-décode chaque .webm en AudioBuffer.
@@ -18,6 +27,10 @@ export function useProjectPersistence({
   audioUrl,
   tracks,
   setTracks,
+  past,
+  setPast,
+  future,
+  setFuture,
 }) {
   const [projectLoaded, setProjectLoaded] = useState(false);
   // Le fallback audioUrl ne doit s'appliquer qu'au tout premier mount, pas à chaque
@@ -32,6 +45,8 @@ export function useProjectPersistence({
     // Reset immédiat : on affiche l'état vide pendant le chargement et si rien n'est trouvé.
     setProjectLoaded(false);
     setTracks([]);
+    setPast([]);
+    setFuture([]);
     (async () => {
       audioCtxRef.current ??= new AudioContext();
       let proj;
@@ -52,18 +67,42 @@ export function useProjectPersistence({
             buffer: await loadAudioBuffer(audioCtxRef.current, paths, t.id),
           })),
         );
-        // Drop les pistes dont le buffer n'a pas pu être chargé (fichier manquant/corrompu).
+        // Drop les pistes dont le buffer n'a pas pu être chargé (fichier manquant).
         const valid = loaded.filter((t) => t.buffer);
         const buffersById = new Map(valid.map((t) => [t.id, t.buffer]));
-        const resolved = valid.map((t) => ({
-          ...t,
-          edl: ensureAbsolutePositions(t.edl).map((seg) => ({
-            ...seg,
-            buffer: seg.bufferTrackId
-              ? buffersById.get(seg.bufferTrackId) || null
-              : null,
-          })),
-        }));
+        const resolved = rehydrateTracks(valid, buffersById);
+
+        // --- NEW : historique undo/redo depuis le cache ---
+        const hist = loadHistory(paths);
+        if (hist) {
+          // Buffers référencés par l'historique mais pas déjà chargés pour le projet
+          // (typiquement des pistes supprimées qu'un undo peut ramener).
+          const snapshots = [...hist.past, hist.present, ...hist.future];
+          const missing = [...collectBufferIds(snapshots)].filter(
+            (id) => !buffersById.has(id),
+          );
+          await Promise.all(
+            missing.map(async (id) => {
+              const buf = await loadAudioBuffer(audioCtxRef.current, paths, id);
+              if (buf) buffersById.set(id, buf);
+            }),
+          );
+          if (cancelled) return;
+          // Par snapshot, on droppe les pistes dont le buffer a disparu (cohérent
+          // avec le filtrage `valid` du projet).
+          const hydrate = (snap) =>
+            rehydrateTracks(snap, buffersById).filter((t) => t.buffer);
+          setPast(hist.past.map(hydrate));
+          setFuture(hist.future.map(hydrate));
+          // `present` du cache = état courant → undo/redo restent alignés.
+          // (Le _project.json reste la source durable ; ici on préfère le cache
+          //  pour que la pile undo soit cohérente avec l'état affiché.)
+          setTracks(hydrate(hist.present));
+          setProjectLoaded(true);
+          return;
+        }
+
+        // Pas de cache d'historique : comportement actuel.
         if (!cancelled) {
           setTracks(resolved);
           setProjectLoaded(true);
@@ -98,20 +137,34 @@ export function useProjectPersistence({
     };
   }, [paths, audioUrl]);
 
+  // Sauve le projet (_project.json) côté backend, debounced 500 ms, sans les
+  // buffers (strip AudioBuffer ; bufferTrackId suffit à ré-attacher au reload).
+  // C'est la source durable : sans elle, rien n'est rechargé après navigation.
   useEffect(() => {
     if (!paths || !projectLoaded || tracks.length === 0) return;
     const handle = setTimeout(() => {
       saveProject(paths, {
         tracks: tracks.map(({ buffer, edl, ...rest }) => ({
           ...rest,
-          // On strip seg.buffer (AudioBuffer non sérialisable) ; bufferTrackId suffit
-          // pour ré-attacher la réf au reload.
           edl: edl.map(({ buffer: _b, ...segRest }) => segRest),
         })),
       });
     }, 500);
     return () => clearTimeout(handle);
   }, [tracks, paths, projectLoaded]);
+
+  // Sauve l'historique undo/redo en cache (localStorage), debounced 500 ms.
+  // projectLoaded=false pendant le (re)chargement empêche d'écraser le cache
+  // avec un état transitoire vide.
+  useEffect(() => {
+    if (!paths || !projectLoaded) return;
+    // Rien à mémoriser tant qu'on n'a ni historique ni contenu.
+    if (past.length === 0 && future.length === 0 && tracks.length === 0) return;
+    const handle = setTimeout(() => {
+      saveHistory(paths, { past, present: tracks, future });
+    }, 500);
+    return () => clearTimeout(handle);
+  }, [past, future, tracks, paths, projectLoaded]);
 
   return { projectLoaded };
 }

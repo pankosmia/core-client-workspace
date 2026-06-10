@@ -92,7 +92,17 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
     [metadata?.local_path, obs],
   );
 
-  useProjectPersistence({ paths, audioCtxRef, audioUrl, tracks, setTracks });
+  useProjectPersistence({
+    paths,
+    audioCtxRef,
+    audioUrl,
+    tracks,
+    setTracks,
+    past,
+    setPast,
+    future,
+    setFuture,
+  });
   const {
     isRecording,
     startRecording,
@@ -305,8 +315,9 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
     setRegionSelection(null);
   };
 
+  const HISTORY_CAP = 150;
   const setTracksWithHistory = (updater) => {
-    setPast((p) => [...p, tracks]);
+    setPast((p) => [...p, tracks].slice(-HISTORY_CAP));
     setFuture([]);
     setTracks(updater);
   };

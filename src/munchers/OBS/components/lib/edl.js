@@ -259,6 +259,24 @@ export function ensureAbsolutePositions(edl) {
   });
 }
 
+// Ré-attache les AudioBuffer à des pistes désérialisées (issues du JSON projet
+// OU du cache d'historique). `buffersById` mappe trackId → AudioBuffer.
+//   - track.buffer ← buffersById.get(track.id)
+//   - seg.buffer   ← buffersById.get(seg.bufferTrackId) (ou null)
+// Fonction pure : l'appelant droppe ensuite les pistes à buffer null si besoin.
+export function rehydrateTracks(tracks, buffersById) {
+  return tracks.map((t) => ({
+    ...t,
+    buffer: buffersById.get(t.id) || null,
+    edl: ensureAbsolutePositions(t.edl).map((seg) => ({
+      ...seg,
+      buffer: seg.bufferTrackId
+        ? buffersById.get(seg.bufferTrackId) || null
+        : null,
+    })),
+  }));
+}
+
 // Coupe le segment à la position vTime.
 export function splitAt(edl, vTime) {
   if (edl.length === 0) return edl;
