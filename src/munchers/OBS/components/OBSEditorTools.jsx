@@ -46,8 +46,6 @@ function OBSEditorTools({
         right: 0,
         display: "flex",
         padding: 2,
-        zIndex: 1100,
-        backgroundColor: "background.paper",
       }}
     >
       <Grid2

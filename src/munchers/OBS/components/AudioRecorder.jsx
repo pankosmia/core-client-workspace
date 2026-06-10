@@ -36,7 +36,7 @@ import { pickTickInterval } from "./lib/snap";
 import SplitIcon from "./SplitIcon";
 // import GestureIcon from "./GestureIcon";
 
-export default function AudioRecorder({ audioUrl, obs, metadata }) {
+export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const audioCtxRef = useRef(null);
   const [tracks, setTracks] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -85,11 +85,12 @@ export default function AudioRecorder({ audioUrl, obs, metadata }) {
       metadata?.local_path && obs
         ? projectPaths({
             localPath: metadata.local_path,
+            book,
             chapter: obs[0],
             paragraph: obs[1],
           })
         : null,
-    [metadata?.local_path, obs],
+    [metadata?.local_path, obs, book],
   );
 
   useProjectPersistence({ paths, audioCtxRef, audioUrl, tracks, setTracks });

@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Box, MenuItem, TextField } from "@mui/material";
-import { getJson, doI18n, postEmptyJson, getText } from "pithekos-lib";
+import { getJson, doI18n } from "pithekos-lib";
 import {
   bcvContext as BcvContext,
   i18nContext as I18nContext,
@@ -32,7 +32,7 @@ function BookPicker({ setFirstChapter, disable = false }) {
   }, [currentProjectRef]);
 
   useEffect(() => {
-    if (currentBook) {
+    if (currentBook && bcvRef.current.bookCode !== currentBook) {
       setFirstChapter(currentProjectRef.current, debugRef.current, currentBook);
     }
   }, [currentBook]);

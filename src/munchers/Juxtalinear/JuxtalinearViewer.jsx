@@ -143,7 +143,7 @@ function JuxtalinearViewerMuncher({ metadata }) {
             ))}
           </Grid2>
         ) : (
-          "No notes found for this book"
+          `${doI18n("pages:core-local-workspace:no_juxta", i18nRef.current)}`
         )}
       </div>
     </Stack>

@@ -1,10 +1,14 @@
-// Audio  : audio_content/{CC}-{PP}/{CC}-{PP}_{trackId}.webm   (blob MediaRecorder brut)
-// Projet : audio_content/{CC}-{PP}/{CC}-{PP}_project.json
+// Audio  : audio_content/[{BOOK}/]{CC}-{PP}/{CC}-{PP}_{trackId}.webm   (blob MediaRecorder brut)
+// Projet : audio_content/[{BOOK}/]{CC}-{PP}/{CC}-{PP}_project.json
+// `book` is optional: OBS omits it (single book), scripture audio passes the
+// book code so {CC}-{PP} doesn't collide across books.
 
-export function projectPaths({ localPath, chapter, paragraph }) {
+export function projectPaths({ localPath, book, chapter, paragraph }) {
   const cc = String(chapter).padStart(2, "0");
   const pp = String(paragraph).padStart(2, "0");
-  const dir = `audio_content/${cc}-${pp}`;
+  const dir = book
+    ? `audio_content/${book}/${cc}-${pp}`
+    : `audio_content/${cc}-${pp}`;
   return {
     localPath,
     audio: (id) => `${dir}/${cc}-${pp}_${id}.webm`,

@@ -78,7 +78,7 @@ function TranslationPlanViewerMuncher({ metadata }) {
   useEffect(() => {
     async function fetchSummaries() {
       try {
-        const response = await fetch("/burrito/metadata/summaries");
+        const response = await fetch("/api/burrito/metadata/summaries");
         if (!response.ok) throw new Error(`HTTP error ${response.status}`);
         const data = await response.json();
         // Filter only those with flavor_type = scripture
