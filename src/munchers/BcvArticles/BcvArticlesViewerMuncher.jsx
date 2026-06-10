@@ -64,21 +64,33 @@ function BcvArticlesViewerMuncher({ metadata }) {
     () => {
       const doVerseNotes = async () => {
         let ret = [];
+        const seenLinks = new Set();
+        const startVerse = systemBcv.verseNum;
+        const endVerse = systemBcv.endVerseNum || systemBcv.verseNum;
+
         const filteredRows = ingredient.filter((row) => {
           const reference = row[0];
           if (!reference) return false;
           const [chapterPart, versePart] = reference.split(":");
           const chapter = parseInt(chapterPart);
           if (chapter !== systemBcv.chapterNum) return false;
+
+          let rowStart, rowEnd;
           if (versePart.includes("-")) {
             const [start, end] = versePart.split("-").map(Number);
-            return systemBcv.verseNum >= start && systemBcv.verseNum <= end;
+            rowStart = start;
+            rowEnd = end;
           } else {
-            return parseInt(versePart) === systemBcv.verseNum;
+            rowStart = rowEnd = parseInt(versePart);
           }
+
+          return rowStart <= endVerse && rowEnd >= startVerse;
         });
+
         for (const row of filteredRows) {
           let payloadLink = row[5];
+          if (seenLinks.has(payloadLink)) continue;
+          seenLinks.add(payloadLink);
           let payloadResponse = await getText(
             `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${payloadLink.slice(2)}.md`,
           );
@@ -95,7 +107,12 @@ function BcvArticlesViewerMuncher({ metadata }) {
       doVerseNotes().then();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ingredient, systemBcv.chapterNum, systemBcv.verseNum],
+    [
+      ingredient,
+      systemBcv.chapterNum,
+      systemBcv.verseNum,
+      systemBcv.endVerseNum,
+    ],
   );
 
   // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
