@@ -13,6 +13,10 @@ import { snapTime } from "../lib/snap";
 const INSET_X = 0;
 const INSET_Y = 2;
 const HEADER_HEIGHT = 12;
+// En-deçà de ce déplacement cumulé (px), on considère que c'est un clic et non
+// un drag : évite qu'un micro-mouvement de la main pendant le clic n'avale la
+// sélection du clip.
+const DRAG_THRESHOLD_PX = 4;
 // Marge réservée au bord droit de la lane : empêche le dernier clip (dont
 // vEnd == projectDuration) de coller / déborder sur la bordure de séparation
 // droite de la piste. Appliquée seulement à l'extrémité, pas entre les clips.
@@ -62,10 +66,12 @@ export default function Clip({
   const dragDyRef = useRef(0);
   const hoveredTrackIdRef = useRef(trackId);
 
-  // Suppression du clic (sélection) si un drag interact.js a réellement eu lieu.
-  // interact.js intercepte la propagation après le seuil, mais on garde un
-  // garde-fou explicite via cette ref consultée dans onHeaderClick.
-  const draggedRef = useRef(false);
+  // Suppression du clic (sélection) si un drag interact.js a RÉELLEMENT déplacé
+  // le clip. interact.js déclenche start() dès 1-2px de mouvement (un clic qui
+  // tremble), ce qui mangeait la sélection : on n'arme donc ce flag que dans
+  // move(), une fois passé un seuil perceptible (DRAG_THRESHOLD_PX). Un clic
+  // immobile garde le flag à false → la sélection passe du premier coup.
+  const dragMovedRef = useRef(false);
 
   // Snap props refletées en refs pour que les listeners interact.js (capturés
   // une fois dans useEffect) lisent toujours la valeur courante sans devoir
@@ -140,7 +146,8 @@ export default function Clip({
           const clipRect = el.getBoundingClientRect();
           dragStartTopRef.current = clipRect.top;
 
-          draggedRef.current = true;
+          // Pas encore un vrai drag : on attend de dépasser le seuil dans move().
+          dragMovedRef.current = false;
           el.classList.add("dragging");
           document.body.classList.add("clip-dragging");
           // Élève le clip au-dessus des autres pendant le drag pour qu'il
@@ -155,6 +162,13 @@ export default function Clip({
           // libérer — au lieu de se baser sur la position du curseur.
           dragDxRef.current += e.dx;
           dragDyRef.current += e.dy;
+
+          // Au-delà du seuil → vrai drag : le clic de fin ne sélectionnera pas.
+          if (
+            Math.hypot(dragDxRef.current, dragDyRef.current) > DRAG_THRESHOLD_PX
+          ) {
+            dragMovedRef.current = true;
+          }
 
           // Hit-test : trouve la lane sous le pointeur.
           const under = document.elementFromPoint(e.client.x, e.client.y);
@@ -299,8 +313,8 @@ export default function Clip({
     // Pas de stopPropagation : interact.js (attaché au parent) doit pouvoir
     // recevoir le pointerdown. La lane ignore déjà les pointerdown issus
     // du header via [data-clip-header].
-    if (draggedRef.current) {
-      draggedRef.current = false;
+    if (dragMovedRef.current) {
+      dragMovedRef.current = false;
       return;
     }
     onSelect?.(trackId, segment.id, {
