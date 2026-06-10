@@ -75,9 +75,14 @@ function BcvImagesViewerMuncher({ metadata }) {
     () => {
       const doVerseNotes = async () => {
         let ret = [];
-        for (const row of ingredient.filter(
-          (l) => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`,
-        )) {
+        const start = systemBcv.verseNum;
+        const end = systemBcv.endVerseNum || systemBcv.verseNum;
+        for (const row of ingredient.filter((l) => {
+          const [chapter, verse] = l[0].split(":").map(Number);
+          return (
+            chapter === systemBcv.chapterNum && verse >= start && verse <= end
+          );
+        })) {
           ret.push(row[6]);
         }
         setVerseNotes(ret);
@@ -87,7 +92,7 @@ function BcvImagesViewerMuncher({ metadata }) {
       doVerseNotes().then();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ingredient],
+    [ingredient, systemBcv],
   );
 
   const [verseCaptions, setVerseCaptions] = useState([]);
