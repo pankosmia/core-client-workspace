@@ -168,10 +168,18 @@ function TranslationPlanViewerMuncher({ metadata }) {
     const [endChapter, endVerse] = section.cv[1].split(":").map(Number);
     const chapterNum = systemBcv.chapterNum;
     const verseNum = systemBcv.verseNum;
+    const endVerseNum = systemBcv.endVerseNum || systemBcv.verseNum;
 
-    if (chapterNum < startChapter || chapterNum > endChapter) return false;
-    if (chapterNum === startChapter && verseNum < startVerse) return false;
-    if (chapterNum === endChapter && verseNum > endVerse) return false;
+    if (
+      chapterNum < startChapter ||
+      (chapterNum === startChapter && endVerseNum < startVerse)
+    )
+      return false;
+    if (
+      chapterNum > endChapter ||
+      (chapterNum === endChapter && verseNum > endVerse)
+    )
+      return false;
     return true;
   };
 
