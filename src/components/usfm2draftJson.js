@@ -16,11 +16,11 @@ function processGraftItems(items) {
   return ret;
 }
 
-function processCvItems(items, os, chapterNo) {
+function processCvItems(items, os, chapterNo, newChapter) {
   let ret = [];
   // start empty verse if open
   const openVerse = os.filter((s) => s.payload.startsWith("verses"))[0];
-  if (openVerse) {
+  if (openVerse && !newChapter) {
     ret.push({
       chapter: chapterNo,
       verses: openVerse.payload.split("/")[1],
@@ -59,6 +59,7 @@ function processBlocks(blocks, sequenceType, sequences) {
   let ret = [];
   let chapterNo = 0;
   for (const block of blocks) {
+    let newChapter = false;
     if (block.bs.payload.split("/")[1] === "hangingGraft") {
       continue;
     }
@@ -70,6 +71,7 @@ function processBlocks(blocks, sequenceType, sequences) {
       const blockChapter = parseInt(blockChapterOb.payload.split("/")[1]);
       if (blockChapter !== chapterNo) {
         chapterNo = blockChapter;
+        newChapter = true;
         ret.push({
           type: "chapter",
           chapter: chapterNo,
@@ -94,7 +96,12 @@ function processBlocks(blocks, sequenceType, sequences) {
       blockOb.tag = block.bs.payload.split("/")[1];
     }
     if (sequenceType === "main") {
-      blockOb.units = processCvItems(block.items, block.os, chapterNo);
+      blockOb.units = processCvItems(
+        block.items,
+        block.os,
+        chapterNo,
+        newChapter,
+      );
     } else {
       blockOb.content = processGraftItems(block.items);
     }
