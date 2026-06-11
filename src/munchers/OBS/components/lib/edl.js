@@ -366,3 +366,25 @@ export function insertSegmentAt(edl, seg, vStart) {
   const placed = { ...seg, vStart };
   return [...cleared, placed].sort((a, b) => a.vStart - b.vStart);
 }
+
+export function overwriteAt(edl, vTime, newSegments) {
+  if (!newSegments?.length) return edl;
+  let result = edl;
+  const placed = [];
+  for (const s of newSegments) {
+    const seg = makeSegment(
+      s.vStart + vTime,
+      s.srcStart,
+      s.srcEnd,
+      s.buffer,
+      s.bufferTrackId,
+    );
+    result = cutRange(
+      result,
+      seg.vStart,
+      seg.vStart + (seg.srcEnd - seg.srcStart),
+    );
+    placed.push(seg);
+  }
+  return [...result, ...placed].sort((a, b) => a.vStart - b.vStart);
+}

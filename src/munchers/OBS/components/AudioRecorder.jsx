@@ -23,7 +23,7 @@ import { formatTime } from "./Timeline";
 import {
   cutRange,
   extractRange,
-  insertAt,
+  overwriteAt,
   splitAt,
   trimSegment,
   removeSegment,
@@ -411,7 +411,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     setTracksWithHistory((ts) =>
       ts.map((t) =>
         t.id === trackId
-          ? { ...t, edl: insertAt(t.edl, time, clipboard.segments) }
+          ? { ...t, edl: overwriteAt(t.edl, time, clipboard.segments) }
           : t,
       ),
     );
