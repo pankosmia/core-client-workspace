@@ -147,13 +147,13 @@ export default function Clip({
           dragStartTopRef.current = clipRect.top;
 
           // Pas encore un vrai drag : on attend de dépasser le seuil dans move().
+          // SURTOUT ne rien armer ici (ni classes, ni pointerEvents) :
+          // `pointerEvents = "none"` posé dès start() rendait le clip
+          // transparent au mouseup d'un simple clic qui tremble de 1-2px →
+          // la cible du mouseup devenait la lane, le navigateur ne
+          // dispatchait jamais de `click` sur le header, et la sélection
+          // échouait aléatoirement (il fallait recliquer).
           dragMovedRef.current = false;
-          el.classList.add("dragging");
-          document.body.classList.add("clip-dragging");
-          // Élève le clip au-dessus des autres pendant le drag pour qu'il
-          // passe visuellement par-dessus les autres lanes.
-          el.style.zIndex = "10";
-          el.style.pointerEvents = "none"; // pour que elementFromPoint voie la lane sous le clip
         },
         move(e) {
           // dragDxRef = cumul brut du curseur, JAMAIS écrasé par le snap.
@@ -163,11 +163,27 @@ export default function Clip({
           dragDxRef.current += e.dx;
           dragDyRef.current += e.dy;
 
-          // Au-delà du seuil → vrai drag : le clic de fin ne sélectionnera pas.
+          // En-deçà du seuil : on ne touche à rien (ni transform, ni
+          // pointerEvents). Si le geste s'arrête là, c'est un clic et le
+          // header doit recevoir le mouseup/click normalement.
           if (
-            Math.hypot(dragDxRef.current, dragDyRef.current) > DRAG_THRESHOLD_PX
+            !dragMovedRef.current &&
+            Math.hypot(dragDxRef.current, dragDyRef.current) <=
+              DRAG_THRESHOLD_PX
           ) {
+            return;
+          }
+
+          // Premier franchissement du seuil → vrai drag : on arme le visuel
+          // de drag maintenant (et le clic de fin ne sélectionnera pas).
+          if (!dragMovedRef.current) {
             dragMovedRef.current = true;
+            el.classList.add("dragging");
+            document.body.classList.add("clip-dragging");
+            // Élève le clip au-dessus des autres pendant le drag pour qu'il
+            // passe visuellement par-dessus les autres lanes.
+            el.style.zIndex = "10";
+            el.style.pointerEvents = "none"; // pour que elementFromPoint voie la lane sous le clip
           }
 
           // Hit-test : trouve la lane sous le pointeur.
@@ -193,6 +209,16 @@ export default function Clip({
           el.style.transform = `translate(${displayDx}px, ${displayDy}px)`;
         },
         end(e) {
+          // Seuil jamais franchi = simple clic : rien n'a été armé dans
+          // move(), rien à défaire ni à déplacer. Sans ce garde, le snap
+          // pouvait transformer un drag d'1px en saut sur le tick voisin.
+          if (!dragMovedRef.current) {
+            dragDxRef.current = 0;
+            dragDyRef.current = 0;
+            hoveredTrackIdRef.current = trackId;
+            return;
+          }
+
           const dstTrackId = hoveredTrackIdRef.current;
           const altKey = e.altKey ?? e.originalEvent?.altKey ?? false;
           const finalDx = computeSnappedDx(
@@ -308,6 +334,15 @@ export default function Clip({
     return () => interact(el).unset();
   }, [pxPerSec, onMove, onMoveAcrossTracks, onClipTrim, trackId, segment.id]);
 
+  // Chaque geste repart d'un flag propre. Indispensable : après un vrai drag,
+  // le `click` n'atteint pas le header (pointerEvents était "none" au moment
+  // du mouseup), donc onHeaderClick ne consomme jamais le flag — sans ce
+  // reset, le clic immobile SUIVANT serait avalé par le garde (il fallait
+  // cliquer deux fois après avoir déplacé un clip).
+  const onHeaderPointerDown = () => {
+    dragMovedRef.current = false;
+  };
+
   const onHeaderClick = (e) => {
     // Si un drag interact.js a eu lieu, on n'enclenche pas la sélection.
     // Pas de stopPropagation : interact.js (attaché au parent) doit pouvoir
@@ -357,6 +392,7 @@ export default function Clip({
     >
       <Box
         data-clip-header={segment.id}
+        onPointerDown={onHeaderPointerDown}
         onClick={onHeaderClick}
         sx={{
           height: HEADER_HEIGHT,
