@@ -31,6 +31,7 @@ export default function TrackView({
   onRename,
   onClipMove,
   onClipMoveAcrossTracks,
+  onClipsMoveBy,
   onClipTrim,
   clipSelection,
   onClipSelect,
@@ -246,12 +247,14 @@ export default function TrackView({
                     isSelected={isClipSelected}
                     onMove={onClipMove}
                     onMoveAcrossTracks={onClipMoveAcrossTracks}
+                    onClipsMoveBy={onClipsMoveBy}
                     onClipTrim={onClipTrim}
                     onSelect={onClipSelect}
                     getSnapCandidates={getSnapCandidates}
                     snapEnabled={snapEnabled}
                     snapStep={snapStep}
                     resizeBounds={resizeBounds}
+                    clipSelection={clipSelection}
                   />
                 );
               })}

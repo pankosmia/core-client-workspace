@@ -65,12 +65,17 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     () => localStorage.getItem("snapEnabled") !== "false",
   );
 
-  const getSnapCandidates = (trackId, excludeSegId) => {
+  // excludeSegIds : Set<string> | string | null — rétro-compatible.
+  const getSnapCandidates = (trackId, excludeSegIds) => {
+    const exclude =
+      excludeSegIds instanceof Set
+        ? excludeSegIds
+        : new Set(excludeSegIds ? [excludeSegIds] : []);
     const t = tracks.find((x) => x.id === trackId);
     if (!t) return [];
     const out = [];
     for (const s of t.edl) {
-      if (s.id === excludeSegId) continue;
+      if (exclude.has(s.id)) continue;
       out.push(s.vStart);
       out.push(s.vStart + (s.srcEnd - s.srcStart));
     }
@@ -712,6 +717,46 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     }
   };
 
+  // Drag de groupe : déplace tous les clips sélectionnés du même delta.
+  // Punch-in comme le drag mono : on retire d'abord TOUS les segments
+  // sélectionnés (pour qu'ils ne se coupent pas entre eux), puis on les
+  // réinsère à vStart + delta ; insertSegmentAt coupe ce qui chevauche
+  // chez les non-sélectionnés. Un seul setTracksWithHistory = un seul undo.
+  const moveClipsBy = (deltaSec) => {
+    if (clipSelection.length === 0) return;
+
+    // Clamp global : le clip le plus à gauche du groupe ne passe pas sous 0.
+    // (PAS de Math.max(0, ...) par clip : ça compresserait les écarts.)
+    let minVStart = Infinity;
+    for (const { trackId, segId } of clipSelection) {
+      const t = tracks.find((x) => x.id === trackId);
+      const s = t?.edl.find((x) => x.id === segId);
+      if (s) minVStart = Math.min(minVStart, s.vStart);
+    }
+    const delta = Math.max(deltaSec, -minVStart);
+    if (Math.abs(delta) < 0.001) return;
+
+    const byTrack = new Map();
+    for (const { trackId, segId } of clipSelection) {
+      if (!byTrack.has(trackId)) byTrack.set(trackId, new Set());
+      byTrack.get(trackId).add(segId);
+    }
+
+    setTracksWithHistory((ts) =>
+      ts.map((t) => {
+        const ids = byTrack.get(t.id);
+        if (!ids) return t;
+        const moved = t.edl.filter((s) => ids.has(s.id));
+        let edl = t.edl.filter((s) => !ids.has(s.id));
+        // Tri par vStart : réinsertion gauche → droite, déterministe.
+        for (const s of [...moved].sort((a, b) => a.vStart - b.vStart)) {
+          edl = insertSegmentAt(edl, s, s.vStart + delta);
+        }
+        return { ...t, edl };
+      }),
+    );
+  };
+
   // Drag intra-piste : punch-in à la nouvelle position absolue.
   // On retire d'abord le segment source (pour qu'insertSegmentAt ne le
   // coupe pas avec lui-même), puis on l'insère : cutRange efface ce qui
@@ -926,6 +971,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
                 pxPerSec={pxPerSec}
                 onClipMove={moveClip}
                 onClipMoveAcrossTracks={moveClipAcrossTracks}
+                onClipsMoveBy={moveClipsBy}
                 onClipTrim={trimClip}
                 clipSelection={clipSelection}
                 onClipSelect={handleClipSelect}
