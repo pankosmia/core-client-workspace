@@ -208,38 +208,38 @@ export function extractRange(
 // Les clips qui commençaient avant vTime ne sont jamais touchés (un overlap
 // avec eux peut subsister si vTime tombe au milieu d'un clip — c'est au caller
 // de splitAt d'abord s'il veut l'éviter).
-export function insertAt(edl, vTime, newSegments) {
-  if (!newSegments?.length) return edl;
+// export function insertAt(edl, vTime, newSegments) {
+//   if (!newSegments?.length) return edl;
 
-  const shifted = newSegments.map((s) =>
-    makeSegment(
-      s.vStart + vTime,
-      s.srcStart,
-      s.srcEnd,
-      s.buffer,
-      s.bufferTrackId,
-    ),
-  );
-  const insertEnd = Math.max(
-    ...shifted.map((s) => s.vStart + (s.srcEnd - s.srcStart)),
-  );
+//   const shifted = newSegments.map((s) =>
+//     makeSegment(
+//       s.vStart + vTime,
+//       s.srcStart,
+//       s.srcEnd,
+//       s.buffer,
+//       s.bufferTrackId,
+//     ),
+//   );
+//   const insertEnd = Math.max(
+//     ...shifted.map((s) => s.vStart + (s.srcEnd - s.srcStart)),
+//   );
 
-  const nextStart = edl
-    .filter((s) => s.vStart >= vTime)
-    .reduce((min, s) => Math.min(min, s.vStart), Infinity);
+//   const nextStart = edl
+//     .filter((s) => s.vStart >= vTime)
+//     .reduce((min, s) => Math.min(min, s.vStart), Infinity);
 
-  const pushBy = Math.max(0, insertEnd - nextStart);
-  return [...makeSpace(edl, vTime, pushBy), ...shifted];
-}
+//   const pushBy = Math.max(0, insertEnd - nextStart);
+//   return [...makeSpace(edl, vTime, pushBy), ...shifted];
+// }
 
 // Décale vers la droite tous les segments dont vStart ≥ vTime de `amount` secondes.
 // Si amount vaut 0, retourne l'EDL inchangée (pas de nouveau tableau).
-export function makeSpace(edl, vTime, amount) {
-  if (amount === 0) return edl;
-  return edl.map((s) =>
-    s.vStart >= vTime ? { ...s, vStart: s.vStart + amount } : s,
-  );
-}
+// export function makeSpace(edl, vTime, amount) {
+//   if (amount === 0) return edl;
+//   return edl.map((s) =>
+//     s.vStart >= vTime ? { ...s, vStart: s.vStart + amount } : s,
+//   );
+// }
 
 export function virtualToSource(edl, vTime) {
   for (const seg of edl) {
