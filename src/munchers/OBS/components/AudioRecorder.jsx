@@ -912,7 +912,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             size="small"
             onClick={copySelection}
             disabled={!regionSelection && clipSelection.length === 0}
-            title={`Copy ( ${ctrlKeyTitle} + C)`}
+            title={`Copy (${ctrlKeyTitle} + C)`}
           >
             <ContentCopyIcon fontSize="small" />
           </IconButton>
@@ -920,7 +920,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             size="small"
             onClick={pasteAtCursor}
             disabled={!clipboard || !selection}
-            title="Paste ( Ctrl + V)"
+            title="Paste (Ctrl + V)"
           >
             <ContentPasteIcon fontSize="small" />
           </IconButton>
@@ -928,7 +928,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             size="small"
             onClick={cutSelection}
             disabled={!regionSelection && clipSelection.length === 0}
-            title="Cut ( Ctrl + X)"
+            title="Cut (Ctrl + X)"
           >
             <ContentCutIcon fontSize="small" />
           </IconButton>
@@ -944,7 +944,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             size="small"
             onClick={undo}
             disabled={past.length === 0}
-            title="Undo ( Ctrl + Z)"
+            title="Undo (Ctrl + Z)"
           >
             <UndoIcon fontSize="small" />
           </IconButton>
@@ -952,7 +952,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             size="small"
             onClick={redo}
             disabled={future.length === 0}
-            title="Redo ( Ctrl + Y)"
+            title="Redo (Ctrl + Y)"
           >
             <RedoIcon fontSize="small" />
           </IconButton>
