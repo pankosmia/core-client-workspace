@@ -17,7 +17,6 @@ import Divider from "@mui/material/Divider";
 import TrackView from "./TrackView";
 import { scheduleTrackFrom, stopSources } from "./lib/playback";
 import TimelineAxis from "./trackview/TimelineAxis";
-import LiveRecordingLane from "./trackview/LiveRecordingLane";
 import { projectPaths } from "./lib/storageUtil";
 import { useProjectPersistence } from "./hooks/useProjectPersistence";
 import { useRecorder } from "./hooks/useRecorder";
@@ -46,6 +45,9 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const [tracks, setTracks] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playerHeadTime, setPlayerHeadTime] = useState(0);
+  // Cible de l'enregistrement en cours : { trackId, startTime } figé au record()
+  // pour afficher le clip live au bon endroit (bonne piste + position curseur).
+  const [recordTarget, setRecordTarget] = useState(null);
   // Region/selection
   const [selection, setSelection] = useState(null); // { trackId, time }
   const [regionSelection, setRegionSelection] = useState(null); // { trackId, start, end }
@@ -140,9 +142,11 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     // avec ~5s de marge à droite. Donne de la place au clip live pour
     // grandir visuellement, et évite que pxPerSec change à chaque tick
     // d'update de recordingDuration (saut tous les 5s seulement).
-    const liveWindow = Math.max(10, Math.ceil(recordingDuration / 5) * 5 + 5);
+    // On part du curseur (recordTarget.startTime) car la prise y est posée.
+    const liveEnd = (recordTarget?.startTime ?? 0) + recordingDuration;
+    const liveWindow = Math.max(10, Math.ceil(liveEnd / 5) * 5 + 5);
     return Math.max(MIN_TIMELINE_SEC, trackMax, liveWindow);
-  }, [tracks, recordingDuration]);
+  }, [tracks, recordingDuration, recordTarget]);
 
   // snapStep = même intervalle que les ticks affichés par TimelineAxis.
   // Quand on zoome/dézoome (projectDuration change), le snap suit la grille.
@@ -225,8 +229,14 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const record = () => {
     const trackId = selection?.trackId ?? tracks[0]?.id ?? null;
     const time = selection?.time ?? 0;
+    setRecordTarget(trackId != null ? { trackId, startTime: time } : null);
     startRecording(trackId, time);
   };
+
+  // L'enregistrement terminé (ou annulé) : on retire le clip live.
+  useEffect(() => {
+    if (!isRecording) setRecordTarget(null);
+  }, [isRecording]);
 
   // Ajoute une piste vide en bas, prête à recevoir un enregistrement, et y
   // place le curseur pour qu'un Record immédiat l'utilise.
@@ -1024,6 +1034,15 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
                 snapEnabled={snapEnabled}
                 snapStep={snapStep}
                 resizeBounds={getResizeBounds}
+                liveRecording={
+                  isRecording && recordTarget?.trackId === t.id
+                    ? {
+                        peaksRef,
+                        sampleHz,
+                        startTime: recordTarget.startTime,
+                      }
+                    : null
+                }
               />
             );
           })
@@ -1052,15 +1071,6 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
           </Button>
         </Box>
       </Box>
-
-      {isRecording && (
-        <LiveRecordingLane
-          peaksRef={peaksRef}
-          pxPerSec={pxPerSec}
-          sampleHz={sampleHz}
-          trackNumber={tracks.length + 1}
-        />
-      )}
 
       {/* {ctrlHeld && (
                 <Box

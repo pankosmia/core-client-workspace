@@ -8,10 +8,13 @@ import EditIcon from "@mui/icons-material/EditOutlined";
 import TextField from "@mui/material/TextField";
 import MicIcon from "@mui/icons-material/MicNoneOutlined";
 
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+
 import Clip from "./trackview/Clip";
 import TimelineAxis from "./trackview/TimelineAxis";
 import Playhead from "./trackview/Playhead";
 import SelectionOverlay from "./trackview/SelectionOverlay";
+import LiveRecordingClip from "./trackview/LiveRecordingClip";
 
 const DRAG_THRESHOLD = 3;
 const LANE_HEIGHT = 80;
@@ -42,6 +45,7 @@ export default function TrackView({
   snapEnabled,
   snapStep,
   resizeBounds,
+  liveRecording,
 }) {
   const laneRef = useRef(null);
   const [laneWidth, setLaneWidth] = useState(0);
@@ -233,7 +237,7 @@ export default function TrackView({
                 pxPerSec={pxPerSec}
               />
             )}
-            {track.edl.length === 0 && (
+            {track.edl.length === 0 && !liveRecording && (
               <Stack
                 direction="row"
                 spacing={0.5}
@@ -286,6 +290,14 @@ export default function TrackView({
               <SelectionOverlay
                 start={visibleSelection.start}
                 end={visibleSelection.end}
+                pxPerSec={pxPerSec}
+              />
+            )}
+            {liveRecording && pxPerSec > 0 && (
+              <LiveRecordingClip
+                peaksRef={liveRecording.peaksRef}
+                sampleHz={liveRecording.sampleHz}
+                startTime={liveRecording.startTime}
                 pxPerSec={pxPerSec}
               />
             )}
@@ -365,23 +377,49 @@ export default function TrackView({
               </Box>
             )}
           </Box>
-          <Stack direction="row" margin={-0.7}>
-            <IconButton
-              size="small"
-              onClick={() => {
-                setDraftName(track.name);
-                setIsRenaming(true);
+          {liveRecording ? (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+                color: "#c62828",
+                fontSize: 11,
+                fontWeight: 600,
+                marginTop: 0.5,
+                "@keyframes recblink": {
+                  "0%, 100%": { opacity: 1 },
+                  "50%": { opacity: 0.3 },
+                },
+                animation: "recblink 1s ease-in-out infinite",
               }}
-              title="Rename track"
             >
-              <EditIcon fontSize="small" />
-            </IconButton>
-            {!isMainTrack && (
-              <IconButton size="small" onClick={onDelete} title="Delete track">
-                <DeleteIcon fontSize="small" />
+              <FiberManualRecordIcon sx={{ fontSize: 12 }} />
+              REC
+            </Box>
+          ) : (
+            <Stack direction="row" margin={-0.7}>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setDraftName(track.name);
+                  setIsRenaming(true);
+                }}
+                title="Rename track"
+              >
+                <EditIcon fontSize="small" />
               </IconButton>
-            )}
-          </Stack>
+              {!isMainTrack && (
+                <IconButton
+                  size="small"
+                  onClick={onDelete}
+                  title="Delete track"
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Stack>
+          )}
         </Stack>
       </Stack>
     </Box>
