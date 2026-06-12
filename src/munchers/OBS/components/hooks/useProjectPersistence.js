@@ -66,13 +66,12 @@ export function useProjectPersistence({
               : null,
           })),
         );
-        // Drop les pistes AVEC contenu dont le buffer n'a pas pu être chargé
-        // (fichier manquant). Les pistes vides (edl: []) sont légitimes sans buffer.
-        const valid = loaded.filter((t) => t.buffer || !t.edl?.length);
-        const buffersById = new Map(valid.map((t) => [t.id, t.buffer]));
+        const buffersById = new Map(
+          loaded.filter((t) => t.buffer).map((t) => [t.id, t.buffer]),
+        );
         // Buffers référencés par des clips (bufferTrackId) dont la piste n'est plus
         // dans le projet (supprimée) : le .webm reste sur disque, on le re-décode.
-        const referenced = [...collectBufferIds([valid])].filter(
+        const referenced = [...collectBufferIds([loaded])].filter(
           (id) => !buffersById.has(id),
         );
         await Promise.all(
@@ -83,7 +82,16 @@ export function useProjectPersistence({
         );
         if (cancelled) return;
 
-        const resolved = rehydrateTracks(valid, buffersById);
+        // Une piste est valide si chaque segment retrouve SON audio : le buffer
+        // de sa piste source pour un clip déplacé/copié (bufferTrackId), le
+        // buffer propre de la piste sinon. Une piste sans .webm à elle mais
+        // composée de clips d'autres pistes est donc légitime ; une piste dont
+        // un fichier manque est droppée (comportement historique).
+        const isPlayable = (t) =>
+          t.edl.every((seg) => (seg.bufferTrackId ? seg.buffer : t.buffer));
+        const resolved = rehydrateTracks(loaded, buffersById).filter(
+          isPlayable,
+        );
 
         // --- NEW : historique undo/redo depuis le cache ---
         const hist = loadHistory(paths);
@@ -101,12 +109,10 @@ export function useProjectPersistence({
             }),
           );
           if (cancelled) return;
-          // Par snapshot, on droppe les pistes dont le buffer a disparu (cohérent
-          // avec le filtrage `valid` du projet).
+          // Par snapshot, on droppe les pistes dont un buffer a disparu (même
+          // critère `isPlayable` que pour le projet).
           const hydrate = (snap) =>
-            rehydrateTracks(snap, buffersById).filter(
-              (t) => t.buffer || !t.edl?.length,
-            );
+            rehydrateTracks(snap, buffersById).filter(isPlayable);
           setPast(hist.past.map(hydrate));
           setFuture(hist.future.map(hydrate));
           // `present` du cache = état courant → undo/redo restent alignés.

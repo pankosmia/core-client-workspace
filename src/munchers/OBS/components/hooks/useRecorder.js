@@ -11,7 +11,13 @@ import { saveAudioBlob } from "../lib/storageUtil";
 const SAMPLE_HZ = 30; // peaks par seconde
 const DURATION_UPDATE_MS = 200;
 
-export function useRecorder({ paths, audioCtxRef, setTracks, tracksRef }) {
+export function useRecorder({
+  paths,
+  audioCtxRef,
+  setTracks,
+  tracksRef,
+  pushHistory,
+}) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecRef = useRef(null);
@@ -75,6 +81,9 @@ export function useRecorder({ paths, audioCtxRef, setTracks, tracksRef }) {
       targetTrackIdRef.current = null;
       atTimeRef.current = 0;
       const target = tracksRef?.current?.find((t) => t.id === targetId);
+
+      // Snapshot pré-prise pour que Ctrl+Z annule l'enregistrement.
+      pushHistory?.();
 
       if (!target) {
         // Pas de piste cible : on crée une nouvelle piste (filet de sécurité).

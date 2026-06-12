@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
@@ -119,6 +119,16 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     future,
     setFuture,
   });
+
+  // Snapshot l'état courant des pistes dans l'historique undo. Stable et basée
+  // sur tracksRef car l'enregistreur commite de façon asynchrone (onstop),
+  // hors des handlers synchrones où `setTracksWithHistory` lit le `tracks` du
+  // render courant. Sans ça, une prise n'était pas annulable (Ctrl+Z).
+  const pushHistory = useCallback(() => {
+    setPast((p) => [...p, tracksRef.current].slice(-HISTORY_CAP));
+    setFuture([]);
+  }, []);
+
   const {
     isRecording,
     startRecording,
@@ -131,6 +141,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     audioCtxRef,
     setTracks,
     tracksRef,
+    pushHistory,
   });
 
   const projectDuration = useMemo(() => {
