@@ -10,6 +10,8 @@ import ContentPasteIcon from "@mui/icons-material/ContentPasteOutlined";
 import ContentCutIcon from "@mui/icons-material/ContentCutOutlined";
 import UndoIcon from "@mui/icons-material/UndoOutlined";
 import RedoIcon from "@mui/icons-material/RedoOutlined";
+import AddIcon from "@mui/icons-material/AddOutlined";
+import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 
 import TrackView from "./TrackView";
@@ -31,6 +33,7 @@ import {
   virtualDuration,
   segmentBuffer,
   makeSegment,
+  makeEmptyTrack,
 } from "./lib/edl";
 import { pickTickInterval } from "./lib/snap";
 import SplitIcon from "./SplitIcon";
@@ -217,13 +220,23 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     startPlayback(trackId, time);
   };
 
+  // Comme la lecture : on enregistre sur la piste où est le curseur, à sa
+  // position temporelle (overwrite si la piste a déjà du contenu).
   const record = () => {
-    const sel = tracks.find((t) => t.id === selection?.trackId);
-    const target =
-      sel && sel.edl.length === 0
-        ? sel
-        : tracks.find((t) => t.edl.length === 0);
-    startRecording(target?.id ?? null);
+    const trackId = selection?.trackId ?? tracks[0]?.id ?? null;
+    const time = selection?.time ?? 0;
+    startRecording(trackId, time);
+  };
+
+  // Ajoute une piste vide en bas, prête à recevoir un enregistrement, et y
+  // place le curseur pour qu'un Record immédiat l'utilise.
+  const addTrack = () => {
+    const id = crypto.randomUUID();
+    setTracksWithHistory((ts) => [
+      ...ts,
+      makeEmptyTrack(`Track - ${ts.length + 1}`, id),
+    ]);
+    setSelection({ trackId: id, time: 0 });
   };
 
   const stop = () => {
@@ -1027,6 +1040,17 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             No tracks to display
           </Box>
         ) : null}
+
+        <Box sx={{ p: 1, borderTop: "1px solid #777" }}>
+          <Button
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={addTrack}
+            sx={{ color: "#666" }}
+          >
+            Add track
+          </Button>
+        </Box>
       </Box>
 
       {isRecording && (

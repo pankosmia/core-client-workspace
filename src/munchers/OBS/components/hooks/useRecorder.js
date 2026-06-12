@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { makeTrack, makeSegment } from "../lib/edl";
+import { makeTrack, makeSegment, overwriteAt } from "../lib/edl";
 import { saveAudioBlob } from "../lib/storageUtil";
 
 // Encapsule MediaRecorder + persistance du blob + ajout d'une piste.
@@ -23,9 +23,13 @@ export function useRecorder({ paths, audioCtxRef, setTracks, tracksRef }) {
   const rafRef = useRef(null);
   const durationIntervalRef = useRef(null);
   const targetTrackIdRef = useRef(null);
+  // Position (en s) où poser la prise sur la piste cible : suit le curseur,
+  // comme la lecture démarre au curseur.
+  const atTimeRef = useRef(0);
 
-  const startRecording = async (targetTrackId = null) => {
+  const startRecording = async (targetTrackId = null, atTime = 0) => {
     targetTrackIdRef.current = targetTrackId;
+    atTimeRef.current = atTime;
     if (!paths) return;
     audioCtxRef.current ??= new AudioContext();
     const ctx = audioCtxRef.current;
@@ -67,20 +71,48 @@ export function useRecorder({ paths, audioCtxRef, setTracks, tracksRef }) {
         await blob.arrayBuffer(),
       );
       const targetId = targetTrackIdRef.current;
+      const atTime = atTimeRef.current ?? 0;
       targetTrackIdRef.current = null;
-      const target = tracksRef?.current?.find(
-        (t) => t.id === targetId && t.edl.length === 0 && !t.buffer,
-      );
-      const id = target ? target.id : crypto.randomUUID();
-      await saveAudioBlob(paths, id, blob);
+      atTimeRef.current = 0;
+      const target = tracksRef?.current?.find((t) => t.id === targetId);
+
+      if (!target) {
+        // Pas de piste cible : on crée une nouvelle piste (filet de sécurité).
+        const id = crypto.randomUUID();
+        await saveAudioBlob(paths, id, blob);
+        setTracks((prev) => [
+          ...prev,
+          makeTrack(buffer, `Track - ${prev.length + 1}`, id),
+        ]);
+        return;
+      }
+
+      if (target.edl.length === 0 && !target.buffer) {
+        // Première prise sur une piste vierge : modèle "buffer natif", sauvé
+        // sous l'id de la piste (rechargé via track.id au reload).
+        await saveAudioBlob(paths, target.id, blob);
+        setTracks((prev) =>
+          prev.map((t) =>
+            t.id === target.id
+              ? { ...t, buffer, edl: [makeSegment(atTime, 0, buffer.duration)] }
+              : t,
+          ),
+        );
+        return;
+      }
+
+      // Piste déjà remplie : on pose la prise au curseur en overwrite. C'est un
+      // buffer étranger à la piste, sauvé sous son propre id et référencé via
+      // bufferTrackId pour être ré-attaché au reload (cf. collectBufferIds).
+      const bufId = crypto.randomUUID();
+      await saveAudioBlob(paths, bufId, blob);
+      const seg = makeSegment(0, 0, buffer.duration, buffer, bufId);
       setTracks((prev) =>
-        target
-          ? prev.map((t) =>
-              t.id === id
-                ? { ...t, buffer, edl: [makeSegment(0, 0, buffer.duration)] }
-                : t,
-            )
-          : [...prev, makeTrack(buffer, `Track - ${prev.length + 1}`, id)],
+        prev.map((t) =>
+          t.id === target.id
+            ? { ...t, edl: overwriteAt(t.edl, atTime, [seg]) }
+            : t,
+        ),
       );
     };
     rec.start();
