@@ -36,6 +36,7 @@ import {
 } from "./lib/edl";
 import { pickTickInterval } from "./lib/snap";
 import SplitIcon from "./SplitIcon";
+import CursorToStartIcon from "./CursorToStartIcon";
 // import GestureIcon from "./GestureIcon";
 
 const MIN_TIMELINE_SEC = 15;
@@ -277,6 +278,13 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     setClipSelection([]);
     clipSelectionAnchorRef.current = null;
     if (isPlaying) startPlayback(trackId, time);
+  };
+
+  // Ramène le curseur au tout début de la piste courante (temps 0).
+  const cursorToStart = () => {
+    const trackId = selection?.trackId ?? tracks[0]?.id;
+    if (trackId == null) return;
+    handleSeek(trackId, 0);
   };
 
   // Sélection clip(s) — appelée depuis le header d'un clip.
@@ -891,6 +899,14 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             {formatTime(displayTime, true)}
           </Box>
 
+          <IconButton
+            size="small"
+            onClick={cursorToStart}
+            disabled={tracks.length === 0}
+            title="Cursor to start"
+          >
+            <CursorToStartIcon fontSize="small" />
+          </IconButton>
           <IconButton
             size="small"
             onClick={isPlaying ? stop : play}
