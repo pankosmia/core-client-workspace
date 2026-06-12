@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { makeTrack, rehydrateTracks } from "../lib/edl";
+import { makeTrack, rehydrateTracks, makeEmptyTrack } from "../lib/edl";
 import {
   loadProject,
   saveProject,
@@ -60,11 +60,15 @@ export function useProjectPersistence({
         const loaded = await Promise.all(
           proj.tracks.map(async (t) => ({
             ...t,
-            buffer: await loadAudioBuffer(audioCtxRef.current, paths, t.id),
+            // Piste vide (jamais enregistrée) : pas de .webm à charger, on évite
+            buffer: t.edl?.length
+              ? await loadAudioBuffer(audioCtxRef.current, paths, t.id)
+              : null,
           })),
         );
-        // Drop les pistes dont le buffer n'a pas pu être chargé (fichier manquant).
-        const valid = loaded.filter((t) => t.buffer);
+        // Drop les pistes AVEC contenu dont le buffer n'a pas pu être chargé
+        // (fichier manquant). Les pistes vides (edl: []) sont légitimes sans buffer.
+        const valid = loaded.filter((t) => t.buffer || !t.edl?.length);
         const buffersById = new Map(valid.map((t) => [t.id, t.buffer]));
         // Buffers référencés par des clips (bufferTrackId) dont la piste n'est plus
         // dans le projet (supprimée) : le .webm reste sur disque, on le re-décode.
@@ -100,7 +104,9 @@ export function useProjectPersistence({
           // Par snapshot, on droppe les pistes dont le buffer a disparu (cohérent
           // avec le filtrage `valid` du projet).
           const hydrate = (snap) =>
-            rehydrateTracks(snap, buffersById).filter((t) => t.buffer);
+            rehydrateTracks(snap, buffersById).filter(
+              (t) => t.buffer || !t.edl?.length,
+            );
           setPast(hist.past.map(hydrate));
           setFuture(hist.future.map(hydrate));
           // `present` du cache = état courant → undo/redo restent alignés.
@@ -120,7 +126,11 @@ export function useProjectPersistence({
       }
 
       if (!isInitial || !audioUrl) {
-        if (!cancelled) setProjectLoaded(true);
+        if (!cancelled) {
+          // Projet vierge : vue par défaut = main track + une piste vide.
+          setTracks([makeEmptyTrack("MainTrack"), makeEmptyTrack("Track - 2")]);
+          setProjectLoaded(true);
+        }
         return;
       }
       try {
@@ -131,14 +141,17 @@ export function useProjectPersistence({
           await blob.arrayBuffer(),
         );
         if (cancelled) return;
-        const track = makeTrack(buffer, "Piste 1");
+        const track = makeTrack(buffer, "MainTrack");
         await saveAudioBlob(paths, track.id, blob);
         if (!cancelled) {
-          setTracks([track]);
+          setTracks([track, makeEmptyTrack("Track - 2")]);
           setProjectLoaded(true);
         }
       } catch {
-        if (!cancelled) setProjectLoaded(true);
+        if (!cancelled) {
+          setTracks([makeEmptyTrack("MainTrack"), makeEmptyTrack("Track - 2")]);
+          setProjectLoaded(true);
+        }
       }
     })();
     return () => {

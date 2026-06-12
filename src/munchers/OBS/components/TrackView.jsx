@@ -6,6 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/EditOutlined";
 import TextField from "@mui/material/TextField";
+import MicIcon from "@mui/icons-material/MicNoneOutlined";
 
 import Clip from "./trackview/Clip";
 import TimelineAxis from "./trackview/TimelineAxis";
@@ -21,6 +22,7 @@ const CLIP_RESIZE_MARGIN = 10;
 
 export default function TrackView({
   track,
+  isMainTrack,
   projectDuration,
   isSelected,
   onSeek,
@@ -231,6 +233,28 @@ export default function TrackView({
                 pxPerSec={pxPerSec}
               />
             )}
+            {track.edl.length === 0 && (
+              <Stack
+                direction="row"
+                spacing={0.5}
+                alignItems="center"
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  justifyContent: "center",
+                  color: "#999",
+                  fontSize: 13,
+                  // Laisse passer les clics : poser le playhead reste possible.
+                  pointerEvents: "none",
+                  zIndex: 1,
+                  userSelect: "none",
+                }}
+              >
+                <span>Click</span>
+                <MicIcon sx={{ fontSize: 16 }} />
+                <span>or press R to record</span>
+              </Stack>
+            )}
             {pxPerSec > 0 &&
               track.edl.map((seg) => {
                 const isClipSelected = !!clipSelection?.some(
@@ -352,9 +376,11 @@ export default function TrackView({
             >
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton size="small" onClick={onDelete} title="Delete track">
-              <DeleteIcon fontSize="small" />
-            </IconButton>
+            {!isMainTrack && (
+              <IconButton size="small" onClick={onDelete} title="Delete track">
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            )}
           </Stack>
         </Stack>
       </Stack>

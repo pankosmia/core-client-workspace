@@ -38,6 +38,10 @@ export function makeTrack(buffer, name, id = crypto.randomUUID()) {
   };
 }
 
+export function makeEmptyTrack(name, id = crypto.randomUUID()) {
+  return { id, name, buffer: null, edl: [] };
+}
+
 // Durée totale de la timeline virtuelle d'une piste = somme des durées des segments de son EDL.
 export function virtualDuration(track) {
   if (!track.edl || track.edl.length === 0) return 0;

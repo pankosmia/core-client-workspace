@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { makeTrack } from "../lib/edl";
+import { makeTrack, makeSegment } from "../lib/edl";
 import { saveAudioBlob } from "../lib/storageUtil";
 
 // Encapsule MediaRecorder + persistance du blob + ajout d'une piste.
@@ -11,7 +11,7 @@ import { saveAudioBlob } from "../lib/storageUtil";
 const SAMPLE_HZ = 30; // peaks par seconde
 const DURATION_UPDATE_MS = 200;
 
-export function useRecorder({ paths, audioCtxRef, setTracks }) {
+export function useRecorder({ paths, audioCtxRef, setTracks, tracksRef }) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecRef = useRef(null);
@@ -22,8 +22,10 @@ export function useRecorder({ paths, audioCtxRef, setTracks }) {
   const peaksRef = useRef([]);
   const rafRef = useRef(null);
   const durationIntervalRef = useRef(null);
+  const targetTrackIdRef = useRef(null);
 
-  const startRecording = async () => {
+  const startRecording = async (targetTrackId = null) => {
+    targetTrackIdRef.current = targetTrackId;
     if (!paths) return;
     audioCtxRef.current ??= new AudioContext();
     const ctx = audioCtxRef.current;
@@ -64,14 +66,23 @@ export function useRecorder({ paths, audioCtxRef, setTracks }) {
       const buffer = await audioCtxRef.current.decodeAudioData(
         await blob.arrayBuffer(),
       );
-      const id = crypto.randomUUID();
+      const targetId = targetTrackIdRef.current;
+      targetTrackIdRef.current = null;
+      const target = tracksRef?.current?.find(
+        (t) => t.id === targetId && t.edl.length === 0 && !t.buffer,
+      );
+      const id = target ? target.id : crypto.randomUUID();
       await saveAudioBlob(paths, id, blob);
-      setTracks((prev) => [
-        ...prev,
-        makeTrack(buffer, `Track - ${prev.length + 1}`, id),
-      ]);
+      setTracks((prev) =>
+        target
+          ? prev.map((t) =>
+              t.id === id
+                ? { ...t, buffer, edl: [makeSegment(0, 0, buffer.duration)] }
+                : t,
+            )
+          : [...prev, makeTrack(buffer, `Track - ${prev.length + 1}`, id)],
+      );
     };
-
     rec.start();
     mediaRecRef.current = rec;
     startedAtRef.current = ctx.currentTime;

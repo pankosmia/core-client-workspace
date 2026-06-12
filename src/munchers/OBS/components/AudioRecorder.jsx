@@ -36,6 +36,8 @@ import { pickTickInterval } from "./lib/snap";
 import SplitIcon from "./SplitIcon";
 // import GestureIcon from "./GestureIcon";
 
+const MIN_TIMELINE_SEC = 15;
+
 export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const audioCtxRef = useRef(null);
   const [tracks, setTracks] = useState([]);
@@ -59,6 +61,8 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const playingFromRef = useRef(null); // { trackId, startTime } figé au play()
   const rafRef = useRef(null);
   const sourcesRef = useRef([]);
+  const tracksRef = useRef([]);
+  tracksRef.current = tracks;
 
   // Snap
   const [snapEnabled, setSnapEnabled] = useState(
@@ -120,6 +124,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     paths,
     audioCtxRef,
     setTracks,
+    tracksRef,
   });
 
   const projectDuration = useMemo(() => {
@@ -127,13 +132,13 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
       (max, t) => Math.max(max, virtualDuration(t)),
       0,
     );
-    if (recordingDuration <= 0) return trackMax;
+    if (recordingDuration <= 0) return Math.max(MIN_TIMELINE_SEC, trackMax);
     // Pendant l'enregistrement, élargit la timeline par paliers de 5s
     // avec ~5s de marge à droite. Donne de la place au clip live pour
     // grandir visuellement, et évite que pxPerSec change à chaque tick
     // d'update de recordingDuration (saut tous les 5s seulement).
     const liveWindow = Math.max(10, Math.ceil(recordingDuration / 5) * 5 + 5);
-    return Math.max(trackMax, liveWindow);
+    return Math.max(MIN_TIMELINE_SEC, trackMax, liveWindow);
   }, [tracks, recordingDuration]);
 
   // snapStep = même intervalle que les ticks affichés par TimelineAxis.
@@ -152,6 +157,11 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (tracks.length === 0 || selection) return;
+    setSelection({ trackId: tracks[0].id, time: 0 });
+  }, [tracks, selection]);
 
   // Pour afficher le temps meme quand on ne joue pas de track
   const displayTime = isPlaying
@@ -205,6 +215,15 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     const trackId = selection?.trackId ?? tracks[0].id;
     const time = selection?.time ?? 0;
     startPlayback(trackId, time);
+  };
+
+  const record = () => {
+    const sel = tracks.find((t) => t.id === selection?.trackId);
+    const target =
+      sel && sel.edl.length === 0
+        ? sel
+        : tracks.find((t) => t.edl.length === 0);
+    startRecording(target?.id ?? null);
   };
 
   const stop = () => {
@@ -487,6 +506,10 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   useEffect(() => {
     const onKey = (e) => {
       const isCmd = e.ctrlKey || e.metaKey;
+      // Ignore les touches "nues" (espace, s, r, Delete…) quand on tape dans
+      // un input (rename, etc.) : sinon preventDefault avale le caractère.
+      const tag = e.target?.tagName;
+      const isTyping = tag === "INPUT" || tag === "TEXTAREA";
 
       // Undo shortcut
       if (isCmd && e.key.toLowerCase() === "z" && !e.shiftKey) {
@@ -518,9 +541,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
       }
       // Suppr/Backspace : selon le contexte
       else if (e.key === "Delete" || e.key === "Backspace") {
-        // Ignore quand on tape dans un input (rename, etc.)
-        const tag = e.target?.tagName;
-        if (tag === "INPUT" || tag === "TEXTAREA") return;
+        if (isTyping) return;
         if (clipSelection.length > 0) {
           e.preventDefault();
           deleteSelectedClips();
@@ -535,13 +556,14 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
       }
       // Espace : Play / Pause
       else if (e.key === " ") {
-        console.log("isPlaying", isPlaying);
+        if (isTyping) return;
         e.preventDefault();
         if (isPlaying) stop();
         else play();
       }
       // S : Split sur le Playherd
       else if (e.key === "s") {
+        if (isTyping) return;
         e.preventDefault();
         splitAtPlayhead();
       } else if (isCmd && e.key === "a") {
@@ -563,6 +585,13 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
           !e.repeat,
         );
       }
+      // R : Record
+      else if (e.key.toLowerCase() === "r" && !isCmd) {
+        if (isTyping) return;
+        e.preventDefault();
+        if (isRecording) stopRecording();
+        else record();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -575,6 +604,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     clipboard,
     clipSelection,
     isPlaying,
+    isRecording,
     playerHeadTime,
   ]);
 
@@ -848,7 +878,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
           </IconButton>
           <IconButton
             size="small"
-            onClick={isRecording ? stopRecording : startRecording}
+            onClick={isRecording ? stopRecording : record}
             color={isRecording ? "error" : "default"}
             disabled={!paths}
             title={isRecording ? "Stop recording (R)" : "Record (R)"}
@@ -945,7 +975,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
         </Stack>
 
         {tracks.length > 0 ? (
-          tracks.map((t) => {
+          tracks.map((t, idx) => {
             const isSel = selection?.trackId === t.id;
             // Le playhead suit la piste qu'on a *réellement* lancée,
             // pas la sélection en cours (qui peut changer pendant la lecture).
@@ -962,6 +992,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
                 track={t}
                 projectDuration={projectDuration}
                 isSelected={isSel}
+                isMainTrack={idx === 0}
                 onSeek={handleSeek}
                 onDelete={() => deleteTrack(t.id)}
                 playheadTime={playheadTime}
