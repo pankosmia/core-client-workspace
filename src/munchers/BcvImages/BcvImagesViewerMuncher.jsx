@@ -15,7 +15,7 @@ function ImageViewer({ metadata, reference }) {
   return (
     <Stack>
       <img
-        src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${reference.slice(2)}.jpg`}
+        src={`/api/burrito/ingredient/bytes/${metadata.local_path}?ipath=${reference.slice(2)}.jpg`}
         alt="resource image"
       />
     </Stack>
@@ -166,7 +166,7 @@ function BcvImagesViewerMuncher({ metadata }) {
                   style={{ width: `${100 / verseNotes.length}%` }}
                 >
                   <img
-                    src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.jpg`}
+                    src={`/api/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.jpg`}
                     alt="resource image"
                     className="w-full h-full object-contain"
                   />

@@ -14,7 +14,7 @@ function VideoViewer({ metadata, reference }) {
   return (
     <Stack>
       <img
-        src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${reference.slice(2)}.jpg`}
+        src={`/api/burrito/ingredient/bytes/${metadata.local_path}?ipath=${reference.slice(2)}.jpg`}
         alt="resource image"
       />
     </Stack>
@@ -211,7 +211,7 @@ function BcvImagesViewerMuncher({ metadata }) {
                       className="max-w-full max-h-full w-auto h-auto object-contain"
                     >
                       <source
-                        src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.mp4`}
+                        src={`/api/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.mp4`}
                         type="video/mp4"
                       />
                       {"video"}
