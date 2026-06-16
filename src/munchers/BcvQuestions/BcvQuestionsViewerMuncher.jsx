@@ -86,9 +86,18 @@ function BcvQuestionsViewerMuncher({ metadata }) {
       return [...new Set([].concat(...numbersArray))];
     };
 
+    const start = systemBcv.verseNum;
+    const end = systemBcv.endVerseNum || systemBcv.verseNum;
+    const targetVerses = Array.from(
+      { length: end - start + 1 },
+      (_, i) => start + i,
+    );
+
     return (
       l[0].split(":")[0] === `${systemBcv.chapterNum}` &&
-      expandedVerseNumbers(l[0].split(":")[1]).includes(systemBcv.verseNum)
+      expandedVerseNumbers(l[0].split(":")[1]).some((v) =>
+        targetVerses.includes(v),
+      )
     );
   });
 
@@ -116,7 +125,7 @@ function BcvQuestionsViewerMuncher({ metadata }) {
             alignItems: "center",
           }}
         >
-          <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</Typography>
+          <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`}</Typography>
         </Grid2>
         <Grid2 item size={12}>
           {ingredient && verseQuestions.length > 0 ? (
