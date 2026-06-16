@@ -557,11 +557,14 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   // Raccourci clavier
   useEffect(() => {
     const onKey = (e) => {
+      // Quand le focus est dans un champ de saisie ou dans l'éditeur de texte
+      const target = e.target;
+      const tag = target?.tagName;
+      const isTyping =
+        tag === "INPUT" || tag === "TEXTAREA" || !!target?.isContentEditable;
+      if (isTyping) return;
+
       const isCmd = e.ctrlKey || e.metaKey;
-      // Ignore les touches "nues" (espace, s, r, Delete…) quand on tape dans
-      // un input (rename, etc.) : sinon preventDefault avale le caractère.
-      const tag = e.target?.tagName;
-      const isTyping = tag === "INPUT" || tag === "TEXTAREA";
 
       // Undo shortcut
       if (isCmd && e.key.toLowerCase() === "z" && !e.shiftKey) {
@@ -593,7 +596,6 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
       }
       // Suppr/Backspace : selon le contexte
       else if (e.key === "Delete" || e.key === "Backspace") {
-        if (isTyping) return;
         if (clipSelection.length > 0) {
           e.preventDefault();
           deleteSelectedClips();
@@ -608,14 +610,12 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
       }
       // Espace : Play / Pause
       else if (e.key === " ") {
-        if (isTyping) return;
         e.preventDefault();
         if (isPlaying) stop();
         else play();
       }
       // S : Split sur le Playherd
       else if (e.key === "s") {
-        if (isTyping) return;
         e.preventDefault();
         splitAtPlayhead();
       } else if (isCmd && e.key === "a") {
@@ -639,7 +639,6 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
       }
       // R : Record
       else if (e.key.toLowerCase() === "r" && !isCmd) {
-        if (isTyping) return;
         e.preventDefault();
         if (isRecording) stopRecording();
         else record();
