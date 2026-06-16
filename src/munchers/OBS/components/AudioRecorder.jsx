@@ -943,6 +943,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
               color={isRecording ? "error" : "default"}
               disabled={!paths}
               title={isRecording ? "Stop recording (R)" : "Record (R)"}
+              sx={{ pr: 0.25 }}
             >
               {isRecording ? <StopIcon /> : <MicIcon />}
             </IconButton>

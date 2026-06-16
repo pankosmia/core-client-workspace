@@ -142,8 +142,9 @@ export default function MicSourcePicker({
         onClick={(e) => setAnchorEl(e.currentTarget)}
         disabled={disabled}
         title="Audio input source"
+        sx={{ p: 0, ml: -0.5 }}
       >
-        <ExpandMoreIcon fontSize="small" />
+        <ExpandMoreIcon sx={{ fontSize: 16 }} />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
