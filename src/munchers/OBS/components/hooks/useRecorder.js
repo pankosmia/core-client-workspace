@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
-import { makeTrack } from "../lib/edl";
+import { makeTrack, makeSegment, overwriteAt } from "../lib/edl";
 import { saveAudioBlob } from "../lib/storageUtil";
+import { acquireStream, DEFAULT_SOURCE } from "../lib/audioSource";
 
 // Encapsule MediaRecorder + persistance du blob + ajout d'une piste.
 // Pendant l'enregistrement, sample les peaks via un AnalyserNode pour
@@ -11,7 +12,14 @@ import { saveAudioBlob } from "../lib/storageUtil";
 const SAMPLE_HZ = 30; // peaks par seconde
 const DURATION_UPDATE_MS = 200;
 
-export function useRecorder({ paths, audioCtxRef, setTracks }) {
+export function useRecorder({
+  paths,
+  audioCtxRef,
+  setTracks,
+  tracksRef,
+  pushHistory,
+  source: inputSource,
+}) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecRef = useRef(null);
@@ -22,14 +30,20 @@ export function useRecorder({ paths, audioCtxRef, setTracks }) {
   const peaksRef = useRef([]);
   const rafRef = useRef(null);
   const durationIntervalRef = useRef(null);
+  const targetTrackIdRef = useRef(null);
+  // Position (en s) où poser la prise sur la piste cible : suit le curseur,
+  // comme la lecture démarre au curseur.
+  const atTimeRef = useRef(0);
 
-  const startRecording = async () => {
+  const startRecording = async (targetTrackId = null, atTime = 0) => {
+    targetTrackIdRef.current = targetTrackId;
+    atTimeRef.current = atTime;
     if (!paths) return;
     audioCtxRef.current ??= new AudioContext();
     const ctx = audioCtxRef.current;
     if (ctx.state === "suspended") await ctx.resume();
 
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await acquireStream(inputSource ?? DEFAULT_SOURCE);
     const source = ctx.createMediaStreamSource(stream);
     const analyser = ctx.createAnalyser();
     analyser.fftSize = 2048;
@@ -64,14 +78,54 @@ export function useRecorder({ paths, audioCtxRef, setTracks }) {
       const buffer = await audioCtxRef.current.decodeAudioData(
         await blob.arrayBuffer(),
       );
-      const id = crypto.randomUUID();
-      await saveAudioBlob(paths, id, blob);
-      setTracks((prev) => [
-        ...prev,
-        makeTrack(buffer, `Track - ${prev.length + 1}`, id),
-      ]);
-    };
+      const targetId = targetTrackIdRef.current;
+      const atTime = atTimeRef.current ?? 0;
+      targetTrackIdRef.current = null;
+      atTimeRef.current = 0;
+      const target = tracksRef?.current?.find((t) => t.id === targetId);
 
+      // Snapshot pré-prise pour que Ctrl+Z annule l'enregistrement.
+      pushHistory?.();
+
+      if (!target) {
+        // Pas de piste cible : on crée une nouvelle piste (filet de sécurité).
+        const id = crypto.randomUUID();
+        await saveAudioBlob(paths, id, blob);
+        setTracks((prev) => [
+          ...prev,
+          makeTrack(buffer, `Track - ${prev.length + 1}`, id),
+        ]);
+        return;
+      }
+
+      if (target.edl.length === 0 && !target.buffer) {
+        // Première prise sur une piste vierge : modèle "buffer natif", sauvé
+        // sous l'id de la piste (rechargé via track.id au reload).
+        await saveAudioBlob(paths, target.id, blob);
+        setTracks((prev) =>
+          prev.map((t) =>
+            t.id === target.id
+              ? { ...t, buffer, edl: [makeSegment(atTime, 0, buffer.duration)] }
+              : t,
+          ),
+        );
+        return;
+      }
+
+      // Piste déjà remplie : on pose la prise au curseur en overwrite. C'est un
+      // buffer étranger à la piste, sauvé sous son propre id et référencé via
+      // bufferTrackId pour être ré-attaché au reload (cf. collectBufferIds).
+      const bufId = crypto.randomUUID();
+      await saveAudioBlob(paths, bufId, blob);
+      const seg = makeSegment(0, 0, buffer.duration, buffer, bufId);
+      setTracks((prev) =>
+        prev.map((t) =>
+          t.id === target.id
+            ? { ...t, edl: overwriteAt(t.edl, atTime, [seg]) }
+            : t,
+        ),
+      );
+    };
     rec.start();
     mediaRecRef.current = rec;
     startedAtRef.current = ctx.currentTime;

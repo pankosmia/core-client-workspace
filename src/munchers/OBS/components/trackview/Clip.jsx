@@ -13,6 +13,10 @@ import { snapTime } from "../lib/snap";
 const INSET_X = 0;
 const INSET_Y = 2;
 const HEADER_HEIGHT = 12;
+// En-deçà de ce déplacement cumulé (px), on considère que c'est un clic et non
+// un drag : évite qu'un micro-mouvement de la main pendant le clic n'avale la
+// sélection du clip.
+const DRAG_THRESHOLD_PX = 4;
 // Marge réservée au bord droit de la lane : empêche le dernier clip (dont
 // vEnd == projectDuration) de coller / déborder sur la bordure de séparation
 // droite de la piste. Appliquée seulement à l'extrémité, pas entre les clips.
@@ -27,12 +31,16 @@ export default function Clip({
   isSelected,
   onMove,
   onMoveAcrossTracks,
+  // Commit du drag de groupe : tous les clips sélectionnés bougent du
+  // même delta (en secondes). Géré par moveClipsBy dans AudioRecorder.
+  onClipsMoveBy,
   onClipTrim,
   onSelect,
   getSnapCandidates,
   snapEnabled,
   snapStep,
   resizeBounds,
+  clipSelection,
 }) {
   const dur = segment.srcEnd - segment.srcStart;
   const left = segment.vStart * pxPerSec + INSET_X;
@@ -62,10 +70,12 @@ export default function Clip({
   const dragDyRef = useRef(0);
   const hoveredTrackIdRef = useRef(trackId);
 
-  // Suppression du clic (sélection) si un drag interact.js a réellement eu lieu.
-  // interact.js intercepte la propagation après le seuil, mais on garde un
-  // garde-fou explicite via cette ref consultée dans onHeaderClick.
-  const draggedRef = useRef(false);
+  // Suppression du clic (sélection) si un drag interact.js a RÉELLEMENT déplacé
+  // le clip. interact.js déclenche start() dès 1-2px de mouvement (un clic qui
+  // tremble), ce qui mangeait la sélection : on n'arme donc ce flag que dans
+  // move(), une fois passé un seuil perceptible (DRAG_THRESHOLD_PX). Un clic
+  // immobile garde le flag à false → la sélection passe du premier coup.
+  const dragMovedRef = useRef(false);
 
   // Snap props refletées en refs pour que les listeners interact.js (capturés
   // une fois dans useEffect) lisent toujours la valeur courante sans devoir
@@ -85,6 +95,24 @@ export default function Clip({
   resizeBoundsRef.current = resizeBounds;
   const clampedRectRef = useRef(null);
 
+  const clipSelectionRef = useRef(clipSelection);
+  clipSelectionRef.current = clipSelection;
+
+  // Éléments DOM des co-sélectionnés pendant un drag de groupe, capturés une
+  // seule fois au franchissement du seuil (pas de querySelector par move()).
+  // null = drag mono.
+  const groupElsRef = useRef(null);
+
+  // Retourne la liste des clips du groupe si le clip saisi fait partie d'une
+  // sélection multiple, sinon null (= drag mono, comportement actuel).
+  const getDragGroup = () => {
+    const sel = clipSelectionRef.current ?? [];
+    const inSel = sel.some(
+      (c) => c.trackId === trackId && c.segId === segment.id,
+    );
+    return inSel && sel.length > 1 ? sel : null;
+  };
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -100,9 +128,16 @@ export default function Clip({
       }
 
       const sameTrack = dstTrackId === trackId;
-      const excludeId = sameTrack ? segment.id : null;
+      const group = getDragGroup();
+      const excludeIds = group
+        ? new Set(
+            group.filter((c) => c.trackId === trackId).map((c) => c.segId),
+          )
+        : sameTrack
+          ? segment.id
+          : null;
       const rawCandidates =
-        getSnapCandidatesRef.current?.(dstTrackId, excludeId) ?? [];
+        getSnapCandidatesRef.current?.(dstTrackId, excludeIds) ?? [];
       const segDur = segment.srcEnd - segment.srcStart;
       const rawV = segment.vStart + rawDx / pxPerSec;
       const snapStepCur = snapStepRef.current;
@@ -140,13 +175,14 @@ export default function Clip({
           const clipRect = el.getBoundingClientRect();
           dragStartTopRef.current = clipRect.top;
 
-          draggedRef.current = true;
-          el.classList.add("dragging");
-          document.body.classList.add("clip-dragging");
-          // Élève le clip au-dessus des autres pendant le drag pour qu'il
-          // passe visuellement par-dessus les autres lanes.
-          el.style.zIndex = "10";
-          el.style.pointerEvents = "none"; // pour que elementFromPoint voie la lane sous le clip
+          // Pas encore un vrai drag : on attend de dépasser le seuil dans move().
+          // SURTOUT ne rien armer ici (ni classes, ni pointerEvents) :
+          // `pointerEvents = "none"` posé dès start() rendait le clip
+          // transparent au mouseup d'un simple clic qui tremble de 1-2px →
+          // la cible du mouseup devenait la lane, le navigateur ne
+          // dispatchait jamais de `click` sur le header, et la sélection
+          // échouait aléatoirement (il fallait recliquer).
+          dragMovedRef.current = false;
         },
         move(e) {
           // dragDxRef = cumul brut du curseur, JAMAIS écrasé par le snap.
@@ -156,12 +192,71 @@ export default function Clip({
           dragDxRef.current += e.dx;
           dragDyRef.current += e.dy;
 
-          // Hit-test : trouve la lane sous le pointeur.
-          const under = document.elementFromPoint(e.client.x, e.client.y);
-          const laneEl = under?.closest("[data-lane-id]");
-          const overTrackId =
-            laneEl?.dataset.laneId ?? hoveredTrackIdRef.current;
-          hoveredTrackIdRef.current = overTrackId;
+          // En-deçà du seuil : on ne touche à rien (ni transform, ni
+          // pointerEvents). Si le geste s'arrête là, c'est un clic et le
+          // header doit recevoir le mouseup/click normalement.
+          if (
+            !dragMovedRef.current &&
+            Math.hypot(dragDxRef.current, dragDyRef.current) <=
+              DRAG_THRESHOLD_PX
+          ) {
+            return;
+          }
+
+          // Premier franchissement du seuil → vrai drag : on arme le visuel
+          // de drag maintenant (et le clic de fin ne sélectionnera pas).
+          if (!dragMovedRef.current) {
+            dragMovedRef.current = true;
+            el.classList.add("dragging");
+            document.body.classList.add("clip-dragging");
+            // Élève le clip au-dessus des autres pendant le drag pour qu'il
+            // passe visuellement par-dessus les autres lanes.
+            el.style.zIndex = "10";
+            el.style.pointerEvents = "none"; // pour que elementFromPoint voie la lane sous le clip
+
+            // Drag de groupe : capture les éléments DOM des co-sélectionnés
+            // (les data-clip-id sont des UUID, uniques toutes lanes
+            // confondues, donc querySelector global suffit). pointerEvents
+            // none aussi sur eux : un membre du groupe qui passe sous le
+            // curseur ne doit pas intercepter le mouseup.
+            const group = getDragGroup();
+            if (group) {
+              groupElsRef.current = group
+                .filter((c) => c.segId !== segment.id)
+                .map((c) =>
+                  document.querySelector(`[data-clip-id="${c.segId}"]`),
+                )
+                .filter(Boolean);
+              for (const gEl of groupElsRef.current) {
+                gEl.classList.add("dragging");
+                gEl.style.zIndex = "10";
+                gEl.style.pointerEvents = "none";
+              }
+            } else {
+              groupElsRef.current = null;
+            }
+          }
+
+          const isGroup = !!groupElsRef.current;
+
+          // En mode groupe : horizontal only. Pas de hit-test de lane (on
+          // reste sur la piste source, hoveredTrackIdRef n'est pas touché)
+          // et dy forcé à 0.
+          let overTrackId = trackId;
+          let displayDy = 0;
+          if (!isGroup) {
+            // Hit-test : trouve la lane sous le pointeur.
+            const under = document.elementFromPoint(e.client.x, e.client.y);
+            const laneEl = under?.closest("[data-lane-id]");
+            overTrackId = laneEl?.dataset.laneId ?? hoveredTrackIdRef.current;
+            hoveredTrackIdRef.current = overTrackId;
+
+            displayDy = dragDyRef.current; // fallback
+            if (laneEl) {
+              const laneRect = laneEl.getBoundingClientRect();
+              displayDy = laneRect.top - dragStartTopRef.current + INSET_Y;
+            }
+          }
 
           const altKey = e.altKey ?? e.originalEvent?.altKey ?? false;
           const displayDx = computeSnappedDx(
@@ -170,15 +265,24 @@ export default function Clip({
             overTrackId,
           );
 
-          let displayDy = dragDyRef.current; // fallback
-          if (laneEl) {
-            const laneRect = laneEl.getBoundingClientRect();
-            displayDy = laneRect.top - dragStartTopRef.current + INSET_Y;
-          }
-
           el.style.transform = `translate(${displayDx}px, ${displayDy}px)`;
+          if (isGroup) {
+            for (const gEl of groupElsRef.current) {
+              gEl.style.transform = `translateX(${displayDx}px)`;
+            }
+          }
         },
         end(e) {
+          // Seuil jamais franchi = simple clic : rien n'a été armé dans
+          // move(), rien à défaire ni à déplacer. Sans ce garde, le snap
+          // pouvait transformer un drag d'1px en saut sur le tick voisin.
+          if (!dragMovedRef.current) {
+            dragDxRef.current = 0;
+            dragDyRef.current = 0;
+            hoveredTrackIdRef.current = trackId;
+            return;
+          }
+
           const dstTrackId = hoveredTrackIdRef.current;
           const altKey = e.altKey ?? e.originalEvent?.altKey ?? false;
           const finalDx = computeSnappedDx(
@@ -188,11 +292,22 @@ export default function Clip({
           );
           const deltaSec = pxPerSec > 0 ? finalDx / pxPerSec : 0;
 
-          // Reset visuel.
+          // Reset visuel. Indispensable aussi pour le groupe : React ne
+          // nettoie pas les style.transform posés impérativement.
+          const wasGroup = !!groupElsRef.current;
           el.style.transform = "";
           el.style.zIndex = "";
           el.style.pointerEvents = "";
           el.classList.remove("dragging");
+          if (groupElsRef.current) {
+            for (const gEl of groupElsRef.current) {
+              gEl.style.transform = "";
+              gEl.style.zIndex = "";
+              gEl.style.pointerEvents = "";
+              gEl.classList.remove("dragging");
+            }
+            groupElsRef.current = null;
+          }
           document.body.classList.remove("clip-dragging");
           document
             .querySelectorAll("[data-lane-id].drop-target")
@@ -201,9 +316,13 @@ export default function Clip({
           dragDyRef.current = 0;
           hoveredTrackIdRef.current = trackId;
 
+          if (wasGroup) {
+            if (Math.abs(deltaSec) < 0.001) return;
+            onClipsMoveBy?.(deltaSec);
+            return;
+          }
+          // --- mode mono : comportement actuel inchangé ---
           if (Math.abs(deltaSec) < 0.001 && dstTrackId === trackId) return;
-          // Position absolue dans la piste cible. Vrai pour same-track et
-          // cross-track : le drop "remplace" la zone d'arrivée (punch-in).
           const newVStart = Math.max(0, segment.vStart + deltaSec);
           if (dstTrackId === trackId) {
             onMove?.(trackId, segment.id, newVStart);
@@ -231,6 +350,7 @@ export default function Clip({
             left: e.rect.left,
             right: e.rect.right,
           };
+          clampedRectRef.current = null;
         },
         move(e) {
           const start = resizeStartRectRef.current;
@@ -273,14 +393,13 @@ export default function Clip({
         },
         end(e) {
           const start = resizeStartRectRef.current;
+          const finalRect = clampedRectRef.current; // capturer AVANT reset
           el.style.transform = "";
           el.style.width = "";
           resizeStartRectRef.current = null;
+          clampedRectRef.current = null;
           if (!start || pxPerSec <= 0) return;
-          const finalRect = clampedRectRef.current ?? {
-            left: e.rect.left,
-            right: e.rect.right,
-          };
+          if (!finalRect) return;
           const deltaLeft = (finalRect.left - start.left) / pxPerSec;
           const deltaRight = (finalRect.right - start.right) / pxPerSec;
           if (Math.abs(deltaLeft) > 0.001 || Math.abs(deltaRight) > 0.001) {
@@ -294,13 +413,22 @@ export default function Clip({
     return () => interact(el).unset();
   }, [pxPerSec, onMove, onMoveAcrossTracks, onClipTrim, trackId, segment.id]);
 
+  // Chaque geste repart d'un flag propre. Indispensable : après un vrai drag,
+  // le `click` n'atteint pas le header (pointerEvents était "none" au moment
+  // du mouseup), donc onHeaderClick ne consomme jamais le flag — sans ce
+  // reset, le clic immobile SUIVANT serait avalé par le garde (il fallait
+  // cliquer deux fois après avoir déplacé un clip).
+  const onHeaderPointerDown = () => {
+    dragMovedRef.current = false;
+  };
+
   const onHeaderClick = (e) => {
     // Si un drag interact.js a eu lieu, on n'enclenche pas la sélection.
     // Pas de stopPropagation : interact.js (attaché au parent) doit pouvoir
     // recevoir le pointerdown. La lane ignore déjà les pointerdown issus
     // du header via [data-clip-header].
-    if (draggedRef.current) {
-      draggedRef.current = false;
+    if (dragMovedRef.current) {
+      dragMovedRef.current = false;
       return;
     }
     onSelect?.(trackId, segment.id, {
@@ -334,15 +462,21 @@ export default function Clip({
         transition: "box-shadow 120ms ease, background 120ms ease",
         display: "flex",
         flexDirection: "column",
-        "&:hover": {
-          boxShadow:
-            "0 0 0 1px rgba(34, 173, 197, 0.7), 0 1px 2px rgba(0, 0, 0, 0.22)",
-          background: "rgba(34, 173, 197, 0.28)",
-        },
+        // Hover seulement sur les clips NON sélectionnés : sinon il écrase
+        // boxShadow/background et fait "disparaître" l'effet de sélection
+        // tant que le curseur est sur le clip.
+        "&:hover": isSelected
+          ? {}
+          : {
+              boxShadow:
+                "0 0 0 1px rgba(34, 173, 197, 0.7), 0 1px 2px rgba(0, 0, 0, 0.22)",
+              background: "rgba(34, 173, 197, 0.28)",
+            },
       }}
     >
       <Box
         data-clip-header={segment.id}
+        onPointerDown={onHeaderPointerDown}
         onClick={onHeaderClick}
         sx={{
           height: HEADER_HEIGHT,

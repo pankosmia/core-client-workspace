@@ -17,6 +17,7 @@ export function projectPaths({ localPath, book, chapter, paragraph }) {
       `/api/burrito/ingredient/bytes/${localPath}?ipath=${ipath}`,
     deleteUrl: (ipath) =>
       `/api/burrito/ingredient/delete/${localPath}?ipath=${ipath}`,
+    // history: `${dir}/${cc}-${pp}_history.json`,
   };
 }
 

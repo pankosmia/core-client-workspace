@@ -38,6 +38,10 @@ export function makeTrack(buffer, name, id = crypto.randomUUID()) {
   };
 }
 
+export function makeEmptyTrack(name, id = crypto.randomUUID()) {
+  return { id, name, buffer: null, edl: [] };
+}
+
 // Durée totale de la timeline virtuelle d'une piste = somme des durées des segments de son EDL.
 export function virtualDuration(track) {
   if (!track.edl || track.edl.length === 0) return 0;
@@ -52,7 +56,9 @@ export function virtualDuration(track) {
 // éviter de tomber sur un objet résiduel issu d'une sérialisation JSON.
 export function segmentBuffer(seg, trackBuffer) {
   const b = seg.buffer;
-  return b && typeof b.getChannelData === "function" ? b : trackBuffer;
+  if (b && typeof b.getChannelData === "function") return b;
+  if (seg.bufferTrackId) return null;
+  return trackBuffer;
 }
 
 // Peaks pour UN segment uniquement, à dessiner dans son propre canvas.
@@ -206,38 +212,38 @@ export function extractRange(
 // Les clips qui commençaient avant vTime ne sont jamais touchés (un overlap
 // avec eux peut subsister si vTime tombe au milieu d'un clip — c'est au caller
 // de splitAt d'abord s'il veut l'éviter).
-export function insertAt(edl, vTime, newSegments) {
-  if (!newSegments?.length) return edl;
+// export function insertAt(edl, vTime, newSegments) {
+//   if (!newSegments?.length) return edl;
 
-  const shifted = newSegments.map((s) =>
-    makeSegment(
-      s.vStart + vTime,
-      s.srcStart,
-      s.srcEnd,
-      s.buffer,
-      s.bufferTrackId,
-    ),
-  );
-  const insertEnd = Math.max(
-    ...shifted.map((s) => s.vStart + (s.srcEnd - s.srcStart)),
-  );
+//   const shifted = newSegments.map((s) =>
+//     makeSegment(
+//       s.vStart + vTime,
+//       s.srcStart,
+//       s.srcEnd,
+//       s.buffer,
+//       s.bufferTrackId,
+//     ),
+//   );
+//   const insertEnd = Math.max(
+//     ...shifted.map((s) => s.vStart + (s.srcEnd - s.srcStart)),
+//   );
 
-  const nextStart = edl
-    .filter((s) => s.vStart >= vTime)
-    .reduce((min, s) => Math.min(min, s.vStart), Infinity);
+//   const nextStart = edl
+//     .filter((s) => s.vStart >= vTime)
+//     .reduce((min, s) => Math.min(min, s.vStart), Infinity);
 
-  const pushBy = Math.max(0, insertEnd - nextStart);
-  return [...makeSpace(edl, vTime, pushBy), ...shifted];
-}
+//   const pushBy = Math.max(0, insertEnd - nextStart);
+//   return [...makeSpace(edl, vTime, pushBy), ...shifted];
+// }
 
 // Décale vers la droite tous les segments dont vStart ≥ vTime de `amount` secondes.
 // Si amount vaut 0, retourne l'EDL inchangée (pas de nouveau tableau).
-export function makeSpace(edl, vTime, amount) {
-  if (amount === 0) return edl;
-  return edl.map((s) =>
-    s.vStart >= vTime ? { ...s, vStart: s.vStart + amount } : s,
-  );
-}
+// export function makeSpace(edl, vTime, amount) {
+//   if (amount === 0) return edl;
+//   return edl.map((s) =>
+//     s.vStart >= vTime ? { ...s, vStart: s.vStart + amount } : s,
+//   );
+// }
 
 export function virtualToSource(edl, vTime) {
   for (const seg of edl) {
@@ -257,6 +263,24 @@ export function ensureAbsolutePositions(edl) {
     acc += seg.srcEnd - seg.srcStart;
     return out;
   });
+}
+
+// Ré-attache les AudioBuffer à des pistes désérialisées (issues du JSON projet
+// OU du cache d'historique). `buffersById` mappe trackId → AudioBuffer.
+//   - track.buffer ← buffersById.get(track.id)
+//   - seg.buffer   ← buffersById.get(seg.bufferTrackId) (ou null)
+// Fonction pure : l'appelant droppe ensuite les pistes à buffer null si besoin.
+export function rehydrateTracks(tracks, buffersById) {
+  return tracks.map((t) => ({
+    ...t,
+    buffer: buffersById.get(t.id) || null,
+    edl: ensureAbsolutePositions(t.edl).map((seg) => ({
+      ...seg,
+      buffer: seg.bufferTrackId
+        ? buffersById.get(seg.bufferTrackId) || null
+        : null,
+    })),
+  }));
 }
 
 // Coupe le segment à la position vTime.
@@ -345,4 +369,26 @@ export function insertSegmentAt(edl, seg, vStart) {
   const cleared = cutRange(edl, vStart, vStart + dur);
   const placed = { ...seg, vStart };
   return [...cleared, placed].sort((a, b) => a.vStart - b.vStart);
+}
+
+export function overwriteAt(edl, vTime, newSegments) {
+  if (!newSegments?.length) return edl;
+  let result = edl;
+  const placed = [];
+  for (const s of newSegments) {
+    const seg = makeSegment(
+      s.vStart + vTime,
+      s.srcStart,
+      s.srcEnd,
+      s.buffer,
+      s.bufferTrackId,
+    );
+    result = cutRange(
+      result,
+      seg.vStart,
+      seg.vStart + (seg.srcEnd - seg.srcStart),
+    );
+    placed.push(seg);
+  }
+  return [...result, ...placed].sort((a, b) => a.vStart - b.vStart);
 }

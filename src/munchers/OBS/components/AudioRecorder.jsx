@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
@@ -10,12 +10,13 @@ import ContentPasteIcon from "@mui/icons-material/ContentPasteOutlined";
 import ContentCutIcon from "@mui/icons-material/ContentCutOutlined";
 import UndoIcon from "@mui/icons-material/UndoOutlined";
 import RedoIcon from "@mui/icons-material/RedoOutlined";
+import AddIcon from "@mui/icons-material/AddOutlined";
+import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 
 import TrackView from "./TrackView";
 import { scheduleTrackFrom, stopSources } from "./lib/playback";
 import TimelineAxis from "./trackview/TimelineAxis";
-import LiveRecordingLane from "./trackview/LiveRecordingLane";
 import { projectPaths } from "./lib/storageUtil";
 import { useProjectPersistence } from "./hooks/useProjectPersistence";
 import { useRecorder } from "./hooks/useRecorder";
@@ -23,7 +24,7 @@ import { formatTime } from "./Timeline";
 import {
   cutRange,
   extractRange,
-  insertAt,
+  overwriteAt,
   splitAt,
   trimSegment,
   removeSegment,
@@ -31,16 +32,32 @@ import {
   virtualDuration,
   segmentBuffer,
   makeSegment,
+  makeEmptyTrack,
 } from "./lib/edl";
 import { pickTickInterval } from "./lib/snap";
 import SplitIcon from "./SplitIcon";
+import CursorToStartIcon from "./CursorToStartIcon";
+import MicSourcePicker from "./MicSourcePicker";
+import { loadAudioSource, saveAudioSource } from "./lib/audioSource";
 // import GestureIcon from "./GestureIcon";
+
+const MIN_TIMELINE_SEC = 15;
 
 export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const audioCtxRef = useRef(null);
   const [tracks, setTracks] = useState([]);
+  // Source d'entrée audio (micro choisi), persistée en localStorage et partagée
+  // avec l'enregistreur. Le sélecteur (MicSourcePicker) la met à jour.
+  const [audioSource, setAudioSource] = useState(loadAudioSource);
+  const changeAudioSource = useCallback((next) => {
+    setAudioSource(next);
+    saveAudioSource(next);
+  }, []);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playerHeadTime, setPlayerHeadTime] = useState(0);
+  // Cible de l'enregistrement en cours : { trackId, startTime } figé au record()
+  // pour afficher le clip live au bon endroit (bonne piste + position curseur).
+  const [recordTarget, setRecordTarget] = useState(null);
   // Region/selection
   const [selection, setSelection] = useState(null); // { trackId, time }
   const [regionSelection, setRegionSelection] = useState(null); // { trackId, start, end }
@@ -59,18 +76,25 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const playingFromRef = useRef(null); // { trackId, startTime } figé au play()
   const rafRef = useRef(null);
   const sourcesRef = useRef([]);
+  const tracksRef = useRef([]);
+  tracksRef.current = tracks;
 
   // Snap
   const [snapEnabled, setSnapEnabled] = useState(
     () => localStorage.getItem("snapEnabled") !== "false",
   );
 
-  const getSnapCandidates = (trackId, excludeSegId) => {
+  // excludeSegIds : Set<string> | string | null — rétro-compatible.
+  const getSnapCandidates = (trackId, excludeSegIds) => {
+    const exclude =
+      excludeSegIds instanceof Set
+        ? excludeSegIds
+        : new Set(excludeSegIds ? [excludeSegIds] : []);
     const t = tracks.find((x) => x.id === trackId);
     if (!t) return [];
     const out = [];
     for (const s of t.edl) {
-      if (s.id === excludeSegId) continue;
+      if (exclude.has(s.id)) continue;
       out.push(s.vStart);
       out.push(s.vStart + (s.srcEnd - s.srcStart));
     }
@@ -93,7 +117,27 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     [metadata?.local_path, obs, book],
   );
 
-  useProjectPersistence({ paths, audioCtxRef, audioUrl, tracks, setTracks });
+  useProjectPersistence({
+    paths,
+    audioCtxRef,
+    audioUrl,
+    tracks,
+    setTracks,
+    past,
+    setPast,
+    future,
+    setFuture,
+  });
+
+  // Snapshot l'état courant des pistes dans l'historique undo. Stable et basée
+  // sur tracksRef car l'enregistreur commite de façon asynchrone (onstop),
+  // hors des handlers synchrones où `setTracksWithHistory` lit le `tracks` du
+  // render courant. Sans ça, une prise n'était pas annulable (Ctrl+Z).
+  const pushHistory = useCallback(() => {
+    setPast((p) => [...p, tracksRef.current].slice(-HISTORY_CAP));
+    setFuture([]);
+  }, []);
+
   const {
     isRecording,
     startRecording,
@@ -105,6 +149,9 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     paths,
     audioCtxRef,
     setTracks,
+    tracksRef,
+    pushHistory,
+    source: audioSource,
   });
 
   const projectDuration = useMemo(() => {
@@ -112,14 +159,16 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
       (max, t) => Math.max(max, virtualDuration(t)),
       0,
     );
-    if (recordingDuration <= 0) return trackMax;
+    if (recordingDuration <= 0) return Math.max(MIN_TIMELINE_SEC, trackMax);
     // Pendant l'enregistrement, élargit la timeline par paliers de 5s
     // avec ~5s de marge à droite. Donne de la place au clip live pour
     // grandir visuellement, et évite que pxPerSec change à chaque tick
     // d'update de recordingDuration (saut tous les 5s seulement).
-    const liveWindow = Math.max(10, Math.ceil(recordingDuration / 5) * 5 + 5);
-    return Math.max(trackMax, liveWindow);
-  }, [tracks, recordingDuration]);
+    // On part du curseur (recordTarget.startTime) car la prise y est posée.
+    const liveEnd = (recordTarget?.startTime ?? 0) + recordingDuration;
+    const liveWindow = Math.max(10, Math.ceil(liveEnd / 5) * 5 + 5);
+    return Math.max(MIN_TIMELINE_SEC, trackMax, liveWindow);
+  }, [tracks, recordingDuration, recordTarget]);
 
   // snapStep = même intervalle que les ticks affichés par TimelineAxis.
   // Quand on zoome/dézoome (projectDuration change), le snap suit la grille.
@@ -137,6 +186,11 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (tracks.length === 0 || selection) return;
+    setSelection({ trackId: tracks[0].id, time: 0 });
+  }, [tracks, selection]);
 
   // Pour afficher le temps meme quand on ne joue pas de track
   const displayTime = isPlaying
@@ -192,6 +246,31 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     startPlayback(trackId, time);
   };
 
+  // Comme la lecture : on enregistre sur la piste où est le curseur, à sa
+  // position temporelle (overwrite si la piste a déjà du contenu).
+  const record = () => {
+    const trackId = selection?.trackId ?? tracks[0]?.id ?? null;
+    const time = selection?.time ?? 0;
+    setRecordTarget(trackId != null ? { trackId, startTime: time } : null);
+    startRecording(trackId, time);
+  };
+
+  // L'enregistrement terminé (ou annulé) : on retire le clip live.
+  useEffect(() => {
+    if (!isRecording) setRecordTarget(null);
+  }, [isRecording]);
+
+  // Ajoute une piste vide en bas, prête à recevoir un enregistrement, et y
+  // place le curseur pour qu'un Record immédiat l'utilise.
+  const addTrack = () => {
+    const id = crypto.randomUUID();
+    setTracksWithHistory((ts) => [
+      ...ts,
+      makeEmptyTrack(`Track - ${ts.length + 1}`, id),
+    ]);
+    setSelection({ trackId: id, time: 0 });
+  };
+
   const stop = () => {
     // capture la pos du cursuer avant de reset
     const trackId = playingFromRef.current?.trackId;
@@ -220,6 +299,13 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     setClipSelection([]);
     clipSelectionAnchorRef.current = null;
     if (isPlaying) startPlayback(trackId, time);
+  };
+
+  // Ramène le curseur au tout début de la piste courante (temps 0).
+  const cursorToStart = () => {
+    const trackId = selection?.trackId ?? tracks[0]?.id;
+    if (trackId == null) return;
+    handleSeek(trackId, 0);
   };
 
   // Sélection clip(s) — appelée depuis le header d'un clip.
@@ -306,8 +392,9 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     setRegionSelection(null);
   };
 
+  const HISTORY_CAP = 150;
   const setTracksWithHistory = (updater) => {
-    setPast((p) => [...p, tracks]);
+    setPast((p) => [...p, tracks].slice(-HISTORY_CAP));
     setFuture([]);
     setTracks(updater);
   };
@@ -395,7 +482,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     setTracksWithHistory((ts) =>
       ts.map((t) =>
         t.id === trackId
-          ? { ...t, edl: insertAt(t.edl, time, clipboard.segments) }
+          ? { ...t, edl: overwriteAt(t.edl, time, clipboard.segments) }
           : t,
       ),
     );
@@ -435,10 +522,12 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
         ? vEnd + (buf.duration - seg.srcEnd)
         : Infinity;
 
-    return {
-      minVStart: Math.max(neighborMinVStart, audioMinVStart),
-      maxVEnd: Math.min(neighborMaxVEnd, audioMaxVEnd),
-    };
+    const minVStart = Math.max(neighborMinVStart, audioMinVStart);
+    const maxVEnd = Math.max(
+      minVStart,
+      Math.min(neighborMaxVEnd, audioMaxVEnd),
+    );
+    return { minVStart, maxVEnd };
   };
 
   const getMoveBounds = (trackId, segId, excludeIds = new Set()) => {
@@ -469,6 +558,10 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   useEffect(() => {
     const onKey = (e) => {
       const isCmd = e.ctrlKey || e.metaKey;
+      // Ignore les touches "nues" (espace, s, r, Delete…) quand on tape dans
+      // un input (rename, etc.) : sinon preventDefault avale le caractère.
+      const tag = e.target?.tagName;
+      const isTyping = tag === "INPUT" || tag === "TEXTAREA";
 
       // Undo shortcut
       if (isCmd && e.key.toLowerCase() === "z" && !e.shiftKey) {
@@ -500,9 +593,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
       }
       // Suppr/Backspace : selon le contexte
       else if (e.key === "Delete" || e.key === "Backspace") {
-        // Ignore quand on tape dans un input (rename, etc.)
-        const tag = e.target?.tagName;
-        if (tag === "INPUT" || tag === "TEXTAREA") return;
+        if (isTyping) return;
         if (clipSelection.length > 0) {
           e.preventDefault();
           deleteSelectedClips();
@@ -517,13 +608,14 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
       }
       // Espace : Play / Pause
       else if (e.key === " ") {
-        console.log("isPlaying", isPlaying);
+        if (isTyping) return;
         e.preventDefault();
         if (isPlaying) stop();
         else play();
       }
       // S : Split sur le Playherd
       else if (e.key === "s") {
+        if (isTyping) return;
         e.preventDefault();
         splitAtPlayhead();
       } else if (isCmd && e.key === "a") {
@@ -545,6 +637,13 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
           !e.repeat,
         );
       }
+      // R : Record
+      else if (e.key.toLowerCase() === "r" && !isCmd) {
+        if (isTyping) return;
+        e.preventDefault();
+        if (isRecording) stopRecording();
+        else record();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -557,6 +656,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     clipboard,
     clipSelection,
     isPlaying,
+    isRecording,
     playerHeadTime,
   ]);
 
@@ -699,6 +799,46 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     }
   };
 
+  // Drag de groupe : déplace tous les clips sélectionnés du même delta.
+  // Punch-in comme le drag mono : on retire d'abord TOUS les segments
+  // sélectionnés (pour qu'ils ne se coupent pas entre eux), puis on les
+  // réinsère à vStart + delta ; insertSegmentAt coupe ce qui chevauche
+  // chez les non-sélectionnés. Un seul setTracksWithHistory = un seul undo.
+  const moveClipsBy = (deltaSec) => {
+    if (clipSelection.length === 0) return;
+
+    // Clamp global : le clip le plus à gauche du groupe ne passe pas sous 0.
+    // (PAS de Math.max(0, ...) par clip : ça compresserait les écarts.)
+    let minVStart = Infinity;
+    for (const { trackId, segId } of clipSelection) {
+      const t = tracks.find((x) => x.id === trackId);
+      const s = t?.edl.find((x) => x.id === segId);
+      if (s) minVStart = Math.min(minVStart, s.vStart);
+    }
+    const delta = Math.max(deltaSec, -minVStart);
+    if (Math.abs(delta) < 0.001) return;
+
+    const byTrack = new Map();
+    for (const { trackId, segId } of clipSelection) {
+      if (!byTrack.has(trackId)) byTrack.set(trackId, new Set());
+      byTrack.get(trackId).add(segId);
+    }
+
+    setTracksWithHistory((ts) =>
+      ts.map((t) => {
+        const ids = byTrack.get(t.id);
+        if (!ids) return t;
+        const moved = t.edl.filter((s) => ids.has(s.id));
+        let edl = t.edl.filter((s) => !ids.has(s.id));
+        // Tri par vStart : réinsertion gauche → droite, déterministe.
+        for (const s of [...moved].sort((a, b) => a.vStart - b.vStart)) {
+          edl = insertSegmentAt(edl, s, s.vStart + delta);
+        }
+        return { ...t, edl };
+      }),
+    );
+  };
+
   // Drag intra-piste : punch-in à la nouvelle position absolue.
   // On retire d'abord le segment source (pour qu'insertSegmentAt ne le
   // coupe pas avec lui-même), puis on l'insère : cutRange efface ce qui
@@ -782,26 +922,43 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
 
           <IconButton
             size="small"
+            onClick={cursorToStart}
+            disabled={tracks.length === 0}
+            title="Cursor to start"
+          >
+            <CursorToStartIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
             onClick={isPlaying ? stop : play}
             disabled={tracks.length === 0}
             title={isPlaying ? "Stop (space)" : "Play (space)"}
           >
             {isPlaying ? <StopIcon /> : <PlayArrowIcon />}
           </IconButton>
-          <IconButton
-            size="small"
-            onClick={isRecording ? stopRecording : startRecording}
-            color={isRecording ? "error" : "default"}
-            disabled={!paths}
-            title={isRecording ? "Stop recording (R)" : "Record (R)"}
-          >
-            {isRecording ? <StopIcon /> : <MicIcon />}
-          </IconButton>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton
+              size="small"
+              onClick={isRecording ? stopRecording : record}
+              color={isRecording ? "error" : "default"}
+              disabled={!paths}
+              title={isRecording ? "Stop recording (R)" : "Record (R)"}
+              sx={{ pr: 0.25 }}
+            >
+              {isRecording ? <StopIcon /> : <MicIcon />}
+            </IconButton>
+            <MicSourcePicker
+              source={audioSource}
+              onChange={changeAudioSource}
+              audioCtxRef={audioCtxRef}
+              disabled={isRecording}
+            />
+          </Box>
           <IconButton
             size="small"
             onClick={copySelection}
             disabled={!regionSelection && clipSelection.length === 0}
-            title={`Copy ( ${ctrlKeyTitle} + C)`}
+            title={`Copy (${ctrlKeyTitle} + C)`}
           >
             <ContentCopyIcon fontSize="small" />
           </IconButton>
@@ -809,7 +966,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             size="small"
             onClick={pasteAtCursor}
             disabled={!clipboard || !selection}
-            title="Paste ( Ctrl + V)"
+            title="Paste (Ctrl + V)"
           >
             <ContentPasteIcon fontSize="small" />
           </IconButton>
@@ -817,7 +974,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             size="small"
             onClick={cutSelection}
             disabled={!regionSelection && clipSelection.length === 0}
-            title="Cut ( Ctrl + X)"
+            title="Cut (Ctrl + X)"
           >
             <ContentCutIcon fontSize="small" />
           </IconButton>
@@ -833,7 +990,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             size="small"
             onClick={undo}
             disabled={past.length === 0}
-            title="Undo ( Ctrl + Z)"
+            title="Undo (Ctrl + Z)"
           >
             <UndoIcon fontSize="small" />
           </IconButton>
@@ -841,7 +998,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             size="small"
             onClick={redo}
             disabled={future.length === 0}
-            title="Redo ( Ctrl + Y)"
+            title="Redo (Ctrl + Y)"
           >
             <RedoIcon fontSize="small" />
           </IconButton>
@@ -887,7 +1044,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
         </Stack>
 
         {tracks.length > 0 ? (
-          tracks.map((t) => {
+          tracks.map((t, idx) => {
             const isSel = selection?.trackId === t.id;
             // Le playhead suit la piste qu'on a *réellement* lancée,
             // pas la sélection en cours (qui peut changer pendant la lecture).
@@ -904,6 +1061,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
                 track={t}
                 projectDuration={projectDuration}
                 isSelected={isSel}
+                isMainTrack={idx === 0}
                 onSeek={handleSeek}
                 onDelete={() => deleteTrack(t.id)}
                 playheadTime={playheadTime}
@@ -913,6 +1071,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
                 pxPerSec={pxPerSec}
                 onClipMove={moveClip}
                 onClipMoveAcrossTracks={moveClipAcrossTracks}
+                onClipsMoveBy={moveClipsBy}
                 onClipTrim={trimClip}
                 clipSelection={clipSelection}
                 onClipSelect={handleClipSelect}
@@ -921,6 +1080,15 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
                 snapEnabled={snapEnabled}
                 snapStep={snapStep}
                 resizeBounds={getResizeBounds}
+                liveRecording={
+                  isRecording && recordTarget?.trackId === t.id
+                    ? {
+                        peaksRef,
+                        sampleHz,
+                        startTime: recordTarget.startTime,
+                      }
+                    : null
+                }
               />
             );
           })
@@ -937,16 +1105,18 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             No tracks to display
           </Box>
         ) : null}
-      </Box>
 
-      {isRecording && (
-        <LiveRecordingLane
-          peaksRef={peaksRef}
-          pxPerSec={pxPerSec}
-          sampleHz={sampleHz}
-          trackNumber={tracks.length + 1}
-        />
-      )}
+        <Box sx={{ p: 1, borderTop: "1px solid #777" }}>
+          <Button
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={addTrack}
+            sx={{ color: "#666" }}
+          >
+            Add track
+          </Button>
+        </Box>
+      </Box>
 
       {/* {ctrlHeld && (
                 <Box
