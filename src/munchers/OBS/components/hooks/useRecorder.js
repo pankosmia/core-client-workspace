@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { makeTrack, makeSegment, overwriteAt } from "../lib/edl";
 import { saveAudioBlob } from "../lib/storageUtil";
+import { acquireStream, DEFAULT_SOURCE } from "../lib/audioSource";
 
 // Encapsule MediaRecorder + persistance du blob + ajout d'une piste.
 // Pendant l'enregistrement, sample les peaks via un AnalyserNode pour
@@ -17,6 +18,7 @@ export function useRecorder({
   setTracks,
   tracksRef,
   pushHistory,
+  source: inputSource,
 }) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
@@ -41,7 +43,7 @@ export function useRecorder({
     const ctx = audioCtxRef.current;
     if (ctx.state === "suspended") await ctx.resume();
 
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await acquireStream(inputSource ?? DEFAULT_SOURCE);
     const source = ctx.createMediaStreamSource(stream);
     const analyser = ctx.createAnalyser();
     analyser.fftSize = 2048;

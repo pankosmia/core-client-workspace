@@ -37,6 +37,8 @@ import {
 import { pickTickInterval } from "./lib/snap";
 import SplitIcon from "./SplitIcon";
 import CursorToStartIcon from "./CursorToStartIcon";
+import MicSourcePicker from "./MicSourcePicker";
+import { loadAudioSource, saveAudioSource } from "./lib/audioSource";
 // import GestureIcon from "./GestureIcon";
 
 const MIN_TIMELINE_SEC = 15;
@@ -44,6 +46,13 @@ const MIN_TIMELINE_SEC = 15;
 export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const audioCtxRef = useRef(null);
   const [tracks, setTracks] = useState([]);
+  // Source d'entrée audio (micro choisi), persistée en localStorage et partagée
+  // avec l'enregistreur. Le sélecteur (MicSourcePicker) la met à jour.
+  const [audioSource, setAudioSource] = useState(loadAudioSource);
+  const changeAudioSource = useCallback((next) => {
+    setAudioSource(next);
+    saveAudioSource(next);
+  }, []);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playerHeadTime, setPlayerHeadTime] = useState(0);
   // Cible de l'enregistrement en cours : { trackId, startTime } figé au record()
@@ -142,6 +151,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     setTracks,
     tracksRef,
     pushHistory,
+    source: audioSource,
   });
 
   const projectDuration = useMemo(() => {
@@ -926,15 +936,24 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
           >
             {isPlaying ? <StopIcon /> : <PlayArrowIcon />}
           </IconButton>
-          <IconButton
-            size="small"
-            onClick={isRecording ? stopRecording : record}
-            color={isRecording ? "error" : "default"}
-            disabled={!paths}
-            title={isRecording ? "Stop recording (R)" : "Record (R)"}
-          >
-            {isRecording ? <StopIcon /> : <MicIcon />}
-          </IconButton>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton
+              size="small"
+              onClick={isRecording ? stopRecording : record}
+              color={isRecording ? "error" : "default"}
+              disabled={!paths}
+              title={isRecording ? "Stop recording (R)" : "Record (R)"}
+              sx={{ pr: 0.25 }}
+            >
+              {isRecording ? <StopIcon /> : <MicIcon />}
+            </IconButton>
+            <MicSourcePicker
+              source={audioSource}
+              onChange={changeAudioSource}
+              audioCtxRef={audioCtxRef}
+              disabled={isRecording}
+            />
+          </Box>
           <IconButton
             size="small"
             onClick={copySelection}
