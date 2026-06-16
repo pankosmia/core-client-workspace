@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -137,15 +138,18 @@ export default function MicSourcePicker({
 
   return (
     <>
-      <IconButton
-        size="small"
-        onClick={(e) => setAnchorEl(e.currentTarget)}
-        disabled={disabled}
-        title="Audio input source"
-        sx={{ p: 0, ml: -0.5 }}
-      >
-        <ExpandMoreIcon sx={{ fontSize: 16 }} />
-      </IconButton>
+      <Tooltip title="Audio input source">
+        <span>
+          <IconButton
+            size="small"
+            onClick={(e) => setAnchorEl(e.currentTarget)}
+            disabled={disabled}
+            sx={{ p: 0, ml: -0.5 }}
+          >
+            <ExpandMoreIcon sx={{ fontSize: 16 }} />
+          </IconButton>
+        </span>
+      </Tooltip>
       <Menu
         anchorEl={anchorEl}
         open={open}

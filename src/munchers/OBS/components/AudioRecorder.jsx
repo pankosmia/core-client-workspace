@@ -921,33 +921,42 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             {formatTime(displayTime, true)}
           </Box>
 
-          <IconButton
-            size="small"
-            onClick={cursorToStart}
-            disabled={tracks.length === 0}
-            title="Cursor to start"
-          >
-            <CursorToStartIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            onClick={isPlaying ? stop : play}
-            disabled={tracks.length === 0}
-            title={isPlaying ? "Stop (space)" : "Play (space)"}
-          >
-            {isPlaying ? <StopIcon /> : <PlayArrowIcon />}
-          </IconButton>
+          <Tooltip title="Cursor to start">
+            <span>
+              <IconButton
+                size="small"
+                onClick={cursorToStart}
+                disabled={tracks.length === 0}
+              >
+                <CursorToStartIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={isPlaying ? "Stop (space)" : "Play (space)"}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={isPlaying ? stop : play}
+                disabled={tracks.length === 0}
+              >
+                {isPlaying ? <StopIcon /> : <PlayArrowIcon />}
+              </IconButton>
+            </span>
+          </Tooltip>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton
-              size="small"
-              onClick={isRecording ? stopRecording : record}
-              color={isRecording ? "error" : "default"}
-              disabled={!paths}
-              title={isRecording ? "Stop recording (R)" : "Record (R)"}
-              sx={{ pr: 0.25 }}
-            >
-              {isRecording ? <StopIcon /> : <MicIcon />}
-            </IconButton>
+            <Tooltip title={isRecording ? "Stop recording (R)" : "Record (R)"}>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={isRecording ? stopRecording : record}
+                  color={isRecording ? "error" : "default"}
+                  disabled={!paths}
+                  sx={{ pr: 0.25 }}
+                >
+                  {isRecording ? <StopIcon /> : <MicIcon />}
+                </IconButton>
+              </span>
+            </Tooltip>
             <MicSourcePicker
               source={audioSource}
               onChange={changeAudioSource}
@@ -955,54 +964,72 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
               disabled={isRecording}
             />
           </Box>
-          <IconButton
-            size="small"
-            onClick={copySelection}
-            disabled={!regionSelection && clipSelection.length === 0}
-            title={`Copy (${ctrlKeyTitle} + C)`}
-          >
-            <ContentCopyIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            onClick={pasteAtCursor}
-            disabled={!clipboard || !selection}
-            title="Paste (Ctrl + V)"
-          >
-            <ContentPasteIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            onClick={cutSelection}
-            disabled={!regionSelection && clipSelection.length === 0}
-            title="Cut (Ctrl + X)"
-          >
-            <ContentCutIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            onClick={splitAtPlayhead}
-            disabled={!selection && !isPlaying}
-            title="Split at cursor (S)"
-          >
-            <SplitIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            onClick={undo}
-            disabled={past.length === 0}
-            title="Undo (Ctrl + Z)"
-          >
-            <UndoIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            onClick={redo}
-            disabled={future.length === 0}
-            title="Redo (Ctrl + Y)"
-          >
-            <RedoIcon fontSize="small" />
-          </IconButton>
+          <Tooltip title={`Copy (${ctrlKeyTitle} + C)`}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={copySelection}
+                disabled={!regionSelection && clipSelection.length === 0}
+              >
+                <ContentCopyIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title="Paste (Ctrl + V)">
+            <span>
+              <IconButton
+                size="small"
+                onClick={pasteAtCursor}
+                disabled={!clipboard || !selection}
+              >
+                <ContentPasteIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title="Cut (Ctrl + X)">
+            <span>
+              <IconButton
+                size="small"
+                onClick={cutSelection}
+                disabled={!regionSelection && clipSelection.length === 0}
+              >
+                <ContentCutIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title="Split at cursor (S)">
+            <span>
+              <IconButton
+                size="small"
+                onClick={splitAtPlayhead}
+                disabled={!selection && !isPlaying}
+              >
+                <SplitIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title="Undo (Ctrl + Z)">
+            <span>
+              <IconButton
+                size="small"
+                onClick={undo}
+                disabled={past.length === 0}
+              >
+                <UndoIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title="Redo (Ctrl + Y)">
+            <span>
+              <IconButton
+                size="small"
+                onClick={redo}
+                disabled={future.length === 0}
+              >
+                <RedoIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
           <Tooltip
             title={
               <Box sx={{ whiteSpace: "pre-line" }}>
