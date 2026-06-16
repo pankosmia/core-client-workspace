@@ -11,8 +11,10 @@ import ContentCutIcon from "@mui/icons-material/ContentCutOutlined";
 import UndoIcon from "@mui/icons-material/UndoOutlined";
 import RedoIcon from "@mui/icons-material/RedoOutlined";
 import AddIcon from "@mui/icons-material/AddOutlined";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutlineOutlined";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
+import Tooltip from "@mui/material/Tooltip";
 
 import TrackView from "./TrackView";
 import { scheduleTrackFrom, stopSources } from "./lib/playback";
@@ -1001,17 +1003,19 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
           >
             <RedoIcon fontSize="small" />
           </IconButton>
+          <Tooltip
+            title={
+              <Box sx={{ whiteSpace: "pre-line" }}>
+                {`${ctrlKeyTitle} + Click to multiple select
+                ← and → to move selection`}
+              </Box>
+            }
+          >
+            <IconButton size="small" disableRipple sx={{ cursor: "default" }}>
+              <HelpOutlineIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Stack>
-        <Box
-          sx={{
-            marginLeft: "auto",
-            paddingRight: 4,
-            color: "#666",
-            fontSize: 14,
-          }}
-        >
-          Ctrl to multiple select, ← and → to move selection
-        </Box>
       </Stack>
 
       <Box sx={{ border: "2px solid #777", borderTop: "0px solid #777" }}>
