@@ -98,6 +98,26 @@ export default function Clip({
   const clipSelectionRef = useRef(clipSelection);
   clipSelectionRef.current = clipSelection;
 
+  // pxPerSec, le segment et les callbacks de commit reflétés en refs : sinon ils
+  // entrent dans les deps de l'effet interact.js plus bas, qui se ré-attache
+  // alors (unset + draggable + resizable) à CHAQUE render — donc à chaque frame
+  // de zoom et pour chaque clip. Ré-instancier interact.js en continu était la
+  // cause principale du lag (surtout au trackpad, flux d'events dense). Avec les
+  // refs, l'effet ne tourne plus qu'une fois (au montage) et les listeners
+  // lisent toujours les valeurs courantes.
+  const pxPerSecRef = useRef(pxPerSec);
+  pxPerSecRef.current = pxPerSec;
+  const segmentRef = useRef(segment);
+  segmentRef.current = segment;
+  const onMoveRef = useRef(onMove);
+  onMoveRef.current = onMove;
+  const onMoveAcrossTracksRef = useRef(onMoveAcrossTracks);
+  onMoveAcrossTracksRef.current = onMoveAcrossTracks;
+  const onClipTrimRef = useRef(onClipTrim);
+  onClipTrimRef.current = onClipTrim;
+  const onClipsMoveByRef = useRef(onClipsMoveBy);
+  onClipsMoveByRef.current = onClipsMoveBy;
+
   // Éléments DOM des co-sélectionnés pendant un drag de groupe, capturés une
   // seule fois au franchissement du seuil (pas de querySelector par move()).
   // null = drag mono.
@@ -123,6 +143,8 @@ export default function Clip({
     // Snap aux deux bords (left/right) ; si les deux snappent, on prend
     // le plus proche du curseur ; si un seul snappe, on prend celui-là.
     const computeSnappedDx = (rawDx, altKey, dstTrackId) => {
+      const pxPerSec = pxPerSecRef.current;
+      const segment = segmentRef.current;
       if (!snapEnabledRef.current || altKey || pxPerSec <= 0) {
         return rawDx;
       }
@@ -185,6 +207,7 @@ export default function Clip({
           dragMovedRef.current = false;
         },
         move(e) {
+          const segment = segmentRef.current;
           // dragDxRef = cumul brut du curseur, JAMAIS écrasé par le snap.
           // Sinon le snap suivant se calcule par rapport à la position
           // snappée et il faut s'éloigner du threshold depuis là pour
@@ -283,6 +306,8 @@ export default function Clip({
             return;
           }
 
+          const pxPerSec = pxPerSecRef.current;
+          const segment = segmentRef.current;
           const dstTrackId = hoveredTrackIdRef.current;
           const altKey = e.altKey ?? e.originalEvent?.altKey ?? false;
           const finalDx = computeSnappedDx(
@@ -318,16 +343,21 @@ export default function Clip({
 
           if (wasGroup) {
             if (Math.abs(deltaSec) < 0.001) return;
-            onClipsMoveBy?.(deltaSec);
+            onClipsMoveByRef.current?.(deltaSec);
             return;
           }
           // --- mode mono : comportement actuel inchangé ---
           if (Math.abs(deltaSec) < 0.001 && dstTrackId === trackId) return;
           const newVStart = Math.max(0, segment.vStart + deltaSec);
           if (dstTrackId === trackId) {
-            onMove?.(trackId, segment.id, newVStart);
+            onMoveRef.current?.(trackId, segment.id, newVStart);
           } else {
-            onMoveAcrossTracks?.(trackId, dstTrackId, segment.id, newVStart);
+            onMoveAcrossTracksRef.current?.(
+              trackId,
+              dstTrackId,
+              segment.id,
+              newVStart,
+            );
           }
         },
       },
@@ -353,6 +383,8 @@ export default function Clip({
           clampedRectRef.current = null;
         },
         move(e) {
+          const pxPerSec = pxPerSecRef.current;
+          const segment = segmentRef.current;
           const start = resizeStartRectRef.current;
           if (!start || pxPerSec <= 0) return;
 
@@ -391,7 +423,9 @@ export default function Clip({
           const newSrcStartPx = segment.srcStart * pxPerSec + dxLeft;
           waveformRef.current?.setSrcStartPx(newSrcStartPx);
         },
-        end(e) {
+        end() {
+          const pxPerSec = pxPerSecRef.current;
+          const segment = segmentRef.current;
           const start = resizeStartRectRef.current;
           const finalRect = clampedRectRef.current; // capturer AVANT reset
           el.style.transform = "";
@@ -403,7 +437,7 @@ export default function Clip({
           const deltaLeft = (finalRect.left - start.left) / pxPerSec;
           const deltaRight = (finalRect.right - start.right) / pxPerSec;
           if (Math.abs(deltaLeft) > 0.001 || Math.abs(deltaRight) > 0.001) {
-            onClipTrim?.(trackId, segment.id, deltaLeft, deltaRight);
+            onClipTrimRef.current?.(trackId, segment.id, deltaLeft, deltaRight);
           }
           // La waveform sera repositionnée par React au prochain
           // render via la prop left de ClipWaveform.
@@ -411,7 +445,10 @@ export default function Clip({
       },
     });
     return () => interact(el).unset();
-  }, [pxPerSec, onMove, onMoveAcrossTracks, onClipTrim, trackId, segment.id]);
+    // Volontairement monté une seule fois : pxPerSec, le segment et les
+    // callbacks sont lus via refs dans les listeners (voir plus haut), donc
+    // interact.js n'est jamais ré-attaché sur un changement de zoom/render.
+  }, [trackId, segment.id]);
 
   // Chaque geste repart d'un flag propre. Indispensable : après un vrai drag,
   // le `click` n'atteint pas le header (pointerEvents était "none" au moment

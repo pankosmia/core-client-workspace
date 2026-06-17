@@ -238,6 +238,34 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     const el = scrollRef.current;
     if (!el) return;
 
+    // Les events molette arrivent bien plus vite que 60 Hz (surtout trackpad).
+    // Sans throttle, chacun déclenche un setZoom → re-render de tout l'arbre +
+    // une écriture de scrollLeft (reflow) : c'est la source principale du lag.
+    // On accumule les deltas et on n'applique qu'un seul zoom par frame.
+    let accumDelta = 0;
+    let anchor = null; // { cursorX, contentX } du dernier event de la frame
+    let rafId = null;
+
+    const applyZoom = () => {
+      rafId = null;
+      const dy = accumDelta;
+      accumDelta = 0;
+      if (!anchor || dy === 0) return;
+      const { cursorX, contentX } = anchor;
+      setZoom((z) => {
+        const next = Math.min(
+          ZOOM_MAX,
+          Math.max(ZOOM_MIN, z * Math.pow(ZOOM_WHEEL_FACTOR, -dy)),
+        );
+        if (next !== z) {
+          // contentWidth ∝ zoom : le point sous le curseur passe de contentX à
+          // contentX * (next/z). On recale scrollLeft pour le garder sous la souris.
+          pendingScrollLeftRef.current = contentX * (next / z) - cursorX;
+        }
+        return next;
+      });
+    };
+
     const onWheel = (e) => {
       // Shift + molette : pan horizontal (sans zoom).
       if (e.shiftKey && !e.ctrlKey && !e.metaKey) {
@@ -250,24 +278,18 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
 
       const rect = el.getBoundingClientRect();
       const cursorX = e.clientX - rect.left; // px dans le viewport scrollé
-      const contentX = el.scrollLeft + cursorX; // px de contenu sous le curseur
-
-      setZoom((z) => {
-        const next = Math.min(
-          ZOOM_MAX,
-          Math.max(ZOOM_MIN, z * Math.pow(ZOOM_WHEEL_FACTOR, -e.deltaY)),
-        );
-        if (next !== z) {
-          // contentWidth ∝ zoom : le point sous le curseur passe de contentX à
-          // contentX * (next/z). On recale scrollLeft pour le garder sous la souris.
-          pendingScrollLeftRef.current = contentX * (next / z) - cursorX;
-        }
-        return next;
-      });
+      accumDelta += e.deltaY;
+      // scrollLeft/zoom n'ont pas changé depuis le dernier commit, donc contentX
+      // reste cohérent avec le zoom courant pour toute la frame.
+      anchor = { cursorX, contentX: el.scrollLeft + cursorX };
+      if (rafId == null) rafId = requestAnimationFrame(applyZoom);
     };
 
     el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      if (rafId != null) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // Applique la cible de scroll APRÈS le re-render (quand scrollWidth a la

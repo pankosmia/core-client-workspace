@@ -25,7 +25,10 @@ const ClipWaveform = forwardRef(function ClipWaveform(
 
   const segBuf = segmentBuffer(segment, trackBuffer);
   const bufDur = segBuf?.duration ?? 0;
-  const canvasWidthPx = Math.min(bufDur * pxPerSec, MAX_CANVAS_W);
+  // Largeur AFFICHÉE du buffer entier (CSS) : suit le zoom. Le bitmap du canvas,
+  // lui, garde une résolution FIXE (cf. draw) et est simplement étiré en CSS →
+  // changer le zoom ne redessine rien, c'est une pure mise à jour de style.
+  const displayWidthPx = bufDur * pxPerSec;
   const canvasLeftPx = -segment.srcStart * pxPerSec;
 
   // Peaks du buffer ENTIER, indépendants du segment. Recalcul uniquement
@@ -56,19 +59,21 @@ const ClipWaveform = forwardRef(function ClipWaveform(
     if (!canvas || !peaks) return;
     const parent = canvas.parentElement;
     const h = parent?.clientHeight ?? 0;
-    const w = canvasWidthPx;
-    if (w <= 0 || h <= 0) return;
+    if (h <= 0) return;
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = `${w}px`;
-    canvas.style.height = `${h}px`;
+    // Résolution FIXE du bitmap (1 px logique par bin), indépendante du zoom :
+    // l'étirement se fait en CSS (style.width), donc draw() ne tourne qu'au
+    // changement de buffer/couleur/hauteur — jamais à chaque cran de molette
+    // (réallouer le bitmap à chaque zoom était la cause du lag).
+    const w = Math.min(peaks.length, MAX_CANVAS_W);
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
     const ctx = canvas.getContext("2d");
-    ctx.scale(dpr, dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = color;
     const mid = h / 2;
-    const barW = w / peaks.length;
+    const barW = w / peaks.length; // = 1 (résolution native des bins)
     for (let i = 0; i < peaks.length; i++) {
       const barH = peaks[i] * mid;
       ctx.fillRect(i * barW, mid - barH, Math.max(barW - 0.5, 0.5), barH * 2);
@@ -78,7 +83,7 @@ const ClipWaveform = forwardRef(function ClipWaveform(
 
   useLayoutEffect(() => {
     draw();
-  }, [peaks, color, canvasWidthPx]);
+  }, [peaks, color]);
 
   // Le parent peut changer de hauteur (resize fenêtre, rezoom UI) :
   // ResizeObserver pour re-draw quand ça arrive. Setup une fois.
@@ -114,6 +119,7 @@ const ClipWaveform = forwardRef(function ClipWaveform(
         position: "absolute",
         top: 0,
         left: `${canvasLeftPx}px`,
+        width: `${displayWidthPx}px`,
         height: "100%",
       }}
     />
