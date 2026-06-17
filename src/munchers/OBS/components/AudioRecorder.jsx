@@ -1017,14 +1017,13 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
           justifyContent: "space-between",
         }}
       >
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} alignItems="center">
           <Box
             sx={{
               color: "#666",
               paddingLeft: 2,
               fontWeight: "bold",
               fontSize: 14,
-              alignSelf: "center",
             }}
           >
             {formatTime(displayTime, true)}
