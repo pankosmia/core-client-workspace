@@ -22,7 +22,6 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutlineOutlined";
 import ZoomInIcon from "@mui/icons-material/ZoomInOutlined";
 import ZoomOutIcon from "@mui/icons-material/ZoomOutOutlined";
 import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
 import Tooltip from "@mui/material/Tooltip";
 
 import TrackView from "./TrackView";
@@ -46,6 +45,7 @@ import {
   makeEmptyTrack,
 } from "./lib/edl";
 import { pickTickInterval } from "./lib/snap";
+import { NAME_COL_W, NAME_COL_INNER_W } from "./lib/timelineLayout";
 import SplitIcon from "./SplitIcon";
 import CursorToStartIcon from "./CursorToStartIcon";
 import MicSourcePicker from "./MicSourcePicker";
@@ -57,7 +57,6 @@ const MIN_TIMELINE_SEC = 15;
 const ZOOM_MIN = 1;
 const ZOOM_MAX = 40;
 const ZOOM_WHEEL_FACTOR = 1.0015;
-const NAME_COL_W = 158;
 
 export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const audioCtxRef = useRef(null);
@@ -1235,7 +1234,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
             overscrollBehaviorX: "contain",
           }}
         >
-          <Stack direction="row" alignItems="stretch" spacing={1}>
+          <Stack direction="row" alignItems="stretch">
             <Box
               sx={{
                 width: contentWidth,
@@ -1251,11 +1250,6 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
                 isTopAxis={true}
               />
             </Box>
-            <Divider
-              orientation="vertical"
-              flexItem
-              sx={{ alignSelf: "stretch", borderColor: "transparent" }}
-            />
             <Stack
               spacing={0}
               paddingRight={3}
@@ -1268,9 +1262,11 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
                 borderLeft: "1px solid #777",
                 background: "#fff",
                 flexShrink: 0,
+                width: NAME_COL_W,
+                boxSizing: "border-box",
               }}
             >
-              <Box minWidth={110} maxWidth={110} />
+              <Box minWidth={NAME_COL_INNER_W} maxWidth={NAME_COL_INNER_W} />
             </Stack>
           </Stack>
 

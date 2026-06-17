@@ -134,7 +134,10 @@ export function useProjectPersistence({
       if (!isInitial || !audioUrl) {
         if (!cancelled) {
           // Projet vierge : vue par défaut = main track + une piste vide.
-          setTracks([makeEmptyTrack("MainTrack"), makeEmptyTrack("Track - 2")]);
+          setTracks([
+            makeEmptyTrack("Main track"),
+            makeEmptyTrack("Track - 2"),
+          ]);
           setProjectLoaded(true);
         }
         return;
@@ -147,7 +150,7 @@ export function useProjectPersistence({
           await blob.arrayBuffer(),
         );
         if (cancelled) return;
-        const track = makeTrack(buffer, "MainTrack");
+        const track = makeTrack(buffer, "Main track");
         await saveAudioBlob(paths, track.id, blob);
         if (!cancelled) {
           setTracks([track, makeEmptyTrack("Track - 2")]);
@@ -155,7 +158,10 @@ export function useProjectPersistence({
         }
       } catch {
         if (!cancelled) {
-          setTracks([makeEmptyTrack("MainTrack"), makeEmptyTrack("Track - 2")]);
+          setTracks([
+            makeEmptyTrack("Main track"),
+            makeEmptyTrack("Track - 2"),
+          ]);
           setProjectLoaded(true);
         }
       }

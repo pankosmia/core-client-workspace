@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/EditOutlined";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutlineOutlined";
 import TextField from "@mui/material/TextField";
 import MicIcon from "@mui/icons-material/MicNoneOutlined";
 
@@ -15,9 +16,13 @@ import TimelineAxis from "./trackview/TimelineAxis";
 import Playhead from "./trackview/Playhead";
 import SelectionOverlay from "./trackview/SelectionOverlay";
 import LiveRecordingClip from "./trackview/LiveRecordingClip";
+import {
+  LANE_HEIGHT,
+  NAME_COL_W,
+  NAME_COL_INNER_W,
+} from "./lib/timelineLayout";
 
 const DRAG_THRESHOLD = 3;
-const LANE_HEIGHT = 80;
 // Doit rester aligné avec la `margin` interact.js resizable (10 par défaut).
 // Sert à savoir si un pointerdown au bord du clip relève du resize (et non
 // d'une sélection de région intra-clip).
@@ -195,18 +200,22 @@ export default function TrackView({
   const [isRenaming, setIsRenaming] = useState(false);
   const [draftName, setDraftName] = useState(track.name);
 
+  const panelBackground = (theme) => {
+    const laneBg = isSelected ? "#e9e9e9" : "#fafafa";
+    if (isMainTrack) {
+      return `color-mix(in srgb, ${theme.palette.secondary.main} 25%, ${laneBg})`;
+    }
+    return laneBg;
+  };
+
   return (
     <Box
       sx={{
-        // borderBottom: "1px solid #777",
         borderTop: "1px solid #777",
-        // S'étend sur toute la largeur scrollable (contentWidth + colonne
-        // description) pour que le trait de séparation horizontal couvre tout
-        // même zoomé, et non juste la largeur visible du viewport.
         width: "max-content",
       }}
     >
-      <Stack direction="row" alignItems="stretch" spacing={1}>
+      <Stack direction="row" alignItems="stretch">
         <Box sx={{ flexShrink: 0 }}>
           <Box
             ref={laneRef}
@@ -214,7 +223,7 @@ export default function TrackView({
             onPointerDown={onLanePointerDown}
             onPointerMove={onLanePointerMove}
             onPointerUp={onLanePointerUp}
-            sx={{
+            sx={(theme) => ({
               position: "relative",
               width: contentWidth,
               height: LANE_HEIGHT,
@@ -222,7 +231,7 @@ export default function TrackView({
               overflow: "visible",
               touchAction: "none",
               userSelect: "none",
-            }}
+            })}
           >
             {pxPerSec > 0 && (
               <TimelineAxis
@@ -300,12 +309,6 @@ export default function TrackView({
           </Box>
         </Box>
 
-        <Divider
-          orientation="vertical"
-          flexItem
-          sx={{ alignSelf: "stretch", borderColor: "transparent" }}
-        />
-
         <Stack
           spacing={0}
           paddingRight={3}
@@ -313,17 +316,16 @@ export default function TrackView({
           alignItems="left"
           margin={0}
           top={0}
-          sx={{
+          sx={(theme) => ({
             position: "sticky",
             right: 0,
             zIndex: 3,
             flexShrink: 0,
-            // Séparateur vertical porté par la colonne sticky : il reste collé à
-            // droite pendant le scroll horizontal (le Divider en flux normal,
-            // lui, défilerait avec la lane).
+            width: NAME_COL_W,
+            boxSizing: "border-box",
             borderLeft: "1px solid #777",
-            background: isSelected ? "#e9e9e9" : "#fafafa",
-          }}
+            background: panelBackground(theme),
+          })}
         >
           <Box
             display="flex"
@@ -331,8 +333,8 @@ export default function TrackView({
             alignItems="center"
             sx={{
               position: "relative",
-              maxWidth: 110,
-              minWidth: 110,
+              maxWidth: NAME_COL_INNER_W,
+              minWidth: NAME_COL_INNER_W,
               marginTop: 1,
             }}
           >
@@ -421,6 +423,24 @@ export default function TrackView({
                 >
                   <DeleteIcon fontSize="small" />
                 </IconButton>
+              )}
+              {isMainTrack && (
+                <Tooltip
+                  title={
+                    <Box sx={{ whiteSpace: "pre-line" }}>
+                      The main track is where you build the final product, the
+                      other tracks are your workspace
+                    </Box>
+                  }
+                >
+                  <IconButton
+                    size="small"
+                    disableRipple
+                    sx={{ cursor: "default" }}
+                  >
+                    <HelpOutlineIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               )}
             </Stack>
           )}
