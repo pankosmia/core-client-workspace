@@ -190,6 +190,8 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const [zoom, setZoom] = useState(ZOOM_MIN);
   const scrollRef = useRef(null);
   const pendingScrollLeftRef = useRef(null);
+  // Position X (px de contenu) du curseur — sert d'ancre au zoom boutons/clavier.
+  const playheadXRef = useRef(0);
 
   // laneWidth = largeur du conteneur scrollé (inclut la gouttière nom).
   const viewportWidth = Math.max(0, laneWidth - NAME_COL_W);
@@ -210,14 +212,17 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     return () => ro.disconnect();
   }, []);
 
-  // Zoom recentré sur le milieu du viewport (boutons / clavier).
+  // Zoom ancré sur le curseur (playhead), pas sur le centre du viewport.
   const zoomBy = useCallback((factor) => {
     const el = scrollRef.current;
     setZoom((z) => {
       const next = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z * factor));
       if (next !== z && el) {
-        const center = el.scrollLeft + el.clientWidth / 2;
-        pendingScrollLeftRef.current = center * (next / z) - el.clientWidth / 2;
+        // Garde le point sous le curseur à la même position à l'écran.
+        const anchorContentX = playheadXRef.current; // px de contenu (zoom z)
+        const anchorViewportX = anchorContentX - el.scrollLeft;
+        pendingScrollLeftRef.current =
+          anchorContentX * (next / z) - anchorViewportX;
       }
       return next;
     });
@@ -296,6 +301,9 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const displayTime = isPlaying
     ? (playingFromRef.current?.startTime ?? 0) + playerHeadTime
     : (selection?.time ?? 0);
+
+  // Ancre du zoom (boutons/clavier) : position du curseur en px de contenu.
+  playheadXRef.current = displayTime * pxPerSec;
 
   const tick = () => {
     const elapsed = Math.max(
