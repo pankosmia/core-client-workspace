@@ -1,4 +1,11 @@
-import { useState, useRef, useMemo, useEffect, useCallback } from "react";
+import {
+  useState,
+  useRef,
+  useMemo,
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
@@ -12,6 +19,8 @@ import UndoIcon from "@mui/icons-material/UndoOutlined";
 import RedoIcon from "@mui/icons-material/RedoOutlined";
 import AddIcon from "@mui/icons-material/AddOutlined";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutlineOutlined";
+import ZoomInIcon from "@mui/icons-material/ZoomInOutlined";
+import ZoomOutIcon from "@mui/icons-material/ZoomOutOutlined";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Tooltip from "@mui/material/Tooltip";
@@ -44,6 +53,11 @@ import { loadAudioSource, saveAudioSource } from "./lib/audioSource";
 // import GestureIcon from "./GestureIcon";
 
 const MIN_TIMELINE_SEC = 15;
+
+const ZOOM_MIN = 1;
+const ZOOM_MAX = 40;
+const ZOOM_WHEEL_FACTOR = 1.0015;
+const NAME_COL_W = 158;
 
 export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const audioCtxRef = useRef(null);
@@ -172,22 +186,106 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     return Math.max(MIN_TIMELINE_SEC, trackMax, liveWindow);
   }, [tracks, recordingDuration, recordTarget]);
 
-  // snapStep = même intervalle que les ticks affichés par TimelineAxis.
-  // Quand on zoome/dézoome (projectDuration change), le snap suit la grille.
-  const snapStep = pickTickInterval(projectDuration);
-
-  const laneRef = useRef(null);
   const [laneWidth, setLaneWidth] = useState(0);
-  const pxPerSec = projectDuration > 0 ? laneWidth / projectDuration : 0;
+  const [zoom, setZoom] = useState(ZOOM_MIN);
+  const scrollRef = useRef(null);
+  const pendingScrollLeftRef = useRef(null);
+
+  // laneWidth = largeur du conteneur scrollé (inclut la gouttière nom).
+  const viewportWidth = Math.max(0, laneWidth - NAME_COL_W);
+  const fitPxPerSec = projectDuration > 0 ? viewportWidth / projectDuration : 0;
+  const pxPerSec = fitPxPerSec * zoom;
+  const contentWidth = projectDuration * pxPerSec;
+
+  // snapStep = même intervalle que les ticks affichés par TimelineAxis.
+  // Quand on zoome, pxPerSec augmente → le pas de grille (et le snap) se resserre.
+  const snapStep = pickTickInterval(projectDuration, pxPerSec);
 
   useEffect(() => {
-    const el = laneRef.current;
+    const el = scrollRef.current;
     if (!el) return;
     setLaneWidth(el.clientWidth);
     const ro = new ResizeObserver(([e]) => setLaneWidth(e.contentRect.width));
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  // Zoom recentré sur le milieu du viewport (boutons / clavier).
+  const zoomBy = useCallback((factor) => {
+    const el = scrollRef.current;
+    setZoom((z) => {
+      const next = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z * factor));
+      if (next !== z && el) {
+        const center = el.scrollLeft + el.clientWidth / 2;
+        pendingScrollLeftRef.current = center * (next / z) - el.clientWidth / 2;
+      }
+      return next;
+    });
+  }, []);
+
+  const resetZoom = useCallback(() => {
+    setZoom(ZOOM_MIN);
+    pendingScrollLeftRef.current = 0;
+  }, []);
+
+  // Ctrl + molette → zoom autour du curseur. Shift + molette → pan horizontal.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const onWheel = (e) => {
+      // Shift + molette : pan horizontal (sans zoom).
+      if (e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+        return;
+      }
+      if (!e.ctrlKey && !e.metaKey) return; // molette seule = scroll vertical normal
+      e.preventDefault(); // bloque le zoom navigateur
+
+      const rect = el.getBoundingClientRect();
+      const cursorX = e.clientX - rect.left; // px dans le viewport scrollé
+      const contentX = el.scrollLeft + cursorX; // px de contenu sous le curseur
+
+      setZoom((z) => {
+        const next = Math.min(
+          ZOOM_MAX,
+          Math.max(ZOOM_MIN, z * Math.pow(ZOOM_WHEEL_FACTOR, -e.deltaY)),
+        );
+        if (next !== z) {
+          // contentWidth ∝ zoom : le point sous le curseur passe de contentX à
+          // contentX * (next/z). On recale scrollLeft pour le garder sous la souris.
+          pendingScrollLeftRef.current = contentX * (next / z) - cursorX;
+        }
+        return next;
+      });
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  // Applique la cible de scroll APRÈS le re-render (quand scrollWidth a la
+  // nouvelle largeur), sinon le navigateur clampe scrollLeft à l'ancienne largeur.
+  useLayoutEffect(() => {
+    if (pendingScrollLeftRef.current != null && scrollRef.current) {
+      scrollRef.current.scrollLeft = pendingScrollLeftRef.current;
+      pendingScrollLeftRef.current = null;
+    }
+  }, [zoom]);
+
+  // Pendant la lecture zoomée, garder le playhead visible (auto-page).
+  useEffect(() => {
+    if (!isPlaying || zoom <= ZOOM_MIN) return;
+    const el = scrollRef.current;
+    if (!el || pxPerSec <= 0) return;
+    const t = (playingFromRef.current?.startTime ?? 0) + playerHeadTime;
+    const x = t * pxPerSec;
+    const view = el.clientWidth - NAME_COL_W; // zone visible des lanes
+    if (x < el.scrollLeft || x > el.scrollLeft + view) {
+      el.scrollLeft = Math.max(0, x - view * 0.1);
+    }
+  }, [playerHeadTime, isPlaying, zoom, pxPerSec]);
 
   useEffect(() => {
     if (tracks.length === 0 || selection) return;
@@ -623,6 +721,15 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
       } else if (isCmd && e.key === "a") {
         e.preventDefault();
         selectAllClips();
+      } else if (isCmd && (e.key === "=" || e.key === "+")) {
+        e.preventDefault();
+        zoomBy(1.5);
+      } else if (isCmd && e.key === "-") {
+        e.preventDefault();
+        zoomBy(1 / 1.5);
+      } else if (isCmd && e.key === "0") {
+        e.preventDefault();
+        resetZoom();
       } else if (
         e.shiftKey &&
         (e.key === "ArrowLeft" || e.key === "ArrowRight")
@@ -659,6 +766,8 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     isPlaying,
     isRecording,
     playerHeadTime,
+    zoomBy,
+    resetZoom,
   ]);
 
   // Affiche le GestureIcon à côté du curseur tant que Ctrl/Cmd est maintenu.
@@ -1030,6 +1139,47 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
               </IconButton>
             </span>
           </Tooltip>
+          <Box sx={{ width: 8 }} />
+          <Tooltip title={`Zoom out (${ctrlKeyTitle} + -)`}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={() => zoomBy(1 / 1.5)}
+                disabled={zoom <= ZOOM_MIN}
+              >
+                <ZoomOutIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={`Reset zoom (${ctrlKeyTitle} + 0)`}>
+            <Box
+              component="span"
+              onClick={resetZoom}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: 38,
+                fontSize: 12,
+                color: "#666",
+                cursor: "pointer",
+                userSelect: "none",
+              }}
+            >
+              {Math.round(zoom * 100)}%
+            </Box>
+          </Tooltip>
+          <Tooltip title={`Zoom in (${ctrlKeyTitle} + +)`}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={() => zoomBy(1.5)}
+                disabled={zoom >= ZOOM_MAX}
+              >
+                <ZoomInIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
           <Tooltip
             title={
               <Box sx={{ whiteSpace: "pre-line" }}>
@@ -1046,96 +1196,121 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
       </Stack>
 
       <Box sx={{ border: "2px solid #777", borderTop: "0px solid #777" }}>
-        <Stack direction="row" alignItems="stretch" spacing={1}>
-          <Box
-            ref={laneRef}
-            sx={{
-              flex: 1,
-              minWidth: 0,
-              position: "relative",
-              height: 16,
-              paddingBottom: 0,
-            }}
-          >
-            <TimelineAxis
-              projectDuration={projectDuration}
-              pxPerSec={pxPerSec}
-              isTopAxis={true}
-            />
-          </Box>
-          <Divider
-            orientation="vertical"
-            flexItem
-            sx={{ alignSelf: "stretch", borderColor: "transparent" }}
-          />
-          <Stack spacing={0} paddingRight={4} paddingLeft={0} margin={0}>
-            <Box minWidth={110} maxWidth={110} />
-          </Stack>
-        </Stack>
-
-        {tracks.length > 0 ? (
-          tracks.map((t, idx) => {
-            const isSel = selection?.trackId === t.id;
-            // Le playhead suit la piste qu'on a *réellement* lancée,
-            // pas la sélection en cours (qui peut changer pendant la lecture).
-            const isLivePlay =
-              isPlaying && playingFromRef.current?.trackId === t.id;
-            const playheadTime = isLivePlay
-              ? (playingFromRef.current?.startTime ?? 0) + playerHeadTime
-              : selection?.trackId === t.id
-                ? selection.time
-                : null;
-            return (
-              <TrackView
-                key={t.id}
-                track={t}
+        {/* ── Zone scrollable horizontalement : axe + pistes ── */}
+        <Box
+          ref={scrollRef}
+          sx={{
+            overflowX: "auto",
+            overflowY: "hidden",
+            // évite le "swipe back" du navigateur pendant le pan horizontal
+            overscrollBehaviorX: "contain",
+          }}
+        >
+          <Stack direction="row" alignItems="stretch" spacing={1}>
+            <Box
+              sx={{
+                width: contentWidth,
+                flexShrink: 0,
+                position: "relative",
+                height: 16,
+                paddingBottom: 0,
+              }}
+            >
+              <TimelineAxis
                 projectDuration={projectDuration}
-                isSelected={isSel}
-                isMainTrack={idx === 0}
-                onSeek={handleSeek}
-                onDelete={() => deleteTrack(t.id)}
-                playheadTime={playheadTime}
-                regionSelection={regionSelection}
-                onRegionChange={setRegionSelection}
-                onRename={renameTrack}
                 pxPerSec={pxPerSec}
-                onClipMove={moveClip}
-                onClipMoveAcrossTracks={moveClipAcrossTracks}
-                onClipsMoveBy={moveClipsBy}
-                onClipTrim={trimClip}
-                clipSelection={clipSelection}
-                onClipSelect={handleClipSelect}
-                onClearClipSelection={clearClipSelection}
-                getSnapCandidates={getSnapCandidates}
-                snapEnabled={snapEnabled}
-                snapStep={snapStep}
-                resizeBounds={getResizeBounds}
-                liveRecording={
-                  isRecording && recordTarget?.trackId === t.id
-                    ? {
-                        peaksRef,
-                        sampleHz,
-                        startTime: recordTarget.startTime,
-                      }
-                    : null
-                }
+                isTopAxis={true}
               />
-            );
-          })
-        ) : !isRecording ? (
-          <Box
-            sx={{
-              color: "#666",
-              p: 4,
-              borderBottom: "1px solid #777",
-              borderLeft: "1px solid #777",
-              borderRight: "1px solid #777",
-            }}
-          >
-            No tracks to display
-          </Box>
-        ) : null}
+            </Box>
+            <Divider
+              orientation="vertical"
+              flexItem
+              sx={{ alignSelf: "stretch", borderColor: "transparent" }}
+            />
+            <Stack
+              spacing={0}
+              paddingRight={3}
+              paddingLeft={1}
+              margin={0}
+              sx={{
+                position: "sticky",
+                right: 0,
+                zIndex: 3,
+                borderLeft: "1px solid #777",
+                background: "#fff",
+                flexShrink: 0,
+              }}
+            >
+              <Box minWidth={110} maxWidth={110} />
+            </Stack>
+          </Stack>
 
+          {tracks.length > 0 ? (
+            tracks.map((t, idx) => {
+              const isSel = selection?.trackId === t.id;
+              // Le playhead suit la piste qu'on a *réellement* lancée,
+              // pas la sélection en cours (qui peut changer pendant la lecture).
+              const isLivePlay =
+                isPlaying && playingFromRef.current?.trackId === t.id;
+              const playheadTime = isLivePlay
+                ? (playingFromRef.current?.startTime ?? 0) + playerHeadTime
+                : selection?.trackId === t.id
+                  ? selection.time
+                  : null;
+              return (
+                <TrackView
+                  key={t.id}
+                  track={t}
+                  projectDuration={projectDuration}
+                  isSelected={isSel}
+                  isMainTrack={idx === 0}
+                  onSeek={handleSeek}
+                  onDelete={() => deleteTrack(t.id)}
+                  playheadTime={playheadTime}
+                  regionSelection={regionSelection}
+                  onRegionChange={setRegionSelection}
+                  onRename={renameTrack}
+                  pxPerSec={pxPerSec}
+                  contentWidth={contentWidth}
+                  onClipMove={moveClip}
+                  onClipMoveAcrossTracks={moveClipAcrossTracks}
+                  onClipsMoveBy={moveClipsBy}
+                  onClipTrim={trimClip}
+                  clipSelection={clipSelection}
+                  onClipSelect={handleClipSelect}
+                  onClearClipSelection={clearClipSelection}
+                  getSnapCandidates={getSnapCandidates}
+                  snapEnabled={snapEnabled}
+                  snapStep={snapStep}
+                  resizeBounds={getResizeBounds}
+                  liveRecording={
+                    isRecording && recordTarget?.trackId === t.id
+                      ? {
+                          peaksRef,
+                          sampleHz,
+                          startTime: recordTarget.startTime,
+                        }
+                      : null
+                  }
+                />
+              );
+            })
+          ) : !isRecording ? (
+            <Box
+              sx={{
+                color: "#666",
+                p: 4,
+                borderBottom: "1px solid #777",
+                borderLeft: "1px solid #777",
+                borderRight: "1px solid #777",
+              }}
+            >
+              No tracks to display
+            </Box>
+          ) : null}
+        </Box>
+
+        {/* footer HORS du conteneur scrollé */}
         <Box sx={{ p: 1, borderTop: "1px solid #777" }}>
           <Button
             size="small"

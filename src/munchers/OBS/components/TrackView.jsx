@@ -27,6 +27,8 @@ export default function TrackView({
   track,
   isMainTrack,
   projectDuration,
+  pxPerSec,
+  contentWidth,
   isSelected,
   onSeek,
   onDelete,
@@ -48,19 +50,6 @@ export default function TrackView({
   liveRecording,
 }) {
   const laneRef = useRef(null);
-  const [laneWidth, setLaneWidth] = useState(0);
-  const pxPerSec = projectDuration > 0 ? laneWidth / projectDuration : 0;
-
-  useEffect(() => {
-    const el = laneRef.current;
-    if (!el) return;
-    setLaneWidth(el.clientWidth);
-    const ro = new ResizeObserver(([entry]) => {
-      setLaneWidth(entry.contentRect.width);
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   // Sélection en cours de construction (drag souris sur la lane).
   // Quand le drag se termine, on commit via onRegionChange et on remet à null.
@@ -211,10 +200,14 @@ export default function TrackView({
       sx={{
         // borderBottom: "1px solid #777",
         borderTop: "1px solid #777",
+        // S'étend sur toute la largeur scrollable (contentWidth + colonne
+        // description) pour que le trait de séparation horizontal couvre tout
+        // même zoomé, et non juste la largeur visible du viewport.
+        width: "max-content",
       }}
     >
       <Stack direction="row" alignItems="stretch" spacing={1}>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Box sx={{ flexShrink: 0 }}>
           <Box
             ref={laneRef}
             data-lane-id={track.id}
@@ -223,7 +216,7 @@ export default function TrackView({
             onPointerUp={onLanePointerUp}
             sx={{
               position: "relative",
-              width: "100%",
+              width: contentWidth,
               height: LANE_HEIGHT,
               background: isSelected ? "#e9e9e9" : "#fafafa",
               overflow: "visible",
@@ -315,11 +308,22 @@ export default function TrackView({
 
         <Stack
           spacing={0}
-          paddingRight={4}
-          paddingLeft={0}
+          paddingRight={3}
+          paddingLeft={1}
           alignItems="left"
           margin={0}
           top={0}
+          sx={{
+            position: "sticky",
+            right: 0,
+            zIndex: 3,
+            flexShrink: 0,
+            // Séparateur vertical porté par la colonne sticky : il reste collé à
+            // droite pendant le scroll horizontal (le Divider en flux normal,
+            // lui, défilerait avec la lane).
+            borderLeft: "1px solid #777",
+            background: isSelected ? "#e9e9e9" : "#fafafa",
+          }}
         >
           <Box
             display="flex"

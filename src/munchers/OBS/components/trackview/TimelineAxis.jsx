@@ -11,7 +11,7 @@ export default function TimelineAxis({
 }) {
   if (projectDuration <= 0 || pxPerSec <= 0) return null;
 
-  const tickEvery = pickTickInterval(projectDuration);
+  const tickEvery = pickTickInterval(projectDuration, pxPerSec);
   const labelEvery = tickEvery * 5;
 
   const ticks = [];
