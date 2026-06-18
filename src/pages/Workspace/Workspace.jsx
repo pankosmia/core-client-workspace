@@ -68,6 +68,34 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
     }
   }, [selectedResources, projectSummaries]);
 
+  useEffect(() => {
+    const checkOverflow = () => {
+      document.querySelectorAll(".react-tile-pane-tabTitle").forEach((el) => {
+        el.classList.toggle("is-overflowing", el.scrollWidth > el.clientWidth);
+      });
+    };
+
+    checkOverflow();
+
+    const resizeObserver = new ResizeObserver(checkOverflow);
+    document
+      .querySelectorAll(".react-tile-pane-tabTitle")
+      .forEach((el) => resizeObserver.observe(el));
+
+    const mutationObserver = new MutationObserver(() => {
+      checkOverflow();
+      document
+        .querySelectorAll(".react-tile-pane-tabTitle")
+        .forEach((el) => resizeObserver.observe(el));
+    });
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+    };
+  }, []);
+
   const isGraphite = GraphiteTest();
   /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
   const adjSelectedFontClass = isGraphite
@@ -122,6 +150,17 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
 
   return (
     <>
+      <style>{`
+        .react-tile-pane-tabTitle {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .react-tile-pane-tabTitle.is-overflowing {
+          justify-content: flex-start;
+          text-align: left;
+        }
+      `}</style>
       <Header
         titleKey="pages:core-local-workspace:title"
         requireNet={false}
@@ -148,8 +187,17 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
                 top: "110px",
                 bottom: 0,
                 right: 0,
+                left: 0,
                 overflow: "auto",
-                width: "100vw",
+                /* width: "100vw", */
+              }}
+              onMouseOver={(e) => {
+                if (
+                  e.target.classList.contains("react-tile-pane-tabTitle") &&
+                  !e.target.title
+                ) {
+                  e.target.title = e.target.textContent;
+                }
               }}
             >
               <TileContainer />
