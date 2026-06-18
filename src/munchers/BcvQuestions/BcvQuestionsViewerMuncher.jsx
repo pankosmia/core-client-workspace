@@ -103,6 +103,7 @@ function BcvQuestionsViewerMuncher({ metadata }) {
 
   const verseQuestions = filteredIngredient.map((l) => l[5]);
   const verseAnswers = filteredIngredient.map((l) => l[6]);
+  const verseLabel = `(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`;
 
   // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
   return (
@@ -123,9 +124,21 @@ function BcvQuestionsViewerMuncher({ metadata }) {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            minWidth: 0,
           }}
         >
-          <Typography variant="subtitle1">{`(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`}</Typography>
+          <Typography
+            variant="subtitle1"
+            title={verseLabel}
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              minWidth: 0,
+            }}
+          >
+            {verseLabel}
+          </Typography>
         </Grid2>
         <Grid2 item size={12}>
           {ingredient && verseQuestions.length > 0 ? (

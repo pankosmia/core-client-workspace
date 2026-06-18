@@ -48,10 +48,21 @@ function VideoLinksViewerMuncher({ metadata }) {
     );
   }, [ingredient, systemBcv]);
 
+  const videoLabel = `${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`;
+
   return (
     <Box>
-      <Typography variant="h5">
-        {`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`}
+      <Typography
+        variant="h5"
+        title={videoLabel}
+        sx={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          minWidth: 0,
+        }}
+      >
+        {videoLabel}
       </Typography>
       <Typography variant="h6">
         {doI18n("munchers:video_links_viewer:title", i18nRef.current)}

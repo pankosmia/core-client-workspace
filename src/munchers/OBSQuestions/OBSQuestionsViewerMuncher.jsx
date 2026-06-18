@@ -63,6 +63,7 @@ function OBSQuestionsViewerMuncher({ metadata }) {
   const verseTags = filteredIngredient.map((l) =>
     l[2].split(",").map((t) => t.trim()),
   );
+  const verseLabel = `(${obs[0]}:${obs[1]})`;
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -84,7 +85,18 @@ function OBSQuestionsViewerMuncher({ metadata }) {
             alignItems: "center",
           }}
         >
-          <Typography variant="subtitle1">{`(${obs[0]}:${obs[1]})`}</Typography>
+          <Typography
+            variant="subtitle1"
+            title={verseLabel}
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              minWidth: 0,
+            }}
+          >
+            {verseLabel}
+          </Typography>
         </Grid2>
         <Grid2 item size={12}>
           {ingredient && verseQuestions.length > 0
