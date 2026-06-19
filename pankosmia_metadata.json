@@ -567,6 +567,12 @@
       "es": "Capítulo",
       "id": "Pasal"
     },
+    "section": {
+      "en": "Section",
+      "fr": "Section",
+      "es": "Sección",
+      "id": "Bagian"
+    },
     "segment": {
       "en": "Segment",
       "fr": "Segment",

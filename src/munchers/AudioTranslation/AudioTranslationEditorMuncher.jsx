@@ -159,6 +159,7 @@ function AudioTranslationEditorMuncher({ metadata }) {
         nav={{
           book: selectedBook,
           books,
+          segmentation,
           onSelectBook: setSelectedBook,
           segIndex,
           flatSegments,
