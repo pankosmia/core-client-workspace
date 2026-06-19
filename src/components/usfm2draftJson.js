@@ -110,7 +110,7 @@ function processBlocks(blocks, sequenceType, sequences) {
   return ret;
 }
 
-export default function usfm2draftJson(usfm) {
+function parseUsfm2draftJson(usfm) {
   const pk = new Proskomma();
   pk.importDocument({ abbr: "xxx", lang: "yyy" }, "usfm", usfm);
   const query = `{
@@ -143,4 +143,23 @@ export default function usfm2draftJson(usfm) {
     headers,
     blocks,
   };
+}
+
+const PARSE_CACHE_MAX = 5;
+const parseCache = new Map();
+
+export default function usfm2draftJson(usfm) {
+  if (!usfm) return { headers: {}, blocks: [] };
+  const cached = parseCache.get(usfm);
+  if (cached) {
+    parseCache.delete(usfm);
+    parseCache.set(usfm, cached);
+    return cached;
+  }
+  const result = parseUsfm2draftJson(usfm);
+  parseCache.set(usfm, result);
+  if (parseCache.size > PARSE_CACHE_MAX) {
+    parseCache.delete(parseCache.keys().next().value);
+  }
+  return result;
 }
