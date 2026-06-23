@@ -23,6 +23,7 @@ function OBSEditorMuncher({ metadata }) {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
   const [isExportingParaEnabled, setIsExportingParaEnabled] = useState(false);
+  const [audioModified, setAudioModified] = useState(false);
 
   /* Données de l'ingredient */
   const initIngredient = async () => {
@@ -79,7 +80,9 @@ function OBSEditorMuncher({ metadata }) {
     setChecksums((prev) => ({ ...prev, [key]: checksum }));
   };
 
-  const isModified = () => {
+  const isModified = () => isTextModified() || audioModified;
+
+  const isTextModified = () => {
     const chapterIndex = obs[0];
     const originalChecksum = chapterChecksums[chapterIndex];
     if (!originalChecksum) {
@@ -89,6 +92,42 @@ function OBSEditorMuncher({ metadata }) {
 
     return originalChecksum !== currentChecksum;
   };
+
+  const isAudioModified = async () => {
+    const cc = String(obs[0]).padStart(2, "0");
+    const pp = String(obs[1]).padStart(2, "0");
+    const res = await fetch(`/api/burrito/paths-info/${metadata.local_path}`);
+    // if (!res.ok) return false;
+    const files = await res.json();
+    const projectPath = `audio_content/${cc}-${pp}/${cc}-${pp}_project.json`;
+    const mp3Path = `audio_content/${cc}-${pp}/${cc}-${pp}.mp3`;
+    const project = files.find((f) => f.path === projectPath);
+    const mp3 = files.find((f) => f.path === mp3Path);
+    const projectUrl = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=audio_content/${cc}-${pp}/${cc}-${pp}_project.json`;
+    const projectResponse = await fetch(projectUrl);
+    const projectData = await projectResponse.json();
+    const tracks = projectData.tracks;
+    // verifier que les edl sont vides
+    const isEdlEmpty = tracks.every((t) => t.edl.length === 0);
+
+    if (!project) return false;
+
+    if (isEdlEmpty) return false;
+    if (!mp3) return true;
+
+    console.log(`${cc}-${pp} project.modified_epoch`, project.modified_epoch);
+    console.log(`${cc}-${pp} mp3.modified_epoch`, mp3.modified_epoch);
+    return project.modified_epoch > mp3.modified_epoch;
+  };
+
+  const refreshAudioModified = async () => {
+    try {
+      setAudioModified(await isAudioModified());
+    } catch {
+      setAudioModified(false);
+    }
+  };
+
   const updateChecksums = (chapterIndex) => {
     const chapter = ingredient[chapterIndex];
     if (!chapter) return;
@@ -113,9 +152,62 @@ function OBSEditorMuncher({ metadata }) {
   const handleSaveOBS = async () => {
     if (!ingredient || ingredient.length === 0) return;
 
-    for (let i = 0; i < ingredient.length; i++) {
-      if (!ingredient[i] || ingredient[i].length === 0) continue;
-      await uploadOBSIngredient(ingredient[i], i);
+    if (isTextModified()) {
+      for (let i = 0; i < ingredient.length; i++) {
+        if (!ingredient[i] || ingredient[i].length === 0) continue;
+        await uploadOBSIngredient(ingredient[i], i);
+      }
+    }
+    if (await isAudioModified()) {
+      await compileAudio();
+    }
+    // L'mp3 vient d'être (re)compilé : l'audio n'est plus en attente.
+    await refreshAudioModified();
+  };
+
+  const compileAudio = async () => {
+    /* curl -X POST http://localhost:19119/api/audio/compile/_local_/_local_/OBST \
+            -H "Content-Type: application/json" -d '{"chapter":1,"paragraph":3}' */
+    const audioUrl = `/api/audio/compile/${metadata.local_path}`;
+    const json = {
+      chapter: obs[0],
+      paragraph: obs[1],
+    };
+    const response = await fetch(audioUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(json),
+    });
+    if (response.ok) {
+    } else {
+      console.error(
+        `Failed to compile audio: ${response.status}, ${response.error}`,
+      );
+      throw new Error(
+        `Failed to compile audio: ${response.status}, ${response.error}`,
+      );
+    }
+
+    /*  curl -X POST http://localhost:19119/api/audio/compile-chapter/_local_/_local_/OBST \
+            -H "Content-Type: application/json" \
+            -d '{"chapter": 1}' */
+    const audioChapterUrl = `/api/audio/compile-chapter/${metadata.local_path}`;
+    const chapterJson = {
+      chapter: obs[0],
+    };
+    const chapterResponse = await fetch(audioChapterUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(chapterJson),
+    });
+    if (chapterResponse.ok) {
+    } else {
+      console.error(
+        `Failed to compile audio chapter: ${chapterResponse.status}, ${chapterResponse.error}`,
+      );
+      throw new Error(
+        `Failed to compile audio chapter: ${chapterResponse.status}, ${chapterResponse.error}`,
+      );
     }
   };
 
@@ -192,6 +284,10 @@ function OBSEditorMuncher({ metadata }) {
   useEffect(() => {
     updateIsExportingParaEnabled();
   }, [obs]);
+
+  useEffect(() => {
+    refreshAudioModified();
+  }, [obs[0], obs[1]]);
 
   // Intercepter les tentatives de navigation
   useEffect(() => {
@@ -293,6 +389,7 @@ function OBSEditorMuncher({ metadata }) {
               setAudioUrl={setAudioUrl}
               metadata={metadata}
               obs={obs}
+              onAudioEdited={() => setAudioModified(true)}
             />
           )}
         </Stack>

@@ -58,7 +58,13 @@ const ZOOM_MIN = 1;
 const ZOOM_MAX = 40;
 const ZOOM_WHEEL_FACTOR = 1.0015;
 
-export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
+export default function AudioRecorder({
+  audioUrl,
+  obs,
+  metadata,
+  book,
+  onAudioEdited,
+}) {
   const audioCtxRef = useRef(null);
   const [tracks, setTracks] = useState([]);
   // Source d'entrée audio (micro choisi), persistée en localStorage et partagée
@@ -132,7 +138,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     [metadata?.local_path, obs, book],
   );
 
-  useProjectPersistence({
+  const { projectLoaded } = useProjectPersistence({
     paths,
     audioCtxRef,
     audioUrl,
@@ -143,6 +149,25 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     future,
     setFuture,
   });
+
+  // Signale au parent toute édition audio, pour activer le bouton sauvegarder en
+  // quasi temps réel (optimiste : une édition rend forcément l'mp3 périmé).
+  // On ignore le chargement du projet : seuls les changements de `tracks` APRÈS
+  // le load comptent comme édition.
+  const audioLoadedRef = useRef(false);
+  useEffect(() => {
+    // Nouvelle section : on repart de "chargé, pas encore édité".
+    audioLoadedRef.current = false;
+  }, [paths?.project]);
+  useEffect(() => {
+    if (!projectLoaded) return;
+    if (!audioLoadedRef.current) {
+      // Premier état après load = projet chargé, pas une édition.
+      audioLoadedRef.current = true;
+      return;
+    }
+    onAudioEdited?.();
+  }, [tracks, projectLoaded]);
 
   // Snapshot l'état courant des pistes dans l'historique undo. Stable et basée
   // sur tracksRef car l'enregistreur commite de façon asynchrone (onstop),
