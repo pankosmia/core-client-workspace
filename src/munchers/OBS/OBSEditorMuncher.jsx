@@ -24,6 +24,7 @@ function OBSEditorMuncher({ metadata }) {
   const isMenuOpen = Boolean(menuAnchorEl);
   const [isExportingParaEnabled, setIsExportingParaEnabled] = useState(false);
   const [audioModified, setAudioModified] = useState(false);
+  const [audioTrackModified, setAudioTrackModified] = useState([[]]);
 
   /* Données de l'ingredient */
   const initIngredient = async () => {

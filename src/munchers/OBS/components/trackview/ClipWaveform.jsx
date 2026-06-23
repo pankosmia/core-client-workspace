@@ -7,6 +7,7 @@ import {
   useRef,
 } from "react";
 import { segmentBuffer } from "../lib/edl";
+import { computePeaks, drawWaveform } from "../lib/waveform";
 
 // Dessine la waveform du BUFFER ENTIER (pas seulement de la portion [srcStart,
 // srcEnd]) en absolu dans le wrapper, positionné par `left = -srcStart*pxPerSec`.
@@ -14,7 +15,6 @@ import { segmentBuffer } from "../lib/edl";
 // correspond exactement au segment. Pendant un resize, on n'a qu'à déplacer
 // le canvas (translateX) et changer la largeur du Clip : aucun recalcul de
 // peaks, aucun re-render React → pas de tremblement.
-const MAX_CANVAS_W = 16000; // limite Chrome ~16384
 
 const ClipWaveform = forwardRef(function ClipWaveform(
   { segment, trackBuffer, pxPerSec, color = "rgb(34, 173, 197)" },
@@ -38,46 +38,11 @@ const ClipWaveform = forwardRef(function ClipWaveform(
   const N_BINS = 4000;
   const peaks = useMemo(() => {
     if (!segBuf) return null;
-    const ch = segBuf.getChannelData(0);
-    const out = new Float32Array(N_BINS);
-    const binSize = ch.length / N_BINS;
-    for (let i = 0; i < N_BINS; i++) {
-      const a = Math.floor(i * binSize);
-      const b = Math.floor((i + 1) * binSize);
-      let max = 0;
-      for (let j = a; j < b && j < ch.length; j++) {
-        const v = Math.abs(ch[j]);
-        if (v > max) max = v;
-      }
-      out[i] = max;
-    }
-    return out;
+    return computePeaks(segBuf.getChannelData(0), N_BINS);
   }, [segBuf]);
 
   const draw = () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !peaks) return;
-    const parent = canvas.parentElement;
-    const h = parent?.clientHeight ?? 0;
-    if (h <= 0) return;
-    const dpr = window.devicePixelRatio || 1;
-    // Résolution FIXE du bitmap (1 px logique par bin), indépendante du zoom :
-    // l'étirement se fait en CSS (style.width), donc draw() ne tourne qu'au
-    // changement de buffer/couleur/hauteur — jamais à chaque cran de molette
-    // (réallouer le bitmap à chaque zoom était la cause du lag).
-    const w = Math.min(peaks.length, MAX_CANVAS_W);
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
-    const ctx = canvas.getContext("2d");
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = color;
-    const mid = h / 2;
-    const barW = w / peaks.length; // = 1 (résolution native des bins)
-    for (let i = 0; i < peaks.length; i++) {
-      const barH = peaks[i] * mid;
-      ctx.fillRect(i * barW, mid - barH, Math.max(barW - 0.5, 0.5), barH * 2);
-    }
+    drawWaveform(canvasRef.current, peaks, { color });
   };
   drawRef.current = draw;
 
