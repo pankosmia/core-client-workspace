@@ -139,8 +139,11 @@ function AudioTranslationEditorMuncher({ metadata }) {
     if (!current || !selectedBook) return;
     const [chap, verse] = current.ref.split("-")[0].split(":");
     if (!chap || !verse) return;
+    const endPart = current.ref.split("-")[1];
+    const endVerseWithoutChapter = endPart?.split(":")?.[1];
+    const endVerse = endVerseWithoutChapter ? endVerseWithoutChapter : endPart;
     postEmptyJson(
-      `/api/navigation/bcv/${selectedBook}/${chap}/${verse}`,
+      `/api/navigation/bcv/${selectedBook}/${chap}/${verse}${endVerse ? `/${endVerse}` : ""}`,
       debugRef.current,
     );
   }, [selectedBook, segmentKey, current, debugRef]);
@@ -156,6 +159,7 @@ function AudioTranslationEditorMuncher({ metadata }) {
         nav={{
           book: selectedBook,
           books,
+          segmentation,
           onSelectBook: setSelectedBook,
           segIndex,
           flatSegments,

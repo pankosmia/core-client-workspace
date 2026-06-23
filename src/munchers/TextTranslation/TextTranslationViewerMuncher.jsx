@@ -11,7 +11,7 @@ import TextDir from "../helpers/TextDir";
 function TextTranslationViewerMuncher({ metadata }) {
   const { systemBcv } = useContext(bcvContext);
   const { debugRef } = useContext(debugContext);
-  const [chapterData, setChapterData] = useState([]);
+  const [bookData, setBookData] = useState(null);
   const [textDir, setTextDir] = useState(
     metadata?.script_direction
       ? metadata.script_direction.toLowerCase()
@@ -30,12 +30,7 @@ function TextTranslationViewerMuncher({ metadata }) {
         debugRef.current,
       );
       if (usfmResponse.ok) {
-        setChapterData(
-          filterByChapter(
-            usfm2draftJson(usfmResponse.text),
-            systemBcv.chapterNum,
-          ),
-        );
+        setBookData(usfm2draftJson(usfmResponse.text));
         if (!sbScriptDirSet) {
           const dir = await TextDir(usfmResponse.text, "usfm");
           setTextDir(dir);
@@ -46,15 +41,11 @@ function TextTranslationViewerMuncher({ metadata }) {
       }
     };
     getUsfm();
-  }, [
-    debugRef,
-    systemBcv.bookCode,
-    systemBcv.chapterNum,
-    systemBcv.verseNum,
-    metadata.local_path,
-    sbScriptDirSet,
-    textDir,
-  ]);
+  }, [debugRef, systemBcv.bookCode, metadata.local_path, sbScriptDirSet]);
+
+  const chapterData = bookData
+    ? filterByChapter(bookData, systemBcv.chapterNum)
+    : [];
 
   //console.log('sbScriptDirSet: ' + !sbScriptDirSet.toString())
   //console.log('textDir: ' + textDir)

@@ -19,3 +19,18 @@ code {
 .markdown > * {
   all: revert;
 }
+
+.markdown ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.markdown li {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.markdown li p {
+  margin: 0;
+  padding: 0;
+}

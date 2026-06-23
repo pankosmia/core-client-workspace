@@ -18,7 +18,7 @@ function AudioViewer({ metadata, bookCode, chapter }) {
     <Stack>
       <audio
         controls
-        src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${bookCode}/${bookCode}_${paddedChapter}.mp3`}
+        src={`/api/burrito/ingredient/bytes/${metadata.local_path}?ipath=${bookCode}/${bookCode}_${paddedChapter}.mp3`}
       ></audio>
     </Stack>
   );

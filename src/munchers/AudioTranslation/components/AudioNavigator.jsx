@@ -16,12 +16,24 @@ import { useContext } from "react";
 import { i18nContext as I18nContext } from "pankosmia-rcl";
 import { doI18n } from "pithekos-lib";
 
+// Collapse a "C:V-C:V" reference to "C:V-V" when both ends share a chapter
+// (e.g. "2:1-2:5" -> "2:1-5"); leave cross-chapter or single refs untouched.
+function formatRef(ref) {
+  if (!ref || !ref.includes("-")) return ref;
+  const [start, end] = ref.split("-");
+  if (!end || !end.includes(":")) return ref;
+  const startChapter = start.split(":")[0];
+  const [endChapter, endVerse] = end.split(":");
+  return endChapter === startChapter ? `${start}-${endVerse}` : ref;
+}
+
 // Single navigation control for the audio translation editor, modelled on
 // OBSNavigator: double arrows jump book, single arrows move one segment.
 // Two dropdowns inside allow manual book / segment selection. Prop-driven.
 function AudioNavigator({
   book,
   books,
+  segmentation,
   onSelectBook,
   segIndex,
   flatSegments,
@@ -37,6 +49,15 @@ function AudioNavigator({
 }) {
   const { i18nRef } = useContext(I18nContext);
 
+  // The segment dropdown is labelled by the plan's granularity: a section-based
+  // plan reads "Section", anything else reads "Chapter".
+  const segmentLabel = doI18n(
+    segmentation === "section"
+      ? "pages:core-local-workspace:section"
+      : "pages:core-local-workspace:chapter",
+    i18nRef.current,
+  );
+
   // Segment menu items, grouped by start chapter for orientation. The MenuItem
   // value is the index into flatSegments so selection maps straight to segIndex.
   const segmentItems = [];
@@ -47,7 +68,7 @@ function AudioNavigator({
     }
     segmentItems.push(
       <MenuItem key={s.audioId} value={idx} dense>
-        {s.ref}
+        {formatRef(s.ref)}
       </MenuItem>,
     );
   });
@@ -89,18 +110,13 @@ function AudioNavigator({
           sx={{ minWidth: 140 }}
           disabled={!flatSegments.length}
         >
-          <InputLabel id="audio-nav-segment-label">
-            {doI18n("pages:core-local-workspace:segment", i18nRef.current)}
-          </InputLabel>
+          <InputLabel id="audio-nav-segment-label">{segmentLabel}</InputLabel>
           <Select
             labelId="audio-nav-segment-label"
-            label={doI18n(
-              "pages:core-local-workspace:segment",
-              i18nRef.current,
-            )}
+            label={segmentLabel}
             value={flatSegments.length ? segIndex : ""}
             onChange={(e) => onSelectSegment(e.target.value)}
-            renderValue={(idx) => flatSegments[idx]?.ref ?? ""}
+            renderValue={(idx) => formatRef(flatSegments[idx]?.ref ?? "")}
           >
             {segmentItems}
           </Select>

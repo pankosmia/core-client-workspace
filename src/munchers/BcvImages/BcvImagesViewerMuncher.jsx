@@ -15,7 +15,7 @@ function ImageViewer({ metadata, reference }) {
   return (
     <Stack>
       <img
-        src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${reference.slice(2)}.jpg`}
+        src={`/api/burrito/ingredient/bytes/${metadata.local_path}?ipath=${reference.slice(2)}.jpg`}
         alt="resource image"
       />
     </Stack>
@@ -75,9 +75,14 @@ function BcvImagesViewerMuncher({ metadata }) {
     () => {
       const doVerseNotes = async () => {
         let ret = [];
-        for (const row of ingredient.filter(
-          (l) => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`,
-        )) {
+        const start = systemBcv.verseNum;
+        const end = systemBcv.endVerseNum || systemBcv.verseNum;
+        for (const row of ingredient.filter((l) => {
+          const [chapter, verse] = l[0].split(":").map(Number);
+          return (
+            chapter === systemBcv.chapterNum && verse >= start && verse <= end
+          );
+        })) {
           ret.push(row[6]);
         }
         setVerseNotes(ret);
@@ -87,7 +92,7 @@ function BcvImagesViewerMuncher({ metadata }) {
       doVerseNotes().then();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ingredient],
+    [ingredient, systemBcv],
   );
 
   const [verseCaptions, setVerseCaptions] = useState([]);
@@ -140,7 +145,7 @@ function BcvImagesViewerMuncher({ metadata }) {
       dir={!sbScriptDirSet ? textDir : undefined}
     >
       <div className="flex flex-col items-center justify-center p-2">
-        <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}</h5>
+        <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`}</h5>
         <h6>{doI18n("munchers:bcv_images_viewer:title", i18nRef.current)}</h6>
       </div>
       <div className="flex-1 min-h-0 min-w-0 overflow-hidden p-2">
@@ -161,7 +166,7 @@ function BcvImagesViewerMuncher({ metadata }) {
                   style={{ width: `${100 / verseNotes.length}%` }}
                 >
                   <img
-                    src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.jpg`}
+                    src={`/api/burrito/ingredient/bytes/${metadata.local_path}?ipath=${v.slice(2)}.jpg`}
                     alt="resource image"
                     className="w-full h-full object-contain"
                   />

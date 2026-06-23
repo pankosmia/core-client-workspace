@@ -48,6 +48,7 @@ function OBSNotesViewerMuncher({ metadata }) {
   const verseNotes = filteredIngredient.map((l) => l[6] || l[5]);
   const verseIds = filteredIngredient.map((l) => l[1]);
   const verseSupReferences = filteredIngredient.map((l) => l[3]);
+  const verseLabel = `(${obs[0]}:${obs[1]})`;
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -69,7 +70,18 @@ function OBSNotesViewerMuncher({ metadata }) {
             alignItems: "center",
           }}
         >
-          <Typography variant="subtitle1">{`(${obs[0]}:${obs[1]})`}</Typography>
+          <Typography
+            variant="subtitle1"
+            title={verseLabel}
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              minWidth: 0,
+            }}
+          >
+            {verseLabel}
+          </Typography>
         </Grid2>
         <Grid2 item size={12} sx={{ paddingRight: "5%" }}>
           {ingredient && (

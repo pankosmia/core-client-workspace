@@ -62,6 +62,9 @@ function OBSArticlesViewerMuncher({ metadata }) {
     };
     doVerseNotes().then();
   }, [ingredient]);
+
+  const articleLabel = `(${obs[0]}:${obs[1]})`;
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid2
@@ -82,7 +85,18 @@ function OBSArticlesViewerMuncher({ metadata }) {
             alignItems: "center",
           }}
         >
-          <Typography variant="subtitle1">{`(${obs[0]}:${obs[1]})`}</Typography>
+          <Typography
+            variant="subtitle1"
+            title={articleLabel}
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              minWidth: 0,
+            }}
+          >
+            {articleLabel}
+          </Typography>
         </Grid2>
         <Grid2 item size={12}>
           {verseNotes.length > 0 &&

@@ -34,17 +34,35 @@ function VideoLinksViewerMuncher({ metadata }) {
   }, [systemBcv]);
 
   useEffect(() => {
+    const start = systemBcv.verseNum;
+    const end = systemBcv.endVerseNum || systemBcv.verseNum;
     setVerseNotes(
       ingredient
-        .filter((l) => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)
+        .filter((l) => {
+          const [chapter, verse] = l[0].split(":").map(Number);
+          return (
+            chapter === systemBcv.chapterNum && verse >= start && verse <= end
+          );
+        })
         .map((l) => l[5]),
     );
   }, [ingredient, systemBcv]);
 
+  const videoLabel = `${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`;
+
   return (
     <Box>
-      <Typography variant="h5">
-        {`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}
+      <Typography
+        variant="h5"
+        title={videoLabel}
+        sx={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          minWidth: 0,
+        }}
+      >
+        {videoLabel}
       </Typography>
       <Typography variant="h6">
         {doI18n("munchers:video_links_viewer:title", i18nRef.current)}
