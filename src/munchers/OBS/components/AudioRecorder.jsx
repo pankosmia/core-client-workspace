@@ -58,13 +58,7 @@ const ZOOM_MIN = 1;
 const ZOOM_MAX = 40;
 const ZOOM_WHEEL_FACTOR = 1.0015;
 
-export default function AudioRecorder({
-  audioUrl,
-  obs,
-  metadata,
-  book,
-  onAudioEdited,
-}) {
+export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const audioCtxRef = useRef(null);
   const [tracks, setTracks] = useState([]);
   // Source d'entrée audio (micro choisi), persistée en localStorage et partagée
@@ -166,7 +160,6 @@ export default function AudioRecorder({
       audioLoadedRef.current = true;
       return;
     }
-    onAudioEdited?.();
   }, [tracks, projectLoaded]);
 
   // Snapshot l'état courant des pistes dans l'historique undo. Stable et basée

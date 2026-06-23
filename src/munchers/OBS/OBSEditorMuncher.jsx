@@ -23,8 +23,6 @@ function OBSEditorMuncher({ metadata }) {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
   const [isExportingParaEnabled, setIsExportingParaEnabled] = useState(false);
-  const [audioModified, setAudioModified] = useState(false);
-  const [audioTrackModified, setAudioTrackModified] = useState([[]]);
 
   /* Données de l'ingredient */
   const initIngredient = async () => {
@@ -81,7 +79,7 @@ function OBSEditorMuncher({ metadata }) {
     setChecksums((prev) => ({ ...prev, [key]: checksum }));
   };
 
-  const isModified = () => isTextModified() || audioModified;
+  const isModified = () => isTextModified();
 
   const isTextModified = () => {
     const chapterIndex = obs[0];
@@ -121,14 +119,6 @@ function OBSEditorMuncher({ metadata }) {
     return project.modified_epoch > mp3.modified_epoch;
   };
 
-  const refreshAudioModified = async () => {
-    try {
-      setAudioModified(await isAudioModified());
-    } catch {
-      setAudioModified(false);
-    }
-  };
-
   const updateChecksums = (chapterIndex) => {
     const chapter = ingredient[chapterIndex];
     if (!chapter) return;
@@ -152,18 +142,10 @@ function OBSEditorMuncher({ metadata }) {
   /* Systeme de sauvegarde */
   const handleSaveOBS = async () => {
     if (!ingredient || ingredient.length === 0) return;
-
-    if (isTextModified()) {
-      for (let i = 0; i < ingredient.length; i++) {
-        if (!ingredient[i] || ingredient[i].length === 0) continue;
-        await uploadOBSIngredient(ingredient[i], i);
-      }
+    for (let i = 0; i < ingredient.length; i++) {
+      if (!ingredient[i] || ingredient[i].length === 0) continue;
+      await uploadOBSIngredient(ingredient[i], i);
     }
-    if (await isAudioModified()) {
-      await compileAudio();
-    }
-    // L'mp3 vient d'être (re)compilé : l'audio n'est plus en attente.
-    await refreshAudioModified();
   };
 
   const compileAudio = async () => {
@@ -181,9 +163,6 @@ function OBSEditorMuncher({ metadata }) {
     });
     if (response.ok) {
     } else {
-      console.error(
-        `Failed to compile audio: ${response.status}, ${response.error}`,
-      );
       throw new Error(
         `Failed to compile audio: ${response.status}, ${response.error}`,
       );
@@ -203,9 +182,6 @@ function OBSEditorMuncher({ metadata }) {
     });
     if (chapterResponse.ok) {
     } else {
-      console.error(
-        `Failed to compile audio chapter: ${chapterResponse.status}, ${chapterResponse.error}`,
-      );
       throw new Error(
         `Failed to compile audio chapter: ${chapterResponse.status}, ${chapterResponse.error}`,
       );
@@ -285,10 +261,6 @@ function OBSEditorMuncher({ metadata }) {
   useEffect(() => {
     updateIsExportingParaEnabled();
   }, [obs]);
-
-  useEffect(() => {
-    refreshAudioModified();
-  }, [obs[0], obs[1]]);
 
   // Intercepter les tentatives de navigation
   useEffect(() => {
@@ -375,6 +347,7 @@ function OBSEditorMuncher({ metadata }) {
         isMenuOpen={isMenuOpen}
         menuAnchorEl={menuAnchorEl}
         setMenuAnchorEl={setMenuAnchorEl}
+        compileAudio={compileAudio}
       />
       <Box sx={{ mt: "120px", padding: 2 }}>
         <Stack>
@@ -390,7 +363,6 @@ function OBSEditorMuncher({ metadata }) {
               setAudioUrl={setAudioUrl}
               metadata={metadata}
               obs={obs}
-              onAudioEdited={() => setAudioModified(true)}
             />
           )}
         </Stack>
