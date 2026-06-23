@@ -1054,17 +1054,35 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
   const ctrlKeyTitle = platform?.includes("Mac") ? "Cmd" : "Ctrl";
 
   return (
-    <Box sx={{ width: "100%", p: 2 }}>
+    <Box sx={{ width: "100%", p: 2, boxSizing: "border-box" }}>
       <Stack
         direction="row"
         spacing={1}
+        useFlexGap
         sx={{
           border: "2px solid #777",
           alignItems: "center",
           justifyContent: "space-between",
+          flexWrap: "wrap",
+          rowGap: 0.5,
+          width: "100%",
+          maxWidth: "100%",
+          boxSizing: "border-box",
+          overflow: "hidden",
         }}
       >
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={1}
+          useFlexGap
+          alignItems="center"
+          sx={{
+            minWidth: 0,
+            maxWidth: "100%",
+            flexWrap: "wrap",
+            rowGap: 0.5,
+          }}
+        >
           <Box
             sx={{
               color: "#666",
