@@ -242,19 +242,15 @@ const AudioViewer = ({ chapter, paragraph, metadata }) => {
       {/* ── Boîte + grille ── */}
       <Box sx={{ border: "2px solid #777", borderTop: "0px solid #777" }}>
         <Box ref={scrollRef} sx={{ overflow: "hidden" }}>
-          {/* Axe (grille) */}
-          <Box sx={{ position: "relative", width: "100%", height: 16 }}>
+          <Box sx={{ position: "relative" }}>
             <TimelineAxis
               projectDuration={duration}
               pxPerSec={pxPerSec}
               isTopAxis={true}
             />
-          </Box>
-          {/* Waveform + playhead (grille en fond), ou état de chargement */}
-          {ready ? (
-            <Box sx={{ position: "relative" }}>
-              <TimelineAxis projectDuration={duration} pxPerSec={pxPerSec} />
-              <Box sx={{ position: "relative", zIndex: 1 }}>
+            <Box sx={{ height: 16 }} />
+            <Box sx={{ position: "relative", zIndex: 1 }}>
+              {ready ? (
                 <AudioViewerTrack
                   peaks={peaks}
                   duration={duration}
@@ -262,24 +258,23 @@ const AudioViewer = ({ chapter, paragraph, metadata }) => {
                   height={LANE_HEIGHT}
                   onSeek={handleSeek}
                 />
-              </Box>
+              ) : (
+                <Box
+                  sx={{
+                    height: LANE_HEIGHT,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#999",
+                    fontSize: 13,
+                  }}
+                >
+                  {status === "loading" && "Loading…"}
+                  {status === "error" && "No audio for this paragraph"}
+                </Box>
+              )}
             </Box>
-          ) : (
-            <Box
-              sx={{
-                height: LANE_HEIGHT,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#999",
-                fontSize: 13,
-                borderTop: "1px solid #777",
-              }}
-            >
-              {status === "loading" && "Loading…"}
-              {status === "error" && "No audio for this paragraph"}
-            </Box>
-          )}
+          </Box>
         </Box>
       </Box>
     </Box>
