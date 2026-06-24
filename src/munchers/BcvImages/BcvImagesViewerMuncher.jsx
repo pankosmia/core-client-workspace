@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useRef } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Box, Stack } from "@mui/material";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
@@ -8,7 +8,8 @@ import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
-import { doI18n, getText } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import TextDir from "../helpers/TextDir";
 
 function ImageViewer({ metadata, reference }) {

@@ -5,11 +5,8 @@ import LayoutIcon from "../../TextTranslation/SimplifiedEditor/layouts/LayoutIco
 import OBSNavigator from "./OBSNavigator";
 import SaveOBSButton from "./SaveOBSButton";
 import { Grid2, IconButton, Menu, MenuItem } from "@mui/material";
-import { doI18n } from "pithekos-lib";
-import md5sum from "md5";
+import { doI18n } from "pankosmia-lib/i18n";
 import { useNavigate } from "react-router-dom";
-import { getText } from "pithekos-lib";
-import usfm2draftJson from "../../../components/usfm2draftJson";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,

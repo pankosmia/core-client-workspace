@@ -1,5 +1,4 @@
-import { getText, getJson, postEmptyJson } from "pithekos-lib";
-
+import { getJson, postEmptyJson, getText } from "pankosmia-lib/http";
 export async function getFirstChapterTextTranslation(
   currentProjectRefCurr,
   debugRefCurr,

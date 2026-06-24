@@ -10,11 +10,10 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  ListSubheader,
 } from "@mui/material";
 import { useContext } from "react";
 import { i18nContext as I18nContext } from "pankosmia-rcl";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
 
 // Collapse a "C:V-C:V" reference to "C:V-V" when both ends share a chapter
 // (e.g. "2:1-2:5" -> "2:1-5"); leave cross-chapter or single refs untouched.

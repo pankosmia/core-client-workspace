@@ -3,15 +3,13 @@ import ChapterPicker from "./ChapterPicker";
 import SaveButton from "./SaveButton";
 import BookPicker from "./BookPicker";
 import PreviewText from "./PreviewText";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import md5sum from "md5";
-import SettingsIcon from "@mui/icons-material/Settings";
 import { useContext, useEffect, useState } from "react";
-import { getText } from "pithekos-lib";
 import usfm2draftJson from "../../../../components/usfm2draftJson";
 import { useNavigate } from "react-router-dom";
 import LayoutIcon from "../layouts/LayoutIcon";
-import { doI18n } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import { getFirstChapterTextTranslation } from "../../../../common/findFirstChapter";
 import {
   bcvContext as BcvContext,

@@ -1,16 +1,12 @@
 import { useEffect, useContext, useState } from "react";
-import { getText, getJson } from "pithekos-lib";
-import {
-  bcvContext as BcvContext,
-  debugContext as DebugContext,
-} from "pankosmia-rcl";
+import { getJson } from "pankosmia-lib/http";
+import { debugContext as DebugContext } from "pankosmia-rcl";
 import { Box, Typography } from "@mui/material";
 import md5sum from "md5";
 import JuxtaEditorTools from "../JuxtaEditorTools/JuxtaEditorTools";
 import JuxtaEditable from "../JuxtaEditable";
 
 function JuxtaDraftingEditor({ metadata, modified, setModified }) {
-  const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
 
   const [md5sumScriptureJson, setMd5sumScriptureJson] = useState([]);

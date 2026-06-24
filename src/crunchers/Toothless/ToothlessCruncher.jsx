@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Box, Grid2 } from "@mui/material";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
 import { i18nContext as I18nContext } from "pankosmia-rcl";
 
 function ToothlessCruncher({ metadata, style }) {

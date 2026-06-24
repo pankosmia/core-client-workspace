@@ -2,7 +2,7 @@ import { DialogContent, Grid2, Typography } from "@mui/material";
 import LlmModelPicker from "./LlmModelPicker";
 import NumberPicker from "./NumberPicker";
 import { PanDialog } from "pankosmia-rcl";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
 import { useContext } from "react";
 import { i18nContext } from "pankosmia-rcl";
 

@@ -7,7 +7,8 @@ import {
   CircularProgress,
   Typography,
 } from "@mui/material";
-import { doI18n, getJson, postJson, getText } from "pithekos-lib";
+import { getJson, postJson, getText } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,

@@ -1,8 +1,8 @@
 import { Box, Grid2, IconButton, Tooltip } from "@mui/material";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { doI18n } from "pithekos-lib";
 import { enqueueSnackbar } from "notistack";
+import { doI18n } from "pankosmia-lib/i18n";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,

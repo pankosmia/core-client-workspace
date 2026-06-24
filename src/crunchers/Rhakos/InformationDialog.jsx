@@ -1,6 +1,6 @@
 import { DialogContent, Grid2 } from "@mui/material";
 import { PanDialog } from "pankosmia-rcl";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
 import { useContext } from "react";
 import { i18nContext } from "pankosmia-rcl";
 import Markdown from "react-markdown";

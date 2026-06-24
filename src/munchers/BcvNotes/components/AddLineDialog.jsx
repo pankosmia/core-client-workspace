@@ -12,7 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import TsvLineForm from "./TsvLineForm";
 
 import { i18nContext as I18nContext } from "pankosmia-rcl";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
 
 function AddLineDialog({
   open,
