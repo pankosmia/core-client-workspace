@@ -1,4 +1,5 @@
-import { doI18n, getAndSetJson } from "pithekos-lib";
+import { getAndSetJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import { i18nContext } from "pankosmia-rcl";
 import { useContext, useEffect, useState } from "react";
 import { Stack, Typography } from "@mui/material";

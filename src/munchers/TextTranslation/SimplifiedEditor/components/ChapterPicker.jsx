@@ -3,7 +3,7 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { Box, IconButton, MenuItem, TextField } from "@mui/material";
 import { ButtonGroup } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import { getJson, postEmptyJson } from "pithekos-lib";
+import { getJson, postEmptyJson } from "pankosmia-lib/http";
 import { bcvContext, debugContext } from "pankosmia-rcl";
 function ChapterPicker({ repoMetadata, chapterNumbers }) {
   const [scriptDirection, setScriptDirection] = useState([]);

@@ -1,7 +1,8 @@
 import { useEffect, useState, useContext } from "react";
 import { Box, Grid2, Typography } from "@mui/material";
 
-import { getText, doI18n } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,

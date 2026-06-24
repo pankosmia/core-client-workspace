@@ -3,7 +3,7 @@ import { Box, Grid2, Typography } from "@mui/material";
 import Markdown from "react-markdown";
 import OBSContext from "../../contexts/obsContext";
 
-import { getText } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
 import { debugContext as DebugContext } from "pankosmia-rcl";
 function OBSNotesViewerMuncher({ metadata }) {
   const [ingredient, setIngredient] = useState([]);

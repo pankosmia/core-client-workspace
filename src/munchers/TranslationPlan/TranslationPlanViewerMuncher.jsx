@@ -1,17 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { doI18n, postEmptyJson, getText } from "pithekos-lib";
-import {
-  bcvContext as BcvContext,
-  debugContext,
-  i18nContext,
-} from "pankosmia-rcl";
+import { getText } from "pankosmia-lib/http";
+
+import { bcvContext as BcvContext, debugContext } from "pankosmia-rcl";
 
 import InfoIcon from "@mui/icons-material/Info";
-import SearchIcon from "@mui/icons-material/Search";
-import { Proskomma } from "proskomma-core";
-import { PanDialog } from "pankosmia-rcl";
-
 import TextDir from "../helpers/TextDir";
 import ExtractJsonValues from "../helpers/ExtractJsonValues";
 import InformationDialog from "./InformationDialog";

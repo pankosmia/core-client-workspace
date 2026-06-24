@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext, useCallback, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getJson, doI18n } from "pithekos-lib";
+import { getJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import {
   debugContext,
   i18nContext,

@@ -7,7 +7,8 @@ import {
   Checkbox,
 } from "@mui/material";
 import { PanDialog } from "pankosmia-rcl";
-import { doI18n, getJson, getAndSetJson } from "pithekos-lib";
+import { getJson, getAndSetJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import { useContext, useEffect, useState } from "react";
 import { i18nContext, debugContext, bcvContext } from "pankosmia-rcl";
 

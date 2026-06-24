@@ -4,7 +4,8 @@ import GraphiteTest from "./GraphiteTest";
 import CenterFocusStrongOutlinedIcon from "@mui/icons-material/CenterFocusStrongOutlined";
 import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 import { createTilePanes, TileContainer, TileProvider } from "react-tile-pane";
-import { getJson, doI18n } from "pithekos-lib";
+import { getJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import OBSContext from "../../contexts/obsContext";
 import layoutJson from "./layouts";
 import {

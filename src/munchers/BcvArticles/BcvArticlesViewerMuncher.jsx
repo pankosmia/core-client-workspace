@@ -9,7 +9,9 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Markdown from "react-markdown";
-import { doI18n, getText, getJson } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
+
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,

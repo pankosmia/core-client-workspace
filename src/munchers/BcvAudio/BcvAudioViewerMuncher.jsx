@@ -6,7 +6,7 @@ import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
 
 function AudioViewer({ metadata, bookCode, chapter }) {
   const overPaddedChapter = `000${chapter}`;

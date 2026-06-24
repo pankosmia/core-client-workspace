@@ -2,7 +2,8 @@ import { useEffect, useState, useContext } from "react";
 import { Box, Button, Grid2 } from "@mui/material";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
-import { getJson, doI18n } from "pithekos-lib";
+import { getJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,

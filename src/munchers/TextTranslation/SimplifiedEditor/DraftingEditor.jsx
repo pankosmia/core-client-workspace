@@ -1,5 +1,5 @@
 import { useEffect, useContext, useState } from "react";
-import { getText } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
 import {
   bcvContext as BcvContext,
   debugContext as DebugContext,

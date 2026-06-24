@@ -5,7 +5,8 @@ import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
-import { getText, postEmptyJson, doI18n } from "pithekos-lib";
+import { postEmptyJson, getText } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import SearchWithVerses from "./components/SearchWithVerses";
 import Editor from "./components/Editor";
 import AddFab from "./components/AddFab";

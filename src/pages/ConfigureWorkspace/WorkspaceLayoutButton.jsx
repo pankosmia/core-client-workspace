@@ -6,7 +6,7 @@ import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEdito
 import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row";
 import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_top";
 import { useEffect, useState, useContext } from "react";
-import { getJson } from "pithekos-lib";
+import { getJson } from "pankosmia-lib/http";
 import { debugContext } from "pankosmia-rcl";
 
 export default function LayoutPicker({

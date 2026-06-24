@@ -3,7 +3,7 @@ import usfm2draftJson from "../../components/usfm2draftJson";
 import filterByChapter from "../../components/filterByChapter";
 import ViewableBible from "./SimplifiedEditor/components/ViewableBible";
 
-import { getText } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
 import { debugContext, bcvContext } from "pankosmia-rcl";
 import "./TextTranslationViewerMuncher.css";
 import TextDir from "../helpers/TextDir";

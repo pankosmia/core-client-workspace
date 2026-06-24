@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@mui/material";
 import { i18nContext as I18nContext } from "pankosmia-rcl";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
 
 function MarkdownField({ onChangeNote, value, ingredient, currentRowN, mode }) {
   const { i18nRef } = useContext(I18nContext);

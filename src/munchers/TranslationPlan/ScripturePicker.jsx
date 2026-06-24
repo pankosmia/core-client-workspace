@@ -1,5 +1,5 @@
 import { FormControl, MenuItem, TextField } from "@mui/material";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
 import { i18nContext } from "pankosmia-rcl";
 import { useContext } from "react";
 

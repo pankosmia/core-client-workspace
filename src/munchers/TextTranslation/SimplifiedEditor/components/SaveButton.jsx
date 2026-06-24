@@ -1,7 +1,8 @@
 import { IconButton } from "@mui/material";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import md5sum from "md5";
-import { doI18n, postJson } from "pithekos-lib";
+import { postJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import { enqueueSnackbar } from "notistack";
 import { useContext } from "react";
 import draftJson2usfm from "../../../../components/draftJson2usfm";

@@ -897,6 +897,10 @@
       "fr": "Aucune note trouvée",
       "es": "No se encontraron notas"
     },
+    "no_question": {
+      "en": "No question found for this verse",
+      "fr": "Aucune question trouvée pour ce verset "
+    },
     "reference": {
       "en": "REF",
       "es": "REF",

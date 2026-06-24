@@ -4,7 +4,8 @@ import AddIcon from "@mui/icons-material/Add";
 import AddLineDialog from "./AddLineDialog";
 
 import { i18nContext as I18nContext } from "pankosmia-rcl";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
+
 function AddFab({
   currentRowN,
   setCurrentRowN,

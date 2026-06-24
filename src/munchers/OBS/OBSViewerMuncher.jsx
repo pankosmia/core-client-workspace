@@ -1,20 +1,16 @@
 import { useState, useContext, useEffect } from "react";
-import { Box, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import OBSContext from "../../contexts/obsContext";
 import Markdown from "react-markdown";
 import RequireResources from "../../components/RequireResources";
 import "./OBSMuncher.css";
 
-import { doI18n, getText } from "pithekos-lib";
-import {
-  i18nContext as I18nContext,
-  debugContext as DebugContext,
-} from "pankosmia-rcl";
+import { getText } from "pankosmia-lib/http";
+import { debugContext as DebugContext } from "pankosmia-rcl";
 
 function OBSViewerMuncher({ metadata }) {
   const { obs, setObs } = useContext(OBSContext);
   const { debugRef } = useContext(DebugContext);
-  const { i18nRef } = useContext(I18nContext);
   const [ingredient, setIngredient] = useState("");
 
   const getAllData = async () => {
