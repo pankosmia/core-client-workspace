@@ -39,6 +39,10 @@ export function useProjectPersistence({
   setPast,
   future,
   setFuture,
+  // Nom de la piste principale d'un projet vierge : le muncher le dérive de la
+  // référence courante (ex. "MRK 1:3" en traduction, "1:3" en OBS). Fallback
+  // historique "Main track" si non fourni.
+  mainTrackName = "Main track",
 }) {
   const [projectLoaded, setProjectLoaded] = useState(false);
   // Le fallback audioUrl ne doit s'appliquer qu'au tout premier mount, pas à chaque
@@ -157,7 +161,7 @@ export function useProjectPersistence({
         if (!cancelled) {
           // Projet vierge : vue par défaut = main track + une piste vide.
           const empty = [
-            makeEmptyTrack("Main track"),
+            makeEmptyTrack(mainTrackName),
             makeEmptyTrack("Track - 2"),
           ];
           setTracks(empty);
@@ -176,7 +180,7 @@ export function useProjectPersistence({
           await blob.arrayBuffer(),
         );
         if (cancelled) return;
-        const track = makeTrack(buffer, "Main track");
+        const track = makeTrack(buffer, mainTrackName);
         await saveAudioBlob(paths, track.id, blob);
         if (!cancelled) {
           // Import initial : on laisse lastSavedRef=null pour que la sauvegarde
@@ -187,7 +191,7 @@ export function useProjectPersistence({
       } catch {
         if (!cancelled) {
           const empty = [
-            makeEmptyTrack("Main track"),
+            makeEmptyTrack(mainTrackName),
             makeEmptyTrack("Track - 2"),
           ];
           setTracks(empty);

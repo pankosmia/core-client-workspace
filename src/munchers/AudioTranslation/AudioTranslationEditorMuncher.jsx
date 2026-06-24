@@ -153,9 +153,48 @@ function AudioTranslationEditorMuncher({ metadata }) {
     if (idx >= 0 && idx < books.length) setSelectedBook(books[idx]);
   };
 
+  const postAudioCompile = async (endpoint, payload, errorMessage) => {
+    const response = await fetch(
+      `/api/audio/${endpoint}/${metadata.local_path}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`${errorMessage}: ${response.status}, ${response.error}`);
+    }
+  };
+
+  const compileAudio = async () => {
+    if (!current || !selectedBook) {
+      throw new Error("No audio segment selected");
+    }
+
+    await postAudioCompile(
+      "compile",
+      {
+        book: selectedBook,
+        chapter: current.chapter,
+        paragraph: current.paragraph,
+      },
+      "Failed to compile audio",
+    );
+    await postAudioCompile(
+      "compile-chapter",
+      {
+        book: selectedBook,
+        chapter: current.chapter,
+      },
+      "Failed to compile audio chapter",
+    );
+  };
+
   return (
     <Box>
       <AudioEditorTools
+        compileAudio={current ? compileAudio : null}
         nav={{
           book: selectedBook,
           books,
@@ -183,6 +222,9 @@ function AudioTranslationEditorMuncher({ metadata }) {
             metadata={metadata}
             obs={obs}
             book={selectedBook}
+            // Nom de la piste principale d'un nouveau segment : code livre +
+            // référence chapitre:verset, ex. "MRK 1:3".
+            mainTrackName={`${selectedBook} ${current.ref}`}
           />
         ) : (
           <Typography sx={{ color: "text.secondary", padding: 2 }}>

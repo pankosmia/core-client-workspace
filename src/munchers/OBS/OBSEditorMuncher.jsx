@@ -363,6 +363,9 @@ function OBSEditorMuncher({ metadata }) {
               setAudioUrl={setAudioUrl}
               metadata={metadata}
               obs={obs}
+              // Nom de la piste principale d'un nouveau projet : story:paragraph,
+              // ex. "1:3".
+              mainTrackName={`${obs[0]}:${obs[1]}`}
             />
           )}
         </Stack>

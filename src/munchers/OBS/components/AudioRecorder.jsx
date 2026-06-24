@@ -58,7 +58,13 @@ const ZOOM_MIN = 1;
 const ZOOM_MAX = 40;
 const ZOOM_WHEEL_FACTOR = 1.0015;
 
-export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
+export default function AudioRecorder({
+  audioUrl,
+  obs,
+  metadata,
+  book,
+  mainTrackName,
+}) {
   const audioCtxRef = useRef(null);
   const [tracks, setTracks] = useState([]);
   // Source d'entrée audio (micro choisi), persistée en localStorage et partagée
@@ -142,6 +148,7 @@ export default function AudioRecorder({ audioUrl, obs, metadata, book }) {
     setPast,
     future,
     setFuture,
+    mainTrackName,
   });
 
   // Signale au parent toute édition audio, pour activer le bouton sauvegarder en
