@@ -9,6 +9,10 @@ import { doI18n, postEmptyJson } from "pithekos-lib";
 
 import AudioRecorder from "../OBS/components/AudioRecorder";
 import AudioEditorTools from "./components/AudioEditorTools";
+import {
+  loadGeneratedAtMap,
+  saveGeneratedAt,
+} from "../OBS/components/lib/audioGeneratedAt";
 
 // Derive the segments of one book straight from the plan, at the chosen
 // granularity. Books carry no info of their own in audio translation, so there
@@ -70,6 +74,9 @@ function AudioTranslationEditorMuncher({ metadata }) {
   const [plan, setPlan] = useState(null);
   const [selectedBook, setSelectedBook] = useState("");
   const [segIndex, setSegIndex] = useState(0);
+  const [generatedAtMap, setGeneratedAtMap] = useState(() =>
+    loadGeneratedAtMap(metadata?.local_path),
+  );
 
   // 1. Load the plan stored in the repo (single source of structure).
   useEffect(() => {
@@ -189,12 +196,15 @@ function AudioTranslationEditorMuncher({ metadata }) {
       },
       "Failed to compile audio chapter",
     );
+
+    setGeneratedAtMap(saveGeneratedAt(metadata?.local_path, segmentKey));
   };
 
   return (
     <Box>
       <AudioEditorTools
         compileAudio={current ? compileAudio : null}
+        generatedAt={segmentKey ? generatedAtMap[segmentKey] : null}
         nav={{
           book: selectedBook,
           books,

@@ -11,6 +11,10 @@ import { debugContext as DebugContext } from "pankosmia-rcl";
 import { getText, postText } from "pithekos-lib";
 import md5 from "md5";
 import OBSEditorTools from "./components/OBSEditorTools";
+import {
+  loadGeneratedAtMap,
+  saveGeneratedAt,
+} from "./components/lib/audioGeneratedAt";
 
 function OBSEditorMuncher({ metadata }) {
   const { obs, setObs } = useContext(OBSContext);
@@ -23,6 +27,11 @@ function OBSEditorMuncher({ metadata }) {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
   const [isExportingParaEnabled, setIsExportingParaEnabled] = useState(false);
+  const [generatedAtMap, setGeneratedAtMap] = useState(() =>
+    loadGeneratedAtMap(metadata.local_path),
+  );
+  // One timestamp per paragraph: obs = [story, paragraph].
+  const audioSegmentKey = `${obs[0]}:${obs[1]}`;
 
   /* Données de l'ingredient */
   const initIngredient = async () => {
@@ -186,6 +195,10 @@ function OBSEditorMuncher({ metadata }) {
         `Failed to compile audio chapter: ${chapterResponse.status}, ${chapterResponse.error}`,
       );
     }
+
+    setGeneratedAtMap(
+      saveGeneratedAt(metadata.local_path, `${obs[0]}:${obs[1]}`),
+    );
   };
 
   const uploadOBSIngredient = async (ingredientItem, i) => {
@@ -348,6 +361,7 @@ function OBSEditorMuncher({ metadata }) {
         menuAnchorEl={menuAnchorEl}
         setMenuAnchorEl={setMenuAnchorEl}
         compileAudio={compileAudio}
+        generatedAt={generatedAtMap[audioSegmentKey]}
       />
       <Box sx={{ mt: "120px", padding: 2 }}>
         <Stack>

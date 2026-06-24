@@ -17,6 +17,7 @@ import {
 import Switch from "@mui/material/Switch";
 import { useContext } from "react";
 import AudioCompileIcon from "./AudioCompileIcon";
+import GeneratedAtLabel from "./GeneratedAtLabel";
 import { enqueueSnackbar } from "notistack";
 
 function OBSEditorTools({
@@ -35,6 +36,7 @@ function OBSEditorTools({
   menuAnchorEl,
   setMenuAnchorEl,
   compileAudio,
+  generatedAt,
 }) {
   const { i18nRef } = useContext(I18nContext);
   const { debugRef } = useContext(DebugContext);
@@ -103,6 +105,7 @@ function OBSEditorTools({
               <AudioCompileIcon />
             </IconButton>
           </Tooltip>
+          <GeneratedAtLabel date={generatedAt} />
           <IconButton
             id="obs-export-button"
             aria-controls={isMenuOpen ? "obs-export-menu" : undefined}
