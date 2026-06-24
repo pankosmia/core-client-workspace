@@ -7,13 +7,12 @@ import {
   List,
   Collapse,
   Typography,
-  Button,
 } from "@mui/material";
 import AddFab from "./AddFab";
 import AddLineDialog from "./AddLineDialog";
 import { ExpandLess, ExpandMore, Add } from "@mui/icons-material";
 import { i18nContext as I18nContext } from "pankosmia-rcl";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
 
 function SearchWithVerses({
   ingredient,

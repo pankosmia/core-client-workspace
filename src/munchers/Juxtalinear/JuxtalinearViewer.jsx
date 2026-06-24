@@ -6,7 +6,8 @@ import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
-import { doI18n, getJson } from "pithekos-lib";
+import { getJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import Juxta2Verbs from "./components/juxta2verbs";
 
 function JuxtalinearViewerMuncher({ metadata }) {

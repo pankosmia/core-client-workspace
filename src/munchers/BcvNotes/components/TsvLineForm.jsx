@@ -17,7 +17,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { i18nContext as I18nContext } from "pankosmia-rcl";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
 import { v4 as uuidv4 } from "uuid";
 
 function TsvLineForm({

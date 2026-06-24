@@ -1,11 +1,10 @@
 import { IconButton } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import md5sum from "md5";
-import { doI18n, postJson } from "pithekos-lib";
+import { postJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import { enqueueSnackbar } from "notistack";
 import { useContext } from "react";
-import draftJson2usfm from "../../../../components/draftJson2usfm";
-import { useEffect } from "react";
 import { i18nContext as I18nContext } from "pankosmia-rcl";
 
 function JuxtaSaveButton({

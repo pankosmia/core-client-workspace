@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Box, MenuItem, TextField } from "@mui/material";
-import { getJson, doI18n } from "pithekos-lib";
+import { getJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import {
   bcvContext as BcvContext,
   i18nContext as I18nContext,

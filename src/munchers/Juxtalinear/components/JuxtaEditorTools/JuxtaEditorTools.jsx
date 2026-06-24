@@ -1,11 +1,10 @@
 import { Box, Grid2, IconButton, Tooltip } from "@mui/material";
 import LayoutIcon from "../../../TextTranslation/SimplifiedEditor/layouts/LayoutIcon";
-import SaveButton from "../../../TextTranslation/SimplifiedEditor/components/SaveButton";
 import BookPicker from "../../../TextTranslation/SimplifiedEditor/components/BookPicker";
 import md5sum from "md5";
 import { useContext, useEffect, useState } from "react";
-import { getJson, getText, postEmptyJson, doI18n } from "pithekos-lib";
-import usfm2draftJson from "../../../../components/usfm2draftJson";
+import { getJson, postEmptyJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import { useNavigate } from "react-router-dom";
 import JuxtaSaveButton from "./JuxtaSaveButton";
 import JuxtaSentencesNav from "./JuxtaSentencesNav";

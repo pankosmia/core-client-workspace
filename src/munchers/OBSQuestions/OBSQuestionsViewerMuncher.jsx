@@ -13,7 +13,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Markdown from "react-markdown";
 import OBSContext from "../../contexts/obsContext";
 
-import { doI18n, getText } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,

@@ -1,7 +1,7 @@
 import { useContext, useRef, useState } from "react";
 import { useEditable } from "use-editable";
 import { updateUnitContent } from "../Controller";
-import { postEmptyJson } from "pithekos-lib";
+import { postEmptyJson } from "pankosmia-lib/http";
 
 import {
   bcvContext as BcvContext,

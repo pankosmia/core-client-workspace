@@ -8,7 +8,7 @@ import MarkdownField from "../../components/MarkdownField";
 import "./OBSMuncher.css";
 
 import { debugContext as DebugContext } from "pankosmia-rcl";
-import { getText, postText } from "pithekos-lib";
+import { getText, postText } from "pankosmia-lib/http";
 import md5 from "md5";
 import OBSEditorTools from "./components/OBSEditorTools";
 

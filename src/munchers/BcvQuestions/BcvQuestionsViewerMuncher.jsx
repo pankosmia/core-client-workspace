@@ -19,7 +19,8 @@ import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
-import { doI18n, getText } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import TextDir from "../helpers/TextDir";
 
 function BcvQuestionsViewerMuncher({ metadata }) {
@@ -180,7 +181,10 @@ function BcvQuestionsViewerMuncher({ metadata }) {
             })
           ) : (
             <Typography sx={{ pl: 2 }}>
-              No questions found for this verse
+              {doI18n(
+                "pages:core-local-workspace:no_question",
+                i18nRef.current,
+              )}
             </Typography>
           )}
         </Grid2>

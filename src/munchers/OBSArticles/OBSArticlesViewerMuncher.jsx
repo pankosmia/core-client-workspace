@@ -11,18 +11,14 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Markdown from "react-markdown";
 import OBSContext from "../../contexts/obsContext";
 
-import { doI18n, getText, getJson } from "pithekos-lib";
-import {
-  i18nContext as I18nContext,
-  debugContext as DebugContext,
-} from "pankosmia-rcl";
+import { getText } from "pankosmia-lib/http";
+import { debugContext as DebugContext } from "pankosmia-rcl";
 
 function OBSArticlesViewerMuncher({ metadata }) {
   const [ingredient, setIngredient] = useState([]);
   const [verseNotes, setVerseNotes] = useState([]);
   const { obs } = useContext(OBSContext);
   const { debugRef } = useContext(DebugContext);
-  const { i18nRef } = useContext(I18nContext);
 
   const getAllData = async () => {
     const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=OBS.tsv`;

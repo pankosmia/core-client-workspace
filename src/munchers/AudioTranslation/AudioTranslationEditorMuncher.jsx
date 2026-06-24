@@ -5,7 +5,8 @@ import {
   i18nContext as I18nContext,
   debugContext as DebugContext,
 } from "pankosmia-rcl";
-import { doI18n, postEmptyJson } from "pithekos-lib";
+import { postEmptyJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 
 import AudioRecorder from "../OBS/components/AudioRecorder";
 import AudioEditorTools from "./components/AudioEditorTools";

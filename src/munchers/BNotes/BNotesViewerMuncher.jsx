@@ -7,7 +7,8 @@ import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
-import { doI18n, getText } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import TextDir from "../helpers/TextDir";
 
 function BNotesViewerMuncher({ metadata }) {

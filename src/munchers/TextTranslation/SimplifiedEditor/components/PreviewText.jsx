@@ -1,6 +1,7 @@
 import { SofriaRenderFromProskomma, render } from "proskomma-json-tools";
 import { Proskomma } from "proskomma-core";
-import { getText, doI18n, getJson } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import { debugContext, i18nContext, typographyContext } from "pankosmia-rcl";
 import { enqueueSnackbar } from "notistack";
 import { useContext, useEffect, useRef, useState } from "react";

@@ -5,7 +5,8 @@ import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
-import { doI18n, postJson } from "pithekos-lib";
+import { postJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import { enqueueSnackbar } from "notistack";
 import { IconButton } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
