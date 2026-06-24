@@ -4,6 +4,7 @@ import OBSContext from "../../contexts/obsContext";
 import Markdown from "react-markdown";
 import RequireResources from "../../components/RequireResources";
 import "./OBSMuncher.css";
+import AudioViewer from "./components/AudioViewer";
 
 import { getText } from "pankosmia-lib/http";
 import { debugContext as DebugContext } from "pankosmia-rcl";
@@ -60,6 +61,11 @@ function OBSViewerMuncher({ metadata }) {
       <Stack sx={{ p: 1 }}>
         <div>
           <Markdown className="markdown-content">{ingredient}</Markdown>
+          <AudioViewer
+            chapter={obs[0]}
+            paragraph={obs[1]}
+            metadata={metadata}
+          />
         </div>
       </Stack>
     </RequireResources>

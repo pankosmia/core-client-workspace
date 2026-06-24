@@ -68,7 +68,11 @@ export function collectBufferIds(snapshots) {
   const ids = new Set();
   for (const tracks of snapshots) {
     for (const t of tracks) {
-      ids.add(t.id);
+      // N'ajoute l'id de la piste que si elle a un buffer NATIF : un segment sans
+      // bufferTrackId, qui lit le .webm propre de la piste. Une piste vide, ou
+      // composée uniquement de clips d'autres pistes, n'a pas de .webm propre →
+      // tenter de le charger déclenche un 400 inutile.
+      if (t.edl.some((seg) => !seg.bufferTrackId)) ids.add(t.id);
       for (const seg of t.edl) {
         if (seg.bufferTrackId) ids.add(seg.bufferTrackId);
       }

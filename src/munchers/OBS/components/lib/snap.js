@@ -1,6 +1,15 @@
 // Intervalle entre deux ticks affichés sur la timeline. Sert aussi de pas de
 // snap par défaut pour rester aligné sur la grille visible.
-export function pickTickInterval(duration) {
+const TICK_STEPS = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 30, 60, 300];
+export function pickTickInterval(duration, pxPerSec = 0) {
+  // Quand pxPerSec est connu (timeline montée/zoomée), on choisit le pas qui
+  // garde au moins MIN_TICK_PX entre deux ticks → la grille se resserre au zoom.
+  if (pxPerSec > 0) {
+    const MIN_TICK_PX = 12;
+    for (const s of TICK_STEPS) if (s * pxPerSec >= MIN_TICK_PX) return s;
+    return TICK_STEPS[TICK_STEPS.length - 1];
+  }
+  // Fallback historique (par durée) tant que pxPerSec n'est pas connu.
   if (duration < 5) return 0.2;
   if (duration < 20) return 0.5;
   if (duration < 60) return 1;

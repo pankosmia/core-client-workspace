@@ -758,6 +758,22 @@
       "en": "Edit layout and resources",
       "fr": "Editer disposition et choix de ressources"
     },
+    "button_generate_audio": {
+      "en": "Generate audio",
+      "fr": "Générer l'audio"
+    },
+    "audio_compiled": {
+      "en": "Audio generated successfully",
+      "fr": "Audio généré avec succès"
+    },
+    "audio_generated_at": {
+      "en": "Generated at:",
+      "fr": "Généré à :"
+    },
+    "audio_never_generated": {
+      "en": "Audio never generated",
+      "fr": "Audio jamais généré"
+    },
     "no_scripture_for_story": {
       "en": "No Scripture found for this story in this translation",
       "fr": "Aucun texte biblique trouvé dans cette traduction pour cette histoire"

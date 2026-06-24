@@ -7,6 +7,7 @@ import {
   useRef,
 } from "react";
 import { segmentBuffer } from "../lib/edl";
+import { computePeaks, drawWaveform } from "../lib/waveform";
 
 // Dessine la waveform du BUFFER ENTIER (pas seulement de la portion [srcStart,
 // srcEnd]) en absolu dans le wrapper, positionné par `left = -srcStart*pxPerSec`.
@@ -14,7 +15,6 @@ import { segmentBuffer } from "../lib/edl";
 // correspond exactement au segment. Pendant un resize, on n'a qu'à déplacer
 // le canvas (translateX) et changer la largeur du Clip : aucun recalcul de
 // peaks, aucun re-render React → pas de tremblement.
-const MAX_CANVAS_W = 16000; // limite Chrome ~16384
 
 const ClipWaveform = forwardRef(function ClipWaveform(
   { segment, trackBuffer, pxPerSec, color = "rgb(34, 173, 197)" },
@@ -25,7 +25,10 @@ const ClipWaveform = forwardRef(function ClipWaveform(
 
   const segBuf = segmentBuffer(segment, trackBuffer);
   const bufDur = segBuf?.duration ?? 0;
-  const canvasWidthPx = Math.min(bufDur * pxPerSec, MAX_CANVAS_W);
+  // Largeur AFFICHÉE du buffer entier (CSS) : suit le zoom. Le bitmap du canvas,
+  // lui, garde une résolution FIXE (cf. draw) et est simplement étiré en CSS →
+  // changer le zoom ne redessine rien, c'est une pure mise à jour de style.
+  const displayWidthPx = bufDur * pxPerSec;
   const canvasLeftPx = -segment.srcStart * pxPerSec;
 
   // Peaks du buffer ENTIER, indépendants du segment. Recalcul uniquement
@@ -35,50 +38,17 @@ const ClipWaveform = forwardRef(function ClipWaveform(
   const N_BINS = 4000;
   const peaks = useMemo(() => {
     if (!segBuf) return null;
-    const ch = segBuf.getChannelData(0);
-    const out = new Float32Array(N_BINS);
-    const binSize = ch.length / N_BINS;
-    for (let i = 0; i < N_BINS; i++) {
-      const a = Math.floor(i * binSize);
-      const b = Math.floor((i + 1) * binSize);
-      let max = 0;
-      for (let j = a; j < b && j < ch.length; j++) {
-        const v = Math.abs(ch[j]);
-        if (v > max) max = v;
-      }
-      out[i] = max;
-    }
-    return out;
+    return computePeaks(segBuf.getChannelData(0), N_BINS);
   }, [segBuf]);
 
   const draw = () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !peaks) return;
-    const parent = canvas.parentElement;
-    const h = parent?.clientHeight ?? 0;
-    const w = canvasWidthPx;
-    if (w <= 0 || h <= 0) return;
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = `${w}px`;
-    canvas.style.height = `${h}px`;
-    const ctx = canvas.getContext("2d");
-    ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = color;
-    const mid = h / 2;
-    const barW = w / peaks.length;
-    for (let i = 0; i < peaks.length; i++) {
-      const barH = peaks[i] * mid;
-      ctx.fillRect(i * barW, mid - barH, Math.max(barW - 0.5, 0.5), barH * 2);
-    }
+    drawWaveform(canvasRef.current, peaks, { color });
   };
   drawRef.current = draw;
 
   useLayoutEffect(() => {
     draw();
-  }, [peaks, color, canvasWidthPx]);
+  }, [peaks, color]);
 
   // Le parent peut changer de hauteur (resize fenêtre, rezoom UI) :
   // ResizeObserver pour re-draw quand ça arrive. Setup une fois.
@@ -114,6 +84,7 @@ const ClipWaveform = forwardRef(function ClipWaveform(
         position: "absolute",
         top: 0,
         left: `${canvasLeftPx}px`,
+        width: `${displayWidthPx}px`,
         height: "100%",
       }}
     />

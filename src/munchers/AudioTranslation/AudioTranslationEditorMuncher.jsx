@@ -10,6 +10,10 @@ import { doI18n } from "pankosmia-lib/i18n";
 
 import AudioRecorder from "../OBS/components/AudioRecorder";
 import AudioEditorTools from "./components/AudioEditorTools";
+import {
+  loadGeneratedAtMap,
+  saveGeneratedAt,
+} from "../OBS/components/lib/audioGeneratedAt";
 
 // Derive the segments of one book straight from the plan, at the chosen
 // granularity. Books carry no info of their own in audio translation, so there
@@ -71,6 +75,9 @@ function AudioTranslationEditorMuncher({ metadata }) {
   const [plan, setPlan] = useState(null);
   const [selectedBook, setSelectedBook] = useState("");
   const [segIndex, setSegIndex] = useState(0);
+  const [generatedAtMap, setGeneratedAtMap] = useState(() =>
+    loadGeneratedAtMap(metadata?.local_path),
+  );
 
   // 1. Load the plan stored in the repo (single source of structure).
   useEffect(() => {
@@ -154,9 +161,51 @@ function AudioTranslationEditorMuncher({ metadata }) {
     if (idx >= 0 && idx < books.length) setSelectedBook(books[idx]);
   };
 
+  const postAudioCompile = async (endpoint, payload, errorMessage) => {
+    const response = await fetch(
+      `/api/audio/${endpoint}/${metadata.local_path}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`${errorMessage}: ${response.status}, ${response.error}`);
+    }
+  };
+
+  const compileAudio = async () => {
+    if (!current || !selectedBook) {
+      throw new Error("No audio segment selected");
+    }
+
+    await postAudioCompile(
+      "compile",
+      {
+        book: selectedBook,
+        chapter: current.chapter,
+        paragraph: current.paragraph,
+      },
+      "Failed to compile audio",
+    );
+    await postAudioCompile(
+      "compile-chapter",
+      {
+        book: selectedBook,
+        chapter: current.chapter,
+      },
+      "Failed to compile audio chapter",
+    );
+
+    setGeneratedAtMap(saveGeneratedAt(metadata?.local_path, segmentKey));
+  };
+
   return (
     <Box>
       <AudioEditorTools
+        compileAudio={current ? compileAudio : null}
+        generatedAt={segmentKey ? generatedAtMap[segmentKey] : null}
         nav={{
           book: selectedBook,
           books,
@@ -184,6 +233,9 @@ function AudioTranslationEditorMuncher({ metadata }) {
             metadata={metadata}
             obs={obs}
             book={selectedBook}
+            // Nom de la piste principale d'un nouveau segment : code livre +
+            // référence chapitre:verset, ex. "MRK 1:3".
+            mainTrackName={`${selectedBook} ${current.ref}`}
           />
         ) : (
           <Typography sx={{ color: "text.secondary", padding: 2 }}>

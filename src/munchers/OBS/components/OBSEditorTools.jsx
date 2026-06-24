@@ -13,6 +13,9 @@ import {
 } from "pankosmia-rcl";
 import Switch from "@mui/material/Switch";
 import { useContext } from "react";
+import AudioCompileIcon from "./AudioCompileIcon";
+import GeneratedAtLabel from "./GeneratedAtLabel";
+import { enqueueSnackbar } from "notistack";
 
 function OBSEditorTools({
   obs,
@@ -29,9 +32,27 @@ function OBSEditorTools({
   isMenuOpen,
   menuAnchorEl,
   setMenuAnchorEl,
+  compileAudio,
+  generatedAt,
 }) {
   const { i18nRef } = useContext(I18nContext);
   const { debugRef } = useContext(DebugContext);
+
+  const compileAudioHandler = async () => {
+    try {
+      await compileAudio();
+      enqueueSnackbar(
+        doI18n(
+          "pages:core-local-workspace:audio_compiled",
+          i18nRef.current,
+          debugRef.current,
+        ),
+        { variant: "success" },
+      );
+    } catch (error) {
+      enqueueSnackbar(error.message, { variant: "error" });
+    }
+  };
 
   const navigate = useNavigate();
   return (
@@ -70,6 +91,18 @@ function OBSEditorTools({
               onChange={() => setAudioEnabled(!audioEnabled)}
             />
           </Box>
+          <Tooltip
+            title={doI18n(
+              "pages:core-local-workspace:button_generate_audio",
+              i18nRef.current,
+              debugRef.current,
+            )}
+          >
+            <IconButton onClick={compileAudioHandler}>
+              <AudioCompileIcon />
+            </IconButton>
+          </Tooltip>
+          <GeneratedAtLabel date={generatedAt} />
           <IconButton
             id="obs-export-button"
             aria-controls={isMenuOpen ? "obs-export-menu" : undefined}

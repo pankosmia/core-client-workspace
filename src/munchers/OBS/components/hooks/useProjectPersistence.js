@@ -12,6 +12,18 @@ import {
   collectBufferIds,
 } from "../lib/historyStorage";
 
+// Forme sérialisable du projet : on retire les AudioBuffer (runtime), le
+// bufferTrackId suffit à ré-attacher l'audio au reload.
+function projectState(tracks) {
+  return {
+    tracks: tracks.map(({ buffer, edl, ...rest }) => ({
+      ...rest,
+      edl: edl.map(({ buffer: _b, ...segRest }) => segRest),
+    })),
+  };
+}
+const serializeProject = (tracks) => JSON.stringify(projectState(tracks));
+
 // Synchronise `tracks` avec le backend :
 //   - au mount : charge `_project.json`, re-décode chaque .webm en AudioBuffer.
 //   - si aucun projet sauvegardé au tout premier mount et `audioUrl` fourni : l'importe comme première piste.
@@ -27,11 +39,19 @@ export function useProjectPersistence({
   setPast,
   future,
   setFuture,
+  // Nom de la piste principale d'un projet vierge : le muncher le dérive de la
+  // référence courante (ex. "MRK 1:3" en traduction, "1:3" en OBS). Fallback
+  // historique "Main track" si non fourni.
+  mainTrackName = "Main track",
 }) {
   const [projectLoaded, setProjectLoaded] = useState(false);
   // Le fallback audioUrl ne doit s'appliquer qu'au tout premier mount, pas à chaque
   // navigation OBS — sinon naviguer sur un OBS vide ré-importerait la démo.
   const initialLoadRef = useRef(true);
+  // Sérialisation du dernier projet écrit sur disque (ou chargé). Sert à n'écrire
+  // que sur un vrai changement : un simple chargement ne doit pas réécrire le
+  // fichier (sinon son mtime est bumpé et la section paraît "à recompiler").
+  const lastSavedRef = useRef(null);
 
   useEffect(() => {
     if (!paths) return;
@@ -43,6 +63,7 @@ export function useProjectPersistence({
     setTracks([]);
     setPast([]);
     setFuture([]);
+    lastSavedRef.current = null;
     (async () => {
       audioCtxRef.current ??= new AudioContext();
       let proj;
@@ -60,8 +81,10 @@ export function useProjectPersistence({
         const loaded = await Promise.all(
           proj.tracks.map(async (t) => ({
             ...t,
-            // Piste vide (jamais enregistrée) : pas de .webm à charger, on évite
-            buffer: t.edl?.length
+            // Charge le .webm propre de la piste seulement si elle a un segment
+            // natif (sans bufferTrackId). Piste vide ou faite uniquement de clips
+            // d'autres pistes : pas de .webm propre → on évite un 400 inutile.
+            buffer: t.edl?.some((seg) => !seg.bufferTrackId)
               ? await loadAudioBuffer(audioCtxRef.current, paths, t.id)
               : null,
           })),
@@ -118,7 +141,9 @@ export function useProjectPersistence({
           // `present` du cache = état courant → undo/redo restent alignés.
           // (Le _project.json reste la source durable ; ici on préfère le cache
           //  pour que la pile undo soit cohérente avec l'état affiché.)
-          setTracks(hydrate(hist.present));
+          const present = hydrate(hist.present);
+          setTracks(present);
+          lastSavedRef.current = serializeProject(present);
           setProjectLoaded(true);
           return;
         }
@@ -126,6 +151,7 @@ export function useProjectPersistence({
         // Pas de cache d'historique : comportement actuel.
         if (!cancelled) {
           setTracks(resolved);
+          lastSavedRef.current = serializeProject(resolved);
           setProjectLoaded(true);
         }
         return;
@@ -134,7 +160,14 @@ export function useProjectPersistence({
       if (!isInitial || !audioUrl) {
         if (!cancelled) {
           // Projet vierge : vue par défaut = main track + une piste vide.
-          setTracks([makeEmptyTrack("MainTrack"), makeEmptyTrack("Track - 2")]);
+          const empty = [
+            makeEmptyTrack(mainTrackName),
+            makeEmptyTrack("Track - 2"),
+          ];
+          setTracks(empty);
+          // Projet vide non enregistré : on traite ce contenu comme déjà "à jour"
+          // pour ne pas créer un _project.json sur simple visite.
+          lastSavedRef.current = serializeProject(empty);
           setProjectLoaded(true);
         }
         return;
@@ -147,15 +180,22 @@ export function useProjectPersistence({
           await blob.arrayBuffer(),
         );
         if (cancelled) return;
-        const track = makeTrack(buffer, "MainTrack");
+        const track = makeTrack(buffer, mainTrackName);
         await saveAudioBlob(paths, track.id, blob);
         if (!cancelled) {
+          // Import initial : on laisse lastSavedRef=null pour que la sauvegarde
+          // débouncée écrive bien le nouveau _project.json.
           setTracks([track, makeEmptyTrack("Track - 2")]);
           setProjectLoaded(true);
         }
       } catch {
         if (!cancelled) {
-          setTracks([makeEmptyTrack("MainTrack"), makeEmptyTrack("Track - 2")]);
+          const empty = [
+            makeEmptyTrack(mainTrackName),
+            makeEmptyTrack("Track - 2"),
+          ];
+          setTracks(empty);
+          lastSavedRef.current = serializeProject(empty);
           setProjectLoaded(true);
         }
       }
@@ -170,13 +210,14 @@ export function useProjectPersistence({
   // C'est la source durable : sans elle, rien n'est rechargé après navigation.
   useEffect(() => {
     if (!paths || !projectLoaded || tracks.length === 0) return;
+    const state = projectState(tracks);
+    const serialized = JSON.stringify(state);
+    // Contenu identique à ce qui est déjà sur disque (typiquement juste après un
+    // chargement) : on n'écrit pas, pour ne pas bumper le mtime du _project.json.
+    if (serialized === lastSavedRef.current) return;
     const handle = setTimeout(() => {
-      saveProject(paths, {
-        tracks: tracks.map(({ buffer, edl, ...rest }) => ({
-          ...rest,
-          edl: edl.map(({ buffer: _b, ...segRest }) => segRest),
-        })),
-      });
+      saveProject(paths, state);
+      lastSavedRef.current = serialized;
     }, 500);
     return () => clearTimeout(handle);
   }, [tracks, paths, projectLoaded]);

@@ -1,6 +1,7 @@
 import { Box, Grid2, IconButton, Tooltip } from "@mui/material";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { enqueueSnackbar } from "notistack";
 import { doI18n } from "pankosmia-lib/i18n";
 import {
   i18nContext as I18nContext,
@@ -8,15 +9,33 @@ import {
 } from "pankosmia-rcl";
 
 import LayoutIcon from "../../TextTranslation/SimplifiedEditor/layouts/LayoutIcon";
+import AudioCompileIcon from "../../OBS/components/AudioCompileIcon";
+import GeneratedAtLabel from "../../OBS/components/GeneratedAtLabel";
 import AudioNavigator from "./AudioNavigator";
 
 // Top toolbar for the audio translation editor, modelled on OBSEditorTools /
 // TextTranslation EditorTools: a fixed bar with the navigator centred and the
 // layout-edit button on the right.
-function AudioEditorTools({ nav }) {
+function AudioEditorTools({ nav, compileAudio, generatedAt }) {
   const { i18nRef } = useContext(I18nContext);
   const { debugRef } = useContext(DebugContext);
   const navigate = useNavigate();
+
+  const compileAudioHandler = async () => {
+    try {
+      await compileAudio();
+      enqueueSnackbar(
+        doI18n(
+          "pages:core-local-workspace:audio_compiled",
+          i18nRef.current,
+          debugRef.current,
+        ),
+        { variant: "success" },
+      );
+    } catch (error) {
+      enqueueSnackbar(error.message, { variant: "error" });
+    }
+  };
 
   return (
     <Box
@@ -35,7 +54,25 @@ function AudioEditorTools({ nav }) {
         justifyContent="space-between"
         width="100%"
       >
-        <Grid2 display="flex" gap={1} sx={{ flex: 1 }} />
+        <Grid2 display="flex" alignItems="center" gap={1} sx={{ flex: 1 }}>
+          <Tooltip
+            title={doI18n(
+              "pages:core-local-workspace:button_generate_audio",
+              i18nRef.current,
+              debugRef.current,
+            )}
+          >
+            <span>
+              <IconButton
+                disabled={!compileAudio}
+                onClick={compileAudioHandler}
+              >
+                <AudioCompileIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <GeneratedAtLabel date={generatedAt} />
+        </Grid2>
 
         <Grid2 display="flex" justifyContent="center" gap={1} sx={{ flex: 1 }}>
           <AudioNavigator {...nav} />
