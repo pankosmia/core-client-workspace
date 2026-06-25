@@ -157,9 +157,43 @@ function OBSEditorMuncher({ metadata }) {
     }
   };
 
+  // Vrai si le projet audio du paragraphe courant n'a pas de piste principale
+  // exploitable (EDL vide ou projet absent). Compiler dans ce cas n'assemble
+  // rien et le serveur renvoie une 500 peu parlante : on l'intercepte avant.
+  // La piste principale est toujours la première du _project.json (cf. ordre
+  // de création des pistes dans le hook de persistance).
+  const isMainTrackEmpty = async () => {
+    const cc = String(obs[0]).padStart(2, "0");
+    const pp = String(obs[1]).padStart(2, "0");
+    const projectUrl = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=audio_content/${cc}-${pp}/${cc}-${pp}_project.json`;
+    try {
+      const res = await fetch(projectUrl);
+      if (!res.ok) return true;
+      const data = await res.json();
+      const mainTrack = data?.tracks?.[0];
+      return !mainTrack?.edl || mainTrack.edl.length === 0;
+    } catch {
+      return true;
+    }
+  };
+
+  // Lit le corps de la réponse pour produire un message d'erreur parlant
+  // (le serveur y détaille l'échec, ex. erreur ffmpeg) au lieu d'un
+  // « undefined ». Tronqué pour rester lisible dans le snackbar.
+  const describeError = async (response) => {
+    const body = await response.text().catch(() => "");
+    const detail = (body || response.statusText || "").trim().slice(0, 300);
+    return `${response.status}${detail ? ` — ${detail}` : ""}`;
+  };
+
   const compileAudio = async () => {
     /* curl -X POST http://localhost:19119/api/audio/compile/_local_/_local_/OBST \
             -H "Content-Type: application/json" -d '{"chapter":1,"paragraph":3}' */
+    if (await isMainTrackEmpty()) {
+      throw new Error(
+        "Cannot generate audio: the main track is empty. Add audio to the main track before generating.",
+      );
+    }
     const audioUrl = `/api/audio/compile/${metadata.local_path}`;
     const json = {
       chapter: obs[0],
@@ -170,10 +204,9 @@ function OBSEditorMuncher({ metadata }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(json),
     });
-    if (response.ok) {
-    } else {
+    if (!response.ok) {
       throw new Error(
-        `Failed to compile audio: ${response.status}, ${response.error}`,
+        `Failed to compile audio: ${await describeError(response)}`,
       );
     }
 
@@ -189,10 +222,9 @@ function OBSEditorMuncher({ metadata }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(chapterJson),
     });
-    if (chapterResponse.ok) {
-    } else {
+    if (!chapterResponse.ok) {
       throw new Error(
-        `Failed to compile audio chapter: ${chapterResponse.status}, ${chapterResponse.error}`,
+        `Failed to compile audio chapter: ${await describeError(chapterResponse)}`,
       );
     }
 

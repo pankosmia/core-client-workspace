@@ -27,6 +27,12 @@ const DRAG_THRESHOLD = 3;
 // Sert à savoir si un pointerdown au bord du clip relève du resize (et non
 // d'une sélection de région intra-clip).
 const CLIP_RESIZE_MARGIN = 10;
+// Fenêtre (ms) pour qu'un second clic sur le MÊME clip soit traité comme un
+// double-clic (= sélection du clip). Détecté ici, côté lane, et non via le
+// onDoubleClick du clip : la lane capture le pointeur au pointerdown, ce qui
+// retarge le dblclick navigateur vers la lane et empêche le handler du clip
+// de se déclencher de façon fiable sur le corps du clip.
+const DOUBLE_CLICK_MS = 350;
 
 export default function TrackView({
   track,
@@ -60,6 +66,9 @@ export default function TrackView({
   // Quand le drag se termine, on commit via onRegionChange et on remet à null.
   const [dragSel, setDragSel] = useState(null);
   const dragStateRef = useRef(null);
+  // Dernier clic simple sur un clip { time, clipId } : sert à détecter un
+  // double-clic (cf. DOUBLE_CLICK_MS).
+  const lastClickRef = useRef({ time: 0, clipId: null });
 
   const xToTime = (clientX) => {
     if (pxPerSec <= 0) return 0;
@@ -143,6 +152,22 @@ export default function TrackView({
     if (!st) return;
 
     if (!st.dragged) {
+      // Double-clic sur le corps d'un clip → sélection du clip entier. On le
+      // détecte ici (et non via onDoubleClick du clip) car la lane a capturé
+      // le pointeur, ce qui empêche le dblclick navigateur d'atteindre le clip.
+      if (st.clipSeg && !st.inResizeZone) {
+        const now = Date.now();
+        const last = lastClickRef.current;
+        if (
+          last.clipId === st.clipSeg.id &&
+          now - last.time < DOUBLE_CLICK_MS
+        ) {
+          lastClickRef.current = { time: 0, clipId: null };
+          onClipSelect?.(track.id, st.clipSeg.id, {});
+          return;
+        }
+        lastClickRef.current = { time: now, clipId: st.clipSeg.id };
+      }
       // Clic simple (body d'un clip, bord de resize, ou fond de la lane) →
       // playhead.
       onSeek?.(track.id, st.startTime);

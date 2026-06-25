@@ -888,7 +888,21 @@ export default function AudioRecorder({
   };
 
   // Split à la position du playhead (suit le curseur en lecture).
+  // Si une région est sélectionnée, on découpe aux DEUX bords de la région
+  // (start puis end) : la portion sélectionnée devient un clip indépendant.
   const splitAtPlayhead = () => {
+    if (regionSelection) {
+      const { trackId, start, end } = regionSelection;
+      setTracksWithHistory((ts) =>
+        ts.map((t) =>
+          t.id === trackId
+            ? { ...t, edl: splitAt(splitAt(t.edl, start), end) }
+            : t,
+        ),
+      );
+      setRegionSelection(null);
+      return;
+    }
     const trackId = isPlaying
       ? playingFromRef.current?.trackId
       : selection?.trackId;
@@ -1194,12 +1208,12 @@ export default function AudioRecorder({
               </IconButton>
             </span>
           </Tooltip>
-          <Tooltip title="Split at cursor (S)">
+          <Tooltip title="Split at cursor / selected region (S)">
             <span>
               <IconButton
                 size="small"
                 onClick={splitAtPlayhead}
-                disabled={!selection && !isPlaying}
+                disabled={!regionSelection && !selection && !isPlaying}
               >
                 <SplitIcon fontSize="small" />
               </IconButton>
