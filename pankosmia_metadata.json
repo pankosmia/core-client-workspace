@@ -766,6 +766,10 @@
       "en": "Audio generated successfully",
       "fr": "Audio généré avec succès"
     },
+    "audio_main_track_empty": {
+      "en": "The main track is empty: add audio to it before generating.",
+      "fr": "La piste principale est vide : ajoutez-y de l'audio avant de générer."
+    },
     "audio_generated_at": {
       "en": "Generated at:",
       "fr": "Généré à :"

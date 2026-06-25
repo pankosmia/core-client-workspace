@@ -474,10 +474,23 @@ export default function Clip({
     });
   };
 
+  // Double-clic n'importe où sur le clip = sélection du clip entier. Le header
+  // (seul point de sélection au simple clic) ne fait que 12px de haut et est
+  // donc difficile à viser ; double-cliquer sur le corps offre une cible large.
+  // Les simples clics du corps posent le playhead ; le dblclick final
+  // (toujours dispatché après les click) sélectionne le clip.
+  const onClipDoubleClick = (e) => {
+    onSelect?.(trackId, segment.id, {
+      ctrlKey: e.ctrlKey || e.metaKey,
+      shiftKey: e.shiftKey,
+    });
+  };
+
   return (
     <Box
       ref={ref}
       data-clip-id={segment.id}
+      onDoubleClick={onClipDoubleClick}
       sx={{
         position: "absolute",
         boxSizing: "border-box",

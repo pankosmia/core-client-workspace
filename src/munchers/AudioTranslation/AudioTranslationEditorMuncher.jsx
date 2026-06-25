@@ -14,6 +14,7 @@ import {
   loadGeneratedAtMap,
   saveGeneratedAt,
 } from "../OBS/components/lib/audioGeneratedAt";
+import { projectPaths, loadProject } from "../OBS/components/lib/storageUtil";
 
 // Derive the segments of one book straight from the plan, at the chosen
 // granularity. Books carry no info of their own in audio translation, so there
@@ -171,13 +172,55 @@ function AudioTranslationEditorMuncher({ metadata }) {
       },
     );
     if (!response.ok) {
-      throw new Error(`${errorMessage}: ${response.status}, ${response.error}`);
+      // `response.error` n'existe pas sur un objet Response : l'erreur
+      // affichait donc "undefined". On lit le corps renvoyé par le backend
+      // (typiquement le message ffmpeg) pour nommer la vraie cause.
+      let detail = "";
+      try {
+        detail = (await response.text()).trim();
+      } catch {
+        /* corps illisible : on garde juste le code HTTP */
+      }
+      throw new Error(
+        `${errorMessage}: ${response.status}${detail ? ` — ${detail}` : ""}`,
+      );
     }
   };
 
   const compileAudio = async () => {
     if (!current || !selectedBook) {
       throw new Error("No audio segment selected");
+    }
+
+    // Garde-fou : si la piste principale (main track) est vide, le backend
+    // échoue avec une erreur ffmpeg illisible. On lit le projet sauvegardé
+    // (même source que celle compilée côté serveur) et on remonte un message
+    // clair avant même d'appeler le serveur.
+    const projPaths = projectPaths({
+      localPath: metadata.local_path,
+      book: selectedBook,
+      chapter: current.chapter,
+      paragraph: current.paragraph,
+    });
+    let project;
+    try {
+      project = await loadProject(projPaths); // null = aucun projet enregistré
+    } catch {
+      // Serveur injoignable / projet illisible : on ne peut pas conclure, on
+      // laisse le serveur compiler et remonter l'erreur réelle (cf. ci-dessus).
+      project = undefined;
+    }
+    if (project !== undefined) {
+      const mainTrack = project?.tracks?.[0];
+      if (!mainTrack?.edl?.length) {
+        throw new Error(
+          doI18n(
+            "pages:core-local-workspace:audio_main_track_empty",
+            i18nRef.current,
+            debugRef.current,
+          ),
+        );
+      }
     }
 
     await postAudioCompile(
