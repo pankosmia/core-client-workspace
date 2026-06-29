@@ -54,6 +54,14 @@ import { loadAudioSource, saveAudioSource } from "./lib/audioSource";
 
 const MIN_TIMELINE_SEC = 15;
 
+// Espace vide toujours réservé après le dernier clip, pour pouvoir démarrer une
+// sélection (highlight) au bout de la piste — même au zoom minimum, où toute la
+// timeline tient dans le viewport. Exprimé en fraction de la durée du contenu
+// (≈ largeur constante à l'écran au fit) avec un plancher en secondes pour les
+// pistes très courtes.
+const RIGHT_TAIL_FRACTION = 0.08;
+const RIGHT_TAIL_MIN_SEC = 2;
+
 const ZOOM_MIN = 1;
 const ZOOM_MAX = 40;
 const ZOOM_WHEEL_FACTOR = 1.0015;
@@ -199,7 +207,16 @@ export default function AudioRecorder({
       (max, t) => Math.max(max, virtualDuration(t)),
       0,
     );
-    if (recordingDuration <= 0) return Math.max(MIN_TIMELINE_SEC, trackMax);
+    if (recordingDuration <= 0) {
+      // Hors enregistrement : on ajoute une queue vide après le dernier clip
+      // pour garder de l'espace cliquable au bout (cf. RIGHT_TAIL_*).
+      const trackMaxWithTail =
+        trackMax > 0
+          ? trackMax +
+            Math.max(RIGHT_TAIL_MIN_SEC, trackMax * RIGHT_TAIL_FRACTION)
+          : trackMax;
+      return Math.max(MIN_TIMELINE_SEC, trackMaxWithTail);
+    }
     // Pendant l'enregistrement, élargit la timeline par paliers de 5s
     // avec ~5s de marge à droite. Donne de la place au clip live pour
     // grandir visuellement, et évite que pxPerSec change à chaque tick
@@ -871,7 +888,21 @@ export default function AudioRecorder({
   };
 
   // Split à la position du playhead (suit le curseur en lecture).
+  // Si une région est sélectionnée, on découpe aux DEUX bords de la région
+  // (start puis end) : la portion sélectionnée devient un clip indépendant.
   const splitAtPlayhead = () => {
+    if (regionSelection) {
+      const { trackId, start, end } = regionSelection;
+      setTracksWithHistory((ts) =>
+        ts.map((t) =>
+          t.id === trackId
+            ? { ...t, edl: splitAt(splitAt(t.edl, start), end) }
+            : t,
+        ),
+      );
+      setRegionSelection(null);
+      return;
+    }
     const trackId = isPlaying
       ? playingFromRef.current?.trackId
       : selection?.trackId;
@@ -1177,12 +1208,12 @@ export default function AudioRecorder({
               </IconButton>
             </span>
           </Tooltip>
-          <Tooltip title="Split at cursor (S)">
+          <Tooltip title="Split at cursor / selected region (S)">
             <span>
               <IconButton
                 size="small"
                 onClick={splitAtPlayhead}
-                disabled={!selection && !isPlaying}
+                disabled={!regionSelection && !selection && !isPlaying}
               >
                 <SplitIcon fontSize="small" />
               </IconButton>

@@ -57,7 +57,10 @@ const AudioViewer = ({ chapter, paragraph, metadata }) => {
   // pxPerSec : largeur disponible / durée → l'axe couvre exactement la largeur.
   const pxPerSec = duration > 0 && laneWidth > 0 ? laneWidth / duration : 0;
 
-  // Mesure de la largeur disponible (pour graduer l'axe).
+  // Mesure de la largeur disponible (pour graduer l'axe). Le visualiseur
+  // n'est monté qu'une fois l'audio prêt (cf. early-return plus bas) : on
+  // (re)mesure donc quand `status` change, sinon scrollRef.current serait
+  // encore null au montage et la largeur resterait à 0.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -65,7 +68,7 @@ const AudioViewer = ({ chapter, paragraph, metadata }) => {
     const ro = new ResizeObserver(([e]) => setLaneWidth(e.contentRect.width));
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [status]);
 
   // --- Lecture ---
   const stopSource = () => {
@@ -201,6 +204,12 @@ const AudioViewer = ({ chapter, paragraph, metadata }) => {
 
   const ready = status === "ready";
 
+  // On n'affiche RIEN tant qu'un audio n'est pas confirmé prêt : ni pendant le
+  // chargement, ni en cas d'absence d'audio. Le visualiseur n'apparaît donc
+  // qu'au moment où il y a effectivement quelque chose à montrer (pas de flash
+  // « apparaît puis disparaît » sur les paragraphes sans audio).
+  if (!ready) return null;
+
   return (
     <Box sx={{ width: "100%", p: 2 }}>
       {/* ── Toolbar réduite : temps · retour au début · play/stop ── */}
@@ -250,29 +259,13 @@ const AudioViewer = ({ chapter, paragraph, metadata }) => {
             />
             <Box sx={{ height: 16 }} />
             <Box sx={{ position: "relative", zIndex: 1 }}>
-              {ready ? (
-                <AudioViewerTrack
-                  peaks={peaks}
-                  duration={duration}
-                  playheadTime={playheadTime}
-                  height={LANE_HEIGHT}
-                  onSeek={handleSeek}
-                />
-              ) : (
-                <Box
-                  sx={{
-                    height: LANE_HEIGHT,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#999",
-                    fontSize: 13,
-                  }}
-                >
-                  {status === "loading" && "Loading…"}
-                  {status === "error" && "No audio for this paragraph"}
-                </Box>
-              )}
+              <AudioViewerTrack
+                peaks={peaks}
+                duration={duration}
+                playheadTime={playheadTime}
+                height={LANE_HEIGHT}
+                onSeek={handleSeek}
+              />
             </Box>
           </Box>
         </Box>
