@@ -40,7 +40,12 @@ function OBSEditorTools({
 
   const compileAudioHandler = async () => {
     try {
-      await compileAudio();
+      // compileAudio renvoie false lorsqu'il court-circuite pour ouvrir le
+      // modal FFmpeg : rien n'a été compilé, on n'affiche pas de succès.
+      const compiled = await compileAudio();
+      if (compiled === false) {
+        return;
+      }
       enqueueSnackbar(
         doI18n(
           "pages:core-local-workspace:audio_compiled",
