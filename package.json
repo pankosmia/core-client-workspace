@@ -17,7 +17,7 @@
     "md5": "^2.3.0",
     "notistack": "^3.0.2",
     "pankosmia-lib": "^0.0.3",
-    "pankosmia-rcl": "^0.2.5",
+    "pankosmia-rcl": "^0.3.0",
     "proskomma-core": "^0.11.2",
     "proskomma-json-tools": "^0.9.1",
     "react": "^17.0.0 || ^18.0.0",

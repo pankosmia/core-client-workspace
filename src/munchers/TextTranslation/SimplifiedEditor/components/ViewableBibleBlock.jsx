@@ -4,6 +4,8 @@ export default function ViewableBibleBlock({
   blockJson,
   systemBcv,
   lastPrintedVerseRef,
+  /* systemWord, */
+  word,
 }) {
   const versesRefs = useRef({});
 
@@ -16,6 +18,24 @@ export default function ViewableBibleBlock({
       });
     }
   }, [systemBcv.verseNum]);
+
+  const highlightText = (text, target) => {
+    if (!target) return text;
+    const str = String(text);
+    const parts = str.split(new RegExp(`(\\b${target}\\b)`, "gi"));
+    return parts.map((part, i) =>
+      part.toLowerCase() === target.toLowerCase() ? (
+        <mark
+          key={i}
+          style={{ backgroundColor: "#FFD700", borderRadius: "2px" }}
+        >
+          {part}
+        </mark>
+      ) : (
+        part
+      ),
+    );
+  };
 
   return (
     <div
@@ -71,8 +91,13 @@ export default function ViewableBibleBlock({
                 {currentVerse}
               </span>
             )}
-            <span style={{ whiteSpace: "normal", paddingRight: "2pt" }}>
+            {/* <span style={{ whiteSpace: "normal", paddingRight: "2pt" }}>
               {isDuplicate ? ` ${contentToDisplay}` : contentToDisplay}
+            </span> */}
+            <span style={{ whiteSpace: "normal", paddingRight: "2pt" }}>
+              {isDuplicate
+                ? ` ${highlightText(contentToDisplay, word?.target)}`
+                : highlightText(contentToDisplay, word?.target)}
             </span>
           </span>
         );

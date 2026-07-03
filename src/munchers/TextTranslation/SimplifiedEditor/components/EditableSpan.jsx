@@ -1,7 +1,7 @@
 import { useContext, useRef, useState } from "react";
 import { useEditable } from "use-editable";
 import { updateUnitContent } from "../Controller";
-import { postEmptyJson } from "pankosmia-lib/http";
+import { postEmptyJson, postJson } from "pankosmia-lib/http";
 
 import {
   bcvContext as BcvContext,
@@ -49,6 +49,52 @@ export default function EditableSpan({
     setValue(incomingContent);
     setFirstTime(false);
   }
+
+  const getWordAtCursor = () => {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return null;
+    const range = selection.getRangeAt(0);
+    const text = range.startContainer.textContent;
+    let offset = range.startOffset;
+
+    if (offset >= text.length || !/\w/.test(text[offset])) {
+      let distPrev = Infinity,
+        posPrev = -1;
+      let spaces = 0;
+      for (let i = offset - 1; i >= 0; i--) {
+        if (/\w/.test(text[i])) {
+          distPrev = spaces;
+          posPrev = i;
+          break;
+        }
+        if (/\s/.test(text[i])) spaces++;
+      }
+
+      let distNext = Infinity,
+        posNext = -1;
+      spaces = 0;
+      for (let i = offset; i < text.length; i++) {
+        if (/\w/.test(text[i])) {
+          distNext = spaces;
+          posNext = i;
+          break;
+        }
+        if (/\s/.test(text[i])) spaces++;
+      }
+
+      if (posPrev === -1 && posNext === -1) return null;
+      offset = distNext < distPrev ? posNext : posPrev;
+    }
+
+    let start = offset;
+    while (start > 0 && /\w/.test(text[start - 1])) start--;
+
+    let end = offset;
+    while (end < text.length && /\w/.test(text[end])) end++;
+
+    return text.slice(start, end);
+  };
+
   return (
     <span
       key={`${key}-editable`}
@@ -68,6 +114,16 @@ export default function EditableSpan({
         //console.log("FOCUS", position)
         updateBcv(systemBcv.bookCode, chapter, verse, endVerse);
         return false;
+      }}
+      onClick={(e) => {
+        const word = getWordAtCursor();
+        if (word) {
+          postJson(
+            "/api/app-state/word",
+            JSON.stringify({ target: word }),
+            debugRef.current,
+          );
+        }
       }}
     >
       {value}
