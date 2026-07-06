@@ -42,15 +42,12 @@ function ConfigureWorkspace({
   const { debugRef } = useContext(debugContext);
   const { i18nRef } = useContext(i18nContext);
   const { currentProjectRef } = useContext(currentProjectContext);
-  console.log("currentProjectRef", currentProjectRef);
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const [projectSummaries, setProjectSummaries] = useState({});
   const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
-  console.log("isoOneToThreeLookup", isoOneToThreeLookup);
   const [isoThreeLookup, setIsoThreeLookup] = useState([]);
-  console.log("isoThreeLookup", isoThreeLookup);
 
   const [contentBooks, setContentBooks] = useState();
   const [showRhakos, setShowRhakos] = useState(null);
@@ -255,7 +252,7 @@ function ConfigureWorkspace({
           ]?.en ?? rep.language_code,
       };
     });
-  console.log(rows);
+  //console.log(rows);
 
   const selectedResourcesIndexes = useMemo(
     () => rows.filter((r) => selectedResources.has(r.path)).map((r) => r.id),
