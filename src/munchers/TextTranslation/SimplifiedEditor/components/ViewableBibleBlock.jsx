@@ -4,8 +4,7 @@ export default function ViewableBibleBlock({
   blockJson,
   systemBcv,
   lastPrintedVerseRef,
-  /* systemWord, */
-  word,
+  systemWord,
 }) {
   const versesRefs = useRef({});
 
@@ -91,13 +90,10 @@ export default function ViewableBibleBlock({
                 {currentVerse}
               </span>
             )}
-            {/* <span style={{ whiteSpace: "normal", paddingRight: "2pt" }}>
-              {isDuplicate ? ` ${contentToDisplay}` : contentToDisplay}
-            </span> */}
             <span style={{ whiteSpace: "normal", paddingRight: "2pt" }}>
               {isDuplicate
-                ? ` ${highlightText(contentToDisplay, word?.target)}`
-                : highlightText(contentToDisplay, word?.target)}
+                ? ` ${highlightText(contentToDisplay, systemWord?.target)}`
+                : highlightText(contentToDisplay, systemWord?.target)}
             </span>
           </span>
         );

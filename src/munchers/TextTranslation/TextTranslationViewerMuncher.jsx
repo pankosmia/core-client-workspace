@@ -3,10 +3,7 @@ import usfm2draftJson from "../../components/usfm2draftJson";
 import filterByChapter from "../../components/filterByChapter";
 import ViewableBible from "./SimplifiedEditor/components/ViewableBible";
 
-import {
-  getText,
-  getJson /* For testing Context only */,
-} from "pankosmia-lib/http";
+import { getText } from "pankosmia-lib/http";
 import { debugContext, bcvContext } from "pankosmia-rcl";
 import "./TextTranslationViewerMuncher.css";
 import TextDir from "../helpers/TextDir";
@@ -25,8 +22,6 @@ function TextTranslationViewerMuncher({ metadata }) {
     ? metadata.script_direction.toLowerCase()
     : undefined;
   const sbScriptDirSet = sbScriptDir === "ltr" || sbScriptDir === "rtl";
-
-  const [word, setWord] = useState(null);
 
   useEffect(() => {
     const getUsfm = async () => {
@@ -52,24 +47,6 @@ function TextTranslationViewerMuncher({ metadata }) {
     ? filterByChapter(bookData, systemBcv.chapterNum)
     : [];
 
-  /* For testing Context only */
-  useEffect(() => {
-    const fetchAlignment = async () => {
-      const response = await getJson(
-        "/api/app-state/alignment",
-        debugRef.current,
-      );
-      if (response.ok) setWord(response.json.word);
-    };
-
-    fetchAlignment();
-
-    const evtSource = new EventSource("/api/notifications");
-    evtSource.addEventListener("alignment", () => fetchAlignment());
-
-    return () => evtSource.close();
-  }, []);
-
   //console.log('sbScriptDirSet: ' + !sbScriptDirSet.toString())
   //console.log('textDir: ' + textDir)
 
@@ -79,7 +56,6 @@ function TextTranslationViewerMuncher({ metadata }) {
       <ViewableBible
         chapterJson={chapterData}
         dir={!sbScriptDirSet ? textDir : undefined}
-        word={word}
       />
     )
   );
