@@ -1,20 +1,30 @@
 import { useState, useEffect, useContext, useMemo } from "react";
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  Typography,
+  DialogContent,
+  DialogContentText,
+  useTheme,
+} from "@mui/material";
 
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,
+  PanDialog,
+  PanDialogActions,
 } from "pankosmia-rcl";
 import { postEmptyJson } from "pankosmia-lib/http";
 import { doI18n } from "pankosmia-lib/i18n";
 
 import AudioRecorder from "../OBS/components/AudioRecorder";
 import AudioEditorTools from "./components/AudioEditorTools";
+import FfmpegDownloadButton from "../OBS/components/FfmpegDownloadButton";
 import {
   loadGeneratedAtMap,
   saveGeneratedAt,
 } from "../OBS/components/lib/audioGeneratedAt";
 import { projectPaths, loadProject } from "../OBS/components/lib/storageUtil";
+import getFfmpegPath from "../helpers/getFfmpegPath";
 
 // Derive the segments of one book straight from the plan, at the chosen
 // granularity. Books carry no info of their own in audio translation, so there
@@ -70,9 +80,11 @@ function deriveChapters(plan, bookCode, segmentation) {
 }
 
 function AudioTranslationEditorMuncher({ metadata }) {
+  const theme = useTheme();
   const { i18nRef } = useContext(I18nContext);
   const { debugRef } = useContext(DebugContext);
 
+  const [ffmpegModalOpen, setFfmpegModalOpen] = useState(false);
   const [plan, setPlan] = useState(null);
   const [selectedBook, setSelectedBook] = useState("");
   const [segIndex, setSegIndex] = useState(0);
@@ -187,9 +199,21 @@ function AudioTranslationEditorMuncher({ metadata }) {
     }
   };
 
+  // Renvoie false quand on court-circuite pour afficher le modal FFmpeg (rien
+  // n'a été compilé) afin que l'appelant n'affiche pas de snackbar de succès.
   const compileAudio = async () => {
     if (!current || !selectedBook) {
       throw new Error("No audio segment selected");
+    }
+
+    // Dans le viewer Electron, si aucun ffmpeg n'est disponible, on propose de
+    // le télécharger via le modal plutôt que de laisser le backend échouer.
+    if (window.electronAPI) {
+      const isFFmpegInstalled = await window.electronAPI.checkFfmpegInstalled();
+      if (!isFFmpegInstalled) {
+        setFfmpegModalOpen(true);
+        return false;
+      }
     }
 
     // Garde-fou : si la piste principale (main track) est vide, le backend
@@ -223,12 +247,17 @@ function AudioTranslationEditorMuncher({ metadata }) {
       }
     }
 
+    // Chemin du ffmpeg téléchargé localement (via l'endpoint backend) transmis
+    // au serveur ; s'il est absent, le serveur utilise le ffmpeg système.
+    const ffmpegPath = await getFfmpegPath();
+
     await postAudioCompile(
       "compile",
       {
         book: selectedBook,
         chapter: current.chapter,
         paragraph: current.paragraph,
+        ...(ffmpegPath ? { ffmpeg_path: ffmpegPath } : {}),
       },
       "Failed to compile audio",
     );
@@ -237,6 +266,7 @@ function AudioTranslationEditorMuncher({ metadata }) {
       {
         book: selectedBook,
         chapter: current.chapter,
+        ...(ffmpegPath ? { ffmpeg_path: ffmpegPath } : {}),
       },
       "Failed to compile audio chapter",
     );
@@ -246,6 +276,26 @@ function AudioTranslationEditorMuncher({ metadata }) {
 
   return (
     <Box>
+      <PanDialog
+        titleLabel="FFmpeg not installed"
+        isOpen={ffmpegModalOpen}
+        closeFn={() => setFfmpegModalOpen(false)}
+        theme={theme}
+        size="sm"
+      >
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            FFmpeg is required to compile audio and is not installed yet.
+            Download it below, then generate the audio again.
+          </DialogContentText>
+          <FfmpegDownloadButton />
+        </DialogContent>
+        <PanDialogActions
+          onlyCloseButton
+          closeFn={() => setFfmpegModalOpen(false)}
+          closeLabel="Close"
+        />
+      </PanDialog>
       <AudioEditorTools
         compileAudio={current ? compileAudio : null}
         generatedAt={segmentKey ? generatedAtMap[segmentKey] : null}

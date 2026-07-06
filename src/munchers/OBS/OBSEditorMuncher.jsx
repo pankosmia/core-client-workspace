@@ -1,22 +1,27 @@
 import { useState, useContext, useEffect } from "react";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
+import { DialogContent, DialogContentText, useTheme } from "@mui/material";
 import OBSContext from "../../contexts/obsContext";
 import AudioRecorder from "./components/AudioRecorder";
 import MarkdownField from "../../components/MarkdownField";
 
 import "./OBSMuncher.css";
 
+import { PanDialog, PanDialogActions } from "pankosmia-rcl";
 import { debugContext as DebugContext } from "pankosmia-rcl";
 import { getText, postText } from "pankosmia-lib/http";
 import md5 from "md5";
 import OBSEditorTools from "./components/OBSEditorTools";
+import FfmpegDownloadButton from "./components/FfmpegDownloadButton";
+import getFfmpegPath from "../helpers/getFfmpegPath";
 import {
   loadGeneratedAtMap,
   saveGeneratedAt,
 } from "./components/lib/audioGeneratedAt";
 
 function OBSEditorMuncher({ metadata }) {
+  const theme = useTheme();
   const { obs, setObs } = useContext(OBSContext);
   const { debugRef } = useContext(DebugContext);
   const [ingredient, setIngredient] = useState([]);
@@ -30,6 +35,7 @@ function OBSEditorMuncher({ metadata }) {
   const [generatedAtMap, setGeneratedAtMap] = useState(() =>
     loadGeneratedAtMap(metadata.local_path),
   );
+  const [ffmpegModalOpen, setFfmpegModalOpen] = useState(false);
   // One timestamp per paragraph: obs = [story, paragraph].
   const audioSegmentKey = `${obs[0]}:${obs[1]}`;
 
@@ -186,18 +192,33 @@ function OBSEditorMuncher({ metadata }) {
     return `${response.status}${detail ? ` — ${detail}` : ""}`;
   };
 
+  // Renvoie false quand on court-circuite pour afficher le modal FFmpeg (rien
+  // n'a été compilé) afin que l'appelant n'affiche pas de snackbar de succès.
   const compileAudio = async () => {
     /* curl -X POST http://localhost:19119/api/audio/compile/_local_/_local_/OBST \
             -H "Content-Type: application/json" -d '{"chapter":1,"paragraph":3}' */
+    // Dans le viewer Electron, si aucun ffmpeg n'est disponible, on propose de
+    // le télécharger. Sinon on récupère le chemin du ffmpeg téléchargé et on le
+    // transmet aux requêtes de compilation via `ffmpeg_path` (le backend
+    // privilégie le ffmpeg système et retombe sur ce chemin à défaut).
+    if (window.electronAPI) {
+      const isFFmpegInstalled = await window.electronAPI.checkFfmpegInstalled();
+      if (!isFFmpegInstalled) {
+        setFfmpegModalOpen(true);
+        return false;
+      }
+    }
     if (await isMainTrackEmpty()) {
       throw new Error(
         "Cannot generate audio: the main track is empty. Add audio to the main track before generating.",
       );
     }
+    const ffmpegPath = await getFfmpegPath();
     const audioUrl = `/api/audio/compile/${metadata.local_path}`;
     const json = {
       chapter: obs[0],
       paragraph: obs[1],
+      ...(ffmpegPath ? { ffmpeg_path: ffmpegPath } : {}),
     };
     const response = await fetch(audioUrl, {
       method: "POST",
@@ -216,6 +237,7 @@ function OBSEditorMuncher({ metadata }) {
     const audioChapterUrl = `/api/audio/compile-chapter/${metadata.local_path}`;
     const chapterJson = {
       chapter: obs[0],
+      ...(ffmpegPath ? { ffmpeg_path: ffmpegPath } : {}),
     };
     const chapterResponse = await fetch(audioChapterUrl, {
       method: "POST",
@@ -231,6 +253,7 @@ function OBSEditorMuncher({ metadata }) {
     setGeneratedAtMap(
       saveGeneratedAt(metadata.local_path, `${obs[0]}:${obs[1]}`),
     );
+    return true;
   };
 
   const uploadOBSIngredient = async (ingredientItem, i) => {
@@ -290,10 +313,13 @@ function OBSEditorMuncher({ metadata }) {
 
   const updateIsExportingParaEnabled = async () => {
     if (obs[1] === 0) {
+      console.log("obs[1] === 0");
       setIsExportingParaEnabled(false);
     } else if ((await getMainTrack()) === null) {
+      console.log("(await getMainTrack()) === null");
       setIsExportingParaEnabled(false);
     } else {
+      console.log("setIsExportingParaEnabled(true)");
       setIsExportingParaEnabled(true);
     }
   };
@@ -327,24 +353,22 @@ function OBSEditorMuncher({ metadata }) {
       method: "GET",
     });
     const data = await response.json();
-    let chapterString = obs[0] < 10 ? `0${obs[0]}` : obs[0];
-    let paragraphString = obs[1] < 10 ? `0${obs[1]}` : obs[1];
-    const dataFiltered = data.filter(
-      (item) =>
-        item.includes(
-          `audio_content/${chapterString}-${paragraphString}/${chapterString}-${paragraphString}_0`,
-        ) && !item.includes(".bak"),
-    );
-    return dataFiltered.length > 0 ? dataFiltered[0] : null;
+    const cc = String(obs[0]).padStart(2, "0");
+    const pp = String(obs[1]).padStart(2, "0");
+    const mp3Path = `audio_content/${cc}-${pp}/${cc}-${pp}.mp3`;
+    const match = data.find((item) => item.endsWith(mp3Path));
+    return match || null;
   };
 
   const handleExportVideoParagraph = async () => {
     setMenuAnchorEl(null);
+    const ffmpegPath = await getFfmpegPath();
     const videoUrl = `/api/video/obs-para/${metadata.local_path}`;
     const json = {
       story_n: obs[0],
       para_n: obs[1],
       audio_path: await getMainTrack(),
+      ...(ffmpegPath ? { ffmpeg_path: ffmpegPath } : {}),
     };
     const response = await fetch(videoUrl, {
       method: "POST",
@@ -360,9 +384,11 @@ function OBSEditorMuncher({ metadata }) {
   const handleExportVideoStory = async () => {
     setMenuAnchorEl(null);
 
+    const ffmpegPath = await getFfmpegPath();
     const videoUrl = `/api/video/obs-story/${metadata.local_path}`;
     const json = {
       story_n: obs[0],
+      ...(ffmpegPath ? { ffmpeg_path: ffmpegPath } : {}),
     };
     const response = await fetch(videoUrl, {
       method: "POST",
@@ -395,6 +421,26 @@ function OBSEditorMuncher({ metadata }) {
         compileAudio={compileAudio}
         generatedAt={generatedAtMap[audioSegmentKey]}
       />
+      <PanDialog
+        titleLabel="FFmpeg not installed"
+        isOpen={ffmpegModalOpen}
+        closeFn={() => setFfmpegModalOpen(false)}
+        theme={theme}
+        size="sm"
+      >
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            FFmpeg is required to compile audio and is not installed yet.
+            Download it below, then generate the audio again.
+          </DialogContentText>
+          <FfmpegDownloadButton />
+        </DialogContent>
+        <PanDialogActions
+          onlyCloseButton
+          closeFn={() => setFfmpegModalOpen(false)}
+          closeLabel="Close"
+        />
+      </PanDialog>
       <Box sx={{ mt: "120px", padding: 2 }}>
         <Stack>
           <MarkdownField
