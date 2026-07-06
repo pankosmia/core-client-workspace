@@ -57,12 +57,12 @@ export default function EditableSpan({
     const text = range.startContainer.textContent;
     let offset = range.startOffset;
 
-    if (offset >= text.length || !/\w/.test(text[offset])) {
+    if (offset >= text.length || !/\p{L}/u.test(text[offset])) {
       let distPrev = Infinity,
         posPrev = -1;
       let spaces = 0;
       for (let i = offset - 1; i >= 0; i--) {
-        if (/\w/.test(text[i])) {
+        if (/\p{L}/u.test(text[i])) {
           distPrev = spaces;
           posPrev = i;
           break;
@@ -74,7 +74,7 @@ export default function EditableSpan({
         posNext = -1;
       spaces = 0;
       for (let i = offset; i < text.length; i++) {
-        if (/\w/.test(text[i])) {
+        if (/\p{L}/u.test(text[i])) {
           distNext = spaces;
           posNext = i;
           break;
@@ -87,10 +87,10 @@ export default function EditableSpan({
     }
 
     let start = offset;
-    while (start > 0 && /\w/.test(text[start - 1])) start--;
+    while (start > 0 && /\p{L}/u.test(text[start - 1])) start--;
 
     let end = offset;
-    while (end < text.length && /\w/.test(text[end])) end++;
+    while (end < text.length && /\p{L}/u.test(text[end])) end++;
 
     return text.slice(start, end);
   };

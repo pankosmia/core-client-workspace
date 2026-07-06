@@ -21,7 +21,9 @@ export default function ViewableBibleBlock({
   const highlightText = (text, target) => {
     if (!target) return text;
     const str = String(text);
-    const parts = str.split(new RegExp(`(\\b${target}\\b)`, "gi"));
+    const parts = str.split(
+      new RegExp(`(?<!\\p{L})(${target})(?!\\p{L})`, "giu"),
+    );
     return parts.map((part, i) =>
       part.toLowerCase() === target.toLowerCase() ? (
         <mark
