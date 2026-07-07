@@ -1,4 +1,11 @@
-import { useState, useEffect, useContext, useCallback, useMemo } from "react";
+import {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getJson } from "pankosmia-lib/http";
 import { doI18n } from "pankosmia-lib/i18n";
@@ -41,10 +48,9 @@ function ConfigureWorkspace({
   const [projectSummaries, setProjectSummaries] = useState({});
   const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
   const [isoThreeLookup, setIsoThreeLookup] = useState([]);
-  const [contentBooks, setContentBooks] = useState();
-  const [selectedResourcesIndexes, setSelectedResourcesIndexes] = useState([]);
-  const [showRhakos, setShowRhakos] = useState(null);
 
+  const [contentBooks, setContentBooks] = useState();
+  const [showRhakos, setShowRhakos] = useState(null);
   const getProjectSummaries = async () => {
     const summariesResponse = await getJson(
       "/api/burrito/metadata/summaries",
@@ -204,33 +210,34 @@ function ConfigureWorkspace({
   let rows = Object.entries(projectSummaries).map((e) => {
     return { ...e[1], path: e[0] };
   });
+  const currentFlavor =
+    currentProjectRef.current &&
+    projectSummaries[`_local_/_local_/${currentProjectRef.current.project}`]
+      ?.flavor;
+
+  const currentGroup = projectFlavors[currentFlavor];
   rows = rows.filter(
     (r) =>
       currentProjectRef.current &&
-      projectFlavors[projectSummaries[r.path].flavor] ===
-        projectFlavors[
-          projectSummaries[
-            `_local_/_local_/${currentProjectRef.current.project}`
-          ].flavor
-        ],
+      projectFlavors[projectSummaries[r.path].flavor] === currentGroup,
   );
   rows = rows.filter(
     (r) =>
       r.path !==
       `_local_/_local_/${currentProjectRef.current && currentProjectRef.current.project}`,
   );
-  rows = rows
-    .filter(
-      (r) =>
-        true ||
-        !contentBooks ||
-        contentBooks.size === 0 ||
-        new Set(r.book_codes).intersection(contentBooks).size > 0,
+  rows = rows = rows
+    .filter((r) =>
+      currentGroup !== "myObsList"
+        ? !contentBooks ||
+          contentBooks.size === 0 ||
+          new Set(r.book_codes).intersection(contentBooks).size > 0
+        : true,
     )
     .map((rep, n) => {
       return {
         ...rep,
-        id: n.toString(),
+        id: rep.path,
         name: `${rep.name} (${rep.abbreviation})`,
         description: rep.description !== rep.name ? rep.description : "",
         source: rep.path.startsWith("_local_")
@@ -245,15 +252,12 @@ function ConfigureWorkspace({
           ]?.en ?? rep.language_code,
       };
     });
-  // console.log(rows);
+  //console.log(rows);
 
-  useEffect(() => {
-    if (rows) {
-      setSelectedResourcesIndexes(
-        rows.filter((r) => selectedResources.has(r.path)).map((r) => r.id),
-      );
-    }
-  }, [rows]);
+  const selectedResourcesIndexes = useMemo(
+    () => rows.filter((r) => selectedResources.has(r.path)).map((r) => r.id),
+    [rows, selectedResources],
+  );
 
   /**
    * Important: These are precise calculations given the state of this component at the time this was set up.
@@ -273,7 +277,7 @@ function ConfigureWorkspace({
    *  ------
    *   248px This is the minimum amount by which to reduce the innerHeight (const adjustment)
    */
-  const adjustment = 248;
+  const adjustment = 300;
 
   const [maxWindowHeight, setMaxWindowHeight] = useState(
     window.innerHeight - adjustment,
@@ -463,7 +467,7 @@ function ConfigureWorkspace({
                 }}
                 sx={{
                   fontSize: "1rem",
-                  height: "90%",
+                  height: "100%",
                   "& .MuiTable-root": { height: "100%" },
                   "& .MuiTableCell-head": {
                     position: "sticky",
