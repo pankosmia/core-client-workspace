@@ -17,6 +17,7 @@ import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
   netContext,
+  wordContext,
 } from "pankosmia-rcl";
 
 import TextDir from "../helpers/TextDir";
@@ -34,6 +35,8 @@ function BcvArticlesViewerMuncher({ metadata }) {
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
   const { i18nRef } = useContext(I18nContext);
+  const { word } = useContext(wordContext);
+  const [expandedAccordion, setExpandedAccordion] = useState(null);
 
   const sbScriptDir = metadata?.script_direction
     ? metadata.script_direction.toLowerCase()
@@ -117,6 +120,23 @@ function BcvArticlesViewerMuncher({ metadata }) {
     ],
   );
 
+  useEffect(() => {
+    if (word?.target) {
+      const matchIndex = verseNotes.findIndex((v) => {
+        const titleWords = v
+          .split("\n")[0]
+          .slice(2)
+          .split(",")
+          .map((w) => w.trim().toLowerCase());
+        const target = word.target.toLowerCase();
+        return titleWords.some(
+          (w) => target.startsWith(w) || w.startsWith(target),
+        );
+      });
+      setExpandedAccordion(matchIndex >= 0 ? matchIndex : null);
+    }
+  }, [word, verseNotes]);
+
   const verseLabel = `(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`;
 
   // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
@@ -157,7 +177,12 @@ function BcvArticlesViewerMuncher({ metadata }) {
           {verseNotes.length > 0 &&
             [...new Set(verseNotes)].map((v, n) => {
               return (
-                <Accordion>
+                <Accordion
+                  expanded={expandedAccordion === n}
+                  onChange={() =>
+                    setExpandedAccordion(expandedAccordion === n ? null : n)
+                  }
+                >
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1-content"
