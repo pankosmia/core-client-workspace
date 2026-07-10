@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import {
   Box,
   Grid2,
@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Markdown from "react-markdown";
-import { getText } from "pankosmia-lib/http";
+import { getText, getJson } from "pankosmia-lib/http";
 import { doI18n } from "pankosmia-lib/i18n";
 
 import {
@@ -21,6 +21,9 @@ import {
 } from "pankosmia-rcl";
 
 import TextDir from "../helpers/TextDir";
+import { EnglishStemmer } from "snowball-stemmer.jsx/dest/english-stemmer.common.js";
+import { SpanishStemmer } from "snowball-stemmer.jsx/dest/spanish-stemmer.common.js";
+import { FrenchStemmer } from "snowball-stemmer.jsx/dest/french-stemmer.common.js";
 
 function BcvArticlesViewerMuncher({ metadata }) {
   const { enabledRef } = useContext(netContext);
@@ -43,9 +46,27 @@ function BcvArticlesViewerMuncher({ metadata }) {
     : undefined;
   const sbScriptDirSet = sbScriptDir === "ltr" || sbScriptDir === "rtl";
 
+  const [language, setLanguage] = useState("en");
+
+  const stemmers = useMemo(
+    () => ({
+      en: new EnglishStemmer(),
+      es: new SpanishStemmer(),
+      spa: new SpanishStemmer(),
+      fr: new FrenchStemmer(),
+    }),
+    [],
+  );
+
+  const BaseStemmer = useMemo(() => ({ stemWord: (w) => w }), []);
+
+  const stemmer = stemmers[language] || BaseStemmer;
+
   const getAllData = async () => {
     const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
+    const metadataLink = `/api/burrito/metadata/summary/${metadata.local_path}`;
     let response = await getText(ingredientLink, debugRef.current);
+    let metadataResponse = await getJson(metadataLink, debugRef.current);
     if (response.ok) {
       setIngredient(
         response.text
@@ -54,6 +75,9 @@ function BcvArticlesViewerMuncher({ metadata }) {
       );
     } else {
       setIngredient([]);
+    }
+    if (metadataResponse.ok) {
+      setLanguage(metadataResponse.json.language_code);
     }
   };
 
@@ -127,15 +151,13 @@ function BcvArticlesViewerMuncher({ metadata }) {
           .split("\n")[0]
           .slice(2)
           .split(",")
-          .map((w) => w.trim().toLowerCase());
-        const target = word.target.toLowerCase();
-        return titleWords.some(
-          (w) => target.startsWith(w) || w.startsWith(target),
-        );
+          .map((w) => stemmer.stemWord(w.trim().toLowerCase()));
+        const target = stemmer.stemWord(word.target.toLowerCase());
+        return titleWords.some((w) => w === target);
       });
       setExpandedAccordion(matchIndex >= 0 ? matchIndex : null);
     }
-  }, [word, verseNotes]);
+  }, [word, verseNotes, stemmer]);
 
   const verseLabel = `(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`;
 
