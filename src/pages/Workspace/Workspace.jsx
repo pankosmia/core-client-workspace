@@ -25,7 +25,6 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
   const [projectSummaries, setProjectSummaries] = useState({});
   const [distractionModeCount, setDistractionModeCount] = useState(0);
   const [obs, setObs] = useState([1, 0]);
-  const [muncherCount, setMuncherCount] = useState(0);
 
   const getProjectSummaries = async () => {
     const summariesResponse = await getJson(
@@ -72,11 +71,9 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
 
   useEffect(() => {
     const checkOverflow = () => {
-      const munchers = document.querySelectorAll(".react-tile-pane-tabTitle");
-      munchers.forEach((el) => {
+      document.querySelectorAll(".react-tile-pane-tabTitle").forEach((el) => {
         el.classList.toggle("is-overflowing", el.scrollWidth > el.clientWidth);
       });
-      setMuncherCount(munchers.length);
     };
 
     checkOverflow();
@@ -164,14 +161,8 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
           justify-content: flex-start;
           text-align: left;
         }
-        ${
-          muncherCount === 1
-            ? `
         .react-tile-pane-off {
           display: none !important;
-        }
-        `
-            : ""
         }
       `}</style>
       <Header
