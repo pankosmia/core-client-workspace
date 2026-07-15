@@ -51,9 +51,11 @@ function BcvArticlesViewerMuncher({ metadata }) {
   const stemmers = useMemo(
     () => ({
       en: new EnglishStemmer(),
+      eng: new EnglishStemmer(),
       es: new SpanishStemmer(),
       spa: new SpanishStemmer(),
       fr: new FrenchStemmer(),
+      fra: new FrenchStemmer(),
     }),
     [],
   );
@@ -118,10 +120,14 @@ function BcvArticlesViewerMuncher({ metadata }) {
 
         for (const row of filteredRows) {
           let payloadLink = row[5];
+          const tWordPath = payloadLink.slice(2);
+          const ipath = tWordPath.includes(".md")
+            ? tWordPath
+            : `${tWordPath}.md`;
           if (seenLinks.has(payloadLink)) continue;
           seenLinks.add(payloadLink);
           let payloadResponse = await getText(
-            `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${payloadLink.slice(2)}.md`,
+            `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${ipath}`,
           );
           if (payloadResponse.ok) {
             ret.push(payloadResponse.text);
@@ -159,7 +165,7 @@ function BcvArticlesViewerMuncher({ metadata }) {
     }
   }, [word, verseNotes, stemmer]);
 
-  const verseLabel = `(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`;
+  const verseLabel = `(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum && systemBcv.endVerseNum !== systemBcv.verseNum ? `-${systemBcv.endVerseNum}` : ""})`;
 
   // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
   return (
