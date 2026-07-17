@@ -69,34 +69,6 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
     }
   }, [selectedResources, projectSummaries]);
 
-  useEffect(() => {
-    const checkOverflow = () => {
-      document.querySelectorAll(".react-tile-pane-tabTitle").forEach((el) => {
-        el.classList.toggle("is-overflowing", el.scrollWidth > el.clientWidth);
-      });
-    };
-
-    checkOverflow();
-
-    const resizeObserver = new ResizeObserver(checkOverflow);
-    document
-      .querySelectorAll(".react-tile-pane-tabTitle")
-      .forEach((el) => resizeObserver.observe(el));
-
-    const mutationObserver = new MutationObserver(() => {
-      checkOverflow();
-      document
-        .querySelectorAll(".react-tile-pane-tabTitle")
-        .forEach((el) => resizeObserver.observe(el));
-    });
-    mutationObserver.observe(document.body, { childList: true, subtree: true });
-
-    return () => {
-      resizeObserver.disconnect();
-      mutationObserver.disconnect();
-    };
-  }, []);
-
   const isGraphite = GraphiteTest();
   /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
   const adjSelectedFontClass = isGraphite
@@ -152,14 +124,27 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
   return (
     <>
       <style>{`
+        .react-tile-pane-tabBar {
+          overflow: hidden;
+        }
+        .react-tile-pane-tab {
+          min-width: 0 !important;
+          overflow: hidden;
+          flex-shrink: 1;
+        }
+        .react-tile-pane-tabInnerOff,
+        .react-tile-pane-tabInnerOn {
+          min-width: 0;
+          overflow: hidden;
+        }
         .react-tile-pane-tabTitle {
+          display: block;
+          width: 100%;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-        }
-        .react-tile-pane-tabTitle.is-overflowing {
-          justify-content: flex-start;
-          text-align: left;
+          text-align: center !important;
+          text-align-last: center !important;
         }
         .react-tile-pane-off {
           display: none !important;
