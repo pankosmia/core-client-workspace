@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import {
   Box,
   Grid2,
@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Markdown from "react-markdown";
-import { getText } from "pankosmia-lib/http";
+import { getText, getJson } from "pankosmia-lib/http";
 import { doI18n } from "pankosmia-lib/i18n";
 
 import {
@@ -17,9 +17,13 @@ import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
   netContext,
+  wordContext,
 } from "pankosmia-rcl";
 
 import TextDir from "../helpers/TextDir";
+import { EnglishStemmer } from "snowball-stemmer.jsx/dest/english-stemmer.common.js";
+import { SpanishStemmer } from "snowball-stemmer.jsx/dest/spanish-stemmer.common.js";
+import { FrenchStemmer } from "snowball-stemmer.jsx/dest/french-stemmer.common.js";
 
 function BcvArticlesViewerMuncher({ metadata }) {
   const { enabledRef } = useContext(netContext);
@@ -34,15 +38,37 @@ function BcvArticlesViewerMuncher({ metadata }) {
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
   const { i18nRef } = useContext(I18nContext);
+  const { word } = useContext(wordContext);
+  const [expandedAccordion, setExpandedAccordion] = useState(null);
 
   const sbScriptDir = metadata?.script_direction
     ? metadata.script_direction.toLowerCase()
     : undefined;
   const sbScriptDirSet = sbScriptDir === "ltr" || sbScriptDir === "rtl";
 
+  const [language, setLanguage] = useState("en");
+
+  const stemmers = useMemo(
+    () => ({
+      en: new EnglishStemmer(),
+      eng: new EnglishStemmer(),
+      es: new SpanishStemmer(),
+      spa: new SpanishStemmer(),
+      fr: new FrenchStemmer(),
+      fra: new FrenchStemmer(),
+    }),
+    [],
+  );
+
+  const BaseStemmer = useMemo(() => ({ stemWord: (w) => w }), []);
+
+  const stemmer = stemmers[language] || BaseStemmer;
+
   const getAllData = async () => {
     const ingredientLink = `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.tsv`;
+    const metadataLink = `/api/burrito/metadata/summary/${metadata.local_path}`;
     let response = await getText(ingredientLink, debugRef.current);
+    let metadataResponse = await getJson(metadataLink, debugRef.current);
     if (response.ok) {
       setIngredient(
         response.text
@@ -51,6 +77,9 @@ function BcvArticlesViewerMuncher({ metadata }) {
       );
     } else {
       setIngredient([]);
+    }
+    if (metadataResponse.ok) {
+      setLanguage(metadataResponse.json.language_code);
     }
   };
 
@@ -91,10 +120,14 @@ function BcvArticlesViewerMuncher({ metadata }) {
 
         for (const row of filteredRows) {
           let payloadLink = row[5];
+          const tWordPath = payloadLink.slice(2);
+          const ipath = tWordPath.includes(".md")
+            ? tWordPath
+            : `${tWordPath}.md`;
           if (seenLinks.has(payloadLink)) continue;
           seenLinks.add(payloadLink);
           let payloadResponse = await getText(
-            `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${payloadLink.slice(2)}.md`,
+            `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${ipath}`,
           );
           if (payloadResponse.ok) {
             ret.push(payloadResponse.text);
@@ -117,7 +150,22 @@ function BcvArticlesViewerMuncher({ metadata }) {
     ],
   );
 
-  const verseLabel = `(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`;
+  useEffect(() => {
+    if (word?.target) {
+      const matchIndex = verseNotes.findIndex((v) => {
+        const titleWords = v
+          .split("\n")[0]
+          .slice(2)
+          .split(",")
+          .map((w) => stemmer.stemWord(w.trim().toLowerCase()));
+        const target = stemmer.stemWord(word.target.toLowerCase());
+        return titleWords.some((w) => w === target);
+      });
+      setExpandedAccordion(matchIndex >= 0 ? matchIndex : null);
+    }
+  }, [word, verseNotes, stemmer]);
+
+  const verseLabel = `(${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum && systemBcv.endVerseNum !== systemBcv.verseNum ? `-${systemBcv.endVerseNum}` : ""})`;
 
   // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
   return (
@@ -157,7 +205,12 @@ function BcvArticlesViewerMuncher({ metadata }) {
           {verseNotes.length > 0 &&
             [...new Set(verseNotes)].map((v, n) => {
               return (
-                <Accordion>
+                <Accordion
+                  expanded={expandedAccordion === n}
+                  onChange={() =>
+                    setExpandedAccordion(expandedAccordion === n ? null : n)
+                  }
+                >
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1-content"

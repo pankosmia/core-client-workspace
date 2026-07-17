@@ -185,7 +185,7 @@ function BcvImagesViewerMuncher({ metadata }) {
       dir={!sbScriptDirSet ? textDir : undefined}
     >
       <div className="flex flex-col items-center justify-center p-2">
-        <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`}</h5>
+        <h5>{`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum && systemBcv.endVerseNum !== systemBcv.verseNum ? `-${systemBcv.endVerseNum}` : ""})`}</h5>
       </div>
       <div className="flex-1 min-h-0 min-w-0 overflow-hidden p-2">
         {ingredient && verseNotes.length > 0 ? (
