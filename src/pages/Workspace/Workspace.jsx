@@ -161,6 +161,9 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
           justify-content: flex-start;
           text-align: left;
         }
+        .react-tile-pane-off {
+          display: none !important;
+        }
       `}</style>
       <Header
         titleKey="pages:core-local-workspace:title"
