@@ -146,6 +146,9 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
           text-align: center !important;
           text-align-last: center !important;
         }
+        .react-tile-pane-off {
+          display: none !important;
+        }
       `}</style>
       <Header
         titleKey="pages:core-local-workspace:title"
