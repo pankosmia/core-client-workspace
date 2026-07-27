@@ -52,7 +52,7 @@ function DraftingEditor({ metadata, modified, setModified }) {
           debugRef.current,
         );
         if (usfmResponse.ok) {
-          const usfmDraftJson = usfm2draftJson(usfmResponse.text);
+          const usfmDraftJson = await usfm2draftJson(usfmResponse.text);
           setScriptureJson(usfmDraftJson);
           const hash = md5sum(JSON.stringify(usfmDraftJson));
           setMd5sumScriptureJson(hash);
