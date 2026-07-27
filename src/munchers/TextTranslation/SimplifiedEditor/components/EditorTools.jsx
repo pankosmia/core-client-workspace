@@ -55,7 +55,7 @@ function EditorTools({
           debugRef.current,
         );
         if (usfmResponse.ok) {
-          const usfmDraftJson = usfm2draftJson(usfmResponse.text);
+          const usfmDraftJson = await usfm2draftJson(usfmResponse.text);
           const newChapterNumbers = allChapterNumbers(usfmDraftJson);
           setCurrentBookCode(systemBcv.bookCode);
           setChapterNumbers(newChapterNumbers);

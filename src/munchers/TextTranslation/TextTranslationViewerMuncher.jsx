@@ -7,11 +7,14 @@ import { getText } from "pankosmia-lib/http";
 import { debugContext, bcvContext } from "pankosmia-rcl";
 import "./TextTranslationViewerMuncher.css";
 import TextDir from "../helpers/TextDir";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 function TextTranslationViewerMuncher({ metadata }) {
   const { systemBcv } = useContext(bcvContext);
   const { debugRef } = useContext(debugContext);
   const [bookData, setBookData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [textDir, setTextDir] = useState(
     metadata?.script_direction
       ? metadata.script_direction.toLowerCase()
@@ -25,12 +28,13 @@ function TextTranslationViewerMuncher({ metadata }) {
 
   useEffect(() => {
     const getUsfm = async () => {
+      setIsLoading(true);
       let usfmResponse = await getText(
         `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
         debugRef.current,
       );
       if (usfmResponse.ok) {
-        setBookData(usfm2draftJson(usfmResponse.text));
+        setBookData(await usfm2draftJson(usfmResponse.text));
         if (!sbScriptDirSet) {
           const dir = await TextDir(usfmResponse.text, "usfm");
           setTextDir(dir);
@@ -39,6 +43,7 @@ function TextTranslationViewerMuncher({ metadata }) {
       } else {
         console.error("usfmResponse failed");
       }
+      setIsLoading(false);
     };
     getUsfm();
   }, [debugRef, systemBcv.bookCode, metadata.local_path, sbScriptDirSet]);
@@ -50,6 +55,22 @@ function TextTranslationViewerMuncher({ metadata }) {
   //console.log('sbScriptDirSet: ' + !sbScriptDirSet.toString())
   //console.log('textDir: ' + textDir)
 
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          minHeight: "150px",
+          flexShrink: 0,
+        }}
+      >
+        <CircularProgress size={40} />
+      </Box>
+    );
+  }
   // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
   return (
     Object.keys(chapterData).length > 0 && (
