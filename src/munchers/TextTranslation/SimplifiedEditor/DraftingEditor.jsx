@@ -4,7 +4,7 @@ import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
 } from "pankosmia-rcl";
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import usfm2draftJson from "../../../components/usfm2draftJson";
 import EditableBible from "./components/EditableBible";
 import md5sum from "md5";
@@ -45,8 +45,16 @@ function DraftingEditor({ metadata, modified, setModified }) {
 
   // Get whole book content
   useEffect(() => {
+    console.log(
+      "bookCode:",
+      systemBcv.bookCode,
+      "currentBookCode:",
+      currentBookCode,
+    );
     if (systemBcv.bookCode !== currentBookCode) {
       const doScriptureJson = async () => {
+        setChapterJson(null);
+        console.log("chapterJson reseteado a null");
         let usfmResponse = await getText(
           `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
           debugRef.current,
@@ -67,11 +75,11 @@ function DraftingEditor({ metadata, modified, setModified }) {
   }, [debugRef, systemBcv.bookCode, metadata, currentBookCode, sbScriptDirSet]);
 
   useEffect(() => {
-    if (scriptureJson) {
+    if (scriptureJson && scriptureJson.blocks.length > 0) {
       setChapterJson(filterByChapter(scriptureJson, systemBcv.chapterNum));
       setBookChangeCount(bookChangeCount + 1);
     }
-  }, [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]);
+  }, [scriptureJson, systemBcv.chapterNum]);
 
   useEffect(() => {
     if (!sbScriptDirSet) {
@@ -108,7 +116,17 @@ function DraftingEditor({ metadata, modified, setModified }) {
             key={bookChangeCount}
           />
         ) : (
-          <Typography> loading ...</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              minHeight: "150px",
+            }}
+          >
+            <CircularProgress size={40} />
+          </Box>
         )}
       </Box>
     </>
