@@ -45,16 +45,9 @@ function DraftingEditor({ metadata, modified, setModified }) {
 
   // Get whole book content
   useEffect(() => {
-    console.log(
-      "bookCode:",
-      systemBcv.bookCode,
-      "currentBookCode:",
-      currentBookCode,
-    );
     if (systemBcv.bookCode !== currentBookCode) {
       const doScriptureJson = async () => {
         setChapterJson(null);
-        console.log("chapterJson reseteado a null");
         let usfmResponse = await getText(
           `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
           debugRef.current,

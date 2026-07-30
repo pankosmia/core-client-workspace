@@ -14,6 +14,7 @@ import {
   debugContext,
   Header,
   typographyContext,
+  productContext as ProductContext,
 } from "pankosmia-rcl";
 
 const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
@@ -21,6 +22,7 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
   const { typographyRef } = useContext(typographyContext);
   const { currentProjectRef } = useContext(currentProjectContext);
   const { debugRef } = useContext(debugContext);
+  const { product } = useContext(ProductContext);
   const [resourceDetails, setResourceDetails] = useState({});
   const [projectSummaries, setProjectSummaries] = useState({});
   const [distractionModeCount, setDistractionModeCount] = useState(0);
@@ -173,7 +175,7 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
             <Box
               style={{
                 position: "fixed",
-                top: "110px",
+                top: product && product.os === "android" ? "140px" : "110px",
                 bottom: 0,
                 right: 0,
                 left: 0,

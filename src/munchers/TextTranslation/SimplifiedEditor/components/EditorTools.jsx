@@ -15,6 +15,7 @@ import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
   i18nContext as I18nContext,
+  productContext as ProductContext,
 } from "pankosmia-rcl";
 import { PrintOutlined } from "@mui/icons-material";
 
@@ -31,6 +32,7 @@ function EditorTools({
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
   const { i18nRef } = useContext(I18nContext);
+  const { product } = useContext(ProductContext);
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false);
   const [chapterNumbers, setChapterNumbers] = useState([]);
 
@@ -75,7 +77,7 @@ function EditorTools({
     <Box
       sx={{
         position: "fixed",
-        top: "40px",
+        top: product && product.os == "android" ? "70px" : "40px",
         left: 0,
         right: 0,
         display: "flex",
@@ -98,19 +100,23 @@ function EditorTools({
             setMd5sumScriptureJson={setMd5sumScriptureJson}
             scriptureJson={scriptureJson}
           />
-          <IconButton
-            onClick={() => {
-              setOpenModalPreviewText(true);
-            }}
-          >
-            <PrintOutlined />
-          </IconButton>
-          <PreviewText
-            metadata={metadata}
-            systemBcv={systemBcv}
-            open={openModalPreviewText}
-            setOpenModalPreviewText={setOpenModalPreviewText}
-          />
+          {product && product.os !== "android" && (
+            <>
+              <IconButton
+                onClick={() => {
+                  setOpenModalPreviewText(true);
+                }}
+              >
+                <PrintOutlined />
+              </IconButton>
+              <PreviewText
+                metadata={metadata}
+                systemBcv={systemBcv}
+                open={openModalPreviewText}
+                setOpenModalPreviewText={setOpenModalPreviewText}
+              />
+            </>
+          )}
         </Grid2>
 
         <Grid2 display="flex" gap={1}>
