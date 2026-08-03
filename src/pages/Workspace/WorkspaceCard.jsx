@@ -23,6 +23,11 @@ import JuxtalinearEditorMuncher from "../../munchers/Juxtalinear/JuxtalinearEdit
 import { TranslationPlanViewerMuncher } from "pankosmia-translation_plan-muncher";
 
 function WorkspaceCard({ metadata, style, distractionModeCount }) {
+  const { bcvRef } = useContext(bcvContext);
+  const { debugRef } = useContext(debugContext);
+  const { i18nRef } = useContext(i18nContext);
+  const { typographyRef } = useContext(typographyContext);
+
   const sbScriptDir = metadata?.script_direction
     ? metadata.script_direction.toLowerCase()
     : undefined;
@@ -233,9 +238,10 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
       >
         <TranslationPlanViewerMuncher
           metadata={metadata}
-          bcvRef={bcvRef}
+          systemBcv={bcvRef}
           debugRef={debugRef}
           i18nRef={i18nRef}
+          typographyRef={typographyRef}
         />
       </div>
     );
