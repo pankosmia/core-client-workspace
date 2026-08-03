@@ -19,8 +19,8 @@ import OBSNotesViewerMuncher from "../../munchers/OBSNotes/OBSNotesViewerMuncher
 import OBSQuestionsViewerMuncher from "../../munchers/OBSQuestions/OBSQuestionsViewerMuncher";
 import OBSArticlesViewerMuncher from "../../munchers/OBSArticles/OBSArticlesViewerMuncher";
 import JuxtalinearViewerMuncher from "../../munchers/Juxtalinear/JuxtalinearViewer";
-import TranslationPlanViewerMuncher from "../../munchers/TranslationPlan/TranslationPlanViewerMuncher";
 import JuxtalinearEditorMuncher from "../../munchers/Juxtalinear/JuxtalinearEditorMuncher";
+import { TranslationPlanViewerMuncher } from "pankosmia-translation_plan-muncher";
 
 function WorkspaceCard({ metadata, style, distractionModeCount }) {
   const sbScriptDir = metadata?.script_direction
@@ -231,7 +231,12 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <TranslationPlanViewerMuncher metadata={metadata} />
+        <TranslationPlanViewerMuncher
+          metadata={metadata}
+          bcvRef={bcvRef}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+        />
       </div>
     );
   }
