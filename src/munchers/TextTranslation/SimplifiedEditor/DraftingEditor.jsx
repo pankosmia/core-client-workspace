@@ -4,7 +4,7 @@ import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
 } from "pankosmia-rcl";
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import usfm2draftJson from "../../../components/usfm2draftJson";
 import EditableBible from "./components/EditableBible";
 import md5sum from "md5";
@@ -47,12 +47,13 @@ function DraftingEditor({ metadata, modified, setModified }) {
   useEffect(() => {
     if (systemBcv.bookCode !== currentBookCode) {
       const doScriptureJson = async () => {
+        setChapterJson(null);
         let usfmResponse = await getText(
           `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
           debugRef.current,
         );
         if (usfmResponse.ok) {
-          const usfmDraftJson = usfm2draftJson(usfmResponse.text);
+          const usfmDraftJson = await usfm2draftJson(usfmResponse.text);
           setScriptureJson(usfmDraftJson);
           const hash = md5sum(JSON.stringify(usfmDraftJson));
           setMd5sumScriptureJson(hash);
@@ -67,11 +68,11 @@ function DraftingEditor({ metadata, modified, setModified }) {
   }, [debugRef, systemBcv.bookCode, metadata, currentBookCode, sbScriptDirSet]);
 
   useEffect(() => {
-    if (scriptureJson) {
+    if (scriptureJson && scriptureJson.blocks.length > 0) {
       setChapterJson(filterByChapter(scriptureJson, systemBcv.chapterNum));
       setBookChangeCount(bookChangeCount + 1);
     }
-  }, [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]);
+  }, [scriptureJson, systemBcv.chapterNum]);
 
   useEffect(() => {
     if (!sbScriptDirSet) {
@@ -108,7 +109,17 @@ function DraftingEditor({ metadata, modified, setModified }) {
             key={bookChangeCount}
           />
         ) : (
-          <Typography> loading ...</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              minHeight: "150px",
+            }}
+          >
+            <CircularProgress size={40} />
+          </Box>
         )}
       </Box>
     </>
