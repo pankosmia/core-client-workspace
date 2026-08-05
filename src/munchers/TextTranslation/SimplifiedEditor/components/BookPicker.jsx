@@ -49,6 +49,7 @@ function BookPicker({ setFirstChapter, disable = false }) {
           size="small"
           select
           value={bcvRef.current.bookCode}
+          variant="filled"
         >
           {contentBooks.map((b, n) => (
             <MenuItem

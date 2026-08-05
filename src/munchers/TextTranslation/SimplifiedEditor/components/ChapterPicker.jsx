@@ -5,6 +5,7 @@ import { ButtonGroup } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { getJson, postEmptyJson } from "pankosmia-lib/http";
 import { bcvContext, debugContext } from "pankosmia-rcl";
+
 function ChapterPicker({ repoMetadata, chapterNumbers }) {
   const [scriptDirection, setScriptDirection] = useState([]);
   const { bcvRef, systemBcv } = useContext(bcvContext);
@@ -90,6 +91,7 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
         select
         size="small"
         value={bcvRef.current.chapterNum}
+        variant="filled"
       >
         {chapterNumbers.map((chapter, index) => (
           <MenuItem
