@@ -120,8 +120,6 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
           display: none !important;
         }
       `}</style>
-      <Box sx={{ height: "30px" }}></Box>
-
       <Header
         titleKey="pages:core-local-workspace:title"
         requireNet={false}
