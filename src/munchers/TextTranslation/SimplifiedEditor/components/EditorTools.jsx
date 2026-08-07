@@ -77,7 +77,7 @@ function EditorTools({
     <Box
       sx={{
         position: "fixed",
-        top: product && product.os == "android" ? "70px" : "40px",
+        top: product && product.os === "android" ? "110px" : "40px",
         left: 0,
         right: 0,
         display: "flex",
