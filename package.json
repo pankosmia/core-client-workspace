@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "/clients/core-local-workspace",
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=24",
+    "pnpm": "11.20.0"
+  },
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
@@ -18,7 +23,7 @@
     "notistack": "^3.0.2",
     "pankosmia-juxta-muncher": "0.2.9",
     "pankosmia-lib": "^0.0.3",
-    "pankosmia-rcl": "^0.4.2",
+    "pankosmia-rcl": "^0.4.22",
     "proskomma-core": "^0.11.2",
     "proskomma-json-tools": "^0.9.1",
     "react": "^17.0.0 || ^18.0.0",
@@ -71,24 +76,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-darwin-arm64": "^4.62.2",
-    "@rollup/rollup-darwin-x64": "^4.62.2",
-    "@rollup/rollup-linux-arm64-gnu": "^4.62.2",
-    "@rollup/rollup-linux-x64-gnu": "^4.62.2",
-    "@rollup/rollup-win32-arm64-msvc": "^4.62.2",
-    "@rollup/rollup-win32-x64-msvc": "^4.62.2",
-    "@tailwindcss/oxide-darwin-arm64": "^4.1.8",
-    "@tailwindcss/oxide-darwin-x64": "^4.1.8",
-    "@tailwindcss/oxide-linux-arm64-gnu": "^4.1.8",
-    "@tailwindcss/oxide-linux-x64-gnu": "^4.1.8",
-    "@tailwindcss/oxide-win32-arm64-msvc": "^4.1.8",
-    "lightningcss-darwin-arm64": "^1.30.1",
-    "lightningcss-darwin-x64": "^1.30.1",
-    "lightningcss-linux-arm64-gnu": "^1.30.1",
-    "lightningcss-linux-x64-gnu": "^1.30.1",
-    "lightningcss-win32-arm64-msvc": "^1.30.1",
-    "lightningcss-win32-x64-msvc": "^1.30.1"
   }
 }

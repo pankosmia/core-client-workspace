@@ -1,8 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import { Box, Chip, Stack, Typography } from "@mui/material";
 import GraphiteTest from "./GraphiteTest";
-import CenterFocusStrongOutlinedIcon from "@mui/icons-material/CenterFocusStrongOutlined";
-import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 import { createTilePanes, TileContainer, TileProvider } from "react-tile-pane";
 import { getJson } from "pankosmia-lib/http";
 import { doI18n } from "pankosmia-lib/i18n";
@@ -93,36 +91,6 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
   );
   const paneList = createTilePanes(tileElements)[0];
 
-  const DistractionToggle = ({
-    distractionModeCount,
-    setDistractionModeCount,
-  }) => {
-    return (
-      <Stack sx={{ marginLeft: "1rem" }}>
-        <Chip
-          onClick={() => {
-            setDistractionModeCount(distractionModeCount + 1);
-          }}
-          icon={
-            distractionModeCount % 2 === 0 ? (
-              <CenterFocusStrongOutlinedIcon />
-            ) : (
-              <CenterFocusStrongIcon />
-            )
-          }
-          label={`${doI18n("pages:core-local-workspace:focus_mode", i18nRef.current)}`}
-          color={
-            distractionModeCount % 2 === 0
-              ? "appbar-chip-inactive"
-              : "secondary"
-          }
-          variant="Filled"
-          disabled={Object.keys(resourceDetails).length === 1}
-        />
-      </Stack>
-    );
-  };
-
   return (
     <>
       <style>{`
@@ -152,22 +120,12 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
           display: none !important;
         }
       `}</style>
+      <Box sx={{ height: "30px" }}></Box>
+
       <Header
         titleKey="pages:core-local-workspace:title"
         requireNet={false}
         currentId="core-local-workspace"
-        widget={
-          <span style={{ display: "flex" }}>
-            {["scripture", "parascriptural"].includes(
-              Object.values(resourceDetails).filter((r) => r.primary)[0]
-                .flavor_type,
-            )}
-            <DistractionToggle
-              distractionModeCount={distractionModeCount}
-              setDistractionModeCount={setDistractionModeCount}
-            />
-          </span>
-        }
       />
       <div className={adjSelectedFontClass} id="fontWrapper">
         <OBSContext.Provider value={{ obs, setObs }}>
@@ -175,10 +133,14 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
             <Box
               style={{
                 position: "fixed",
-                top: product && product.os === "android" ? "140px" : "110px",
-                bottom: 0,
-                right: 0,
-                left: 0,
+                top: product && product.os === "android" ? "180px" : "110px",
+                width:
+                  product && product.os === "android"
+                    ? "calc(100% - 60px)"
+                    : "100%",
+                left: product && product.os === "android" ? "30px" : 0,
+                bottom: product && product.os === "android" ? "30px" : 0,
+                right: product && product.os === "android" ? "30px" : 0,
                 overflow: "auto",
                 /* width: "100vw", */
               }}
