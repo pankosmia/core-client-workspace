@@ -21,6 +21,7 @@ import {
   productContext as ProductContext,
 } from "pankosmia-rcl";
 import { getJson, postEmptyJson } from "pankosmia-lib/http";
+import { useNavigate } from "react-router-dom";
 
 export default function ToolbarComp({
   actions = [],
@@ -40,6 +41,7 @@ export default function ToolbarComp({
   const { debugRef } = useContext(DebugContext);
   const { i18nRef } = useContext(I18nContext);
   const { product } = useContext(ProductContext);
+  const navigate = useNavigate();
 
   const layout = () => {
     navigate({

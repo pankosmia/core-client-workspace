@@ -12,9 +12,11 @@ import Editor from "./components/Editor";
 import AddFab from "./components/AddFab";
 import SaveTsvButton from "./components/SaveTsvButton";
 import md5 from "md5";
-import BookPicker from "../TextTranslation/SimplifiedEditor/components/BookPicker";
+import BookPicker from "../../components/BookPicker";
 import NotesChapterPicker from "./components/NotesChapterPicker";
 import { getFirstChapterBCVNotes } from "../../common/findFirstChapter";
+import ToolbarComp from "../../components/ToolbarComp";
+import EditorTool from "./EditorTool";
 function BcvNotesEditorMuncher({ metadata }) {
   const [ingredient, setIngredient] = useState([]);
   const { systemBcv } = useContext(BcvContext);
@@ -139,30 +141,13 @@ function BcvNotesEditorMuncher({ metadata }) {
           padding: 2,
         }}
       >
-        <Grid2
-          container
-          alignItems="flex-start"
-          justifyContent="flex-start"
-          width="100%"
-        >
-          <Grid2 item size={6}>
-            <SaveTsvButton
-              metadata={metadata}
-              ingredient={ingredient}
-              setIngredient={setIngredient}
-              md5Ingredient={md5Ingredient}
-              setMd5Ingredient={setMd5Ingredient}
-            />
-          </Grid2>
-          <Grid2 item size={6} display="flex" gap={1}>
-            <BookPicker setFirstChapter={getFirstChapterBCVNotes} />
-            <NotesChapterPicker
-              ingredient={ingredient}
-              currentChapter={currentChapter}
-              setCurrentChapter={setCurrentChapter}
-            />
-          </Grid2>
-        </Grid2>
+        <EditorTool
+          metadata={metadata}
+          ingredient={ingredient}
+          setIngredient={setIngredient}
+          md5Ingredient={md5Ingredient}
+          setMd5Ingredient={setMd5Ingredient}
+        />
       </Box>
       {notesExist.length > 0 ? (
         <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>

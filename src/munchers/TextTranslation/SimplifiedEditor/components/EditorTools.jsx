@@ -1,6 +1,6 @@
 import { Box, Grid2, IconButton, Tooltip } from "@mui/material";
 import ChapterPicker from "./ChapterPicker";
-import BookPicker from "./BookPicker";
+import BookPicker from "../../../../components/BookPicker";
 import PreviewText from "./PreviewText";
 import md5sum from "md5";
 import { useContext, useEffect, useState } from "react";
@@ -188,7 +188,6 @@ function EditorTools({
       }}
     >
       <ToolbarComp
-        flavorType={metadata.flavor_type}
         save={handleSaveUsfm}
         disabledSave={
           md5sum(JSON.stringify(scriptureJson)) === md5sumScriptureJson
