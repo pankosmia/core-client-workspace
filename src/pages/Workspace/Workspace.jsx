@@ -131,7 +131,7 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
             <Box
               style={{
                 position: "fixed",
-                top: product && product.os === "android" ? "180px" : "110px",
+                top: product && product.os === "android" ? "140px" : "110px",
                 width:
                   product && product.os === "android"
                     ? "calc(100% - 60px)"
