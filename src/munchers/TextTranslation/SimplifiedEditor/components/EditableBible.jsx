@@ -1,8 +1,66 @@
 import EditableBibleBlock from "./EditableBibleBlock";
 import EditableGraft from "./EditableGraft";
 import EditableRemark from "./EditableRemark";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useId } from "react";
 import { bcvContext } from "pankosmia-rcl";
+import { PanDialog, PanDialogActions } from "pankosmia-rcl";
+import { DialogContent, Stack, Box, Button, TextField } from "@mui/material";
+import { splitPara } from "../Controller";
+
+function ActionsDialog({
+  caretPosition,
+  setCaretPosition,
+  scriptureJson,
+  setScriptureJson,
+}) {
+  const id = useId();
+  const [verseNo, setVerseNo] = useState(null);
+
+  let doSplitPara = () => {
+    const unit = scriptureJson.blocks[caretPosition.position[0]]?.units;
+    if (unit) {
+      let content = unit[caretPosition.position[1]]?.content;
+      if (content && content[0]) {
+        setCaretPosition(null);
+        setScriptureJson(splitPara(scriptureJson, caretPosition));
+      }
+    }
+  };
+
+  return (
+    <PanDialog
+      titleLabel="Actions"
+      isOpen={true}
+      closeFn={() => setCaretPosition(null)}
+    >
+      <DialogContent>
+        <Stack sx={{ width: "100%", textAlign: "left" }}>
+          <Button variant="outlined" onClick={doSplitPara}>
+            Split Para
+          </Button>
+          <Box>
+            <Button
+              sx={{ textAlign: "left" }}
+              variant="outlined"
+              onClick={() => false}
+              disabled={!verseNo}
+            >
+              Add Verse
+            </Button>
+            <TextField
+              id="verse number"
+              label="Verse N°"
+              onChange={(e) =>
+                setVerseNo(e.target.value.replace(/[^0-9\-]/g, ""))
+              }
+              value={verseNo}
+            />
+          </Box>
+        </Stack>
+      </DialogContent>
+    </PanDialog>
+  );
+}
 
 export default function EditableBible({
   chapterJson,
@@ -28,7 +86,18 @@ export default function EditableBible({
     }
     loadCSS();
   }, []);
-  console.log("CP", caretPosition);
+
+  if (caretPosition) {
+    return (
+      <ActionsDialog
+        caretPosition={caretPosition}
+        setCaretPosition={setCaretPosition}
+        scriptureJson={scriptureJson}
+        setScriptureJson={setScriptureJson}
+      />
+    );
+  }
+
   return (
     <div>
       {chapterJson.blocks.map((b, n) => {

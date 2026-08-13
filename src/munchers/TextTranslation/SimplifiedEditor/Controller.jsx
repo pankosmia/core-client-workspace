@@ -32,7 +32,6 @@ function splitPara(scriptureJson, caretPosition) {
     blocks: scriptureJson.blocks
       .map((b, n) => {
         if (n === caretPosition.position[0]) {
-          console.log("b", b, "n", n, "caret", caretPosition);
           const newBlocks = [
             {
               ...b,
