@@ -11,7 +11,6 @@ import LayoutIcon from "../layouts/LayoutIcon";
 import { getText } from "pankosmia-lib/http";
 import { doI18n } from "pankosmia-lib/i18n";
 import { getFirstChapterTextTranslation } from "../../../../common/findFirstChapter";
-import ReturnIcon from "@mui/icons-material/KeyboardReturnOutlined";
 import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
@@ -118,13 +117,7 @@ function EditorTools({
               />
             </>
           )}
-          <Grid2 display="flex" gap={1}>
-            <IconButton>
-              <ReturnIcon />
-            </IconButton>
-          </Grid2>
         </Grid2>
-
         <Grid2 display="flex" gap={1}>
           <BookPicker setFirstChapter={getFirstChapterTextTranslation} />
           <ChapterPicker

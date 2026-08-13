@@ -125,7 +125,16 @@ export default function EditableSpan({
       onContextMenu={(e) =>
         setCaretPosition({ cp: getCaretPosition(e), position })
       }
-      onClick={getWordAtCursor}
+      onClick={(e) => {
+        const word = getWordAtCursor();
+        if (word) {
+          postJson(
+            "/api/app-state/word",
+            JSON.stringify({ target: word }),
+            debugRef.current,
+          );
+        }
+      }}
     >
       <span
         key={`${key}-editable`}
