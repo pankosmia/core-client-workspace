@@ -16,6 +16,8 @@ export default function EditableSpan({
   chapter,
   verse,
   endVerse,
+  contextMenu,
+  setContextMenu,
 }) {
   const incomingBlock = scriptureJson.blocks[position[0]];
   const incomingContent =
@@ -49,6 +51,26 @@ export default function EditableSpan({
     setValue(incomingContent);
     setFirstTime(false);
   }
+
+  const getCaretPosition = (e) => {
+    let caretPosition = null;
+    if (editorRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.nativeEvent.stopImmediatePropagation();
+      const selection = window.getSelection();
+      const range = selection.getRangeAt(0);
+      if (!range.collapsed) {
+        return null;
+      }
+      const range2 = range.cloneRange();
+      const temp = document.createTextNode("\0");
+      range.insertNode(temp);
+      caretPosition = editorRef.current.innerText.indexOf("\0");
+      temp.parentNode.removeChild(temp);
+    }
+    return caretPosition;
+  };
 
   const getWordAtCursor = () => {
     const selection = window.getSelection();
@@ -96,37 +118,42 @@ export default function EditableSpan({
   };
 
   return (
-    <span
-      key={`${key}-editable`}
-      ref={editorRef}
-      className="span_edit_verses"
-      contentEditable="plaintext-only"
-      style={{
-        paddingRight: value.trim() === "" ? "20px" : "0",
-        backgroundColor: value.trim() === "" ? "#CCC" : "#FFF",
-      }}
-      onBlur={(e) => {
-        // console.log("BLUR", position)
-        updateScriptureJson(scriptureJson, position, value).then();
-        return false;
-      }}
-      onFocus={(e) => {
-        //console.log("FOCUS", position)
-        updateBcv(systemBcv.bookCode, chapter, verse, endVerse);
-        return false;
-      }}
-      onClick={(e) => {
-        const word = getWordAtCursor();
-        if (word) {
-          postJson(
-            "/api/app-state/word",
-            JSON.stringify({ target: word }),
-            debugRef.current,
-          );
-        }
-      }}
-    >
-      {value}
-    </span>
+    <>
+      <div>
+        <span
+          key={`${key}-editable`}
+          ref={editorRef}
+          className="span_edit_verses"
+          contentEditable="plaintext-only"
+          style={{
+            paddingRight: value.trim() === "" ? "20px" : "0",
+            backgroundColor: value.trim() === "" ? "#CCC" : "#FFF",
+          }}
+          onBlur={(e) => {
+            // console.log("BLUR", position)
+            updateScriptureJson(scriptureJson, position, value).then();
+            return false;
+          }}
+          onFocus={(e) => {
+            //console.log("FOCUS", position)
+            updateBcv(systemBcv.bookCode, chapter, verse, endVerse);
+            return false;
+          }}
+          onClick={(e) => {
+            return;
+            const word = getWordAtCursor();
+            if (word) {
+              postJson(
+                "/api/app-state/word",
+                JSON.stringify({ target: word }),
+                debugRef.current,
+              );
+            }
+          }}
+        >
+          {value}
+        </span>
+      </div>
+    </>
   );
 }

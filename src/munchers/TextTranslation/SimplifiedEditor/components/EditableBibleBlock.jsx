@@ -5,6 +5,8 @@ export default function EditableBibleBlock({
   scriptureJson,
   setScriptureJson,
   position,
+  contextMenu,
+  setContextMenu,
 }) {
   if (scriptureJson.blocks[position[0]]) {
     const tag = scriptureJson.blocks[position[0]].tag;
@@ -29,6 +31,8 @@ export default function EditableBibleBlock({
                 </span>
                 <EditableSpan
                   key={i}
+                  contextMenu={contextMenu}
+                  setContextMenu={setContextMenu}
                   scriptureJson={scriptureJson}
                   setScriptureJson={setScriptureJson}
                   position={[...position, i]}
