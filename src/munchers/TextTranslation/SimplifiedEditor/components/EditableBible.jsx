@@ -10,6 +10,7 @@ import {
   Stack,
   Box,
   Button,
+  ButtonGroup,
   TextField,
 } from "@mui/material";
 import { splitPara } from "../Controller";
@@ -21,7 +22,8 @@ function ActionsDialog({
   setScriptureJson,
 }) {
   const id = useId();
-  const [verseNo, setVerseNo] = useState(null);
+  const [dialog, setDialog] = useState(null);
+  const [vNumber, setVNumber] = useState("");
 
   let doSplitPara = () => {
     const unit = scriptureJson.blocks[caretPosition.position[0]]?.units;
@@ -34,35 +36,59 @@ function ActionsDialog({
     }
   };
 
-  return (
-    <Dialog open={true} onClose={() => setCaretPosition(null)}>
-      <DialogContent>
-        <Stack sx={{ width: "100%", textAlign: "left" }}>
-          <Button variant="outlined" onClick={doSplitPara}>
-            Split Para
-          </Button>
-          <Box>
+  let doAddVerse = () => {
+    setCaretPosition(null);
+    console.log("AddVerse", vNumber);
+  };
+
+  let verseNumberIsValid = () => {
+    const verseRegExp = new RegExp(/^[1-9][0-9]{0,2}(-[1-9][0-9]{0,2})?$/);
+    return verseRegExp.test(vNumber);
+  };
+
+  if (!dialog) {
+    return (
+      <Dialog open={true} onClose={() => setCaretPosition(null)}>
+        <DialogContent>
+          <ButtonGroup
+            variant="outlined"
+            color="secondary"
+            orientation="vertical"
+          >
+            <Button onClick={doSplitPara}>Split Paragraph</Button>
+            <Button onClick={() => setDialog("addVerse")}>Add Verse</Button>
+          </ButtonGroup>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (dialog === "addVerse") {
+    return (
+      <Dialog open={true} onClose={() => setDialog(null)}>
+        <DialogContent>
+          <Stack sx={{ width: "100%", textAlign: "left" }}>
+            <TextField
+              error={!verseNumberIsValid()}
+              label="Verse Number"
+              value={vNumber}
+              onChange={(e) =>
+                setVNumber(e.target.value.replace(/[^0-9-]/g, ""))
+              }
+            />
             <Button
               sx={{ textAlign: "left" }}
               variant="outlined"
-              onClick={() => false}
-              disabled={!verseNo}
+              disabled={!verseNumberIsValid()}
+              onClick={doAddVerse}
             >
               Add Verse
             </Button>
-            <TextField
-              id="verse number"
-              label="Verse N°"
-              onChange={(e) =>
-                setVerseNo(e.target.value.replace(/[^0-9\-]/g, ""))
-              }
-              value={verseNo}
-            />
-          </Box>
-        </Stack>
-      </DialogContent>
-    </Dialog>
-  );
+          </Stack>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 }
 
 export default function EditableBible({
