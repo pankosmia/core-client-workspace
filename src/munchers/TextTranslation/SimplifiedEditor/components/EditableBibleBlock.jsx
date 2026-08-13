@@ -25,6 +25,7 @@ export default function EditableBibleBlock({
         {!["b", "ib"].includes(tag) &&
           scriptureJson.blocks[position[0]].units &&
           scriptureJson.blocks[position[0]].units.map((u, i) => {
+            const uVerses = u["verses"];
             return (
               <span style={{ display: "inline-block" }}>
                 <span key={i} className="marks_verses_label">

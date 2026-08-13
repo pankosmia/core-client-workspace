@@ -3,8 +3,15 @@ import EditableGraft from "./EditableGraft";
 import EditableRemark from "./EditableRemark";
 import { useContext, useEffect, useState, useId } from "react";
 import { bcvContext } from "pankosmia-rcl";
-import { PanDialog, PanDialogActions } from "pankosmia-rcl";
-import { DialogContent, Stack, Box, Button, TextField } from "@mui/material";
+import { PanDialogActions } from "pankosmia-rcl";
+import {
+  Dialog,
+  DialogContent,
+  Stack,
+  Box,
+  Button,
+  TextField,
+} from "@mui/material";
 import { splitPara } from "../Controller";
 
 function ActionsDialog({
@@ -28,11 +35,7 @@ function ActionsDialog({
   };
 
   return (
-    <PanDialog
-      titleLabel="Actions"
-      isOpen={true}
-      closeFn={() => setCaretPosition(null)}
-    >
+    <Dialog open={true} onClose={() => setCaretPosition(null)}>
       <DialogContent>
         <Stack sx={{ width: "100%", textAlign: "left" }}>
           <Button variant="outlined" onClick={doSplitPara}>
@@ -58,7 +61,7 @@ function ActionsDialog({
           </Box>
         </Stack>
       </DialogContent>
-    </PanDialog>
+    </Dialog>
   );
 }
 
@@ -66,10 +69,10 @@ export default function EditableBible({
   chapterJson,
   scriptureJson,
   setScriptureJson,
+  caretPosition,
+  setCaretPosition,
 }) {
-  console.log("bible");
   const { systemBcv } = useContext(bcvContext);
-  const [caretPosition, setCaretPosition] = useState(null);
 
   useEffect(() => {
     async function loadCSS() {

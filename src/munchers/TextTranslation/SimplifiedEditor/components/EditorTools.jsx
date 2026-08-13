@@ -28,6 +28,8 @@ function EditorTools({
   scriptureJson,
   currentBookCode,
   setCurrentBookCode,
+  caretPosition,
+  setCaretPosition,
 }) {
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);

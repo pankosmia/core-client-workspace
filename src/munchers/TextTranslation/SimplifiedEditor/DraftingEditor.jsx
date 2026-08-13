@@ -29,6 +29,7 @@ function DraftingEditor({ metadata, modified, setModified }) {
       ? metadata.script_direction.toLowerCase()
       : undefined,
   );
+  const [caretPosition, setCaretPosition] = useState(null);
 
   const sbScriptDir = metadata?.script_direction
     ? metadata.script_direction.toLowerCase()
@@ -98,6 +99,8 @@ function DraftingEditor({ metadata, modified, setModified }) {
         scriptureJson={scriptureJson}
         currentBookCode={currentBookCode}
         setCurrentBookCode={setCurrentBookCode}
+        caretPosition={caretPosition}
+        setCaretPosition={setCaretPosition}
       />
       {/** If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard */}
       <Box dir={!sbScriptDirSet ? textDir : undefined}>
@@ -107,6 +110,8 @@ function DraftingEditor({ metadata, modified, setModified }) {
             scriptureJson={scriptureJson}
             setScriptureJson={setScriptureJson}
             key={bookChangeCount}
+            caretPosition={caretPosition}
+            setCaretPosition={setCaretPosition}
           />
         ) : (
           <Box

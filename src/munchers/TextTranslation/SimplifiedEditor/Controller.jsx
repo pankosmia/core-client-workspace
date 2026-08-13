@@ -35,29 +35,37 @@ function splitPara(scriptureJson, caretPosition) {
           const newBlocks = [
             {
               ...b,
-              units: b.units.map((u, n2) => {
-                if (n2 < caretPosition.position[1]) {
-                  return u;
-                } else if (n2 === caretPosition.position[1]) {
-                  return {
-                    ...u,
-                    content: [u.content[0].slice(0, caretPosition.cp)],
-                  };
-                }
-              }),
+              units: b.units
+                .map((u, n2) => {
+                  if (n2 < caretPosition.position[1]) {
+                    return u;
+                  } else if (n2 === caretPosition.position[1]) {
+                    return {
+                      ...u,
+                      content: [u.content[0].slice(0, caretPosition.cp)],
+                    };
+                  } else {
+                    return "";
+                  }
+                })
+                .filter((u) => u !== ""),
             },
             {
               ...b,
-              units: b.units.map((u, n2) => {
-                if (n2 > caretPosition.position[1]) {
-                  return u;
-                } else if (n2 === caretPosition.position[1]) {
-                  return {
-                    ...u,
-                    content: [u.content[0].slice(caretPosition.cp)],
-                  };
-                }
-              }),
+              units: b.units
+                .map((u, n2) => {
+                  if (n2 > caretPosition.position[1]) {
+                    return u;
+                  } else if (n2 === caretPosition.position[1]) {
+                    return {
+                      ...u,
+                      content: [u.content[0].slice(caretPosition.cp)],
+                    };
+                  } else {
+                    return "";
+                  }
+                })
+                .filter((u) => u !== ""),
             },
           ];
           return newBlocks;
