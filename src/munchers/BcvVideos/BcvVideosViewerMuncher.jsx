@@ -7,6 +7,7 @@ import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
+import { doI18n } from "pankosmia-lib/i18n";
 import { getText } from "pankosmia-lib/http";
 import TextDir from "../helpers/TextDir";
 
