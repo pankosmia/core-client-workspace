@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
+    "eslint-plugin-jest": "^29.16.1",
     "husky": "^9.1.7",
     "postcss": "^8.5.3",
     "postcss-import": "^16.1.0",
@@ -53,7 +54,10 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "node --max_old_space_size=4096 ./node_modules/vite/bin/vite.js build",
+    "lint": "eslint \"src/**/*.{js,jsx}\"",
+    "lint:fix": "eslint \"src/**/*.{js,jsx}\" --fix",
+    "lint:errors": "eslint \"src/**/*.{js,jsx}\" --quiet",
+    "build": "pnpm run lint && node --max_old_space_size=4096 ./node_modules/vite/bin/vite.js build",
     "build:cra": "node --max_old_space_size=4096 node_modules/react-scripts/scripts/build.js",
     "dev": "vite",
     "watch": "node --max_old_space_size=4096 ./node_modules/vite/bin/vite.js build",
@@ -63,6 +67,16 @@
     "extends": [
       "react-app",
       "react-app/jest"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/*.worker.js"
+        ],
+        "rules": {
+          "no-restricted-globals": "off"
+        }
+      }
     ]
   },
   "browserslist": {
