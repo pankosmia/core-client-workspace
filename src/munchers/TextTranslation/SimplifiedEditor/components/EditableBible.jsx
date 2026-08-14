@@ -5,15 +5,16 @@ import { useContext, useEffect, useState, useId } from "react";
 import { bcvContext } from "pankosmia-rcl";
 import { PanDialogActions } from "pankosmia-rcl";
 import {
-  Dialog,
-  DialogContent,
   Stack,
   Box,
   Button,
   ButtonGroup,
   TextField,
+  IconButton,
 } from "@mui/material";
 import { splitPara } from "../Controller";
+import { productContext as ProductContext } from "pankosmia-rcl";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 
 function ActionsDialog({
   caretPosition,
@@ -22,8 +23,8 @@ function ActionsDialog({
   setScriptureJson,
 }) {
   const id = useId();
-  const [dialog, setDialog] = useState(null);
   const [vNumber, setVNumber] = useState("");
+  const { product } = useContext(ProductContext);
 
   let doSplitPara = () => {
     const unit = scriptureJson.blocks[caretPosition.position[0]]?.units;
@@ -31,7 +32,9 @@ function ActionsDialog({
       let content = unit[caretPosition.position[1]]?.content;
       if (content && content[0]) {
         setCaretPosition(null);
-        setScriptureJson(splitPara(scriptureJson, caretPosition));
+        setTimeout(() => {
+          setScriptureJson(splitPara(scriptureJson, caretPosition));
+        }, 100);
       }
     }
   };
@@ -46,49 +49,82 @@ function ActionsDialog({
     return verseRegExp.test(vNumber);
   };
 
-  if (!dialog) {
+  if (caretPosition) {
     return (
-      <Dialog open={true} onClose={() => setCaretPosition(null)}>
-        <DialogContent>
-          <ButtonGroup
-            variant="outlined"
-            color="secondary"
-            orientation="vertical"
-          >
-            <Button onClick={doSplitPara}>Split Paragraph</Button>
-            <Button onClick={() => setDialog("addVerse")}>Add Verse</Button>
-          </ButtonGroup>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
-  if (dialog === "addVerse") {
-    return (
-      <Dialog open={true} onClose={() => setDialog(null)}>
-        <DialogContent>
-          <Stack sx={{ width: "100%", textAlign: "left" }}>
-            <TextField
-              error={!verseNumberIsValid()}
-              label="Verse Number"
-              value={vNumber}
-              onChange={(e) =>
-                setVNumber(e.target.value.replace(/[^0-9-]/g, ""))
-              }
-            />
-            <Button
-              sx={{ textAlign: "left" }}
-              variant="outlined"
-              disabled={!verseNumberIsValid()}
-              onClick={doAddVerse}
-            >
-              Add Verse
-            </Button>
+      <>
+        <Box
+          sx={{
+            zIndex: 1800,
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: "#000",
+            opacity: "30%",
+          }}
+          onClick={() => setCaretPosition(null)}
+        ></Box>
+        <Box
+          sx={{
+            zIndex: 2000,
+            position: "absolute",
+            top: product && product.os === "android" ? "90px" : "60px",
+            right: product && product.os === "android" ? "90px" : "60px",
+            backgroundColor: "#FFF",
+          }}
+        >
+          <Stack sx={{ width: "100%" }}>
+            <Stack direction="row" justifyContent="end" sx={{ width: "100%" }}>
+              <IconButton size="small" onClick={() => setCaretPosition(null)}>
+                <CloseOutlinedIcon />
+              </IconButton>
+            </Stack>
+            <Stack sx={{ width: "100%", p: 1 }} spacing={2}>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={(e) => {
+                  doSplitPara();
+                  e.stopPropagation();
+                }}
+              >
+                Split Paragraph
+              </Button>
+              <Stack
+                sx={{ width: "100%", border: "1px #CCC solid", p: 1 }}
+                spacing={1}
+              >
+                <TextField
+                  value={vNumber}
+                  size="small"
+                  label="Verse N°"
+                  onChange={(e) => {
+                    setVNumber(e.target.value.replace(/[^0-9-]/g, ""));
+                    e.stopPropagation();
+                  }}
+                />
+                <Button
+                  sx={{ textAlign: "left" }}
+                  size="small"
+                  disabled={!verseNumberIsValid()}
+                  variant="outlined"
+                  onClick={(e) => {
+                    console.log("Adding");
+                    doAddVerse();
+                    e.stopPropagation();
+                  }}
+                >
+                  Add Verse
+                </Button>
+              </Stack>
+            </Stack>
           </Stack>
-        </DialogContent>
-      </Dialog>
+        </Box>
+      </>
     );
   }
+  return "";
 }
 
 export default function EditableBible({
@@ -98,6 +134,7 @@ export default function EditableBible({
   caretPosition,
   setCaretPosition,
 }) {
+  console.log("Bible");
   const { systemBcv } = useContext(bcvContext);
 
   useEffect(() => {
@@ -116,19 +153,16 @@ export default function EditableBible({
     loadCSS();
   }, []);
 
-  if (caretPosition) {
-    return (
-      <ActionsDialog
-        caretPosition={caretPosition}
-        setCaretPosition={setCaretPosition}
-        scriptureJson={scriptureJson}
-        setScriptureJson={setScriptureJson}
-      />
-    );
-  }
-
   return (
     <div>
+      {caretPosition && (
+        <ActionsDialog
+          caretPosition={caretPosition}
+          setCaretPosition={setCaretPosition}
+          scriptureJson={scriptureJson}
+          setScriptureJson={setScriptureJson}
+        />
+      )}
       {chapterJson.blocks.map((b, n) => {
         switch (b.type) {
           case "chapter":

@@ -123,7 +123,12 @@ export default function EditableSpan({
   return (
     <div
       onContextMenu={(e) =>
-        setCaretPosition({ cp: getCaretPosition(e), position })
+        setCaretPosition({
+          cp: getCaretPosition(e),
+          position,
+          mouseX: e.mouseX,
+          mouseY: e.mouseY,
+        })
       }
       onClick={(e) => {
         const word = getWordAtCursor();
@@ -154,17 +159,6 @@ export default function EditableSpan({
           //console.log("FOCUS", position)
           updateBcv(systemBcv.bookCode, chapter, verse, endVerse);
           return false;
-        }}
-        onClick={(e) => {
-          return;
-          const word = getWordAtCursor();
-          if (word) {
-            postJson(
-              "/api/app-state/word",
-              JSON.stringify({ target: word }),
-              debugRef.current,
-            );
-          }
         }}
       >
         {value}
