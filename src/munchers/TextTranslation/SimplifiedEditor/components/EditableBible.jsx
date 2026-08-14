@@ -76,46 +76,92 @@ function ActionsDialog({
         >
           <Stack sx={{ width: "100%" }}>
             <Stack direction="row" justifyContent="end" sx={{ width: "100%" }}>
-              <IconButton size="small" onClick={() => setCaretPosition(null)}>
-                <CloseOutlinedIcon />
+              <IconButton
+                size="small"
+                onClick={() => setCaretPosition(null)}
+                sx={{ pr: 2 }}
+              >
+                <CloseOutlinedIcon sx={{ p: 0 }} />
               </IconButton>
             </Stack>
-            <Stack sx={{ width: "100%", p: 1 }} spacing={2}>
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={(e) => {
-                  doSplitPara();
-                  e.stopPropagation();
-                }}
-              >
-                Split Paragraph
-              </Button>
-              <Stack
-                sx={{ width: "100%", border: "1px #CCC solid", p: 1 }}
-                spacing={1}
-              >
-                <TextField
-                  value={vNumber}
-                  size="small"
-                  label="Verse N°"
-                  onChange={(e) => {
-                    setVNumber(e.target.value.replace(/[^0-9-]/g, ""));
-                    e.stopPropagation();
-                  }}
-                />
+            <Stack
+              sx={{ width: "100%", pt: 0, pb: 1, pl: 1, pr: 1 }}
+              spacing={2}
+            >
+              <Box sx={{ pl: 1, pr: 1, pt: 0, pb: 1 }}>
+                <Stack sx={{ border: "1px #777 solid", p: 1 }} spacing={1}>
+                  <TextField
+                    value={vNumber}
+                    size="small"
+                    label="Verse N°"
+                    onChange={(e) => {
+                      setVNumber(e.target.value.replace(/[^0-9-]/g, ""));
+                      e.stopPropagation();
+                    }}
+                  />
+                  <Button
+                    sx={{ textAlign: "left" }}
+                    size="small"
+                    disabled={!verseNumberIsValid()}
+                    variant="outlined"
+                    onClick={(e) => {
+                      console.log("Adding");
+                      doAddVerse();
+                      e.stopPropagation();
+                    }}
+                  >
+                    Add Verse
+                  </Button>
+                </Stack>
+              </Box>
+              <Stack sx={{ width: "100%", p: 1 }} spacing={1}>
                 <Button
-                  sx={{ textAlign: "left" }}
                   size="small"
-                  disabled={!verseNumberIsValid()}
                   variant="outlined"
                   onClick={(e) => {
-                    console.log("Adding");
-                    doAddVerse();
+                    doSplitPara();
                     e.stopPropagation();
                   }}
                 >
-                  Add Verse
+                  Split Paragraph
+                </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  Merge Paragraph Up
+                </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  Merge Paragraph Down
+                </Button>
+              </Stack>
+              <Stack sx={{ width: "100%", p: 1 }} spacing={1}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  Add Footnote
+                </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  Add Cross-Reference
                 </Button>
               </Stack>
             </Stack>
