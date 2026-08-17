@@ -8,9 +8,7 @@ import { bcvContext, debugContext } from "pankosmia-rcl";
 function ChapterPicker({ repoMetadata, chapterNumbers }) {
   const [scriptDirection, setScriptDirection] = useState([]);
   const { bcvRef, systemBcv } = useContext(bcvContext);
-  const [currentPosition, setCurrentPosition] = useState(
-    chapterNumbers.indexOf(bcvRef.current.chapterNum),
-  );
+  const currentPosition = chapterNumbers.indexOf(systemBcv.chapterNum);
   const { debugRef } = useContext(debugContext);
   const projectScriptDirection = async () => {
     const summariesResponse = await getJson(
@@ -31,7 +29,6 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
   // changer de page -1
   const previousChapter = () => {
     if (currentPosition > 0) {
-      setCurrentPosition(currentPosition - 1);
       postEmptyJson(
         `/api/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[currentPosition - 1]}/1`,
         debugRef.current,
@@ -42,7 +39,6 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
   // changer de page +1
   const nextChapter = () => {
     if (currentPosition < chapterNumbers.length - 1) {
-      setCurrentPosition(currentPosition + 1);
       postEmptyJson(
         `/api/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[currentPosition + 1]}/1`,
         debugRef.current,
@@ -51,7 +47,6 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
   };
 
   const handleClickMenuChapter = (i) => {
-    setCurrentPosition(i);
     postEmptyJson(
       `/api/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[i]}/1`,
       debugRef.current,
