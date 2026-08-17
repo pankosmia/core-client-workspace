@@ -12,6 +12,11 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
     chapterNumbers.indexOf(bcvRef.current.chapterNum),
   );
   const { debugRef } = useContext(debugContext);
+
+  useEffect(() => {
+    setCurrentPosition(chapterNumbers.indexOf(bcvRef.current.chapterNum));
+  }, [chapterNumbers]);
+
   const projectScriptDirection = async () => {
     const summariesResponse = await getJson(
       `/api/burrito/metadata/summary/${repoMetadata.local_path}`,
@@ -57,14 +62,14 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
       debugRef.current,
     );
   };
-
   return (
     <Box
       sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
     >
-      {scriptDirection === "rtr" ? (
+      {scriptDirection === "rtl" ? (
         <ButtonGroup>
           <IconButton
+            disabled={currentPosition < 1}
             onClick={() => {
               previousChapter();
             }}
@@ -103,9 +108,10 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
         ))}
       </TextField>
 
-      {scriptDirection === "rtr" ? (
+      {scriptDirection === "rtl" ? (
         <ButtonGroup>
           <IconButton
+            disabled={currentPosition >= chapterNumbers.length - 1}
             onClick={() => {
               nextChapter();
             }}
