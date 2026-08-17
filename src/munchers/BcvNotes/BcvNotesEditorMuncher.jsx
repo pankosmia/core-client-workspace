@@ -1,5 +1,12 @@
 import { useEffect, useState, useContext, useCallback } from "react";
-import { Box, Stack, Grid2, Typography } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Grid2,
+  Typography,
+  Switch,
+  FormControlLabel,
+} from "@mui/material";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,
@@ -26,6 +33,7 @@ function BcvNotesEditorMuncher({ metadata }) {
   const [currentChapter, setCurrentChapter] = useState("1");
   const [refDisabled, setRefDisabled] = useState(false);
   const [resourceType, setResourceType] = useState("new_bcv_note");
+  const [showAllFields, setShowAllFields] = useState(false);
 
   // Récupération des données du tsv
   const getAllData = async () => {
@@ -190,6 +198,8 @@ function BcvNotesEditorMuncher({ metadata }) {
             refDisabled={refDisabled}
             setRefDisabled={setRefDisabled}
             resourceType={resourceType}
+            showAllFields={showAllFields}
+            setShowAllFields={setShowAllFields}
           />
         </Box>
       ) : (
