@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext, useMemo } from "react";
 import {
   Box,
-  Grid2,
+  Grid,
   Typography,
   Accordion,
   AccordionSummary,
@@ -170,7 +170,7 @@ function BcvArticlesViewerMuncher({ metadata }) {
   // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
   return (
     <Box sx={{ flexGrow: 1 }} dir={!sbScriptDirSet ? textDir : undefined}>
-      <Grid2
+      <Grid
         container
         direction="row"
         sx={{
@@ -179,7 +179,7 @@ function BcvArticlesViewerMuncher({ metadata }) {
           alignItems: "center",
         }}
       >
-        <Grid2
+        <Grid
           item
           size={3}
           sx={{
@@ -200,8 +200,8 @@ function BcvArticlesViewerMuncher({ metadata }) {
           >
             {verseLabel}
           </Typography>
-        </Grid2>
-        <Grid2 item size={12}>
+        </Grid>
+        <Grid item size={12}>
           {verseNotes.length > 0 &&
             [...new Set(verseNotes)].map((v, n) => {
               return (
@@ -236,8 +236,8 @@ function BcvArticlesViewerMuncher({ metadata }) {
                 </Accordion>
               );
             })}
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     </Box>
   );
 }

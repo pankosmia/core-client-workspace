@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Grid2, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 
 import { getText } from "pankosmia-lib/http";
 import { doI18n } from "pankosmia-lib/i18n";
@@ -68,13 +68,13 @@ function VideoLinksViewerMuncher({ metadata }) {
       <Typography variant="h6">
         {doI18n("munchers:video_links_viewer:title", i18nRef.current)}
       </Typography>
-      <Grid2 container spacing={2}>
+      <Grid container spacing={2}>
         {verseNotes.length === 0 &&
           doI18n("munchers:video_links_viewer:no_content", i18nRef.current)}
         {verseNotes.length > 0 &&
           enableNet &&
           verseNotes.map((note) => (
-            <Grid2 size={6}>
+            <Grid size={6}>
               <video width="320" height="240" controls>
                 <source src={note} type="video/mp4" />
                 {doI18n(
@@ -82,10 +82,10 @@ function VideoLinksViewerMuncher({ metadata }) {
                   i18nRef.current,
                 )}
               </video>
-            </Grid2>
+            </Grid>
           ))}
         {verseNotes.length > 0 && !enableNet && <b>Offline Mode</b>}
-      </Grid2>
+      </Grid>
     </Box>
   );
 }

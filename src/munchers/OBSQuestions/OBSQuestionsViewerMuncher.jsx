@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import {
   Box,
-  Grid2,
+  Grid,
   Typography,
   Accordion,
   AccordionSummary,
@@ -67,7 +67,7 @@ function OBSQuestionsViewerMuncher({ metadata }) {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid2
+      <Grid
         container
         direction="row"
         sx={{
@@ -76,7 +76,7 @@ function OBSQuestionsViewerMuncher({ metadata }) {
           alignItems: "center",
         }}
       >
-        <Grid2
+        <Grid
           item
           size={3}
           sx={{
@@ -97,8 +97,8 @@ function OBSQuestionsViewerMuncher({ metadata }) {
           >
             {verseLabel}
           </Typography>
-        </Grid2>
-        <Grid2 item size={12}>
+        </Grid>
+        <Grid item size={12}>
           {ingredient && verseQuestions.length > 0
             ? verseQuestions.map((v, n) => {
                 return verseTags[n].includes("summary") ? (
@@ -128,8 +128,8 @@ function OBSQuestionsViewerMuncher({ metadata }) {
                 );
               })
             : "No questions found for this paragraph"}
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     </Box>
   );
 }

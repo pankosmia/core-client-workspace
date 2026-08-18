@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from "react";
 import {
   Box,
-  Grid2,
+  Grid,
   TextField,
   IconButton,
   CircularProgress,
@@ -254,7 +254,7 @@ function RhakosCruncher({ metadata, style }) {
 
   return (
     <Box sx={{ flexGrow: 1, p: 2 }}>
-      <Grid2
+      <Grid
         container
         direction="row"
         sx={{
@@ -265,10 +265,10 @@ function RhakosCruncher({ metadata, style }) {
         columnSpacing={0.5}
         rowSpacing={1}
       >
-        <Grid2 item size={12}>
+        <Grid item size={12}>
           <Typography variant="h6">{`${bcvRef.current.bookCode} ${bcvRef.current.chapterNum}:${bcvRef.current.verseNum}`}</Typography>
-        </Grid2>
-        <Grid2
+        </Grid>
+        <Grid
           container
           sx={{
             display: "flex",
@@ -278,7 +278,7 @@ function RhakosCruncher({ metadata, style }) {
           item
           size={12}
         >
-          <Grid2 item size="grow">
+          <Grid item size="grow">
             <TextField
               fullWidth
               label={`
@@ -295,14 +295,14 @@ function RhakosCruncher({ metadata, style }) {
                 },
               }}
             />
-          </Grid2>
-          <Grid2 item size={{ "@xs": 2, "@md": 1 }}>
+          </Grid>
+          <Grid item size={{ "@xs": 2, "@md": 1 }}>
             <IconButton onClick={() => setOpenDialogConfig(true)}>
               <SettingsIcon />
             </IconButton>
-          </Grid2>
-        </Grid2>
-        <Grid2
+          </Grid>
+        </Grid>
+        <Grid
           container
           sx={{
             display: "flex",
@@ -312,7 +312,7 @@ function RhakosCruncher({ metadata, style }) {
           item
           size={12}
         >
-          <Grid2 item size="grow">
+          <Grid item size="grow">
             <TextField
               fullWidth
               label={
@@ -338,14 +338,14 @@ function RhakosCruncher({ metadata, style }) {
                 },
               }}
             />
-          </Grid2>
-          <Grid2 item size={{ "@xs": 2, "@md": 1 }}>
+          </Grid>
+          <Grid item size={{ "@xs": 2, "@md": 1 }}>
             <IconButton onClick={() => setOpenDialogResources(true)}>
               <SettingsIcon />
             </IconButton>
-          </Grid2>
-        </Grid2>
-        <Grid2 item size="grow">
+          </Grid>
+        </Grid>
+        <Grid item size="grow">
           <TextField
             fullWidth
             disabled={processing !== "waiting"}
@@ -359,8 +359,8 @@ function RhakosCruncher({ metadata, style }) {
               setPrompt(event.target.value);
             }}
           />
-        </Grid2>
-        <Grid2 item size={{ "@xs": 2, "@md": 1 }} sx={{ display: "flex" }}>
+        </Grid>
+        <Grid item size={{ "@xs": 2, "@md": 1 }} sx={{ display: "flex" }}>
           <IconButton
             fullWidth
             disabled={processing !== "waiting" || prompt === ""}
@@ -397,9 +397,9 @@ function RhakosCruncher({ metadata, style }) {
               <SendIcon />
             )}
           </IconButton>
-        </Grid2>
-      </Grid2>
-      <Grid2
+        </Grid>
+      </Grid>
+      <Grid
         container
         columnSpacing={0.5}
         rowSpacing={1}
@@ -413,7 +413,7 @@ function RhakosCruncher({ metadata, style }) {
         {[...responses].reverse().map((r, n) => (
           <ResponseRow n={n} response={r} />
         ))}
-      </Grid2>
+      </Grid>
       <DialogConfig
         open={openDialogConfig}
         close={setOpenDialogConfig}

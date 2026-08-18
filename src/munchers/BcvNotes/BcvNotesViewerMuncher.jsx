@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import {
   Box,
-  Grid2,
+  Grid,
   Typography,
   Accordion,
   AccordionDetails,
@@ -96,7 +96,7 @@ function BcvNotesViewerMuncher({ metadata }) {
 
   return (
     <Box sx={{ flexGrow: 1 }} dir={!sbScriptDirSet ? textDir : undefined}>
-      <Grid2
+      <Grid
         container
         direction="row"
         sx={{
@@ -105,7 +105,7 @@ function BcvNotesViewerMuncher({ metadata }) {
           alignItems: "center",
         }}
       >
-        <Grid2 item size={12}>
+        <Grid item size={12}>
           {groupedEntries.length > 0 &&
             groupedEntries.map(([reference, items], n) => {
               const notesContent = items
@@ -144,8 +144,8 @@ function BcvNotesViewerMuncher({ metadata }) {
                 </Accordion>
               );
             })}
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     </Box>
   );
 }
