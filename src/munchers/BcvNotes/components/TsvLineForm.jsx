@@ -490,6 +490,22 @@ function TsvLineForm({
                 ingredient={ingredient}
                 currentRowN={currentRowN}
                 mode={mode}
+                label={
+                  cleanColumn === "question"
+                    ? doI18n(
+                        "pages:core-local-workspace:question",
+                        i18nRef.current,
+                      ) || "question"
+                    : cleanColumn === "response"
+                      ? doI18n(
+                          "pages:core-local-workspace:answer",
+                          i18nRef.current,
+                        ) || "answer"
+                      : doI18n(
+                          "pages:core-local-workspace:note",
+                          i18nRef.current,
+                        ) || "note"
+                }
               />
             ) : (
               <TextField
