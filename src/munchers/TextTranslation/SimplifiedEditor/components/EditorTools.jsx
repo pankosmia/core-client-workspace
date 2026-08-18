@@ -1,4 +1,4 @@
-import { Box, Grid2, IconButton, Tooltip } from "@mui/material";
+import { Box, Grid, IconButton, Tooltip } from "@mui/material";
 import ChapterPicker from "./ChapterPicker";
 import SaveButton from "./SaveButton";
 import BookPicker from "./BookPicker";
@@ -84,13 +84,15 @@ function EditorTools({
         padding: 2,
       }}
     >
-      <Grid2
+      <Grid
         container
-        alignItems="center"
-        justifyContent="space-between"
-        width="100%"
+        sx={{
+          alignItems: "center",
+          width: "100%",
+          justifyContent: "space-between",
+        }}
       >
-        <Grid2 display="flex" gap={1}>
+        <Grid sx={{ display: "flex" }} gap={1}>
           <SaveButton
             metadata={metadata}
             systemBcv={systemBcv}
@@ -117,16 +119,16 @@ function EditorTools({
               />
             </>
           )}
-        </Grid2>
+        </Grid>
 
-        <Grid2 display="flex" gap={1}>
+        <Grid sx={{ display: "flex" }} gap={1}>
           <BookPicker setFirstChapter={getFirstChapterTextTranslation} />
           <ChapterPicker
             chapterNumbers={chapterNumbers}
             repoMetadata={metadata}
           />
-        </Grid2>
-        <Grid2 display="flex" gap={1}>
+        </Grid>
+        <Grid sx={{ display: "flex" }} gap={1}>
           <Tooltip
             title={doI18n(
               "pages:core-local-workspace:button_edit_layout",
@@ -149,8 +151,8 @@ function EditorTools({
               <LayoutIcon />
             </IconButton>
           </Tooltip>
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     </Box>
   );
 }

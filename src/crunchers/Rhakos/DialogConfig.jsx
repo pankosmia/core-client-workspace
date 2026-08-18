@@ -1,4 +1,4 @@
-import { DialogContent, Grid2, Typography } from "@mui/material";
+import { DialogContent, Grid, Typography } from "@mui/material";
 import LlmModelPicker from "./LlmModelPicker";
 import NumberPicker from "./NumberPicker";
 import { PanDialog } from "pankosmia-rcl";
@@ -29,8 +29,8 @@ export default function DialogConfig({
       closeFn={() => close(false)}
     >
       <DialogContent>
-        <Grid2 container spacing={2}>
-          <Grid2
+        <Grid container spacing={2}>
+          <Grid
             size={12}
             sx={{
               display: "flex",
@@ -50,8 +50,8 @@ export default function DialogConfig({
               selectedModel={selectedModel}
               setSelectedModel={setSelectedModel}
             />
-          </Grid2>
-          <Grid2 size={6}>
+          </Grid>
+          <Grid size={6}>
             <NumberPicker
               nameSelect={doI18n(
                 "pages:core-local-workspace:topk_rhakos",
@@ -61,8 +61,8 @@ export default function DialogConfig({
               setState={setTopK}
               options={[1, 2, 5, 10, 20, 50, 100, 200, 500]}
             />
-          </Grid2>
-          <Grid2 size={6}>
+          </Grid>
+          <Grid size={6}>
             <NumberPicker
               nameSelect={doI18n(
                 "pages:core-local-workspace:temperature_rhakos",
@@ -74,8 +74,8 @@ export default function DialogConfig({
                 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.5, 2,
               ]}
             />
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
       </DialogContent>
     </PanDialog>
   );

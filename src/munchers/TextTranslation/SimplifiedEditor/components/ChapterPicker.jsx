@@ -57,9 +57,10 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
     <Box
       sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
     >
-      {scriptDirection === "rtr" ? (
+      {scriptDirection === "rtl" ? (
         <ButtonGroup>
           <IconButton
+            disabled={currentPosition < 1}
             onClick={() => {
               previousChapter();
             }}
@@ -98,9 +99,10 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
         ))}
       </TextField>
 
-      {scriptDirection === "rtr" ? (
+      {scriptDirection === "rtl" ? (
         <ButtonGroup>
           <IconButton
+            disabled={currentPosition >= chapterNumbers.length - 1}
             onClick={() => {
               nextChapter();
             }}

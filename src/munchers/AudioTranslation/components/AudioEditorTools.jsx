@@ -1,4 +1,4 @@
-import { Box, Grid2, IconButton, Tooltip } from "@mui/material";
+import { Box, Grid, IconButton, Tooltip } from "@mui/material";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
@@ -53,13 +53,15 @@ function AudioEditorTools({ nav, compileAudio, generatedAt }) {
         padding: 2,
       }}
     >
-      <Grid2
+      <Grid
         container
-        alignItems="center"
-        justifyContent="space-between"
-        width="100%"
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+        }}
       >
-        <Grid2 display="flex" alignItems="center" gap={1} sx={{ flex: 1 }}>
+        <Grid sx={{ display: "flex", alignItems: "center", flex: 1 }} gap={1}>
           <Tooltip
             title={doI18n(
               "pages:core-local-workspace:button_generate_audio",
@@ -77,17 +79,15 @@ function AudioEditorTools({ nav, compileAudio, generatedAt }) {
             </span>
           </Tooltip>
           <GeneratedAtLabel date={generatedAt} />
-        </Grid2>
+        </Grid>
 
-        <Grid2 display="flex" justifyContent="center" gap={1} sx={{ flex: 1 }}>
+        <Grid sx={{ display: "flex", alignItems: "center", flex: 1 }} gap={1}>
           <AudioNavigator {...nav} />
-        </Grid2>
+        </Grid>
 
-        <Grid2
-          display="flex"
-          justifyContent="flex-end"
+        <Grid
           gap={1}
-          sx={{ flex: 1 }}
+          sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}
         >
           <Tooltip
             title={doI18n(
@@ -109,8 +109,8 @@ function AudioEditorTools({ nav, compileAudio, generatedAt }) {
               <LayoutIcon />
             </IconButton>
           </Tooltip>
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     </Box>
   );
 }
