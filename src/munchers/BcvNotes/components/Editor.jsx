@@ -12,6 +12,8 @@ function Editor({
   refDisabled,
   setRefDisabled,
   resourceType,
+  showAllFields,
+  setShowAllFields,
 }) {
   const [currentRow, setCurrentRow] = useState(Array(7).fill("", 0, 7));
 
@@ -45,6 +47,8 @@ function Editor({
         refDisabled={refDisabled}
         setRefDisabled={setRefDisabled}
         resourceType={resourceType}
+        showAllFields={showAllFields}
+        setShowAllFields={setShowAllFields}
       />
     </Box>
   );
