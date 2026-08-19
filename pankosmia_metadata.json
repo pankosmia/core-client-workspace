@@ -1018,6 +1018,10 @@
     "show_all_fields": {
       "en": "Show all fields",
       "es": "Mostrar todos los campos"
+    },
+    "answer": {
+      "en": "Answer",
+      "es": "Respuesta"
     }
   }
 }

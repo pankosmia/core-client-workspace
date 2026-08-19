@@ -12,7 +12,14 @@ import {
 import { i18nContext as I18nContext } from "pankosmia-rcl";
 import { doI18n } from "pankosmia-lib/i18n";
 
-function MarkdownField({ onChangeNote, value, ingredient, currentRowN, mode }) {
+function MarkdownField({
+  onChangeNote,
+  value,
+  ingredient,
+  currentRowN,
+  mode,
+  label,
+}) {
   const { i18nRef } = useContext(I18nContext);
   const [displayMode, setdisplayMode] = useState("write");
 
@@ -39,10 +46,16 @@ function MarkdownField({ onChangeNote, value, ingredient, currentRowN, mode }) {
       {displayMode === "write" ? (
         <FormControl fullWidth margin="normal">
           <TextField
-            label={doI18n(
-              `pages:core-local-workspace:text_paragraph`,
-              i18nRef.current,
-            )}
+            label={
+              doI18n(
+                `pages:core-local-workspace:${label.toLowerCase()}`,
+                i18nRef.current,
+              ) ||
+              doI18n(
+                `pages:core-local-workspace:text_paragraph`,
+                i18nRef.current,
+              )
+            }
             value={value}
             onChange={onChangeNote}
             minRows={5}
