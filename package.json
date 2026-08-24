@@ -3,12 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "/clients/core-local-workspace",
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=24",
+    "pnpm": "11.20.0"
+  },
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@hello-pangea/dnd": "^18.0.1",
-    "@mui/icons-material": "^6.1.5",
-    "@mui/material": "^6.1.5",
+    "@mui/icons-material": "^9.3.1",
+    "@mui/material": "^9.3.1",
     "@tailwindcss/postcss": "^4.1.4",
     "@use-gesture/react": "^10.3.1",
     "@wavesurfer/react": "^1.0.11",
@@ -16,15 +21,16 @@
     "interactjs": "^1.10.27",
     "md5": "^2.3.0",
     "notistack": "^3.0.2",
+    "pankosmia-juxta-muncher": "0.2.10",
     "pankosmia-lib": "^0.0.3",
-    "pankosmia-rcl": "^0.4.2",
+    "pankosmia-rcl": "^0.7.1",
     "pankosmia-translation_plan-muncher": "^0.2.1",
     "proskomma-core": "^0.11.2",
     "proskomma-json-tools": "^0.9.1",
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "react-markdown": "^9.1.0",
-    "react-router-dom": "^6.27.0",
+    "react-router-dom": "^7.18.2",
     "react-tile-pane": "^0.5.1",
     "react-use-measure": "^2.1.1",
     "snowball-stemmer.jsx": "^0.2.3",
@@ -43,8 +49,8 @@
     "vite": "^6.0.7"
   },
   "peerDependencies": {
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "scripts": {
     "start": "vite",
@@ -71,24 +77,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-darwin-arm64": "^4.62.2",
-    "@rollup/rollup-darwin-x64": "^4.62.2",
-    "@rollup/rollup-linux-arm64-gnu": "^4.62.2",
-    "@rollup/rollup-linux-x64-gnu": "^4.62.2",
-    "@rollup/rollup-win32-arm64-msvc": "^4.62.2",
-    "@rollup/rollup-win32-x64-msvc": "^4.62.2",
-    "@tailwindcss/oxide-darwin-arm64": "^4.1.8",
-    "@tailwindcss/oxide-darwin-x64": "^4.1.8",
-    "@tailwindcss/oxide-linux-arm64-gnu": "^4.1.8",
-    "@tailwindcss/oxide-linux-x64-gnu": "^4.1.8",
-    "@tailwindcss/oxide-win32-arm64-msvc": "^4.1.8",
-    "lightningcss-darwin-arm64": "^1.30.1",
-    "lightningcss-darwin-x64": "^1.30.1",
-    "lightningcss-linux-arm64-gnu": "^1.30.1",
-    "lightningcss-linux-x64-gnu": "^1.30.1",
-    "lightningcss-win32-arm64-msvc": "^1.30.1",
-    "lightningcss-win32-x64-msvc": "^1.30.1"
   }
 }

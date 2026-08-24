@@ -10,6 +10,8 @@ import {
   Button,
   IconButton,
   Stack,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
 import MarkdownField from "../../../components/MarkdownField";
 import ActionsButtons from "./ActionsButtons";
@@ -35,6 +37,8 @@ function TsvLineForm({
   resourceType,
   refDisabled,
   setRefDisabled,
+  showAllFields,
+  setShowAllFields,
 }) {
   const { i18nRef } = useContext(I18nContext);
   const columnNames = ingredient[0] || [];
@@ -42,6 +46,9 @@ function TsvLineForm({
   const [tempRef, setTempRef] = useState("");
 
   const isCreate = mode === "add";
+  const isQuestionsFlavor =
+    resourceType === "new_bcv_question" ||
+    resourceType === "new_bcv_study_question";
   const quoteIndex = columnNames.findIndex((c) =>
     c.toLowerCase().includes("quote"),
   );
@@ -108,6 +115,17 @@ function TsvLineForm({
     setOpenRefDialog(false);
   };
 
+  const questionBaseFields = ["question", "response"]; // response no existe en sq → se ignora solo
+  const questionAllFields = [
+    ...(isCreate ? ["reference", "ref", "id"] : []),
+    "quote",
+    "occurrence",
+    "occurence",
+    "tags",
+    "question",
+    "response",
+  ];
+
   /* Here we pick the order and which fields we are printing depending on what resource we got. Some are repeated because they have different names in different file formats. */
   const visibilityMap = {
     new_bcv_note: [
@@ -120,17 +138,15 @@ function TsvLineForm({
       "occurence",
       "note",
     ],
-    new_bcv_question: [
-      ...(isCreate ? ["reference", "ref", "id"] : []),
-      "quote",
-      "question",
-      "response",
-    ],
-    new_bcv_study_question: [
-      ...(isCreate ? ["reference", "ref", "id"] : []),
-      "quote",
-      "question",
-    ],
+    new_bcv_question: showAllFields
+      ? questionAllFields
+      : [
+          ...(isCreate ? ["reference", "ref", "id"] : []),
+          ...questionBaseFields,
+        ],
+    new_bcv_study_question: showAllFields
+      ? questionAllFields
+      : [...(isCreate ? ["reference", "ref", "id"] : []), "question"],
   };
 
   const activeColumns =
@@ -246,6 +262,24 @@ function TsvLineForm({
 
   return (
     <Box sx={{ padding: 1, justifyContent: "center", height: "50%" }}>
+      {isQuestionsFlavor && (
+        <FormControlLabel
+          control={
+            <Switch
+              checked={showAllFields}
+              onChange={(e) => setShowAllFields(e.target.checked)}
+              size="small"
+            />
+          }
+          label={
+            doI18n(
+              "pages:core-local-workspace:show_all_fields",
+              i18nRef.current,
+            ) || "Show all fields"
+          }
+          sx={{ mb: 1 }}
+        />
+      )}
       {!isCreate && (
         <Button
           variant="text"
@@ -456,6 +490,22 @@ function TsvLineForm({
                 ingredient={ingredient}
                 currentRowN={currentRowN}
                 mode={mode}
+                label={
+                  cleanColumn === "question"
+                    ? doI18n(
+                        "pages:core-local-workspace:question",
+                        i18nRef.current,
+                      ) || "question"
+                    : cleanColumn === "response"
+                      ? doI18n(
+                          "pages:core-local-workspace:answer",
+                          i18nRef.current,
+                        ) || "answer"
+                      : doI18n(
+                          "pages:core-local-workspace:note",
+                          i18nRef.current,
+                        ) || "note"
+                }
               />
             ) : (
               <TextField

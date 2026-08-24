@@ -1,5 +1,12 @@
 import { useEffect, useState, useContext, useCallback } from "react";
-import { Box, Stack, Grid2, Typography } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Grid,
+  Typography,
+  Switch,
+  FormControlLabel,
+} from "@mui/material";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,
@@ -26,6 +33,7 @@ function BcvNotesEditorMuncher({ metadata }) {
   const [currentChapter, setCurrentChapter] = useState("1");
   const [refDisabled, setRefDisabled] = useState(false);
   const [resourceType, setResourceType] = useState("new_bcv_note");
+  const [showAllFields, setShowAllFields] = useState(false);
 
   // Récupération des données du tsv
   const getAllData = async () => {
@@ -139,13 +147,15 @@ function BcvNotesEditorMuncher({ metadata }) {
           padding: 2,
         }}
       >
-        <Grid2
+        <Grid
           container
-          alignItems="flex-start"
-          justifyContent="flex-start"
-          width="100%"
+          sx={{
+            alignItems: "flex-start",
+            justifyContent: "flex-start",
+            width: "100%",
+          }}
         >
-          <Grid2 item size={6}>
+          <Grid item size={6}>
             <SaveTsvButton
               metadata={metadata}
               ingredient={ingredient}
@@ -153,16 +163,16 @@ function BcvNotesEditorMuncher({ metadata }) {
               md5Ingredient={md5Ingredient}
               setMd5Ingredient={setMd5Ingredient}
             />
-          </Grid2>
-          <Grid2 item size={6} display="flex" gap={1}>
+          </Grid>
+          <Grid item size={6} sx={{ display: "flex" }} gap={1}>
             <BookPicker setFirstChapter={getFirstChapterBCVNotes} />
             <NotesChapterPicker
               ingredient={ingredient}
               currentChapter={currentChapter}
               setCurrentChapter={setCurrentChapter}
             />
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
       </Box>
       {notesExist.length > 0 ? (
         <Box sx={{ display: "flex", gap: 2, flexGrow: 1, padding: 2 }}>
@@ -190,6 +200,8 @@ function BcvNotesEditorMuncher({ metadata }) {
             refDisabled={refDisabled}
             setRefDisabled={setRefDisabled}
             resourceType={resourceType}
+            showAllFields={showAllFields}
+            setShowAllFields={setShowAllFields}
           />
         </Box>
       ) : (

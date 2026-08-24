@@ -1,4 +1,4 @@
-import { DialogContent, Grid2 } from "@mui/material";
+import { DialogContent, Grid } from "@mui/material";
 import { PanDialog } from "pankosmia-rcl";
 import { doI18n } from "pankosmia-lib/i18n";
 import { useContext } from "react";
@@ -18,8 +18,8 @@ export default function InformationDialogRhakos({ open, close, response }) {
       closeFn={() => close(false)}
     >
       <DialogContent>
-        <Grid2 container spacing={2}>
-          <Grid2 size={6}>
+        <Grid container spacing={2}>
+          <Grid size={6}>
             {doI18n(
               "pages:core-local-workspace:elapsed_rhakos",
               i18nRef.current,
@@ -28,8 +28,8 @@ export default function InformationDialogRhakos({ open, close, response }) {
             {"/"}
             {parseFloat(response?.json?.elapsed.toFixed(2))}{" "}
             {doI18n("pages:core-local-workspace:second", i18nRef.current)}
-          </Grid2>
-          <Grid2 size={6}>
+          </Grid>
+          <Grid size={6}>
             {doI18n(
               "pages:core-local-workspace:submitted_rhakos",
               i18nRef.current,
@@ -38,33 +38,33 @@ export default function InformationDialogRhakos({ open, close, response }) {
             {response?.json?.submitted
               ? new Date(response.json.submitted * 1000).toUTCString()
               : "—"}
-          </Grid2>
-          <Grid2 size={6}>
+          </Grid>
+          <Grid size={6}>
             {doI18n("pages:core-local-workspace:model_rhakos", i18nRef.current)}
             : {response?.json?.model_name}
-          </Grid2>
-          <Grid2 size={6}>
+          </Grid>
+          <Grid size={6}>
             {doI18n("pages:core-local-workspace:bcv_rhakos", i18nRef.current)}:{" "}
             {response?.json?.book} {response?.json?.from_chapter}
             {":"}
             {response?.json?.from_verse}
-          </Grid2>
-          <Grid2 size={6}>
+          </Grid>
+          <Grid size={6}>
             {`${doI18n("pages:core-local-workspace:quantized_rhakos", i18nRef.current)}:  ${response?.json?.response?.quantized ? "true" : "false"}`}
-          </Grid2>
+          </Grid>
 
-          <Grid2 size={6}>
+          <Grid size={6}>
             {doI18n("pages:core-local-workspace:topk_rhakos", i18nRef.current)}:{" "}
             {response?.json?.top_k}
-          </Grid2>
-          <Grid2 size={6}>
+          </Grid>
+          <Grid size={6}>
             {doI18n(
               "pages:core-local-workspace:temperature_rhakos",
               i18nRef.current,
             )}
             : {response?.json?.temperature}
-          </Grid2>
-          <Grid2 size={12}>
+          </Grid>
+          <Grid size={12}>
             <Markdown>
               {response.json.response
                 .replace(/^([\s\S]*?)<[\s\S]*/, (a, b) => b)
@@ -74,8 +74,8 @@ export default function InformationDialogRhakos({ open, close, response }) {
                 response.json.response.replace(/^[\s\S]*<\/think>/, "").trim() +
                 "*"}
             </Markdown>
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
       </DialogContent>
     </PanDialog>
   );

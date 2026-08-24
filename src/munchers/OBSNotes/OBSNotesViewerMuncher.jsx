@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Grid2, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import Markdown from "react-markdown";
 import OBSContext from "../../contexts/obsContext";
 
@@ -52,7 +52,7 @@ function OBSNotesViewerMuncher({ metadata }) {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid2
+      <Grid
         container
         direction="row"
         sx={{
@@ -61,7 +61,7 @@ function OBSNotesViewerMuncher({ metadata }) {
           alignItems: "center",
         }}
       >
-        <Grid2
+        <Grid
           item
           size={3}
           sx={{
@@ -82,8 +82,8 @@ function OBSNotesViewerMuncher({ metadata }) {
           >
             {verseLabel}
           </Typography>
-        </Grid2>
-        <Grid2 item size={12} sx={{ paddingRight: "5%" }}>
+        </Grid>
+        <Grid item size={12} sx={{ paddingRight: "5%" }}>
           {ingredient && (
             <Markdown className="markdown">
               {verseNotes.length > 0
@@ -95,8 +95,8 @@ function OBSNotesViewerMuncher({ metadata }) {
                 : "No notes found for this paragraph"}
             </Markdown>
           )}
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     </Box>
   );
 }

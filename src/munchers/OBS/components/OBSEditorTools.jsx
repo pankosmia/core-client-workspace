@@ -4,7 +4,7 @@ import ImportExportIcon from "@mui/icons-material/ImportExport";
 import LayoutIcon from "../../TextTranslation/SimplifiedEditor/layouts/LayoutIcon.jsx";
 import OBSNavigator from "./OBSNavigator";
 import SaveOBSButton from "./SaveOBSButton";
-import { Grid2, IconButton, Menu, MenuItem } from "@mui/material";
+import { Grid, IconButton, Menu, MenuItem } from "@mui/material";
 import { doI18n } from "pankosmia-lib/i18n";
 import { useNavigate } from "react-router-dom";
 import {
@@ -71,18 +71,22 @@ function OBSEditorTools({
         padding: 2,
       }}
     >
-      <Grid2
+      <Grid
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+        }}
         container
-        alignItems="center"
-        justifyContent="space-between"
-        width="100%"
       >
-        <Grid2
-          display="flex"
-          alignItems="center"
-          justifyContent="flex-start"
+        <Grid
+          sx={{
+            alignItems: "center",
+            justifyContent: "flex-start",
+            display: "flex",
+            flex: 1,
+          }}
           gap={1}
-          sx={{ flex: 1 }}
         >
           <SaveOBSButton
             obs={obs}
@@ -134,17 +138,18 @@ function OBSEditorTools({
               Export video story
             </MenuItem>
           </Menu>
-        </Grid2>
+        </Grid>
 
-        <Grid2 display="flex" justifyContent="center" gap={1} sx={{ flex: 1 }}>
-          <OBSNavigator max={currentChapter.length - 1} title={chapterTitle} />
-        </Grid2>
-
-        <Grid2
-          display="flex"
-          justifyContent="flex-end"
+        <Grid
           gap={1}
-          sx={{ flex: 1 }}
+          sx={{ flex: 1, display: "flex", justifyContent: "center" }}
+        >
+          <OBSNavigator max={currentChapter.length - 1} title={chapterTitle} />
+        </Grid>
+
+        <Grid
+          gap={1}
+          sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}
         >
           <Tooltip
             title={doI18n(
@@ -167,8 +172,8 @@ function OBSEditorTools({
               <LayoutIcon />
             </IconButton>
           </Tooltip>
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     </Box>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Button, Grid2 } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import { getJson } from "pankosmia-lib/http";
@@ -29,7 +29,7 @@ function TastelessMuncher({ metadata }) {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid2
+      <Grid
         container
         direction="row"
         sx={{
@@ -39,7 +39,7 @@ function TastelessMuncher({ metadata }) {
         }}
         spacing={2}
       >
-        <Grid2 item size={12}>
+        <Grid item size={12}>
           <Box sx={{ p: 2 }}>
             <h5>{metadata.name}</h5>
             <p>
@@ -57,10 +57,10 @@ function TastelessMuncher({ metadata }) {
             </p>
             <p>Source: {metadata.local_path}</p>
           </Box>
-        </Grid2>
+        </Grid>
         {sbMetadata && (
           <Box sx={{ p: 2 }}>
-            <Grid2 item size={12}>
+            <Grid item size={12}>
               <Button
                 variant="outlined"
                 size="small"
@@ -69,15 +69,15 @@ function TastelessMuncher({ metadata }) {
               >
                 {doI18n("munchers:tasteless:show_metadata", i18nRef.current)}
               </Button>
-            </Grid2>
+            </Grid>
             {showMetadata && (
-              <Grid2 item size={12}>
+              <Grid item size={12}>
                 {JSON.stringify(sbMetadata, null, 2)}
-              </Grid2>
+              </Grid>
             )}
           </Box>
         )}
-      </Grid2>
+      </Grid>
     </Box>
   );
 }
