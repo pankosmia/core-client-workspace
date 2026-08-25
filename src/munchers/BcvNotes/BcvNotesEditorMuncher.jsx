@@ -2,16 +2,19 @@ import { useEffect, useState, useContext, useCallback } from "react";
 import {
   Box,
   Stack,
-  Grid2,
+  Grid,
   Typography,
   Switch,
   FormControlLabel,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
+import { useNavigate } from "react-router-dom";
 import { postEmptyJson, getText } from "pankosmia-lib/http";
 import { doI18n } from "pankosmia-lib/i18n";
 import SearchWithVerses from "./components/SearchWithVerses";
@@ -22,6 +25,7 @@ import md5 from "md5";
 import BookPicker from "../TextTranslation/SimplifiedEditor/components/BookPicker";
 import NotesChapterPicker from "./components/NotesChapterPicker";
 import { getFirstChapterBCVNotes } from "../../common/findFirstChapter";
+import LayoutIcon from "../TextTranslation/SimplifiedEditor/layouts/LayoutIcon";
 function BcvNotesEditorMuncher({ metadata }) {
   const [ingredient, setIngredient] = useState([]);
   const { systemBcv } = useContext(BcvContext);
@@ -34,6 +38,8 @@ function BcvNotesEditorMuncher({ metadata }) {
   const [refDisabled, setRefDisabled] = useState(false);
   const [resourceType, setResourceType] = useState("new_bcv_note");
   const [showAllFields, setShowAllFields] = useState(false);
+
+  const navigate = useNavigate();
 
   // Récupération des données du tsv
   const getAllData = async () => {
@@ -151,11 +157,11 @@ function BcvNotesEditorMuncher({ metadata }) {
           container
           sx={{
             alignItems: "flex-start",
-            justifyContent: "flex-start",
+            justifyContent: "space-between",
             width: "100%",
           }}
         >
-          <Grid item size={6}>
+          <Grid sx={{ display: "flex" }} gap={1}>
             <SaveTsvButton
               metadata={metadata}
               ingredient={ingredient}
@@ -164,13 +170,34 @@ function BcvNotesEditorMuncher({ metadata }) {
               setMd5Ingredient={setMd5Ingredient}
             />
           </Grid>
-          <Grid item size={6} sx={{ display: "flex" }} gap={1}>
+          <Grid sx={{ display: "flex" }} gap={1}>
             <BookPicker setFirstChapter={getFirstChapterBCVNotes} />
             <NotesChapterPicker
               ingredient={ingredient}
               currentChapter={currentChapter}
               setCurrentChapter={setCurrentChapter}
             />
+          </Grid>
+          <Grid sx={{ display: "flex" }} gap={1}>
+            <Tooltip
+              title={doI18n(
+                "pages:core-local-workspace:button_edit_layout",
+                i18nRef.current,
+                debugRef.current,
+              )}
+            >
+              <IconButton
+                disabled={md5(JSON.stringify(ingredient)) !== md5Ingredient}
+                onClick={() =>
+                  navigate({
+                    pathname: "/",
+                    search: "return-page=workspace",
+                  })
+                }
+              >
+                <LayoutIcon />
+              </IconButton>
+            </Tooltip>
           </Grid>
         </Grid>
       </Box>
