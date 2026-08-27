@@ -31,7 +31,7 @@ import {
   typographyContext,
 } from "pankosmia-rcl";
 function WorkspaceCard({ metadata, style, distractionModeCount }) {
-  const { bcvRef } = useContext(bcvContext);
+  const { bcvRef, systemBcv } = useContext(bcvContext);
   const { debugRef } = useContext(debugContext);
   const { i18nRef } = useContext(i18nContext);
   const { typographyRef } = useContext(typographyContext);
@@ -259,7 +259,7 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
       >
         <TranslationPlanViewerMuncher
           metadata={metadata}
-          systemBcv={bcvRef}
+          systemBcv={systemBcv}
           debugRef={debugRef}
           i18nRef={i18nRef}
           typographyRef={typographyRef}

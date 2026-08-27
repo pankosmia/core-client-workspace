@@ -24,7 +24,7 @@
     "pankosmia-juxta-muncher": "0.2.10",
     "pankosmia-lib": "^0.0.3",
     "pankosmia-rcl": "^0.7.1",
-    "pankosmia-translation_plan-muncher": "^0.2.1",
+    "pankosmia-translation_plan-muncher": "^0.2.6",
     "proskomma-core": "^0.11.2",
     "proskomma-json-tools": "^0.9.1",
     "react": "^19.2.8",
