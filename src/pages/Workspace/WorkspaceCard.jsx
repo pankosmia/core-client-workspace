@@ -18,20 +18,23 @@ import OBSEditorMuncher from "../../munchers/OBS/OBSEditorMuncher";
 import OBSNotesViewerMuncher from "../../munchers/OBSNotes/OBSNotesViewerMuncher";
 import OBSQuestionsViewerMuncher from "../../munchers/OBSQuestions/OBSQuestionsViewerMuncher";
 import OBSArticlesViewerMuncher from "../../munchers/OBSArticles/OBSArticlesViewerMuncher";
-import {JuxtalinearViewerMuncher} from "pankosmia-juxta-muncher"
-import TranslationPlanViewerMuncher from "../../munchers/TranslationPlan/TranslationPlanViewerMuncher";
 import JuxtalinearEditorMuncher from "../../munchers/Juxtalinear/JuxtalinearEditorMuncher";
+
+import { TranslationPlanViewerMuncher } from "pankosmia-translation_plan-muncher";
+import { JuxtalinearViewerMuncher } from "pankosmia-juxta-muncher";
 
 import {
   currentProjectContext,
   bcvContext,
   debugContext,
   i18nContext,
+  typographyContext,
 } from "pankosmia-rcl";
 function WorkspaceCard({ metadata, style, distractionModeCount }) {
-  const { bcvRef } = useContext(bcvContext);
+  const { bcvRef, systemBcv } = useContext(bcvContext);
   const { debugRef } = useContext(debugContext);
   const { i18nRef } = useContext(i18nContext);
+  const { typographyRef } = useContext(typographyContext);
   const { currentProjectRef } = useContext(currentProjectContext);
 
   const sbScriptDir = metadata?.script_direction
@@ -123,11 +126,13 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.primary && metadata.flavor.toLowerCase() === "x-juxtalinear") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <JuxtalinearEditorMuncher metadata={metadata}  
-        bcvRef={bcvRef}
-        debugRef={debugRef}
-        i18nRef={i18nRef}
-        currentProjectRef={currentProjectRef}/>
+        <JuxtalinearEditorMuncher
+          metadata={metadata}
+          bcvRef={bcvRef}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          currentProjectRef={currentProjectRef}
+        />
       </div>
     );
   }
@@ -138,12 +143,13 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <JuxtalinearViewerMuncher 
-        metadata={metadata}         
-        bcvRef={bcvRef}
-        debugRef={debugRef}
-        i18nRef={i18nRef}
-        currentProjectRef={currentProjectRef}/>
+        <JuxtalinearViewerMuncher
+          metadata={metadata}
+          bcvRef={bcvRef}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          currentProjectRef={currentProjectRef}
+        />
       </div>
     );
   }
@@ -251,7 +257,13 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <TranslationPlanViewerMuncher metadata={metadata} />
+        <TranslationPlanViewerMuncher
+          metadata={metadata}
+          systemBcv={systemBcv}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          typographyRef={typographyRef}
+        />
       </div>
     );
   }
