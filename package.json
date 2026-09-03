@@ -1,6 +1,6 @@
 {
   "name": "react-app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "homepage": "/clients/core-local-workspace",
   "packageManager": "pnpm@11.20.0",
@@ -21,8 +21,10 @@
     "interactjs": "^1.10.27",
     "md5": "^2.3.0",
     "notistack": "^3.0.2",
+    "pankosmia-bcv-muncher": "^0.2.9",
     "pankosmia-juxta-muncher": "0.2.10",
     "pankosmia-lib": "^0.0.3",
+    "pankosmia-obs-muncher": "^0.2.6",
     "pankosmia-rcl": "^0.7.1",
     "pankosmia-translation_plan-muncher": "^0.2.6",
     "proskomma-core": "^0.11.2",
