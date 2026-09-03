@@ -44,8 +44,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       pankosmia-bcv-muncher:
-        specifier: ^0.2.3
-        version: 0.2.3(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@19.2.8(react@19.2.8))(react-router-dom@7.18.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2)
+        specifier: ^0.2.9
+        version: 0.2.9(@types/react@19.2.18)(notistack@3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(pankosmia-rcl@0.7.1(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2))(react-dom@19.2.8(react@19.2.8))(react-router-dom@7.18.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)
       pankosmia-juxta-muncher:
         specifier: 0.2.10
         version: 0.2.10(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(notistack@3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2)
@@ -53,8 +53,8 @@ importers:
         specifier: ^0.0.3
         version: 0.0.3
       pankosmia-obs-muncher:
-        specifier: ^0.2.4
-        version: 0.2.4(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2)
+        specifier: ^0.2.6
+        version: 0.2.6(@types/react@19.2.18)(notistack@3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(pankosmia-rcl@0.7.1(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)
       pankosmia-rcl:
         specifier: ^0.7.1
         version: 0.7.1(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2)
@@ -5109,15 +5109,17 @@ packages:
       }
     engines: { node: ">=10" }
 
-  pankosmia-bcv-muncher@0.2.3:
+  pankosmia-bcv-muncher@0.2.9:
     resolution:
       {
-        integrity: sha512-Hz9bdx3ayag7t6RyulacmIMjUwk8As5UQYDPAoSiriIICK61YG226t3Cgo6lx6mcWgh4QlpW+QLEYjC9t/bwHg==,
+        integrity: sha512-IxKv4YMKOrzB4iyKFiXF3hWgi3hCHAf0wY+uv3QysyKkEa7lLLoCrmEe/xI6wVOZNHZXH7XCa/tYgki4xl5dwA==,
       }
     peerDependencies:
+      notistack: ^3.0.2
+      pankosmia-rcl: ^0.7.1
       react: ^19.2.8
       react-dom: ^19.2.8
-      react-router-dom: ^7.18.2
+      react-router-dom: ^6.27.0
 
   pankosmia-juxta-muncher@0.2.10:
     resolution:
@@ -5135,14 +5137,16 @@ packages:
         integrity: sha512-aOANGTQvag5anAadz7Jn52wQYhJiDlEDPT6pRBXzEf9JecKyvW1sQL82wTFdeRU8PRJghIl1oMW9AhFBocPr9g==,
       }
 
-  pankosmia-obs-muncher@0.2.4:
+  pankosmia-obs-muncher@0.2.6:
     resolution:
       {
-        integrity: sha512-nvy+hB6zzDAHIy/1cgO6eO14r1AGG2UTvvyNlSYghjmMz42mtWUJbrQAxDlleZ5AQf3ScAlZwztLXTWUJabNpQ==,
+        integrity: sha512-G8UC+An5+4+IqviWrj05VURvtJJfaxVQJcEYVoDVM3IFy/NZP+1seZgehlAOgJKmxw6FSgvABVjG5YNfyJ69sA==,
       }
     peerDependencies:
-      react: ^19.2.8
-      react-dom: ^19.2.8
+      notistack: ^3.0.2
+      pankosmia-rcl: ^0.7.1
+      react: ^19.0.0
+      react-dom: ^19.0.0
 
   pankosmia-rcl@0.4.22:
     resolution:
@@ -9868,7 +9872,7 @@ snapshots:
     dependencies:
       p-limit: 3.1.0
 
-  pankosmia-bcv-muncher@0.2.3(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@19.2.8(react@19.2.8))(react-router-dom@7.18.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2):
+  pankosmia-bcv-muncher@0.2.9(@types/react@19.2.18)(notistack@3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(pankosmia-rcl@0.7.1(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2))(react-dom@19.2.8(react@19.2.8))(react-router-dom@7.18.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(supports-color@7.2.0):
     dependencies:
       "@emotion/react": 11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
       "@emotion/styled": 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
@@ -9888,16 +9892,9 @@ snapshots:
       react-router-dom: 7.18.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       uuid: 14.0.2
     transitivePeerDependencies:
-      - "@babel/plugin-syntax-flow"
-      - "@babel/plugin-transform-react-jsx"
       - "@mui/material-pigment-css"
       - "@types/react"
-      - eslint
-      - eslint-import-resolver-typescript
-      - eslint-import-resolver-webpack
-      - jest
       - supports-color
-      - typescript
 
   pankosmia-juxta-muncher@0.2.10(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(notistack@3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2):
     dependencies:
@@ -9927,7 +9924,7 @@ snapshots:
 
   pankosmia-lib@0.0.3: {}
 
-  pankosmia-obs-muncher@0.2.4(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2):
+  pankosmia-obs-muncher@0.2.6(@types/react@19.2.18)(notistack@3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(pankosmia-rcl@0.7.1(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0):
     dependencies:
       "@emotion/react": 11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
       "@emotion/styled": 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
@@ -9943,16 +9940,9 @@ snapshots:
       react-markdown: 10.1.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
       react-router-dom: 7.18.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     transitivePeerDependencies:
-      - "@babel/plugin-syntax-flow"
-      - "@babel/plugin-transform-react-jsx"
       - "@mui/material-pigment-css"
       - "@types/react"
-      - eslint
-      - eslint-import-resolver-typescript
-      - eslint-import-resolver-webpack
-      - jest
       - supports-color
-      - typescript
 
   pankosmia-rcl@0.4.22(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2):
     dependencies:

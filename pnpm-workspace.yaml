@@ -5,8 +5,8 @@ minimumReleaseAgeExclude:
   - pankosmia-rcl@0.7.1
   - pankosmia-juxta-muncher@0.2.10
   - pankosmia-translation_plan-muncher@0.2.5 || 0.2.6
-  - pankosmia-bcv-muncher@0.2.1 || 0.2.2 || 0.2.3
-  - pankosmia-obs-muncher@0.2.2 || 0.2.3 || 0.2.4
+  - pankosmia-bcv-muncher@0.2.1 || 0.2.2 || 0.2.3 || 0.2.4 || 0.2.5 || 0.2.6 || 0.2.7 || 0.2.8 || 0.2.9
+  - pankosmia-obs-muncher@0.2.2 || 0.2.3 || 0.2.4 || 0.2.5 || 0.2.6
 supportedArchitectures:
   os:
     - win32

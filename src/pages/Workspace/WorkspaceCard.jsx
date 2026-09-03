@@ -39,13 +39,11 @@ import {
 function WorkspaceCard({ metadata, style, distractionModeCount }) {
   const { bcvRef } = useContext(bcvContext);
   const { systemBcv } = useContext(bcvContext);
-  console.log("🚀 ~ WorkspaceCard ~ systemBcv:", systemBcv);
   const { debugRef } = useContext(debugContext);
   const { i18nRef } = useContext(i18nContext);
   const { typographyRef } = useContext(typographyContext);
   const { currentProjectRef } = useContext(currentProjectContext);
   const { obs, setObs } = useContext(OBSContext);
-  console.log("🚀 ~ WorkspaceCard ~ obs:", obs);
 
   const sbScriptDir = metadata?.script_direction
     ? metadata.script_direction.toLowerCase()
@@ -106,14 +104,16 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvnotes") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvNotesEditorMuncher
-          metadata={metadata}
-          debugRef={debugRef}
-          i18nRef={i18nRef}
-          systemBcv={systemBcv}
-          bcvRef={bcvRef}
-          currentProjectRef={currentProjectRef}
-        />
+        {systemBcv?.bookCode && (
+          <BcvNotesEditorMuncher
+            metadata={metadata}
+            debugRef={debugRef}
+            i18nRef={i18nRef}
+            systemBcv={systemBcv}
+            bcvRef={bcvRef}
+            currentProjectRef={currentProjectRef}
+          />
+        )}
       </div>
     );
   }
@@ -179,7 +179,14 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvquestions") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvNotesEditorMuncher metadata={metadata} />
+        <BcvNotesEditorMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          systemBcv={systemBcv}
+          bcvRef={bcvRef}
+          currentProjectRef={currentProjectRef}
+        />
       </div>
     );
   }
@@ -187,13 +194,15 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-bcvquestions") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvQuestionsViewerMuncher
-          metadata={metadata}
-          debugRef={debugRef}
-          bcvRef={bcvRef}
-          i18nRef={i18nRef}
-          systemBcv={systemBcv}
-        />
+        {systemBcv?.bookCode && (
+          <BcvQuestionsViewerMuncher
+            metadata={metadata}
+            debugRef={debugRef}
+            bcvRef={bcvRef}
+            i18nRef={i18nRef}
+            systemBcv={systemBcv}
+          />
+        )}
       </div>
     );
   }
