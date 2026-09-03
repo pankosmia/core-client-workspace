@@ -235,8 +235,6 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   }
   // This component has TW and MUI lineHeights and fonts interfering!
   if (metadata.primary && metadata.flavor === "textStories") {
-    console.log("🚀 ~ WorkspaceCard ~ obs:", obs);
-    console.log("🚀 ~ WorkspaceCard ~ obs:", obs);
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
         <OBSEditorMuncher
@@ -251,8 +249,6 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   }
   // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
   if (metadata.flavor === "textStories") {
-    console.log("🚀 ~ WorkspaceCard ~ obs:", obs);
-    console.log("🚀 ~ WorkspaceCard ~ obs:", obs);
     return (
       <div
         style={{ ...style, lineHeight: "normal" }}
