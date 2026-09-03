@@ -3,9 +3,13 @@ import TextTranslationEditorMuncher from "../../munchers/TextTranslation/TextTra
 import TextTranslationViewerMuncher from "../../munchers/TextTranslation/TextTranslationViewerMuncher";
 import BcvAudioTranslationViewerMuncher from "../../munchers/BcvAudio/BcvAudioViewerMuncher";
 import AudioTranslationEditorMuncher from "../../munchers/AudioTranslation/AudioTranslationEditorMuncher";
-import BcvNotesViewerMuncher from "../../munchers/BcvNotes/BcvNotesViewerMuncher";
-import BcvNotesEditorMuncher from "../../munchers/BcvNotes/BcvNotesEditorMuncher";
-import BcvQuestionsViewerMuncher from "../../munchers/BcvQuestions/BcvQuestionsViewerMuncher";
+
+import {
+  BcvNotesViewerMuncher,
+  BcvNotesEditorMuncher,
+  BcvQuestionsViewerMuncher,
+} from "pankosmia-bcv-muncher";
+
 import BcvArticlesViewerMuncher from "../../munchers/BcvArticles/BcvArticlesViewerMuncher";
 import BcvImagesViewerMuncher from "../../munchers/BcvImages/BcvImagesViewerMuncher";
 import BcvVideosViewerMuncher from "../../munchers/BcvVideos/BcvVideosViewerMuncher";
@@ -13,16 +17,18 @@ import TastelessMuncher from "../../munchers/Tasteless/TastelessMuncher";
 import "./tiles_styles.css";
 import VideoLinksViewerMuncher from "../../munchers/VideoLinks/VideoLinksViewerMuncher";
 import BNotesViewerMuncher from "../../munchers/BNotes/BNotesViewerMuncher";
-import OBSViewerMuncher from "../../munchers/OBS/OBSViewerMuncher";
-import OBSEditorMuncher from "../../munchers/OBS/OBSEditorMuncher";
+
+import { OBSViewerMuncher, OBSEditorMuncher } from "pankosmia-obs-muncher";
+
 import OBSNotesViewerMuncher from "../../munchers/OBSNotes/OBSNotesViewerMuncher";
+
 import OBSQuestionsViewerMuncher from "../../munchers/OBSQuestions/OBSQuestionsViewerMuncher";
 import OBSArticlesViewerMuncher from "../../munchers/OBSArticles/OBSArticlesViewerMuncher";
 import JuxtalinearEditorMuncher from "../../munchers/Juxtalinear/JuxtalinearEditorMuncher";
 
 import { TranslationPlanViewerMuncher } from "pankosmia-translation_plan-muncher";
 import { JuxtalinearViewerMuncher } from "pankosmia-juxta-muncher";
-
+import OBSContext from "../../contexts/obsContext";
 import {
   currentProjectContext,
   bcvContext,
@@ -31,11 +37,15 @@ import {
   typographyContext,
 } from "pankosmia-rcl";
 function WorkspaceCard({ metadata, style, distractionModeCount }) {
-  const { bcvRef, systemBcv } = useContext(bcvContext);
+  const { bcvRef } = useContext(bcvContext);
+  const { systemBcv } = useContext(bcvContext);
+  console.log("🚀 ~ WorkspaceCard ~ systemBcv:", systemBcv);
   const { debugRef } = useContext(debugContext);
   const { i18nRef } = useContext(i18nContext);
   const { typographyRef } = useContext(typographyContext);
   const { currentProjectRef } = useContext(currentProjectContext);
+  const { obs, setObs } = useContext(OBSContext);
+  console.log("🚀 ~ WorkspaceCard ~ obs:", obs);
 
   const sbScriptDir = metadata?.script_direction
     ? metadata.script_direction.toLowerCase()
@@ -96,7 +106,14 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvnotes") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvNotesEditorMuncher metadata={metadata} />
+        <BcvNotesEditorMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          systemBcv={systemBcv}
+          bcvRef={bcvRef}
+          currentProjectRef={currentProjectRef}
+        />
       </div>
     );
   }
@@ -107,7 +124,12 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <BcvNotesViewerMuncher metadata={metadata} />
+        <BcvNotesViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          systemBcv={systemBcv}
+        />
       </div>
     );
   }
@@ -165,7 +187,13 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-bcvquestions") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvQuestionsViewerMuncher metadata={metadata} />
+        <BcvQuestionsViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          bcvRef={bcvRef}
+          i18nRef={i18nRef}
+          systemBcv={systemBcv}
+        />
       </div>
     );
   }
@@ -198,20 +226,37 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   }
   // This component has TW and MUI lineHeights and fonts interfering!
   if (metadata.primary && metadata.flavor === "textStories") {
+    console.log("🚀 ~ WorkspaceCard ~ obs:", obs);
+    console.log("🚀 ~ WorkspaceCard ~ obs:", obs);
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <OBSEditorMuncher metadata={metadata} />
+        <OBSEditorMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          obs={obs}
+          setObs={setObs}
+        />
       </div>
     );
   }
   // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
   if (metadata.flavor === "textStories") {
+    console.log("🚀 ~ WorkspaceCard ~ obs:", obs);
+    console.log("🚀 ~ WorkspaceCard ~ obs:", obs);
     return (
       <div
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <OBSViewerMuncher metadata={metadata} />
+        <OBSViewerMuncher
+          metadata={metadata}
+          bcvRef={bcvRef}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          obs={obs}
+          setObs={setObs}
+        />
       </div>
     );
   }
