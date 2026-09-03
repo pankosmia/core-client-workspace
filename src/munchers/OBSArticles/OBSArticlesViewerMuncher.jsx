@@ -47,7 +47,7 @@ function OBSArticlesViewerMuncher({ metadata }) {
         let payloadLink = row[5];
         // console.log('payloadLink', payloadLink);
         let payloadResponse = await getText(
-          `/api/burrito/ingredient/raw/git.door43.org/uW/en_tw?ipath=${payloadLink.slice(2)}.md`,
+          `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${payloadLink.slice(2)}.md`,
         );
         // console.log('payloadResponse', payloadResponse);
         if (payloadResponse.ok) {
