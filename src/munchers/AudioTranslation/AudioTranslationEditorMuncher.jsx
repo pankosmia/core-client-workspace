@@ -325,7 +325,7 @@ function AudioTranslationEditorMuncher({ metadata }) {
             audioUrl=""
             metadata={metadata}
             obs={obs}
-            book={selectedBook}
+            book={metadata?.flavor === "textStories" ? undefined : selectedBook}
             // Nom de la piste principale d'un nouveau segment : code livre +
             // référence chapitre:verset, ex. "MRK 1:3".
             mainTrackName={`${selectedBook} ${current.ref}`}
