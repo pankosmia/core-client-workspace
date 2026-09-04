@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
 
 export default function ViewableBibleBlock({
+  position,
   blockJson,
   systemBcv,
   lastPrintedVerseRef,
   systemWord,
+  setSelectedBlockNo,
 }) {
   const versesRefs = useRef({});
 
@@ -45,7 +47,10 @@ export default function ViewableBibleBlock({
         marginBottom: "0.5em",
         textAlign: "justify",
         wordBreak: "break-word",
+        border: "hidden black 2px",
+        padding: "2px",
       }}
+      onClick={() => setSelectedBlockNo(position[0])}
     >
       {blockJson?.units?.map((u, i) => {
         const rawContent = u.content || "";

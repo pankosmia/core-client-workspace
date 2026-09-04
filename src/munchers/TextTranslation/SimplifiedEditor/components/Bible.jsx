@@ -1,9 +1,10 @@
 import EditableBibleBlock from "./EditableBibleBlock";
+import ViewableBibleBlock from "./ViewableBibleBlock";
 import EditableGraft from "./EditableGraft";
 import EditableRemark from "./EditableRemark";
 import ActionsDialog from "./ActionsDialog";
-import { useContext, useEffect, useState } from "react";
-import { bcvContext } from "pankosmia-rcl";
+import { useContext, useEffect, useState, useRef } from "react";
+import { bcvContext, wordContext } from "pankosmia-rcl";
 
 export default function EditableBible({
   chapterJson,
@@ -16,6 +17,8 @@ export default function EditableBible({
   console.log("Bible");
   const { systemBcv } = useContext(bcvContext);
   const [selectedBlockNo, setSelectedBlockNo] = useState(5);
+  const { word } = useContext(wordContext);
+  const lastPrintedVerseRef = useRef(null);
 
   useEffect(() => {
     async function loadCSS() {
@@ -59,6 +62,19 @@ export default function EditableBible({
             );
 
           case "main":
+            if (!isEditable || selectedBlockNo !== n) {
+              return (
+                <ViewableBibleBlock
+                  key={`${systemBcv.bookCode}-${systemBcv.chapterNum}-${n}`}
+                  blockJson={scriptureJson.blocks[b.position]}
+                  systemBcv={systemBcv}
+                  systemWord={word}
+                  setSelectedBlockNo={setSelectedBlockNo}
+                  lastPrintedVerseRef={lastPrintedVerseRef}
+                  position={[b.position]}
+                />
+              );
+            }
             return (
               <EditableBibleBlock
                 key={`${systemBcv.bookCode}-${systemBcv.chapterNum}-${n}`}
@@ -71,7 +87,6 @@ export default function EditableBible({
                 setSelectedBlockNo={setSelectedBlockNo}
               />
             );
-
           default:
             return (
               <EditableGraft

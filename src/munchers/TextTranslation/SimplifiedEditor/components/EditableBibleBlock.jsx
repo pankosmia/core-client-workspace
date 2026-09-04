@@ -8,7 +8,6 @@ export default function EditableBibleBlock({
   position,
   caretPosition,
   setCaretPosition,
-  selectedBlockNo,
   setSelectedBlockNo,
 }) {
   if (scriptureJson.blocks[position[0]]) {
@@ -16,7 +15,12 @@ export default function EditableBibleBlock({
     return (
       <div
         key={position}
-        style={{ flexDirection: "column", textAlign: "left" }}
+        style={{
+          flexDirection: "column",
+          textAlign: "left",
+          border: "solid black 2px",
+          padding: "2px",
+        }}
         className={tag}
         onClick={() => setSelectedBlockNo(position[0])}
       >
@@ -27,34 +31,30 @@ export default function EditableBibleBlock({
         />
         {!["b", "ib"].includes(tag) &&
           scriptureJson.blocks[position[0]].units &&
-          (selectedBlockNo === position[0] ? (
-            <div>Editing</div>
-          ) : (
-            scriptureJson.blocks[position[0]].units.map((u, i) => {
-              return (
-                <span style={{ display: "inline-block" }}>
-                  <span key={i} className="marks_verses_label">
-                    {u.verses}
-                  </span>
-                  <EditableSpan
-                    key={i}
-                    caretPosition={caretPosition}
-                    setCaretPosition={setCaretPosition}
-                    scriptureJson={scriptureJson}
-                    setScriptureJson={setScriptureJson}
-                    position={[...position, i]}
-                    chapter={u.chapter}
-                    verse={
-                      u.verses.includes("-") ? u.verses.split("-")[0] : u.verses
-                    }
-                    endVerse={
-                      u.verses.includes("-") ? u.verses.split("-")[1] : u.verses
-                    }
-                  />
+          scriptureJson.blocks[position[0]].units.map((u, i) => {
+            return (
+              <span style={{ display: "inline-block" }}>
+                <span key={i} className="marks_verses_label">
+                  {u.verses}
                 </span>
-              );
-            })
-          ))}
+                <EditableSpan
+                  key={i}
+                  caretPosition={caretPosition}
+                  setCaretPosition={setCaretPosition}
+                  scriptureJson={scriptureJson}
+                  setScriptureJson={setScriptureJson}
+                  position={[...position, i]}
+                  chapter={u.chapter}
+                  verse={
+                    u.verses.includes("-") ? u.verses.split("-")[0] : u.verses
+                  }
+                  endVerse={
+                    u.verses.includes("-") ? u.verses.split("-")[1] : u.verses
+                  }
+                />
+              </span>
+            );
+          })}
       </div>
     );
   } else {
