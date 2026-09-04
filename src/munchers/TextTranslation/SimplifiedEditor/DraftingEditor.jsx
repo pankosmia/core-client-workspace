@@ -6,7 +6,7 @@ import {
 } from "pankosmia-rcl";
 import { Box, CircularProgress } from "@mui/material";
 import usfm2draftJson from "../../../components/usfm2draftJson";
-import EditableBible from "./components/EditableBible";
+import Bible from "./components/Bible";
 import md5sum from "md5";
 import EditorTools from "./components/EditorTools";
 import filterByChapter from "../../../components/filterByChapter";
@@ -105,13 +105,14 @@ function DraftingEditor({ metadata, modified, setModified }) {
       {/** If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard */}
       <Box dir={!sbScriptDirSet ? textDir : undefined}>
         {chapterJson ? (
-          <EditableBible
+          <Bible
             chapterJson={chapterJson}
             scriptureJson={scriptureJson}
             setScriptureJson={setScriptureJson}
             key={bookChangeCount}
             caretPosition={caretPosition}
             setCaretPosition={setCaretPosition}
+            isEditable={true}
           />
         ) : (
           <Box
