@@ -47,10 +47,11 @@ function MarkdownField({
         <FormControl fullWidth margin="normal">
           <TextField
             label={
-              doI18n(
-                `pages:core-local-workspace:${label.toLowerCase()}`,
-                i18nRef.current,
-              ) ||
+              (label &&
+                doI18n(
+                  `pages:core-local-workspace:${label.toLowerCase()}`,
+                  i18nRef.current,
+                )) ||
               doI18n(
                 `pages:core-local-workspace:text_paragraph`,
                 i18nRef.current,

@@ -32,7 +32,7 @@ importers:
         specifier: ^1.0.11
         version: 1.0.12(react@19.2.8)(wavesurfer.js@7.12.11)
       font-detect-rhl:
-        specifier: ^1.1.7
+        specifier: ^1.1.10
         version: 1.1.10(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       interactjs:
         specifier: ^1.10.27
@@ -47,8 +47,8 @@ importers:
         specifier: ^0.2.9
         version: 0.2.9(@types/react@19.2.18)(notistack@3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(pankosmia-rcl@0.7.1(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2))(react-dom@19.2.8(react@19.2.8))(react-router-dom@7.18.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)
       pankosmia-juxta-muncher:
-        specifier: 0.2.10
-        version: 0.2.10(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(notistack@3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2)
+        specifier: 0.2.11
+        version: 0.2.11(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(notistack@3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2)
       pankosmia-lib:
         specifier: ^0.0.3
         version: 0.0.3
@@ -5121,10 +5121,10 @@ packages:
       react-dom: ^19.2.8
       react-router-dom: ^6.27.0
 
-  pankosmia-juxta-muncher@0.2.10:
+  pankosmia-juxta-muncher@0.2.11:
     resolution:
       {
-        integrity: sha512-/C/iLmqcyXdhkbp3Lg3DRg0b8hhaV8TTRWQI66jpRCJQYFJt+b32bPCSQ/+hXorq5F7+SNuWAz0TRco1Ld7V6A==,
+        integrity: sha512-yHqCQSObDfpJuzGqN/5rgG26INsiRun7F17AsSvuo9jlP4UQ+es2LkTcBZqye9yRhRn6r6OJDh0qTf3shicJ2w==,
       }
     peerDependencies:
       notistack: ^3.0.2
@@ -9896,12 +9896,12 @@ snapshots:
       - "@types/react"
       - supports-color
 
-  pankosmia-juxta-muncher@0.2.10(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(notistack@3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2):
+  pankosmia-juxta-muncher@0.2.11(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(notistack@3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@7.2.0)(typescript@7.0.2):
     dependencies:
       "@emotion/react": 11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
       "@emotion/styled": 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
       "@hello-pangea/dnd": 18.0.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      "@mui/icons-material": 9.3.1(@mui/material@9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
+      "@mui/icons-material": 9.4.0(@mui/material@9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
       "@mui/material": 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       md5: 2.3.0
       notistack: 3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
