@@ -2,8 +2,10 @@ import React, { useContext } from "react";
 import TextTranslationEditorMuncher from "../../munchers/TextTranslation/TextTranslationEditorMuncher";
 import TextTranslationViewerMuncher from "../../munchers/TextTranslation/TextTranslationViewerMuncher";
 import BcvAudioTranslationViewerMuncher from "../../munchers/BcvAudio/BcvAudioViewerMuncher";
-import AudioTranslationEditorMuncher from "../../munchers/AudioTranslation/AudioTranslationEditorMuncher";
-
+import {
+  AudioTranslationEditorMuncher,
+  AudioTranslationViewerMuncher,
+} from "pankosmia-audio_translation-muncher";
 import {
   BcvNotesViewerMuncher,
   BcvNotesEditorMuncher,
@@ -88,7 +90,11 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.primary && metadata.flavor === "audioTranslation") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <AudioTranslationEditorMuncher metadata={metadata} />
+        <AudioTranslationEditorMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+        />
       </div>
     );
   }
@@ -96,7 +102,12 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor === "audioTranslation") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvAudioTranslationViewerMuncher metadata={metadata} />
+        <AudioTranslationViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          systemBcv={systemBcv}
+        />
       </div>
     );
   }
