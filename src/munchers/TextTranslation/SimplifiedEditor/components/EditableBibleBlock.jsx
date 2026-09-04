@@ -8,6 +8,8 @@ export default function EditableBibleBlock({
   position,
   caretPosition,
   setCaretPosition,
+  selectedBlockNo,
+  setSelectedBlockNo,
 }) {
   if (scriptureJson.blocks[position[0]]) {
     const tag = scriptureJson.blocks[position[0]].tag;
@@ -16,6 +18,7 @@ export default function EditableBibleBlock({
         key={position}
         style={{ flexDirection: "column", textAlign: "left" }}
         className={tag}
+        onClick={() => setSelectedBlockNo(position[0])}
       >
         <EditableTag
           scriptureJson={scriptureJson}
@@ -24,7 +27,7 @@ export default function EditableBibleBlock({
         />
         {!["b", "ib"].includes(tag) &&
           scriptureJson.blocks[position[0]].units &&
-          (false ? (
+          (selectedBlockNo === position[0] ? (
             <div>Editing</div>
           ) : (
             scriptureJson.blocks[position[0]].units.map((u, i) => {

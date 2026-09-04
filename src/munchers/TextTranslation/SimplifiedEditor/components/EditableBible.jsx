@@ -182,6 +182,7 @@ export default function EditableBible({
 }) {
   console.log("Bible");
   const { systemBcv } = useContext(bcvContext);
+  const [selectedBlockNo, setSelectedBlockNo] = useState(5);
 
   useEffect(() => {
     async function loadCSS() {
@@ -233,6 +234,8 @@ export default function EditableBible({
                 position={[b.position]}
                 caretPosition={caretPosition}
                 setCaretPosition={setCaretPosition}
+                selectedBlockNo={selectedBlockNo}
+                setSelectedBlockNo={setSelectedBlockNo}
               />
             );
 
