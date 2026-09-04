@@ -3,7 +3,7 @@ import "./index.css";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import ConfigureWorkspace from "./pages/ConfigureWorkspace/ConfigureWorkspace";
 import Workspace from "./pages/Workspace/Workspace";
-import { SpaContainer } from "pankosmia-rcl";
+import { SpaContainer, fallbackTheme } from "pankosmia-rcl";
 import { createTheme, ThemeProvider, styled } from "@mui/material";
 import { getAndSetJson } from "pankosmia-lib/http";
 import { SnackbarProvider, MaterialDesignContent } from "notistack";
@@ -31,16 +31,7 @@ function Router({
   selectedCrunchers,
   setSelectedCrunchers,
 }) {
-  const [themeSpec, setThemeSpec] = useState({
-    palette: {
-      primary: {
-        main: "#666",
-      },
-      secondary: {
-        main: "#888",
-      },
-    },
-  });
+  const [themeSpec, setThemeSpec] = useState(fallbackTheme);
   useEffect(() => {
     if (
       themeSpec.palette &&
@@ -54,7 +45,35 @@ function Router({
       }).then();
     }
   });
-  const theme = createTheme(themeSpec);
+  const theme = createTheme(
+    {
+      components: {
+        MuiFab: {
+          styleOverrides: {
+            root: {
+              textTransform: "capitalize",
+            },
+          },
+        },
+        MuiButton: {
+          styleOverrides: {
+            root: {
+              textTransform: "capitalize",
+            },
+          },
+        },
+        MuiTab: {
+          styleOverrides: {
+            root: {
+              textTransform: "capitalize",
+            },
+          },
+        },
+      },
+    },
+    themeSpec,
+  );
+
   const router = createHashRouter([
     {
       path: "/",
