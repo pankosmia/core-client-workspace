@@ -1,4 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useContext } from "react";
+import { postEmptyJson } from "pankosmia-lib/http";
+import { debugContext } from "pankosmia-rcl";
 
 export default function ViewableBibleBlock({
   position,
@@ -6,9 +8,11 @@ export default function ViewableBibleBlock({
   systemBcv,
   lastPrintedVerseRef,
   systemWord,
+  isCurrentBlock,
   setSelectedBlockNo,
 }) {
   const versesRefs = useRef({});
+  const { debugRef } = useContext(debugContext);
 
   useEffect(() => {
     const verseToScroll = String(systemBcv.verseNum);
@@ -40,6 +44,25 @@ export default function ViewableBibleBlock({
     );
   };
 
+  const updateBcv = (b, c, v, ev) => {
+    postEmptyJson(
+      `/api/navigation/bcv/${b}/${c}/${v}/${ev ? ev : v}`,
+      debugRef.current,
+    );
+  };
+
+  let chapter = null;
+  let verse = null;
+  let endVerse = null;
+  if (blockJson.units && blockJson.units[0] && blockJson.units[0].verses) {
+    let firstUnit = blockJson.units[0];
+    chapter = firstUnit.chapter;
+    let verses = firstUnit.verses;
+    verse = verses.includes("-") ? verses.split("-")[0] : verses;
+    endVerse = verses.includes("-") ? verses.split("-")[1] : verses;
+  }
+  console.log(chapter, verse, endVerse, blockJson);
+
   return (
     <div
       className={blockJson.tag}
@@ -47,10 +70,15 @@ export default function ViewableBibleBlock({
         marginBottom: "0.5em",
         textAlign: "justify",
         wordBreak: "break-word",
-        border: "hidden black 2px",
+        border: `solid ${isCurrentBlock ? "black" : "transparent"} 2px`,
         padding: "2px",
       }}
-      onClick={() => setSelectedBlockNo(position[0])}
+      onClick={() => {
+        if (verse) {
+          updateBcv(systemBcv.bookCode, chapter, verse, endVerse);
+        }
+        setSelectedBlockNo(position[0]);
+      }}
     >
       {blockJson?.units?.map((u, i) => {
         const rawContent = u.content || "";

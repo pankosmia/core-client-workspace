@@ -18,8 +18,6 @@ export default function EditableBibleBlock({
         style={{
           flexDirection: "column",
           textAlign: "left",
-          border: "solid black 2px",
-          padding: "2px",
         }}
         className={tag}
         onClick={() => setSelectedBlockNo(position[0])}

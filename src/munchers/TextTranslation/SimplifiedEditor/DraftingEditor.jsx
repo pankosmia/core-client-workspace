@@ -113,6 +113,7 @@ function DraftingEditor({ metadata, modified, setModified }) {
             caretPosition={caretPosition}
             setCaretPosition={setCaretPosition}
             isEditable={true}
+            metadata={metadata}
           />
         ) : (
           <Box
