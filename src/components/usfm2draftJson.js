@@ -5,16 +5,12 @@ let worker;
 let reqId = 0;
 const pending = new Map();
 
-function getWorkerUrl() {
-  const url = new URL("./usfm2draftJson.worker.js", import.meta.url);
-  url.protocol = window.location.protocol;
-  url.host = window.location.host;
-  return url;
-}
-
 function getWorker() {
   if (!worker) {
-    worker = new Worker(getWorkerUrl(), { type: "module" });
+    worker = new Worker(
+      new URL("./usfm2draftJson.worker.js", import.meta.url),
+      { type: "module" },
+    );
     worker.addEventListener("message", (e) => {
       const { id, ok, result, error } = e.data;
       const p = pending.get(id);
