@@ -61,7 +61,6 @@ export default function ViewableBibleBlock({
     verse = verses.includes("-") ? verses.split("-")[0] : verses;
     endVerse = verses.includes("-") ? verses.split("-")[1] : verses;
   }
-  console.log(chapter, verse, endVerse, blockJson);
 
   return (
     <div
