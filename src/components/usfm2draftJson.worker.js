@@ -28,6 +28,7 @@ function processCvItems(items, os, chapterNo, newChapter) {
     });
   }
   // Build content, push chapters, start over on verses
+
   for (const item of items) {
     if (item.subType === "start" && item.payload.startsWith("verses")) {
       ret.push({
@@ -146,11 +147,21 @@ function parseUsfm2draftJson(usfm) {
 }
 
 self.onmessage = (e) => {
-  const { id, usfm } = e.data;
   try {
-    const result = parseUsfm2draftJson(usfm);
-    self.postMessage({ id, ok: true, result });
+    const result = parseUsfm2draftJson(e.data.usfm);
+
+    self.postMessage({
+      ok: true,
+      result,
+    });
   } catch (err) {
-    self.postMessage({ id, ok: false, error: err.message });
+    self.postMessage({
+      ok: false,
+      error: {
+        name: err?.name,
+        message: err?.message,
+        stack: err?.stack,
+      },
+    });
   }
 };

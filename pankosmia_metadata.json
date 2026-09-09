@@ -107,6 +107,10 @@
       "fr": "La sauvegarde a échoué",
       "id": "Tidak dapat disimpan"
     },
+    "usfm_error": {
+      "en": "An error occurred when loading USFM",
+      "fr": "Une erreur est survenu pendant la lecture de l'USFM"
+    },
     "usfm_conversion_error": {
       "en": "Document could not be converted from USFM to USJ",
       "fr": "Le document n'a pas pu être converti de USFM à USJ",
