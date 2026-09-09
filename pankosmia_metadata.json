@@ -1014,6 +1014,14 @@
     "text_paragraph": {
       "en": "Text paragraph",
       "fr": "Texte du paragraphe"
+    },
+    "show_all_fields": {
+      "en": "Show all fields",
+      "es": "Mostrar todos los campos"
+    },
+    "answer": {
+      "en": "Answer",
+      "es": "Respuesta"
     }
   }
 }

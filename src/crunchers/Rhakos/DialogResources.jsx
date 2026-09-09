@@ -1,6 +1,6 @@
 import {
   DialogContent,
-  Grid2,
+  Grid,
   Typography,
   FormGroup,
   FormControlLabel,
@@ -98,12 +98,12 @@ export default function DialogResources({
       closeFn={() => close(false)}
     >
       <DialogContent>
-        <Grid2 container spacing={2}>
+        <Grid container spacing={2}>
           {Object.keys(resources).map(
             (s, n) =>
               resources[s].length > 0 && (
                 <>
-                  <Grid2 key={n} item size={12}>
+                  <Grid key={n} item size={12}>
                     <Typography variant="h6">
                       {doI18n(
                         `pages:core-local-workspace:${s}`,
@@ -126,11 +126,11 @@ export default function DialogResources({
                         />
                       ))}
                     </FormGroup>
-                  </Grid2>
+                  </Grid>
                 </>
               ),
           )}
-        </Grid2>
+        </Grid>
       </DialogContent>
     </PanDialog>
   );

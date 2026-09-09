@@ -1,4 +1,4 @@
-import { Grid2, IconButton, Typography } from "@mui/material";
+import { Grid, IconButton, Typography } from "@mui/material";
 import { InfoOutlined } from "@mui/icons-material";
 import { useState } from "react";
 import InformationDialogRhakos from "./InformationDialog";
@@ -8,7 +8,7 @@ export default function ResponseRow({ n, response }) {
 
   return (
     <>
-      <Grid2 key={`p-${n}`} item size={3}>
+      <Grid key={`p-${n}`} item size={3}>
         <Typography align="left">
           {response.json.prompt}
           {" ("}
@@ -17,13 +17,13 @@ export default function ResponseRow({ n, response }) {
           {response?.json?.from_verse}
           {")"}
         </Typography>
-      </Grid2>
-      <Grid2 key={`r-${n}`} item size={8}>
+      </Grid>
+      <Grid key={`r-${n}`} item size={8}>
         <Typography align="left">
           {response.json.response.replace(/^[\s\S]*<\/think>/, "")}
         </Typography>
-      </Grid2>
-      <Grid2 key={`info-${n}`} item size={1}>
+      </Grid>
+      <Grid key={`info-${n}`} item size={1}>
         <IconButton onClick={() => setOpenDialogInfo(!openDialogInfo)}>
           <InfoOutlined />
         </IconButton>
@@ -32,7 +32,7 @@ export default function ResponseRow({ n, response }) {
           close={setOpenDialogInfo}
           response={response}
         />
-      </Grid2>
+      </Grid>
     </>
   );
 }

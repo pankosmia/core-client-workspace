@@ -20,7 +20,7 @@ import {
   Box,
   Typography,
   Fab,
-  Grid2,
+  Grid,
   DialogContent,
   ToggleButtonGroup,
   ToggleButton,
@@ -325,7 +325,7 @@ function ConfigureWorkspace({
         size="xl"
       >
         <DialogContent sx={{ overflow: "hidden" }}>
-          <Grid2
+          <Grid
             container
             direction="row"
             sx={{
@@ -336,7 +336,7 @@ function ConfigureWorkspace({
               mb: 2,
             }}
           >
-            <Grid2
+            <Grid
               item
               size="grow"
               sx={{
@@ -392,8 +392,8 @@ function ConfigureWorkspace({
                   </Tooltip>
                 </Box>
               )}
-            </Grid2>
-            <Grid2 item size={2}>
+            </Grid>
+            <Grid item size={2}>
               <Fab
                 variant="extended"
                 color="primary"
@@ -434,16 +434,16 @@ function ConfigureWorkspace({
                 </Typography>
                 <ArrowForwardOutlinedIcon />
               </Fab>
-            </Grid2>
-            <Grid2 item size={12}>
+            </Grid>
+            <Grid item size={12}>
               <Typography variant="h6">
                 {doI18n(
                   "pages:core-local-workspace:choose_resources_workspace",
                   i18nRef.current,
                 )}
               </Typography>
-            </Grid2>
-          </Grid2>
+            </Grid>
+          </Grid>
           <Box
             sx={{
               height: `${maxWindowHeight}px`,

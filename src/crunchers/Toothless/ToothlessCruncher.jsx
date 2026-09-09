@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Box, Grid2 } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import { doI18n } from "pankosmia-lib/i18n";
 import { i18nContext as I18nContext } from "pankosmia-rcl";
 
@@ -8,7 +8,7 @@ function ToothlessCruncher({ metadata, style }) {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid2
+      <Grid
         container
         direction="row"
         sx={{
@@ -18,7 +18,7 @@ function ToothlessCruncher({ metadata, style }) {
         }}
         spacing={2}
       >
-        <Grid2 item size={12}>
+        <Grid item size={12}>
           <Box sx={{ p: 2 }}>
             <h5>{metadata.name}</h5>
             <p>
@@ -28,9 +28,9 @@ function ToothlessCruncher({ metadata, style }) {
               <p>Description: {metadata.description}</p>
             )}
           </Box>
-        </Grid2>
+        </Grid>
         <Box sx={{ p: 2 }}>Cruuuunch!</Box>
-      </Grid2>
+      </Grid>
     </Box>
   );
 }
