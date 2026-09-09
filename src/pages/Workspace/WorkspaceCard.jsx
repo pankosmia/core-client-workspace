@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 import TextTranslationEditorMuncher from "../../munchers/TextTranslation/TextTranslationEditorMuncher";
 import TextTranslationViewerMuncher from "../../munchers/TextTranslation/TextTranslationViewerMuncher";
-import BcvAudioTranslationViewerMuncher from "../../munchers/BcvAudio/BcvAudioViewerMuncher";
 import {
   AudioTranslationEditorMuncher,
   AudioTranslationViewerMuncher,
@@ -12,20 +11,20 @@ import {
   BcvQuestionsViewerMuncher,
 } from "pankosmia-bcv-muncher";
 
-import BcvArticlesViewerMuncher from "../../munchers/BcvArticles/BcvArticlesViewerMuncher";
-import BcvImagesViewerMuncher from "../../munchers/BcvImages/BcvImagesViewerMuncher";
-import BcvVideosViewerMuncher from "../../munchers/BcvVideos/BcvVideosViewerMuncher";
+import { BcvArticlesViewerMuncher } from "pankosmia-bcv_articles-muncher";
+import { BcvImagesViewerMuncher } from "pankosmia-bcv_images-muncher";
+import { BcvVideosViewerMuncher } from "pankosmia-bcv_videos-muncher";
 import TastelessMuncher from "../../munchers/Tasteless/TastelessMuncher";
 import "./tiles_styles.css";
 import VideoLinksViewerMuncher from "../../munchers/VideoLinks/VideoLinksViewerMuncher";
-import BNotesViewerMuncher from "../../munchers/BNotes/BNotesViewerMuncher";
+import { BookIntroViewerMuncher } from "pankosmia-book_intro-muncher";
 
 import { OBSViewerMuncher, OBSEditorMuncher } from "pankosmia-obs-muncher";
 
-import OBSNotesViewerMuncher from "../../munchers/OBSNotes/OBSNotesViewerMuncher";
+import { OBSNotesViewerMuncher } from "pankosmia-obs_notes-muncher";
 
-import OBSQuestionsViewerMuncher from "../../munchers/OBSQuestions/OBSQuestionsViewerMuncher";
-import OBSArticlesViewerMuncher from "../../munchers/OBSArticles/OBSArticlesViewerMuncher";
+import { OBSQuestionsViewerMuncher } from "pankosmia-obs_questions-muncher";
+import { OBSArticlesViewerMuncher } from "pankosmia-obs_articles-muncher";
 import JuxtalinearEditorMuncher from "../../munchers/Juxtalinear/JuxtalinearEditorMuncher";
 
 import { TranslationPlanViewerMuncher } from "pankosmia-translation_plan-muncher";
@@ -37,6 +36,8 @@ import {
   debugContext,
   i18nContext,
   typographyContext,
+  wordContext,
+  netContext,
 } from "pankosmia-rcl";
 function WorkspaceCard({ metadata, style, distractionModeCount }) {
   const { bcvRef } = useContext(bcvContext);
@@ -46,6 +47,8 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   const { typographyRef } = useContext(typographyContext);
   const { currentProjectRef } = useContext(currentProjectContext);
   const { obs, setObs } = useContext(OBSContext);
+  const { word } = useContext(wordContext);
+  const { enabledRef } = useContext(netContext);
 
   const sbScriptDir = metadata?.script_direction
     ? metadata.script_direction.toLowerCase()
@@ -151,7 +154,7 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <BNotesViewerMuncher metadata={metadata} />
+        <BookIntroViewerMuncher metadata={metadata} />
       </div>
     );
   }
@@ -221,7 +224,14 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-bcvarticles") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvArticlesViewerMuncher metadata={metadata} />
+        <BcvArticlesViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          word={word}
+          enabledRef={enabledRef}
+          systemBcv={systemBcv}
+        />
       </div>
     );
   }
@@ -229,7 +239,12 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-bcvimages") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvImagesViewerMuncher metadata={metadata} />
+        <BcvImagesViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          systemBcv={systemBcv}
+        />
       </div>
     );
   }
@@ -280,7 +295,11 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-obsquestions") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <OBSQuestionsViewerMuncher metadata={metadata} />
+        <OBSQuestionsViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          obs={obs}
+        />
       </div>
     );
   }
@@ -291,7 +310,11 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <OBSNotesViewerMuncher metadata={metadata} />
+        <OBSNotesViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          obs={obs}
+        />
       </div>
     );
   }
@@ -299,7 +322,11 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-obsarticles") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <OBSArticlesViewerMuncher metadata={metadata} />
+        <OBSArticlesViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          obs={obs}
+        />
       </div>
     );
   }
@@ -307,7 +334,12 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-bcvvideo") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvVideosViewerMuncher metadata={metadata} />
+        <BcvVideosViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          systemBcv={systemBcv}
+        />
       </div>
     );
   }
