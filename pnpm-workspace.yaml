@@ -12,6 +12,9 @@ minimumReleaseAgeExclude:
   - pankosmia-obs_articles-muncher@0.1.0
   - pankosmia-obs_questions-muncher@0.1.0
   - pankosmia-bcv_articles-muncher@0.1.0
+  - pankosmia-bcv_videos-muncher@0.1.0 || 0.1.1
+  - pankosmia-bcv_images-muncher@0.1.0
+  - pankosmia-book_intro-muncher@0.1.0
 
 supportedArchitectures:
   os:

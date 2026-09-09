@@ -11,20 +11,20 @@ import {
   BcvQuestionsViewerMuncher,
 } from "pankosmia-bcv-muncher";
 
-import BcvArticlesViewerMuncher from "pankosmia-bcv_articles-muncher";
-import BcvImagesViewerMuncher from "pankosmia-bcv_images-muncher";
-import BcvVideosViewerMuncher from "pankosmia-bcv_video-muncher";
+import { BcvArticlesViewerMuncher } from "pankosmia-bcv_articles-muncher";
+import { BcvImagesViewerMuncher } from "pankosmia-bcv_images-muncher";
+import { BcvVideosViewerMuncher } from "pankosmia-bcv_videos-muncher";
 import TastelessMuncher from "../../munchers/Tasteless/TastelessMuncher";
 import "./tiles_styles.css";
 import VideoLinksViewerMuncher from "../../munchers/VideoLinks/VideoLinksViewerMuncher";
-import BNotesViewerMuncher from "pankosmia-BNotes-muncher";
+import { BookIntroViewerMuncher } from "pankosmia-book_intro-muncher";
 
 import { OBSViewerMuncher, OBSEditorMuncher } from "pankosmia-obs-muncher";
 
-import OBSNotesViewerMuncher from "pankosmia-obs_notes-muncher";
+import { OBSNotesViewerMuncher } from "pankosmia-obs_notes-muncher";
 
-import OBSQuestionsViewerMuncher from "pankosmia-obs_questions-muncher";
-import OBSArticlesViewerMuncher from "pankosmia-obs_articles-muncher";
+import { OBSQuestionsViewerMuncher } from "pankosmia-obs_questions-muncher";
+import { OBSArticlesViewerMuncher } from "pankosmia-obs_articles-muncher";
 import JuxtalinearEditorMuncher from "../../munchers/Juxtalinear/JuxtalinearEditorMuncher";
 
 import { TranslationPlanViewerMuncher } from "pankosmia-translation_plan-muncher";
@@ -154,7 +154,7 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <BNotesViewerMuncher metadata={metadata} />
+        <BookIntroViewerMuncher metadata={metadata} />
       </div>
     );
   }
