@@ -108,7 +108,7 @@
       "id": "Tidak dapat disimpan"
     },
     "usfm_error": {
-      "en": "An error happened when loading USFM",
+      "en": "An error occurred when loading USFM",
       "fr": "Une erreur est survenu pendant la lecture de l'USFM"
     },
     "usfm_conversion_error": {
