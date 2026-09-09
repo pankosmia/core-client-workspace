@@ -1,9 +1,8 @@
 import { useContext, useState, useEffect } from "react";
-import { Box, Chip, Stack, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import GraphiteTest from "./GraphiteTest";
 import { createTilePanes, TileContainer, TileProvider } from "react-tile-pane";
 import { getJson } from "pankosmia-lib/http";
-import { doI18n } from "pankosmia-lib/i18n";
 import OBSContext from "../../contexts/obsContext";
 import layoutJson from "./layouts";
 import {
@@ -23,7 +22,7 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
   const { product } = useContext(ProductContext);
   const [resourceDetails, setResourceDetails] = useState({});
   const [projectSummaries, setProjectSummaries] = useState({});
-  const [distractionModeCount, setDistractionModeCount] = useState(0);
+  const distractionModeCount = useState(0)[0];
   const [obs, setObs] = useState([1, 0]);
 
   const getProjectSummaries = async () => {

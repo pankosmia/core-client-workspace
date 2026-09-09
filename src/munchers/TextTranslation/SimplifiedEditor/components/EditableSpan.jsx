@@ -27,10 +27,10 @@ export default function EditableSpan({
   const [firstTime, setFirstTime] = useState(true);
   const [value, setValue] = useState(incomingContent || "");
   const { debugRef } = useContext(DebugContext);
-  const { systemBcv } = useContext(BcvContext);
   const editorRef = useRef(null);
   useEditable(editorRef, setValue);
 
+  /*
   const updateScriptureJson = async (scriptureJson, position, value) =>
     setTimeout(() => {
       setScriptureJson(updateUnitContent(scriptureJson, position, value));
@@ -42,6 +42,7 @@ export default function EditableSpan({
       debugRef.current,
     );
   };
+  */
 
   if (incomingContent === null) {
     return "";
@@ -63,7 +64,6 @@ export default function EditableSpan({
       if (!range.collapsed) {
         return null;
       }
-      const range2 = range.cloneRange();
       const temp = document.createTextNode("\0");
       range.insertNode(temp);
       caretPosition = editorRef.current.innerText.indexOf("\0");

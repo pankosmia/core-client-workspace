@@ -13,17 +13,6 @@ function PreviewText({ open, setOpenModalPreviewText, metadata, systemBcv }) {
   const { i18nRef } = useContext(i18nContext);
   const { debugRef } = useContext(debugContext);
   const fileExport = useRef();
-  const [showTitles, setShowTitles] = useState(true);
-  const [showHeadings, setShowHeadings] = useState(true);
-  const [showIntroductions, setShowIntroductions] = useState(true);
-  const [showFootnotes, setShowFootnotes] = useState(false);
-  const [showXrefs, setShowXrefs] = useState(false);
-  const [showParaStyles, setShowParaStyles] = useState(true);
-  const [showCharacterMarkup, setShowCharacterMarkup] = useState(true);
-  const [showChapterLabels, setShowChapterLabels] = useState(true);
-  const [showVersesLabels, setShowVersesLabels] = useState(true);
-  const [showFirstVerseLabel, setShowFirstVerseLabel] = useState(true);
-  const [selectedColumns, setSelectedColumns] = useState(2);
 
   const { typographyRef } = useContext(typographyContext);
 
@@ -68,17 +57,17 @@ function PreviewText({ open, setOpenModalPreviewText, metadata, systemBcv }) {
       }
       const sectionConfig = {
         showWordAtts: false,
-        showTitles: showTitles,
-        showHeadings: showHeadings,
-        showIntroductions: showIntroductions,
-        showFootnotes: showFootnotes,
-        showXrefs: showXrefs,
-        showParaStyles: showParaStyles,
-        showCharacterMarkup: showCharacterMarkup,
-        showChapterLabels: showChapterLabels,
-        showVersesLabels: showVersesLabels,
-        showFirstVerseLabel: showFirstVerseLabel,
-        nColumns: selectedColumns,
+        showTitles: true,
+        showHeadings: true,
+        showIntroductions: true,
+        showFootnotes: false,
+        showXrefs: false,
+        showParaStyles: true,
+        showCharacterMarkup: true,
+        showChapterLabels: true,
+        showVersesLabels: true,
+        showFirstVerseLabel: true,
+        nColumns: 2,
         showGlossaryStar: false,
       };
       const pk = new Proskomma();

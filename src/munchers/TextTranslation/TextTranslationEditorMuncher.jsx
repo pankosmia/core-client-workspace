@@ -1,7 +1,7 @@
 import "./TextTranslationEditorMuncher.css";
 import { Box } from "@mui/material";
 import DraftingEditor from "./SimplifiedEditor/DraftingEditor";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 function TextTranslationEditorMuncher({ metadata }) {
   const [modified, setModified] = useState(false);

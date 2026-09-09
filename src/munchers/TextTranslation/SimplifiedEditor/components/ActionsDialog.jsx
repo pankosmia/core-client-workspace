@@ -1,11 +1,5 @@
-import { useContext, useState, useId } from "react";
-import {
-  Stack,
-  Box,
-  Button,
-  TextField,
-  IconButton,
-} from "@mui/material";
+import { useContext, useState } from "react";
+import { Stack, Box, Button, TextField, IconButton } from "@mui/material";
 import { splitPara } from "../Controller";
 import { productContext as ProductContext } from "pankosmia-rcl";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";

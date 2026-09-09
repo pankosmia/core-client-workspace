@@ -1,5 +1,3 @@
-import { RepartitionRounded } from "@mui/icons-material";
-
 function updateGraftContent(scriptureJson, position, newValue) {
   return {
     headers: scriptureJson.headers,

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import EditableSpan from "./EditableSpan";
 import EditableTag from "./EditableTag";
 
@@ -10,8 +10,9 @@ export default function EditableBibleBlock({
   setCaretPosition,
   setSelectedBlockNo,
 }) {
-  if (scriptureJson.blocks[position[0]]) {
-    const tag = scriptureJson.blocks[position[0]].tag;
+  const [blockJson, setBlockJson] = useState(scriptureJson.blocks[position[0]]);
+  if (blockJson) {
+    const tag = blockJson.tag;
     return (
       <div
         key={position}
@@ -28,8 +29,8 @@ export default function EditableBibleBlock({
           position={position}
         />
         {!["b", "ib"].includes(tag) &&
-          scriptureJson.blocks[position[0]].units &&
-          scriptureJson.blocks[position[0]].units.map((u, i) => {
+          blockJson.units &&
+          blockJson.units.map((u, i) => {
             return (
               <span style={{ display: "inline-block" }}>
                 <span key={i} className="marks_verses_label">
