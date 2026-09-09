@@ -27,18 +27,34 @@ export default function usfm2draftJson(usfm) {
       },
     );
 
+    const cleanup = () => {
+      worker.terminate();
+    };
+
     worker.addEventListener("message", (e) => {
       const { ok, result, error } = e.data;
 
-      // Worker is finished, so we don't need it anymore
-      worker.terminate();
-
       if (!ok) {
-        reject(new Error(error));
+        cleanup();
+
+        const err = new Error(error?.message || "Unknown worker error");
+        err.name = error?.name || "WorkerError";
+
+        if (error?.stack) {
+          err.stack = error.stack;
+        }
+
+        // Full error for development/debugging
+        console.error("USFM worker error:", err);
+
+        // Short message for the UI
+
+        reject(err);
         return;
       }
 
-      // Update cache
+      cleanup();
+
       parseCache.set(usfm, result);
 
       if (parseCache.size > PARSE_CACHE_MAX) {
@@ -49,7 +65,10 @@ export default function usfm2draftJson(usfm) {
     });
 
     worker.addEventListener("error", (error) => {
-      worker.terminate();
+      cleanup();
+
+      console.error("Uncaught USFM worker error:", error);
+
       reject(error);
     });
 
