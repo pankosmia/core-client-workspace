@@ -10,8 +10,8 @@ import {
 
 export default function EditableSpan({
   key,
-  scriptureJson,
-  setScriptureJson,
+  blockJson,
+  setBlockJson,
   position,
   chapter,
   verse,
@@ -19,7 +19,7 @@ export default function EditableSpan({
   caretPosition,
   setCaretPosition,
 }) {
-  const incomingBlock = scriptureJson.blocks[position[0]];
+  const incomingBlock = blockJson;
   const incomingContent =
     incomingBlock.units && incomingBlock.units[position[1]].content
       ? incomingBlock.units[position[1]].content[0]

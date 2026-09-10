@@ -24,8 +24,8 @@ export default function EditableBibleBlock({
         onClick={() => setSelectedBlockNo(position[0])}
       >
         <EditableTag
-          scriptureJson={scriptureJson}
-          setScriptureJson={setScriptureJson}
+          blockJson={blockJson}
+          setBlockJson={setBlockJson}
           position={position}
         />
         {!["b", "ib"].includes(tag) &&
@@ -40,8 +40,8 @@ export default function EditableBibleBlock({
                   key={i}
                   caretPosition={caretPosition}
                   setCaretPosition={setCaretPosition}
-                  scriptureJson={scriptureJson}
-                  setScriptureJson={setScriptureJson}
+                  blockJson={blockJson}
+                  setBlockJson={setScriptureJson}
                   position={[...position, i]}
                   chapter={u.chapter}
                   verse={

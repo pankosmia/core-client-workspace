@@ -10,16 +10,10 @@ import introduction_headingBlockMenu from "../menuSpecs/intro_heading_blocks.jso
 import { i18nContext as I18nContext } from "pankosmia-rcl";
 import { doI18n } from "pankosmia-lib/i18n";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-export default function EditableTag({
-  scriptureJson,
-  setScriptureJson,
-  position,
-}) {
+export default function EditableTag({ blockJson, setBlockJson, position }) {
   const { i18nRef } = useContext(I18nContext);
   const [anchorEl, setAnchorEl] = useState(null);
-  const incomingBlock = scriptureJson.blocks
-    ? scriptureJson.blocks[position[0]]
-    : null;
+  const incomingBlock = blockJson || null;
   const [value, setValue] = useState("");
   const [subMenuAnchors, setSubMenuAnchors] = useState({});
 
@@ -37,7 +31,7 @@ export default function EditableTag({
   }
   const changeValue = (newValue) => {
     setValue(newValue);
-    setScriptureJson(updateBlockTag(scriptureJson, position, newValue));
+    // setScriptureJson(updateBlockTag(scriptureJson, position, newValue));
   };
 
   const changeValueAnchor = (anchors, n) => {
