@@ -249,16 +249,16 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
     );
   }
   // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
-  if (metadata.flavor === "x-videolinks") {
-    return (
-      <div
-        style={{ ...style, lineHeight: "normal" }}
-        dir={sbScriptDirSet ? sbScriptDir : undefined}
-      >
-        <VideoLinksViewerMuncher metadata={metadata} />
-      </div>
-    );
-  }
+  // if (metadata.flavor === "x-videolinks") {
+  //   return (
+  //     <div
+  //       style={{ ...style, lineHeight: "normal" }}
+  //       dir={sbScriptDirSet ? sbScriptDir : undefined}
+  //     >
+  //       <VideoLinksViewerMuncher metadata={metadata} />
+  //     </div>
+  //   );
+  // }
   // This component has TW and MUI lineHeights and fonts interfering!
   if (metadata.primary && metadata.flavor === "textStories") {
     return (
