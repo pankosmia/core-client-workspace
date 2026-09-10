@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import usfm2draftJson from "../../components/usfm2draftJson";
+import usfm2viewerJson from "../../components/usfm2viewerJson";
 import filterByChapter from "../../components/filterByChapter";
 import ViewableBible from "./SimplifiedEditor/components/ViewableBible";
 
@@ -14,6 +15,7 @@ function TextTranslationViewerMuncher({ metadata }) {
   const { systemBcv } = useContext(bcvContext);
   const { debugRef } = useContext(debugContext);
   const [bookData, setBookData] = useState(null);
+  const [viewerData, setViewerData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [textDir, setTextDir] = useState(
     metadata?.script_direction
@@ -35,6 +37,7 @@ function TextTranslationViewerMuncher({ metadata }) {
       );
       if (usfmResponse.ok) {
         setBookData(await usfm2draftJson(usfmResponse.text));
+        setViewerData(await usfm2viewerJson(usfmResponse.text));
         console.log("test");
         if (!sbScriptDirSet) {
           const dir = await TextDir(usfmResponse.text, "usfm");
@@ -49,8 +52,8 @@ function TextTranslationViewerMuncher({ metadata }) {
     getUsfm();
   }, [debugRef, systemBcv.bookCode, metadata.local_path, sbScriptDirSet]);
 
-  const chapterData = bookData
-    ? filterByChapter(bookData, systemBcv.chapterNum)
+  const chapterData = viewerData
+    ? filterByChapter(viewerData, systemBcv.chapterNum)
     : [];
 
   //console.log('sbScriptDirSet: ' + !sbScriptDirSet.toString())
