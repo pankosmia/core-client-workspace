@@ -13,7 +13,6 @@ function AudioViewer({ metadata, bookCode, chapter }) {
   const paddedChapter = overPaddedChapter.substring(
     overPaddedChapter.length - 3,
   );
-  console.log("paddedChapter", paddedChapter);
   return (
     <Stack>
       <audio

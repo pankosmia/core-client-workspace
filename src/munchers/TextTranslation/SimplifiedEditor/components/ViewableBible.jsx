@@ -1,10 +1,11 @@
 import React, { useRef, useContext, useEffect } from "react";
 import ViewableBibleBlock from "./ViewableBibleBlock";
-import { bcvContext, wordContext } from "pankosmia-rcl";
+import { bcvContext, wordContext, snippetContext } from "pankosmia-rcl";
 
 export default function ViewableBible({ chapterJson, dir }) {
   const { systemBcv } = useContext(bcvContext);
   const { word } = useContext(wordContext);
+  const { snippet } = useContext(snippetContext);
 
   const lastPrintedVerseRef = useRef(null);
 
@@ -44,6 +45,7 @@ export default function ViewableBible({ chapterJson, dir }) {
                 blockJson={b}
                 systemBcv={systemBcv}
                 systemWord={word}
+                systemSnippet={snippet}
                 lastPrintedVerseRef={lastPrintedVerseRef}
               />
             );

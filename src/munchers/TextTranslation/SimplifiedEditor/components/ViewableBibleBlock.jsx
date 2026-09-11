@@ -5,6 +5,7 @@ export default function ViewableBibleBlock({
   systemBcv,
   lastPrintedVerseRef,
   systemWord,
+  systemSnippet,
 }) {
   const versesRefs = useRef({});
 
@@ -18,24 +19,38 @@ export default function ViewableBibleBlock({
     }
   }, [systemBcv.verseNum]);
 
-  const highlightText = (text, target) => {
-    if (!target) return text;
-    const str = String(text);
-    const parts = str.split(
-      new RegExp(`(?<!\\p{L})(${target})(?!\\p{L})`, "giu"),
-    );
-    return parts.map((part, i) =>
-      part.toLowerCase() === target.toLowerCase() ? (
-        <mark
-          key={i}
-          style={{ backgroundColor: "#FFD700", borderRadius: "2px" }}
-        >
-          {part}
-        </mark>
-      ) : (
-        part
-      ),
-    );
+  // snippet can have multiple words
+  const snippetWords = systemSnippet ? systemSnippet.trim().split(/\s+/) : [];
+
+  const wordMatchesSnippet = (word) => {
+    if (!word.source || snippetWords.length === 0) return false;
+    return word.source.some((s) => snippetWords.includes(s));
+  };
+
+  const wordMatchesSystemWord = (word) => {
+    const target = systemWord?.target;
+    if (!target) return false;
+    return word.target.trim().toLowerCase() === target.trim().toLowerCase();
+  };
+
+  const renderContent = (content, allowSnippetHighlight) => {
+    return content.map((word, i) => {
+      const highlightBySnippet =
+        allowSnippetHighlight && wordMatchesSnippet(word);
+      const highlightByWord = wordMatchesSystemWord(word);
+
+      if (highlightBySnippet || highlightByWord) {
+        return (
+          <mark
+            key={i}
+            style={{ backgroundColor: "#FFD700", borderRadius: "2px" }}
+          >
+            {word.target}
+          </mark>
+        );
+      }
+      return word.target;
+    });
   };
 
   return (
@@ -48,8 +63,11 @@ export default function ViewableBibleBlock({
       }}
     >
       {blockJson?.units?.map((u, i) => {
-        const rawContent = u.content || "";
-        const contentToDisplay = rawContent === "_" ? " " : rawContent;
+        const rawContent = u.content || [];
+        const contentToDisplay =
+          rawContent.length === 1 && rawContent[0].target === "_"
+            ? [{ target: " ", source: null }]
+            : rawContent;
         const currentVerse = String(u.verses);
         const isDuplicate = currentVerse === lastPrintedVerseRef.current;
         if (!isDuplicate) lastPrintedVerseRef.current = currentVerse;
@@ -93,9 +111,8 @@ export default function ViewableBibleBlock({
               </span>
             )}
             <span style={{ whiteSpace: "normal", paddingRight: "2pt" }}>
-              {isDuplicate
-                ? ` ${highlightText(contentToDisplay, systemWord?.target)}`
-                : highlightText(contentToDisplay, systemWord?.target)}
+              {isDuplicate && " "}
+              {renderContent(contentToDisplay, isSelected)}
             </span>
           </span>
         );
