@@ -38,7 +38,6 @@ function TextTranslationViewerMuncher({ metadata }) {
       if (usfmResponse.ok) {
         setBookData(await usfm2draftJson(usfmResponse.text));
         setViewerData(await usfm2viewerJson(usfmResponse.text));
-        console.log("test");
         if (!sbScriptDirSet) {
           const dir = await TextDir(usfmResponse.text, "usfm");
           setTextDir(dir);
@@ -68,7 +67,6 @@ function TextTranslationViewerMuncher({ metadata }) {
           alignItems: "center",
           width: "100%",
           minHeight: "150px",
-          backgroundColor: "red",
           flexShrink: 0,
         }}
       >
