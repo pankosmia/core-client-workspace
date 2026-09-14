@@ -149,7 +149,7 @@ self.onmessage = (e) => {
   const { id, usfm } = e.data;
   try {
     const result = parseUsfm2draftJson(usfm);
-    console.log(result);
+    // console.log(result);
     self.postMessage({ id, ok: true, result });
   } catch (err) {
     self.postMessage({ id, ok: false, error: err.message });
