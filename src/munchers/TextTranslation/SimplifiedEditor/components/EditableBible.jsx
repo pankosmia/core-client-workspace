@@ -5,15 +5,18 @@ import { useContext, useEffect } from "react";
 import { bcvContext } from "pankosmia-rcl";
 
 export default function EditableBible({
+  scriptDir,
   chapterJson,
   scriptureJson,
   setScriptureJson,
 }) {
   const { systemBcv } = useContext(bcvContext);
-
   useEffect(() => {
     async function loadCSS() {
-      const url = "/api/app-resources/usfm/bible_page_styles.css";
+      const url =
+        scriptDir === "rtl"
+          ? "/api/app-resources/usfm/bible_page_styles_rtl.css"
+          : "/api/app-resources/usfm/bible_page_styles.css";
       const response = await fetch(url);
       if (!response.ok) {
         console.error("Erreur de chargement du CSS :", response.status);

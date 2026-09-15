@@ -54,7 +54,6 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
     ? metadata.script_direction.toLowerCase()
     : undefined;
   const sbScriptDirSet = sbScriptDir === "ltr" || sbScriptDir === "rtl";
-
   if (!metadata.primary && distractionModeCount % 2 > 0) {
     return (
       <div
@@ -346,10 +345,7 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
   if (metadata.flavor.toLowerCase() === "x-translationplan") {
     return (
-      <div
-        style={{ ...style, lineHeight: "normal" }}
-        dir={sbScriptDirSet ? sbScriptDir : undefined}
-      >
+      <div style={{ ...style, lineHeight: "normal" }}>
         <TranslationPlanViewerMuncher
           metadata={metadata}
           systemBcv={systemBcv}
