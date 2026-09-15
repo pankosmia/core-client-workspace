@@ -124,6 +124,7 @@ function DraftingEditor({ metadata, modified, setModified }) {
           <Box dir={!sbScriptDirSet ? textDir : undefined}>
             {chapterJson ? (
               <EditableBible
+                scriptDir={sbScriptDirSet ? textDir : undefined}
                 chapterJson={chapterJson}
                 scriptureJson={scriptureJson}
                 setScriptureJson={setScriptureJson}
