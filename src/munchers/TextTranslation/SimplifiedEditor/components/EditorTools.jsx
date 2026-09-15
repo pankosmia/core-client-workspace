@@ -18,6 +18,7 @@ import {
   productContext as ProductContext,
 } from "pankosmia-rcl";
 import { PrintOutlined } from "@mui/icons-material";
+import { getFirstverseTextTranslation } from "../../../../common/findFirstVerse";
 
 function EditorTools({
   metadata,
@@ -126,6 +127,7 @@ function EditorTools({
           <ChapterPicker
             chapterNumbers={chapterNumbers}
             repoMetadata={metadata}
+            findFirstVerse={getFirstverseTextTranslation}
           />
         </Grid>
         <Grid sx={{ display: "flex" }} gap={1}>

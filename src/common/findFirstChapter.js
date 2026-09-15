@@ -1,4 +1,6 @@
 import { getJson, postEmptyJson, getText } from "pankosmia-lib/http";
+import { getFirstverseTextTranslation } from "./findFirstVerse";
+
 export async function getFirstChapterTextTranslation(
   currentProjectRefCurr,
   debugRefCurr,
@@ -14,10 +16,17 @@ export async function getFirstChapterTextTranslation(
     const match = usfmString.match(re);
     if (match) {
       const chapter = match[1];
-      postEmptyJson(
-        `/api/navigation/bcv/${bookCode}/${chapter}/1`,
+      console.log(chapter);
+      getFirstverseTextTranslation(
+        chapter,
+        currentProjectRefCurr,
         debugRefCurr,
+        bookCode,
       );
+      // postEmptyJson(
+      //   `/api/navigation/bcv/${bookCode}/${chapter}/1`,
+      //   debugRefCurr,
+      // );
     }
   }
 }
