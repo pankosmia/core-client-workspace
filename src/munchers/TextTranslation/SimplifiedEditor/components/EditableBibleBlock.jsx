@@ -9,11 +9,7 @@ export default function EditableBibleBlock({
   if (scriptureJson.blocks[position[0]]) {
     const tag = scriptureJson.blocks[position[0]].tag;
     return (
-      <div
-        key={position}
-        style={{ flexDirection: "column", textAlign: "left" }}
-        className={tag}
-      >
+      <div key={position} style={{ flexDirection: "column" }} className={tag}>
         <EditableTag
           scriptureJson={scriptureJson}
           setScriptureJson={setScriptureJson}
