@@ -31,6 +31,13 @@ function processCvItems(items, os, chapterNo, newChapter) {
 
   for (const item of items) {
     if (item.subType === "start" && item.payload.startsWith("verses")) {
+      if (
+        ret.length > 0 &&
+        ret[ret.length - 1].content &&
+        ret[ret.length - 1].content[0] === ""
+      ) {
+        ret.pop();
+      }
       ret.push({
         chapter: chapterNo,
         verses: item.payload.split("/")[1],
@@ -149,6 +156,7 @@ function parseUsfm2draftJson(usfm) {
 self.onmessage = (e) => {
   try {
     const result = parseUsfm2draftJson(e.data.usfm);
+    // console.log(JSON.stringify(result, null, 2));
 
     self.postMessage({
       ok: true,
