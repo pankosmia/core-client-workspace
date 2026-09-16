@@ -34,6 +34,7 @@ export default function EditableRemark({
     return (
       <div
         style={{
+          paddingTop: 8,
           flexDirection: "column",
           fontFamily: "monospace",
           fontSize: "medium",
