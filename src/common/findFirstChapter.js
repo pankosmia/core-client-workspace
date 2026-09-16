@@ -16,7 +16,6 @@ export async function getFirstChapterTextTranslation(
     const match = usfmString.match(re);
     if (match) {
       const chapter = match[1];
-      console.log(chapter);
       getFirstverseTextTranslation(
         chapter,
         currentProjectRefCurr,

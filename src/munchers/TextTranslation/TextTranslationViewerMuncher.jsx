@@ -42,7 +42,6 @@ function TextTranslationViewerMuncher({ metadata }) {
           const dir = await TextDir(usfmResponse.text, "usfm");
           setTextDir(dir);
         }
-        //console.log(usfmResponse.text);
       } else {
         console.error("usfmResponse failed");
       }
@@ -54,9 +53,6 @@ function TextTranslationViewerMuncher({ metadata }) {
   const chapterData = viewerData
     ? filterByChapter(viewerData, systemBcv.chapterNum)
     : [];
-
-  //console.log('sbScriptDirSet: ' + !sbScriptDirSet.toString())
-  //console.log('textDir: ' + textDir)
 
   if (isLoading) {
     return (

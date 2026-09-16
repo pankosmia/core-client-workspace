@@ -106,12 +106,10 @@ export default function EditableSpan({
         backgroundColor: value.trim() === "" ? "#CCC" : "#FFF",
       }}
       onBlur={(e) => {
-        // console.log("BLUR", position)
         updateScriptureJson(scriptureJson, position, value).then();
         return false;
       }}
       onFocus={(e) => {
-        //console.log("FOCUS", position)
         updateBcv(systemBcv.bookCode, chapter, verse, endVerse);
         return false;
       }}

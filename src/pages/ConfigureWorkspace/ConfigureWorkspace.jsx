@@ -252,7 +252,6 @@ function ConfigureWorkspace({
           ]?.en ?? rep.language_code,
       };
     });
-  //console.log(rows);
 
   const selectedResourcesIndexes = useMemo(
     () => rows.filter((r) => selectedResources.has(r.path)).map((r) => r.id),
