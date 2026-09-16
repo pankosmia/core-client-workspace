@@ -15,6 +15,9 @@ function BookPicker({ setFirstChapter, disable = false }) {
   const { currentProjectRef } = useContext(CurrentProjectContext);
   const [contentBooks, setContentBooks] = useState([]);
   const [currentBook, setCurrentBook] = useState(bcvRef.current.bookCode);
+  useEffect(() => {
+    setCurrentBook(bcvRef.current.bookCode);
+  }, [bcvRef.current.bookCode]);
 
   useEffect(() => {
     const getProjectBooks = async () => {

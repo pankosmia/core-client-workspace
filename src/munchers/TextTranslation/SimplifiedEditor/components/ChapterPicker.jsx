@@ -15,6 +15,9 @@ function ChapterPicker({ repoMetadata, chapterNumbers, findFirstVerse }) {
   const { currentProjectRef } = useContext(currentProjectContext);
   const [currentBook, setCurrentBook] = useState(bcvRef.current.bookCode);
 
+  useEffect(() => {
+    setCurrentBook(bcvRef.current.bookCode);
+  }, [bcvRef.current.bookCode]);
   const projectScriptDirection = async () => {
     const summariesResponse = await getJson(
       `/api/burrito/metadata/summary/${repoMetadata.local_path}`,
