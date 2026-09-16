@@ -33,7 +33,7 @@ function BookPicker({ setFirstChapter, disable = false }) {
   }, [currentProjectRef]);
 
   useEffect(() => {
-    if (currentBook && bcvRef.current.bookCode !== currentBook) {
+    if (currentBook) {
       setFirstChapter(currentProjectRef.current, debugRef.current, currentBook);
     }
   }, [currentBook]);
@@ -48,7 +48,7 @@ function BookPicker({ setFirstChapter, disable = false }) {
           id="book-button"
           size="small"
           select
-          value={bcvRef.current.bookCode}
+          value={currentBook}
         >
           {contentBooks.map((b, n) => (
             <MenuItem

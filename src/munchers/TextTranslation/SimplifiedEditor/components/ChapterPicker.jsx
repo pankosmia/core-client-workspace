@@ -4,12 +4,17 @@ import { Box, IconButton, MenuItem, TextField } from "@mui/material";
 import { ButtonGroup } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { getJson, postEmptyJson } from "pankosmia-lib/http";
-import { bcvContext, debugContext } from "pankosmia-rcl";
-function ChapterPicker({ repoMetadata, chapterNumbers }) {
+import { bcvContext, debugContext, currentProjectContext } from "pankosmia-rcl";
+
+function ChapterPicker({ repoMetadata, chapterNumbers, findFirstVerse }) {
   const [scriptDirection, setScriptDirection] = useState([]);
   const { bcvRef, systemBcv } = useContext(bcvContext);
   const currentPosition = chapterNumbers.indexOf(systemBcv.chapterNum);
   const { debugRef } = useContext(debugContext);
+
+  const { currentProjectRef } = useContext(currentProjectContext);
+  const [currentBook, setCurrentBook] = useState(bcvRef.current.bookCode);
+
   const projectScriptDirection = async () => {
     const summariesResponse = await getJson(
       `/api/burrito/metadata/summary/${repoMetadata.local_path}`,
@@ -29,9 +34,11 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
   // changer de page -1
   const previousChapter = () => {
     if (currentPosition > 0) {
-      postEmptyJson(
-        `/api/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[currentPosition - 1]}/1`,
+      findFirstVerse(
+        chapterNumbers[currentPosition - 1],
+        currentProjectRef.current,
         debugRef.current,
+        currentBook,
       );
     }
   };
@@ -39,17 +46,21 @@ function ChapterPicker({ repoMetadata, chapterNumbers }) {
   // changer de page +1
   const nextChapter = () => {
     if (currentPosition < chapterNumbers.length - 1) {
-      postEmptyJson(
-        `/api/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[currentPosition + 1]}/1`,
+      findFirstVerse(
+        chapterNumbers[currentPosition + 1],
+        currentProjectRef.current,
         debugRef.current,
+        currentBook,
       );
     }
   };
 
   const handleClickMenuChapter = (i) => {
-    postEmptyJson(
-      `/api/navigation/bcv/${systemBcv["bookCode"]}/${chapterNumbers[i]}/1`,
+    findFirstVerse(
+      chapterNumbers[i],
+      currentProjectRef.current,
       debugRef.current,
+      currentBook,
     );
   };
 
