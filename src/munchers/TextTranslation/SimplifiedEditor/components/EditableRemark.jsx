@@ -38,6 +38,7 @@ export default function EditableRemark({
           flexDirection: "column",
           fontFamily: "monospace",
           fontSize: "medium",
+          paddingBottom: 6,
         }}
       >
         <span
