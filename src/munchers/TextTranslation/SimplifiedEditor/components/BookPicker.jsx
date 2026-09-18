@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Box, MenuItem, TextField } from "@mui/material";
-import { getJson, doI18n, postEmptyJson, getText } from "pithekos-lib";
+import { getJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import {
   bcvContext as BcvContext,
   i18nContext as I18nContext,
@@ -14,6 +15,9 @@ function BookPicker({ setFirstChapter, disable = false }) {
   const { currentProjectRef } = useContext(CurrentProjectContext);
   const [contentBooks, setContentBooks] = useState([]);
   const [currentBook, setCurrentBook] = useState(bcvRef.current.bookCode);
+  useEffect(() => {
+    setCurrentBook(bcvRef.current.bookCode);
+  }, [bcvRef.current.bookCode]);
 
   useEffect(() => {
     const getProjectBooks = async () => {
@@ -47,7 +51,7 @@ function BookPicker({ setFirstChapter, disable = false }) {
           id="book-button"
           size="small"
           select
-          value={bcvRef.current.bookCode}
+          value={currentBook}
         >
           {contentBooks.map((b, n) => (
             <MenuItem

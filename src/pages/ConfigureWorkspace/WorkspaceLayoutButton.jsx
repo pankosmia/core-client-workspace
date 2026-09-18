@@ -1,4 +1,4 @@
-import { Grid2, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Grid, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import SvgViewEditorBottom from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_bottom";
 import SvgViewEditorLeftColumn from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_column";
 import SvgViewEditorRightColumn from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_column";
@@ -6,7 +6,7 @@ import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEdito
 import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row";
 import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_top";
 import { useEffect, useState, useContext } from "react";
-import { getJson } from "pithekos-lib";
+import { getJson } from "pankosmia-lib/http";
 import { debugContext } from "pankosmia-rcl";
 
 export default function LayoutPicker({
@@ -86,7 +86,7 @@ export default function LayoutPicker({
 
   return (
     <>
-      <Grid2 display="flex" gap={1}>
+      <Grid sx={{ display: "felx" }} gap={1}>
         <ToggleButtonGroup
           value={alignment}
           exclusive
@@ -104,7 +104,7 @@ export default function LayoutPicker({
             );
           })}
         </ToggleButtonGroup>
-      </Grid2>
+      </Grid>
     </>
   );
 }

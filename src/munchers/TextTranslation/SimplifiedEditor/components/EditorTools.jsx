@@ -1,24 +1,24 @@
-import { Box, Grid2, IconButton, Tooltip } from "@mui/material";
+import { Box, Grid, IconButton, Tooltip } from "@mui/material";
 import ChapterPicker from "./ChapterPicker";
 import SaveButton from "./SaveButton";
 import BookPicker from "./BookPicker";
 import PreviewText from "./PreviewText";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import md5sum from "md5";
-import SettingsIcon from "@mui/icons-material/Settings";
 import { useContext, useEffect, useState } from "react";
-import { getText } from "pithekos-lib";
 import usfm2draftJson from "../../../../components/usfm2draftJson";
 import { useNavigate } from "react-router-dom";
 import LayoutIcon from "../layouts/LayoutIcon";
-import { doI18n } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import { getFirstChapterTextTranslation } from "../../../../common/findFirstChapter";
 import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
   i18nContext as I18nContext,
+  productContext as ProductContext,
 } from "pankosmia-rcl";
 import { PrintOutlined } from "@mui/icons-material";
+import { getFirstverseTextTranslation } from "../../../../common/findFirstVerse";
 
 function EditorTools({
   metadata,
@@ -33,6 +33,7 @@ function EditorTools({
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
   const { i18nRef } = useContext(I18nContext);
+  const { product } = useContext(ProductContext);
   const [openModalPreviewText, setOpenModalPreviewText] = useState(false);
   const [chapterNumbers, setChapterNumbers] = useState([]);
 
@@ -57,7 +58,7 @@ function EditorTools({
           debugRef.current,
         );
         if (usfmResponse.ok) {
-          const usfmDraftJson = usfm2draftJson(usfmResponse.text);
+          const usfmDraftJson = await usfm2draftJson(usfmResponse.text);
           const newChapterNumbers = allChapterNumbers(usfmDraftJson);
           setCurrentBookCode(systemBcv.bookCode);
           setChapterNumbers(newChapterNumbers);
@@ -77,20 +78,22 @@ function EditorTools({
     <Box
       sx={{
         position: "fixed",
-        top: "40px",
-        left: 0,
-        right: 0,
+        top: product && product.os === "android" ? "70px" : "40px",
+        left: product && product.os === "android" ? "30px" : "0px",
+        right: product && product.os === "android" ? "30px" : "0px",
         display: "flex",
         padding: 2,
       }}
     >
-      <Grid2
+      <Grid
         container
-        alignItems="center"
-        justifyContent="space-between"
-        width="100%"
+        sx={{
+          alignItems: "center",
+          width: "100%",
+          justifyContent: "space-between",
+        }}
       >
-        <Grid2 display="flex" gap={1}>
+        <Grid sx={{ display: "flex" }} gap={1}>
           <SaveButton
             metadata={metadata}
             systemBcv={systemBcv}
@@ -100,29 +103,34 @@ function EditorTools({
             setMd5sumScriptureJson={setMd5sumScriptureJson}
             scriptureJson={scriptureJson}
           />
-          <IconButton
-            onClick={() => {
-              setOpenModalPreviewText(true);
-            }}
-          >
-            <PrintOutlined />
-          </IconButton>
-          <PreviewText
-            metadata={metadata}
-            systemBcv={systemBcv}
-            open={openModalPreviewText}
-            setOpenModalPreviewText={setOpenModalPreviewText}
-          />
-        </Grid2>
+          {product && product.os !== "android" && (
+            <>
+              <IconButton
+                onClick={() => {
+                  setOpenModalPreviewText(true);
+                }}
+              >
+                <PrintOutlined />
+              </IconButton>
+              <PreviewText
+                metadata={metadata}
+                systemBcv={systemBcv}
+                open={openModalPreviewText}
+                setOpenModalPreviewText={setOpenModalPreviewText}
+              />
+            </>
+          )}
+        </Grid>
 
-        <Grid2 display="flex" gap={1}>
+        <Grid sx={{ display: "flex" }} gap={1}>
           <BookPicker setFirstChapter={getFirstChapterTextTranslation} />
           <ChapterPicker
             chapterNumbers={chapterNumbers}
             repoMetadata={metadata}
+            findFirstVerse={getFirstverseTextTranslation}
           />
-        </Grid2>
-        <Grid2 display="flex" gap={1}>
+        </Grid>
+        <Grid sx={{ display: "flex" }} gap={1}>
           <Tooltip
             title={doI18n(
               "pages:core-local-workspace:button_edit_layout",
@@ -145,8 +153,8 @@ function EditorTools({
               <LayoutIcon />
             </IconButton>
           </Tooltip>
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     </Box>
   );
 }

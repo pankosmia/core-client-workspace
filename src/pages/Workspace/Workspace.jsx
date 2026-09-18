@@ -1,10 +1,9 @@
 import { useContext, useState, useEffect } from "react";
 import { Box, Chip, Stack, Typography } from "@mui/material";
 import GraphiteTest from "./GraphiteTest";
-import CenterFocusStrongOutlinedIcon from "@mui/icons-material/CenterFocusStrongOutlined";
-import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 import { createTilePanes, TileContainer, TileProvider } from "react-tile-pane";
-import { getJson, doI18n } from "pithekos-lib";
+import { getJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import OBSContext from "../../contexts/obsContext";
 import layoutJson from "./layouts";
 import {
@@ -13,6 +12,7 @@ import {
   debugContext,
   Header,
   typographyContext,
+  productContext as ProductContext,
 } from "pankosmia-rcl";
 
 const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
@@ -20,6 +20,7 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
   const { typographyRef } = useContext(typographyContext);
   const { currentProjectRef } = useContext(currentProjectContext);
   const { debugRef } = useContext(debugContext);
+  const { product } = useContext(ProductContext);
   const [resourceDetails, setResourceDetails] = useState({});
   const [projectSummaries, setProjectSummaries] = useState({});
   const [distractionModeCount, setDistractionModeCount] = useState(0);
@@ -90,54 +91,39 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
   );
   const paneList = createTilePanes(tileElements)[0];
 
-  const DistractionToggle = ({
-    distractionModeCount,
-    setDistractionModeCount,
-  }) => {
-    return (
-      <Stack sx={{ marginLeft: "1rem" }}>
-        <Chip
-          onClick={() => {
-            setDistractionModeCount(distractionModeCount + 1);
-          }}
-          icon={
-            distractionModeCount % 2 === 0 ? (
-              <CenterFocusStrongOutlinedIcon />
-            ) : (
-              <CenterFocusStrongIcon />
-            )
-          }
-          label={`${doI18n("pages:core-local-workspace:focus_mode", i18nRef.current)}`}
-          color={
-            distractionModeCount % 2 === 0
-              ? "appbar-chip-inactive"
-              : "secondary"
-          }
-          variant="Filled"
-          disabled={Object.keys(resourceDetails).length === 1}
-        />
-      </Stack>
-    );
-  };
-
   return (
     <>
+      <style>{`
+        .react-tile-pane-tabBar {
+          overflow: hidden;
+        }
+        .react-tile-pane-tab {
+          min-width: 0 !important;
+          overflow: hidden;
+          flex-shrink: 1;
+        }
+        .react-tile-pane-tabInnerOff,
+        .react-tile-pane-tabInnerOn {
+          min-width: 0;
+          overflow: hidden;
+        }
+        .react-tile-pane-tabTitle {
+          display: block;
+          width: 100%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          text-align: center !important;
+          text-align-last: center !important;
+        }
+        .react-tile-pane-off {
+          display: none !important;
+        }
+      `}</style>
       <Header
         titleKey="pages:core-local-workspace:title"
         requireNet={false}
         currentId="core-local-workspace"
-        widget={
-          <span style={{ display: "flex" }}>
-            {["scripture", "parascriptural"].includes(
-              Object.values(resourceDetails).filter((r) => r.primary)[0]
-                .flavor_type,
-            )}
-            <DistractionToggle
-              distractionModeCount={distractionModeCount}
-              setDistractionModeCount={setDistractionModeCount}
-            />
-          </span>
-        }
       />
       <div className={adjSelectedFontClass} id="fontWrapper">
         <OBSContext.Provider value={{ obs, setObs }}>
@@ -145,11 +131,24 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
             <Box
               style={{
                 position: "fixed",
-                top: "110px",
-                bottom: 0,
-                right: 0,
+                top: product && product.os === "android" ? "140px" : "110px",
+                width:
+                  product && product.os === "android"
+                    ? "calc(100% - 60px)"
+                    : "100%",
+                left: product && product.os === "android" ? "30px" : 0,
+                bottom: product && product.os === "android" ? "30px" : 0,
+                right: product && product.os === "android" ? "30px" : 0,
                 overflow: "auto",
-                width: "100vw",
+                /* width: "100vw", */
+              }}
+              onMouseOver={(e) => {
+                if (
+                  e.target.classList.contains("react-tile-pane-tabTitle") &&
+                  !e.target.title
+                ) {
+                  e.target.title = e.target.textContent;
+                }
               }}
             >
               <TileContainer />

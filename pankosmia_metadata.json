@@ -41,6 +41,13 @@
         "url": ""
       }
     },
+    "audioTranslation": {
+      "edit": {
+        "doc": "main page for workspace",
+        "label": "pages:core-client-workspace:main",
+        "url": ""
+      }
+    },
     "workspaceMainPage": {
       "doc": "actual workspace page",
       "label": "pages:core-client-workspace:main-page",
@@ -99,6 +106,10 @@
       "en": "Could not save",
       "fr": "La sauvegarde a échoué",
       "id": "Tidak dapat disimpan"
+    },
+    "usfm_error": {
+      "en": "An error occurred when loading USFM",
+      "fr": "Une erreur est survenu pendant la lecture de l'USFM"
     },
     "usfm_conversion_error": {
       "en": "Document could not be converted from USFM to USJ",
@@ -546,9 +557,37 @@
       "en": "No notes found for this verse",
       "fr": "Pas de note pour ce verset"
     },
+    "no_juxta": {
+      "en": "No juxta found for this book",
+      "fr": "Pas de juxta pour ce livre "
+    },
     "book": {
       "en": "Book",
       "fr": "Livre"
+    },
+    "chapter": {
+      "en": "Chapter",
+      "fr": "Chapitre",
+      "es": "Capítulo",
+      "id": "Pasal"
+    },
+    "section": {
+      "en": "Section",
+      "fr": "Section",
+      "es": "Sección",
+      "id": "Bagian"
+    },
+    "segment": {
+      "en": "Segment",
+      "fr": "Segment",
+      "es": "Segmento",
+      "id": "Segmen"
+    },
+    "select_segment": {
+      "en": "Select a segment",
+      "fr": "Sélectionnez un segment",
+      "es": "Seleccione un segmento",
+      "id": "Pilih segmen"
     },
     "usfm_p": {
       "en": "Normal paragraph"
@@ -723,6 +762,26 @@
       "en": "Edit layout and resources",
       "fr": "Editer disposition et choix de ressources"
     },
+    "button_generate_audio": {
+      "en": "Generate audio",
+      "fr": "Générer l'audio"
+    },
+    "audio_compiled": {
+      "en": "Audio generated successfully",
+      "fr": "Audio généré avec succès"
+    },
+    "audio_main_track_empty": {
+      "en": "The main track is empty: add audio to it before generating.",
+      "fr": "La piste principale est vide : ajoutez-y de l'audio avant de générer."
+    },
+    "audio_generated_at": {
+      "en": "Generated at:",
+      "fr": "Généré à :"
+    },
+    "audio_never_generated": {
+      "en": "Audio never generated",
+      "fr": "Audio jamais généré"
+    },
     "no_scripture_for_story": {
       "en": "No Scripture found for this story in this translation",
       "fr": "Aucun texte biblique trouvé dans cette traduction pour cette histoire"
@@ -862,6 +921,10 @@
       "fr": "Aucune note trouvée",
       "es": "No se encontraron notas"
     },
+    "no_question": {
+      "en": "No question found for this verse",
+      "fr": "Aucune question trouvée pour ce verset "
+    },
     "reference": {
       "en": "REF",
       "es": "REF",
@@ -955,6 +1018,14 @@
     "text_paragraph": {
       "en": "Text paragraph",
       "fr": "Texte du paragraphe"
+    },
+    "show_all_fields": {
+      "en": "Show all fields",
+      "es": "Mostrar todos los campos"
+    },
+    "answer": {
+      "en": "Answer",
+      "es": "Respuesta"
     }
   }
 }

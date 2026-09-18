@@ -1,7 +1,8 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Grid2, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 
-import { getText, doI18n } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import {
   i18nContext as I18nContext,
   debugContext as DebugContext,
@@ -34,28 +35,46 @@ function VideoLinksViewerMuncher({ metadata }) {
   }, [systemBcv]);
 
   useEffect(() => {
+    const start = systemBcv.verseNum;
+    const end = systemBcv.endVerseNum || systemBcv.verseNum;
     setVerseNotes(
       ingredient
-        .filter((l) => l[0] === `${systemBcv.chapterNum}:${systemBcv.verseNum}`)
+        .filter((l) => {
+          const [chapter, verse] = l[0].split(":").map(Number);
+          return (
+            chapter === systemBcv.chapterNum && verse >= start && verse <= end
+          );
+        })
         .map((l) => l[5]),
     );
   }, [ingredient, systemBcv]);
 
+  const videoLabel = `${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum}${systemBcv.endVerseNum ? `-${systemBcv.endVerseNum}` : ""})`;
+
   return (
     <Box>
-      <Typography variant="h5">
-        {`${metadata.name} (${systemBcv.bookCode} ${systemBcv.chapterNum}:${systemBcv.verseNum})`}
+      <Typography
+        variant="h5"
+        title={videoLabel}
+        sx={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          minWidth: 0,
+        }}
+      >
+        {videoLabel}
       </Typography>
       <Typography variant="h6">
         {doI18n("munchers:video_links_viewer:title", i18nRef.current)}
       </Typography>
-      <Grid2 container spacing={2}>
+      <Grid container spacing={2}>
         {verseNotes.length === 0 &&
           doI18n("munchers:video_links_viewer:no_content", i18nRef.current)}
         {verseNotes.length > 0 &&
           enableNet &&
           verseNotes.map((note) => (
-            <Grid2 size={6}>
+            <Grid size={6}>
               <video width="320" height="240" controls>
                 <source src={note} type="video/mp4" />
                 {doI18n(
@@ -63,10 +82,10 @@ function VideoLinksViewerMuncher({ metadata }) {
                   i18nRef.current,
                 )}
               </video>
-            </Grid2>
+            </Grid>
           ))}
         {verseNotes.length > 0 && !enableNet && <b>Offline Mode</b>}
-      </Grid2>
+      </Grid>
     </Box>
   );
 }

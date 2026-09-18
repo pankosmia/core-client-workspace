@@ -1,17 +1,22 @@
 import { useEffect, useState, useContext } from "react";
 import usfm2draftJson from "../../components/usfm2draftJson";
+import usfm2viewerJson from "../../components/usfm2viewerJson";
 import filterByChapter from "../../components/filterByChapter";
 import ViewableBible from "./SimplifiedEditor/components/ViewableBible";
 
-import { getText } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
 import { debugContext, bcvContext } from "pankosmia-rcl";
 import "./TextTranslationViewerMuncher.css";
 import TextDir from "../helpers/TextDir";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 function TextTranslationViewerMuncher({ metadata }) {
   const { systemBcv } = useContext(bcvContext);
   const { debugRef } = useContext(debugContext);
-  const [chapterData, setChapterData] = useState([]);
+  const [bookData, setBookData] = useState(null);
+  const [viewerData, setViewerData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [textDir, setTextDir] = useState(
     metadata?.script_direction
       ? metadata.script_direction.toLowerCase()
@@ -25,40 +30,46 @@ function TextTranslationViewerMuncher({ metadata }) {
 
   useEffect(() => {
     const getUsfm = async () => {
+      setIsLoading(true);
       let usfmResponse = await getText(
         `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
         debugRef.current,
       );
       if (usfmResponse.ok) {
-        setChapterData(
-          filterByChapter(
-            usfm2draftJson(usfmResponse.text),
-            systemBcv.chapterNum,
-          ),
-        );
+        setBookData(await usfm2draftJson(usfmResponse.text));
+        setViewerData(await usfm2viewerJson(usfmResponse.text));
         if (!sbScriptDirSet) {
           const dir = await TextDir(usfmResponse.text, "usfm");
           setTextDir(dir);
         }
-        //console.log(usfmResponse.text);
       } else {
         console.error("usfmResponse failed");
       }
+      setIsLoading(false);
     };
     getUsfm();
-  }, [
-    debugRef,
-    systemBcv.bookCode,
-    systemBcv.chapterNum,
-    systemBcv.verseNum,
-    metadata.local_path,
-    sbScriptDirSet,
-    textDir,
-  ]);
+  }, [debugRef, systemBcv.bookCode, metadata.local_path, sbScriptDirSet]);
 
-  //console.log('sbScriptDirSet: ' + !sbScriptDirSet.toString())
-  //console.log('textDir: ' + textDir)
+  const chapterData = viewerData
+    ? filterByChapter(viewerData, systemBcv.chapterNum)
+    : [];
 
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          minHeight: "150px",
+          flexShrink: 0,
+        }}
+      >
+        <CircularProgress size={40} />
+      </Box>
+    );
+  }
   // If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard
   return (
     Object.keys(chapterData).length > 0 && (

@@ -1,9 +1,12 @@
 import React, { useRef, useContext, useEffect } from "react";
 import ViewableBibleBlock from "./ViewableBibleBlock";
-import { bcvContext } from "pankosmia-rcl";
+import { bcvContext, wordContext, snippetContext } from "pankosmia-rcl";
 
 export default function ViewableBible({ chapterJson, dir }) {
   const { systemBcv } = useContext(bcvContext);
+  const { word } = useContext(wordContext);
+  const { snippet } = useContext(snippetContext);
+
   const lastPrintedVerseRef = useRef(null);
 
   useEffect(() => {
@@ -22,8 +25,6 @@ export default function ViewableBible({ chapterJson, dir }) {
     loadCSS();
   }, []);
 
-  //console.log('passed: ' + dir)
-
   return (
     <div style={{ padding: "2px 12px" }} dir={dir}>
       {chapterJson.blocks.map((b, n) => {
@@ -41,6 +42,8 @@ export default function ViewableBible({ chapterJson, dir }) {
                 key={n}
                 blockJson={b}
                 systemBcv={systemBcv}
+                systemWord={word}
+                systemSnippet={snippet}
                 lastPrintedVerseRef={lastPrintedVerseRef}
               />
             );

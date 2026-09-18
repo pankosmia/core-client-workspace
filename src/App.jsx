@@ -5,7 +5,7 @@ import ConfigureWorkspace from "./pages/ConfigureWorkspace/ConfigureWorkspace";
 import Workspace from "./pages/Workspace/Workspace";
 import { SpaContainer } from "pankosmia-rcl";
 import { createTheme, ThemeProvider, styled } from "@mui/material";
-import { getAndSetJson } from "pithekos-lib";
+import { getAndSetJson } from "pankosmia-lib/http";
 import { SnackbarProvider, MaterialDesignContent } from "notistack";
 export default function App() {
   const [layout, setLayout] = useState("ViewEditorRightRow");

@@ -4,6 +4,8 @@ export default function ViewableBibleBlock({
   blockJson,
   systemBcv,
   lastPrintedVerseRef,
+  systemWord,
+  systemSnippet,
 }) {
   const versesRefs = useRef({});
 
@@ -17,6 +19,40 @@ export default function ViewableBibleBlock({
     }
   }, [systemBcv.verseNum]);
 
+  // snippet can have multiple words
+  const snippetWords = systemSnippet ? systemSnippet.trim().split(/\s+/) : [];
+
+  const wordMatchesSnippet = (word) => {
+    if (!word.source || snippetWords.length === 0) return false;
+    return word.source.some((s) => snippetWords.includes(s));
+  };
+
+  const wordMatchesSystemWord = (word) => {
+    const target = systemWord?.target;
+    if (!target) return false;
+    return word.target.trim().toLowerCase() === target.trim().toLowerCase();
+  };
+
+  const renderContent = (content, allowSnippetHighlight) => {
+    return content.map((word, i) => {
+      const highlightBySnippet =
+        allowSnippetHighlight && wordMatchesSnippet(word);
+      const highlightByWord = wordMatchesSystemWord(word);
+
+      if (highlightBySnippet || highlightByWord) {
+        return (
+          <mark
+            key={i}
+            style={{ backgroundColor: "#FFD700", borderRadius: "2px" }}
+          >
+            {word.target}
+          </mark>
+        );
+      }
+      return word.target;
+    });
+  };
+
   return (
     <div
       className={blockJson.tag}
@@ -27,8 +63,11 @@ export default function ViewableBibleBlock({
       }}
     >
       {blockJson?.units?.map((u, i) => {
-        const rawContent = u.content || "";
-        const contentToDisplay = rawContent === "_" ? " " : rawContent;
+        const rawContent = u.content || [];
+        const contentToDisplay =
+          rawContent.length === 1 && rawContent[0].target === "_"
+            ? [{ target: " ", source: null }]
+            : rawContent;
         const currentVerse = String(u.verses);
         const isDuplicate = currentVerse === lastPrintedVerseRef.current;
         if (!isDuplicate) lastPrintedVerseRef.current = currentVerse;
@@ -72,7 +111,8 @@ export default function ViewableBibleBlock({
               </span>
             )}
             <span style={{ whiteSpace: "normal", paddingRight: "2pt" }}>
-              {isDuplicate ? ` ${contentToDisplay}` : contentToDisplay}
+              {isDuplicate && " "}
+              {renderContent(contentToDisplay, isSelected)}
             </span>
           </span>
         );

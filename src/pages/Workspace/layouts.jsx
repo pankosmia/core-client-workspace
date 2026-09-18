@@ -1,5 +1,5 @@
 import WorkspaceCard from "./WorkspaceCard";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
 import WorkspaceCruncherCard from "./WorkspaceCruncherCard";
 
 const paneStyle = {

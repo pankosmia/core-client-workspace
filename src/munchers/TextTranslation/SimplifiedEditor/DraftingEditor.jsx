@@ -1,10 +1,11 @@
 import { useEffect, useContext, useState } from "react";
-import { getText } from "pithekos-lib";
+import { getText } from "pankosmia-lib/http";
 import {
   bcvContext as BcvContext,
   debugContext as DebugContext,
 } from "pankosmia-rcl";
-import { Box, Typography } from "@mui/material";
+import { enqueueSnackbar } from "notistack";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import usfm2draftJson from "../../../components/usfm2draftJson";
 import EditableBible from "./components/EditableBible";
 import md5sum from "md5";
@@ -12,10 +13,13 @@ import EditorTools from "./components/EditorTools";
 import filterByChapter from "../../../components/filterByChapter";
 import TextDir from "../../helpers/TextDir";
 import ExtractJsonValues from "../../helpers/ExtractJsonValues";
-
+import { doI18n } from "pankosmia-lib/i18n";
+import { i18nContext } from "pankosmia-rcl";
 function DraftingEditor({ metadata, modified, setModified }) {
+  const [error, setError] = useState(false);
   const { systemBcv } = useContext(BcvContext);
   const { debugRef } = useContext(DebugContext);
+  const { i18nRef } = useContext(i18nContext);
   const [scriptureJson, setScriptureJson] = useState({
     headers: {},
     blocks: [],
@@ -47,31 +51,47 @@ function DraftingEditor({ metadata, modified, setModified }) {
   useEffect(() => {
     if (systemBcv.bookCode !== currentBookCode) {
       const doScriptureJson = async () => {
-        let usfmResponse = await getText(
-          `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
-          debugRef.current,
-        );
-        if (usfmResponse.ok) {
-          const usfmDraftJson = usfm2draftJson(usfmResponse.text);
+        try {
+          setChapterJson(null);
+
+          const usfmResponse = await getText(
+            `/api/burrito/ingredient/raw/${metadata.local_path}?ipath=${systemBcv.bookCode}.usfm`,
+            debugRef.current,
+          );
+
+          if (!usfmResponse.ok) {
+            console.error("Failed to get USFM:", usfmResponse);
+            return;
+          }
+
+          const usfmDraftJson = await usfm2draftJson(usfmResponse.text);
+
           setScriptureJson(usfmDraftJson);
+
           const hash = md5sum(JSON.stringify(usfmDraftJson));
           setMd5sumScriptureJson(hash);
+
           if (!sbScriptDirSet) {
             const dir = await TextDir(usfmResponse.text, "usfm");
             setTextDir(dir);
           }
+        } catch (error) {
+          console.error("Failed to load/parse USFM:", error);
+          enqueueSnackbar(`${error}`, { variant: "error" });
+          setError(true);
         }
       };
-      doScriptureJson().then();
+
+      doScriptureJson();
     }
   }, [debugRef, systemBcv.bookCode, metadata, currentBookCode, sbScriptDirSet]);
 
   useEffect(() => {
-    if (scriptureJson) {
+    if (scriptureJson && scriptureJson.blocks.length > 0) {
       setChapterJson(filterByChapter(scriptureJson, systemBcv.chapterNum));
       setBookChangeCount(bookChangeCount + 1);
     }
-  }, [scriptureJson, systemBcv.bookCode, systemBcv.chapterNum]);
+  }, [scriptureJson, systemBcv.chapterNum]);
 
   useEffect(() => {
     if (!sbScriptDirSet) {
@@ -88,29 +108,48 @@ function DraftingEditor({ metadata, modified, setModified }) {
 
   return (
     <>
-      <EditorTools
-        metadata={metadata}
-        modified={modified}
-        setModified={setModified}
-        md5sumScriptureJson={md5sumScriptureJson}
-        setMd5sumScriptureJson={setMd5sumScriptureJson}
-        scriptureJson={scriptureJson}
-        currentBookCode={currentBookCode}
-        setCurrentBookCode={setCurrentBookCode}
-      />
-      {/** If SB does not specify direction then it is set here, otherwise it has already been set per SB in WorkspaceCard */}
-      <Box dir={!sbScriptDirSet ? textDir : undefined}>
-        {chapterJson ? (
-          <EditableBible
-            chapterJson={chapterJson}
+      {!error ? (
+        <>
+          <EditorTools
+            metadata={metadata}
+            modified={modified}
+            setModified={setModified}
+            md5sumScriptureJson={md5sumScriptureJson}
+            setMd5sumScriptureJson={setMd5sumScriptureJson}
             scriptureJson={scriptureJson}
-            setScriptureJson={setScriptureJson}
-            key={bookChangeCount}
+            currentBookCode={currentBookCode}
+            setCurrentBookCode={setCurrentBookCode}
           />
-        ) : (
-          <Typography> loading ...</Typography>
-        )}
-      </Box>
+
+          <Box dir={!sbScriptDirSet ? textDir : undefined}>
+            {chapterJson ? (
+              <EditableBible
+                scriptDir={sbScriptDirSet ? textDir : undefined}
+                chapterJson={chapterJson}
+                scriptureJson={scriptureJson}
+                setScriptureJson={setScriptureJson}
+                key={bookChangeCount}
+              />
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                  minHeight: "150px",
+                }}
+              >
+                <CircularProgress size={40} />
+              </Box>
+            )}
+          </Box>
+        </>
+      ) : (
+        <Typography>
+          {doI18n(`pages:core-local-workspace:usfm_error`, i18nRef.current)}
+        </Typography>
+      )}
     </>
   );
 }

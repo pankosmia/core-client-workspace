@@ -1,32 +1,59 @@
-import React from "react";
+import React, { useContext } from "react";
 import TextTranslationEditorMuncher from "../../munchers/TextTranslation/TextTranslationEditorMuncher";
 import TextTranslationViewerMuncher from "../../munchers/TextTranslation/TextTranslationViewerMuncher";
-import BcvAudioTranslationViewerMuncher from "../../munchers/BcvAudio/BcvAudioViewerMuncher";
-import BcvNotesViewerMuncher from "../../munchers/BcvNotes/BcvNotesViewerMuncher";
-import BcvNotesEditorMuncher from "../../munchers/BcvNotes/BcvNotesEditorMuncher";
-import BcvQuestionsViewerMuncher from "../../munchers/BcvQuestions/BcvQuestionsViewerMuncher";
-import BcvArticlesViewerMuncher from "../../munchers/BcvArticles/BcvArticlesViewerMuncher";
-import BcvImagesViewerMuncher from "../../munchers/BcvImages/BcvImagesViewerMuncher";
-import BcvVideosViewerMuncher from "../../munchers/BcvVideos/BcvVideosViewerMuncher";
+import {
+  AudioTranslationEditorMuncher,
+  AudioTranslationViewerMuncher,
+} from "pankosmia-audio_translation-muncher";
+import {
+  BcvNotesViewerMuncher,
+  BcvNotesEditorMuncher,
+  BcvQuestionsViewerMuncher,
+} from "pankosmia-bcv-muncher";
+
+import { BcvArticlesViewerMuncher } from "pankosmia-bcv_articles-muncher";
+import { BcvImagesViewerMuncher } from "pankosmia-bcv_images-muncher";
+import { BcvVideosViewerMuncher } from "pankosmia-bcv_videos-muncher";
 import TastelessMuncher from "../../munchers/Tasteless/TastelessMuncher";
 import "./tiles_styles.css";
 import VideoLinksViewerMuncher from "../../munchers/VideoLinks/VideoLinksViewerMuncher";
-import BNotesViewerMuncher from "../../munchers/BNotes/BNotesViewerMuncher";
-import OBSViewerMuncher from "../../munchers/OBS/OBSViewerMuncher";
-import OBSEditorMuncher from "../../munchers/OBS/OBSEditorMuncher";
-import OBSNotesViewerMuncher from "../../munchers/OBSNotes/OBSNotesViewerMuncher";
-import OBSQuestionsViewerMuncher from "../../munchers/OBSQuestions/OBSQuestionsViewerMuncher";
-import OBSArticlesViewerMuncher from "../../munchers/OBSArticles/OBSArticlesViewerMuncher";
-import JuxtalinearViewerMuncher from "../../munchers/Juxtalinear/JuxtalinearViewer";
-import TranslationPlanViewerMuncher from "../../munchers/TranslationPlan/TranslationPlanViewerMuncher";
+import { BookIntroViewerMuncher } from "pankosmia-book_intro-muncher";
+
+import { OBSViewerMuncher, OBSEditorMuncher } from "pankosmia-obs-muncher";
+
+import { OBSNotesViewerMuncher } from "pankosmia-obs_notes-muncher";
+
+import { OBSQuestionsViewerMuncher } from "pankosmia-obs_questions-muncher";
+import { OBSArticlesViewerMuncher } from "pankosmia-obs_articles-muncher";
 import JuxtalinearEditorMuncher from "../../munchers/Juxtalinear/JuxtalinearEditorMuncher";
 
+import { TranslationPlanViewerMuncher } from "pankosmia-translation_plan-muncher";
+import { JuxtalinearViewerMuncher } from "pankosmia-juxta-muncher";
+import OBSContext from "../../contexts/obsContext";
+import {
+  currentProjectContext,
+  bcvContext,
+  debugContext,
+  i18nContext,
+  typographyContext,
+  wordContext,
+  netContext,
+} from "pankosmia-rcl";
 function WorkspaceCard({ metadata, style, distractionModeCount }) {
+  const { bcvRef } = useContext(bcvContext);
+  const { systemBcv } = useContext(bcvContext);
+  const { debugRef } = useContext(debugContext);
+  const { i18nRef } = useContext(i18nContext);
+  const { typographyRef } = useContext(typographyContext);
+  const { currentProjectRef } = useContext(currentProjectContext);
+  const { obs, setObs } = useContext(OBSContext);
+  const { word } = useContext(wordContext);
+  const { enabledRef } = useContext(netContext);
+
   const sbScriptDir = metadata?.script_direction
     ? metadata.script_direction.toLowerCase()
     : undefined;
   const sbScriptDirSet = sbScriptDir === "ltr" || sbScriptDir === "rtl";
-
   if (!metadata.primary && distractionModeCount % 2 > 0) {
     return (
       <div
@@ -62,11 +89,27 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
       </div>
     );
   }
+  if (metadata.primary && metadata.flavor === "audioTranslation") {
+    return (
+      <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
+        <AudioTranslationEditorMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+        />
+      </div>
+    );
+  }
   // This component is using TW fonts and lineHeight, though also does not currently display translated words.
   if (metadata.flavor === "audioTranslation") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvAudioTranslationViewerMuncher metadata={metadata} />
+        <AudioTranslationViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          systemBcv={systemBcv}
+        />
       </div>
     );
   }
@@ -74,7 +117,16 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvnotes") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvNotesEditorMuncher metadata={metadata} />
+        {systemBcv?.bookCode && (
+          <BcvNotesEditorMuncher
+            metadata={metadata}
+            debugRef={debugRef}
+            i18nRef={i18nRef}
+            systemBcv={systemBcv}
+            bcvRef={bcvRef}
+            currentProjectRef={currentProjectRef}
+          />
+        )}
       </div>
     );
   }
@@ -85,7 +137,12 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <BcvNotesViewerMuncher metadata={metadata} />
+        <BcvNotesViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          systemBcv={systemBcv}
+        />
       </div>
     );
   }
@@ -96,7 +153,7 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <BNotesViewerMuncher metadata={metadata} />
+        <BookIntroViewerMuncher metadata={metadata} />
       </div>
     );
   }
@@ -104,7 +161,13 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.primary && metadata.flavor.toLowerCase() === "x-juxtalinear") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <JuxtalinearEditorMuncher metadata={metadata} />
+        <JuxtalinearEditorMuncher
+          metadata={metadata}
+          bcvRef={bcvRef}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          currentProjectRef={currentProjectRef}
+        />
       </div>
     );
   }
@@ -115,7 +178,13 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <JuxtalinearViewerMuncher metadata={metadata} />
+        <JuxtalinearViewerMuncher
+          metadata={metadata}
+          bcvRef={bcvRef}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          currentProjectRef={currentProjectRef}
+        />
       </div>
     );
   }
@@ -123,7 +192,14 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.primary && metadata.flavor.toLowerCase() === "x-bcvquestions") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvNotesEditorMuncher metadata={metadata} />
+        <BcvNotesEditorMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          systemBcv={systemBcv}
+          bcvRef={bcvRef}
+          currentProjectRef={currentProjectRef}
+        />
       </div>
     );
   }
@@ -131,7 +207,15 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-bcvquestions") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvQuestionsViewerMuncher metadata={metadata} />
+        {systemBcv?.bookCode && (
+          <BcvQuestionsViewerMuncher
+            metadata={metadata}
+            debugRef={debugRef}
+            bcvRef={bcvRef}
+            i18nRef={i18nRef}
+            systemBcv={systemBcv}
+          />
+        )}
       </div>
     );
   }
@@ -139,7 +223,14 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-bcvarticles") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvArticlesViewerMuncher metadata={metadata} />
+        <BcvArticlesViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          word={word}
+          enabledRef={enabledRef}
+          systemBcv={systemBcv}
+        />
       </div>
     );
   }
@@ -147,7 +238,12 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-bcvimages") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvImagesViewerMuncher metadata={metadata} />
+        <BcvImagesViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          systemBcv={systemBcv}
+        />
       </div>
     );
   }
@@ -166,7 +262,13 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.primary && metadata.flavor === "textStories") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <OBSEditorMuncher metadata={metadata} />
+        <OBSEditorMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          obs={obs}
+          setObs={setObs}
+        />
       </div>
     );
   }
@@ -177,7 +279,14 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <OBSViewerMuncher metadata={metadata} />
+        <OBSViewerMuncher
+          metadata={metadata}
+          bcvRef={bcvRef}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          obs={obs}
+          setObs={setObs}
+        />
       </div>
     );
   }
@@ -185,7 +294,11 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-obsquestions") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <OBSQuestionsViewerMuncher metadata={metadata} />
+        <OBSQuestionsViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          obs={obs}
+        />
       </div>
     );
   }
@@ -196,7 +309,11 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <OBSNotesViewerMuncher metadata={metadata} />
+        <OBSNotesViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          obs={obs}
+        />
       </div>
     );
   }
@@ -204,7 +321,11 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-obsarticles") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <OBSArticlesViewerMuncher metadata={metadata} />
+        <OBSArticlesViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          obs={obs}
+        />
       </div>
     );
   }
@@ -212,18 +333,26 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.flavor.toLowerCase() === "x-bcvvideo") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <BcvVideosViewerMuncher metadata={metadata} />
+        <BcvVideosViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          systemBcv={systemBcv}
+        />
       </div>
     );
   }
   // Override tailwind with lineHeight: 'normal' to support Awami Nastaliq
   if (metadata.flavor.toLowerCase() === "x-translationplan") {
     return (
-      <div
-        style={{ ...style, lineHeight: "normal" }}
-        dir={sbScriptDirSet ? sbScriptDir : undefined}
-      >
-        <TranslationPlanViewerMuncher metadata={metadata} />
+      <div style={{ ...style, lineHeight: "normal" }}>
+        <TranslationPlanViewerMuncher
+          metadata={metadata}
+          systemBcv={systemBcv}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          typographyRef={typographyRef}
+        />
       </div>
     );
   }

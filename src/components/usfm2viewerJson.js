@@ -1,7 +1,7 @@
 const PARSE_CACHE_MAX = 5;
 const parseCache = new Map();
 
-export default function usfm2draftJson(usfm) {
+export default function usfm2viewerJson(usfm) {
   if (!usfm) {
     return Promise.resolve({
       headers: {},
@@ -9,7 +9,6 @@ export default function usfm2draftJson(usfm) {
     });
   }
 
-  // Check cache first
   const cached = parseCache.get(usfm);
 
   if (cached) {
@@ -21,7 +20,7 @@ export default function usfm2draftJson(usfm) {
 
   return new Promise((resolve, reject) => {
     const worker = new Worker(
-      new URL("./usfm2draftJson.worker.js", import.meta.url),
+      new URL("./usfm2viewerJson.worker.js", import.meta.url),
       {
         type: "module",
       },
@@ -44,10 +43,7 @@ export default function usfm2draftJson(usfm) {
           err.stack = error.stack;
         }
 
-        // Full error for development/debugging
-        console.error("USFM worker error:", err);
-
-        // Short message for the UI
+        console.error("USFM viewer worker error:", err);
 
         reject(err);
         return;
@@ -67,7 +63,7 @@ export default function usfm2draftJson(usfm) {
     worker.addEventListener("error", (error) => {
       cleanup();
 
-      console.error("Uncaught USFM worker error:", error);
+      console.error("Uncaught USFM viewer worker error:", error);
 
       reject(error);
     });

@@ -6,19 +6,18 @@ import {
   debugContext as DebugContext,
   bcvContext as BcvContext,
 } from "pankosmia-rcl";
-import { doI18n } from "pithekos-lib";
+import { doI18n } from "pankosmia-lib/i18n";
 
 function AudioViewer({ metadata, bookCode, chapter }) {
   const overPaddedChapter = `000${chapter}`;
   const paddedChapter = overPaddedChapter.substring(
     overPaddedChapter.length - 3,
   );
-  console.log("paddedChapter", paddedChapter);
   return (
     <Stack>
       <audio
         controls
-        src={`/burrito/ingredient/bytes/${metadata.local_path}?ipath=${bookCode}/${bookCode}_${paddedChapter}.mp3`}
+        src={`/api/burrito/ingredient/bytes/${metadata.local_path}?ipath=${bookCode}/${bookCode}_${paddedChapter}.mp3`}
       ></audio>
     </Stack>
   );
