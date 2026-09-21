@@ -251,7 +251,8 @@ function ConfigureWorkspace({
             isoOneToThreeLookup[rep.language_code] ?? rep.language_code
           ]?.en ?? rep.language_code,
       };
-    });
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const selectedResourcesIndexes = useMemo(
     () => rows.filter((r) => selectedResources.has(r.path)).map((r) => r.id),
