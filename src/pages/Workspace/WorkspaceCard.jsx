@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext, useState } from "react";
 import {
   TextTranslationViewerMuncher,
   TextTranslationEditorMuncher,
@@ -23,15 +23,14 @@ import VideoLinksViewerMuncher from "../../munchers/VideoLinks/VideoLinksViewerM
 import { BookIntroViewerMuncher } from "pankosmia-book_intro-muncher";
 
 import { OBSViewerMuncher, OBSEditorMuncher } from "pankosmia-obs-muncher";
-
 import { OBSNotesViewerMuncher } from "pankosmia-obs_notes-muncher";
-
 import { OBSQuestionsViewerMuncher } from "pankosmia-obs_questions-muncher";
 import { OBSArticlesViewerMuncher } from "pankosmia-obs_articles-muncher";
-import JuxtalinearEditorMuncher from "../../munchers/Juxtalinear/JuxtalinearEditorMuncher";
 
 import { TranslationPlanViewerMuncher } from "pankosmia-translation_plan-muncher";
 import { JuxtalinearViewerMuncher } from "pankosmia-juxta-muncher";
+import { JuxtaDraftingEditor } from "pankosmia-juxta-muncher";
+
 import OBSContext from "../../contexts/obsContext";
 import {
   currentProjectContext,
@@ -45,6 +44,8 @@ import {
   productContext,
 } from "pankosmia-rcl";
 function WorkspaceCard({ metadata, style, distractionModeCount }) {
+  const [modified, setModified] = useState(false);
+
   const { bcvRef } = useContext(bcvContext);
   const { systemBcv } = useContext(bcvContext);
   const { debugRef } = useContext(debugContext);
@@ -189,8 +190,10 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.primary && metadata.flavor.toLowerCase() === "x-juxtalinear") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <JuxtalinearEditorMuncher
+        <JuxtaDraftingEditor
           metadata={metadata}
+          modified={modified}
+          setModified={setModified}
           bcvRef={bcvRef}
           debugRef={debugRef}
           i18nRef={i18nRef}
