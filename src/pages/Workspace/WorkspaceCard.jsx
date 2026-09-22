@@ -1,6 +1,9 @@
 import React, { useContext } from "react";
-import TextTranslationEditorMuncher from "../../munchers/TextTranslation/TextTranslationEditorMuncher";
-import TextTranslationViewerMuncher from "../../munchers/TextTranslation/TextTranslationViewerMuncher";
+import {
+  TextTranslationViewerMuncher,
+  TextTranslationEditorMuncher,
+} from "pankosmia-text_translation-muncher";
+
 import {
   AudioTranslationEditorMuncher,
   AudioTranslationViewerMuncher,
@@ -38,6 +41,8 @@ import {
   typographyContext,
   wordContext,
   netContext,
+  snippetContext,
+  productContext,
 } from "pankosmia-rcl";
 function WorkspaceCard({ metadata, style, distractionModeCount }) {
   const { bcvRef } = useContext(bcvContext);
@@ -49,6 +54,8 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   const { obs, setObs } = useContext(OBSContext);
   const { word } = useContext(wordContext);
   const { enabledRef } = useContext(netContext);
+  const { snippet } = useContext(snippetContext);
+  const { product } = useContext(productContext);
 
   const sbScriptDir = metadata?.script_direction
     ? metadata.script_direction.toLowerCase()
@@ -74,7 +81,16 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <TextTranslationEditorMuncher metadata={metadata} />
+        <TextTranslationEditorMuncher
+          metadata={metadata}
+          systemBcv={systemBcv}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          product={product}
+          typographyRef={typographyRef}
+          currentProjectRef={currentProjectRef}
+          bcvRef={bcvRef}
+        />
       </div>
     );
   }
@@ -85,7 +101,14 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <TextTranslationViewerMuncher metadata={metadata} />
+        <TextTranslationViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          systemBcv={systemBcv}
+          i18nRef={i18nRef}
+          snippet={snippet}
+          word={word}
+        />
       </div>
     );
   }

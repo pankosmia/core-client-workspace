@@ -1,10 +1,10 @@
 import { Grid, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import SvgViewEditorBottom from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_bottom";
-import SvgViewEditorLeftColumn from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_column";
-import SvgViewEditorRightColumn from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_column";
-import SvgViewEditorLeftRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_left_row";
-import SvgViewEditorRightRow from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_right_row";
-import SvgViewEditorTop from "../../munchers/TextTranslation/SimplifiedEditor/layouts/view_editor_top";
+import SvgViewEditorBottom from "../../munchers/Icons/layouts/view_editor_bottom";
+import SvgViewEditorLeftColumn from "../../munchers/Icons/layouts/view_editor_left_column";
+import SvgViewEditorRightColumn from "../../munchers/Icons/layouts/view_editor_right_column";
+import SvgViewEditorLeftRow from "../../munchers/Icons/layouts/view_editor_left_row";
+import SvgViewEditorRightRow from "../../munchers/Icons/layouts/view_editor_right_row";
+import SvgViewEditorTop from "../../munchers/Icons/layouts/view_editor_top";
 import { useEffect, useState, useContext } from "react";
 import { getJson } from "pankosmia-lib/http";
 import { debugContext } from "pankosmia-rcl";
