@@ -153,7 +153,12 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <BookIntroViewerMuncher metadata={metadata} />
+        <BookIntroViewerMuncher
+          metadata={metadata}
+          systemBcv={systemBcv}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+        />
       </div>
     );
   }

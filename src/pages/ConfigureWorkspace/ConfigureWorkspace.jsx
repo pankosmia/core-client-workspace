@@ -245,13 +245,22 @@ function ConfigureWorkspace({
             ? doI18n("pages:content:local_resource", i18nRef.current)
             : doI18n("pages:content:local_project", i18nRef.current)
           : `${rep.path.split("/")[1]} (${rep.path.split("/")[0]})`,
-        type: rep.flavor,
+        type: doI18n(
+          `flavors:names:${rep.flavor_type}/${rep.flavor}`,
+          i18nRef.current,
+        ).includes("flavors:names")
+          ? `${rep.flavor_type}/${rep.flavor}`
+          : doI18n(
+              `flavors:names:${rep.flavor_type}/${rep.flavor}`,
+              i18nRef.current,
+            ),
         language:
           isoThreeLookup?.[
             isoOneToThreeLookup[rep.language_code] ?? rep.language_code
           ]?.en ?? rep.language_code,
       };
-    });
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const selectedResourcesIndexes = useMemo(
     () => rows.filter((r) => selectedResources.has(r.path)).map((r) => r.id),
