@@ -1,6 +1,9 @@
-import React, { useContext } from "react";
-import TextTranslationEditorMuncher from "../../munchers/TextTranslation/TextTranslationEditorMuncher";
-import TextTranslationViewerMuncher from "../../munchers/TextTranslation/TextTranslationViewerMuncher";
+import { useContext, useState } from "react";
+import {
+  TextTranslationViewerMuncher,
+  TextTranslationEditorMuncher,
+} from "pankosmia-text_translation-muncher";
+
 import {
   AudioTranslationEditorMuncher,
   AudioTranslationViewerMuncher,
@@ -20,15 +23,14 @@ import VideoLinksViewerMuncher from "../../munchers/VideoLinks/VideoLinksViewerM
 import { BookIntroViewerMuncher } from "pankosmia-book_intro-muncher";
 
 import { OBSViewerMuncher, OBSEditorMuncher } from "pankosmia-obs-muncher";
-
 import { OBSNotesViewerMuncher } from "pankosmia-obs_notes-muncher";
-
 import { OBSQuestionsViewerMuncher } from "pankosmia-obs_questions-muncher";
 import { OBSArticlesViewerMuncher } from "pankosmia-obs_articles-muncher";
-import JuxtalinearEditorMuncher from "../../munchers/Juxtalinear/JuxtalinearEditorMuncher";
 
 import { TranslationPlanViewerMuncher } from "pankosmia-translation_plan-muncher";
 import { JuxtalinearViewerMuncher } from "pankosmia-juxta-muncher";
+import { JuxtaDraftingEditor } from "pankosmia-juxta-muncher";
+
 import OBSContext from "../../contexts/obsContext";
 import {
   currentProjectContext,
@@ -38,8 +40,12 @@ import {
   typographyContext,
   wordContext,
   netContext,
+  snippetContext,
+  productContext,
 } from "pankosmia-rcl";
 function WorkspaceCard({ metadata, style, distractionModeCount }) {
+  const [modified, setModified] = useState(false);
+
   const { bcvRef } = useContext(bcvContext);
   const { systemBcv } = useContext(bcvContext);
   const { debugRef } = useContext(debugContext);
@@ -49,6 +55,8 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   const { obs, setObs } = useContext(OBSContext);
   const { word } = useContext(wordContext);
   const { enabledRef } = useContext(netContext);
+  const { snippet } = useContext(snippetContext);
+  const { product } = useContext(productContext);
 
   const sbScriptDir = metadata?.script_direction
     ? metadata.script_direction.toLowerCase()
@@ -74,7 +82,16 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <TextTranslationEditorMuncher metadata={metadata} />
+        <TextTranslationEditorMuncher
+          metadata={metadata}
+          systemBcv={systemBcv}
+          debugRef={debugRef}
+          i18nRef={i18nRef}
+          product={product}
+          typographyRef={typographyRef}
+          currentProjectRef={currentProjectRef}
+          bcvRef={bcvRef}
+        />
       </div>
     );
   }
@@ -85,7 +102,14 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
         style={{ ...style, lineHeight: "normal" }}
         dir={sbScriptDirSet ? sbScriptDir : undefined}
       >
-        <TextTranslationViewerMuncher metadata={metadata} />
+        <TextTranslationViewerMuncher
+          metadata={metadata}
+          debugRef={debugRef}
+          systemBcv={systemBcv}
+          i18nRef={i18nRef}
+          snippet={snippet}
+          word={word}
+        />
       </div>
     );
   }
@@ -166,8 +190,10 @@ function WorkspaceCard({ metadata, style, distractionModeCount }) {
   if (metadata.primary && metadata.flavor.toLowerCase() === "x-juxtalinear") {
     return (
       <div style={style} dir={sbScriptDirSet ? sbScriptDir : undefined}>
-        <JuxtalinearEditorMuncher
+        <JuxtaDraftingEditor
           metadata={metadata}
+          modified={modified}
+          setModified={setModified}
           bcvRef={bcvRef}
           debugRef={debugRef}
           i18nRef={i18nRef}
