@@ -125,7 +125,7 @@ const Workspace = ({ layout, selectedResources, selectedCrunchers }) => {
         requireNet={false}
         currentId="core-local-workspace"
       />
-      <div className={adjSelectedFontClass} id="fontWrapper">
+      <div class={adjSelectedFontClass} id="fontWrapper">
         <OBSContext.Provider value={{ obs, setObs }}>
           <TileProvider tilePanes={paneList} rootNode={rootPane}>
             <Box
