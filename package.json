@@ -31,7 +31,7 @@
     "pankosmia-obs_articles-muncher": "0.1.1",
     "pankosmia-obs_notes-muncher": "0.1.1",
     "pankosmia-obs_questions-muncher": "0.1.1",
-    "pankosmia-text_translation-muncher": "0.2.5",
+    "pankosmia-text_translation-muncher": "0.2.6",
     "pankosmia-rcl": "0.8.3",
     "pankosmia-translation_plan-muncher": "0.3.4",
     "proskomma-core": "^0.11.2",

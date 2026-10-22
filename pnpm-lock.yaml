@@ -77,8 +77,8 @@ importers:
         specifier: 0.8.3
         version: 0.8.3(1bfbbf07b38d15b3d4887a0aa062241b)
       pankosmia-text_translation-muncher:
-        specifier: 0.2.5
-        version: 0.2.5(7f48d289e1cbf1a12f4d4011eed70323)
+        specifier: 0.2.6
+        version: 0.2.6(7f5e2382918427f9d873eb7f14330080)
       pankosmia-translation_plan-muncher:
         specifier: 0.3.4
         version: 0.3.4(19ede06199266a5d05d1cc133208e864)
@@ -3896,6 +3896,13 @@ packages:
       }
     engines: { node: ">=14.14" }
 
+  fs-extra@11.4.1:
+    resolution:
+      {
+        integrity: sha512-KYAb4c9BJQI6QqGKthV68OHe0badztdXJWKo0WtBA9IuCFPTKvE5ZdUBglP833aMjhaSPNO4A5j/EkzZtGlKjA==,
+      }
+    engines: { node: ">=14.14" }
+
   fs-readdir-recursive@1.1.0:
     resolution:
       {
@@ -5368,10 +5375,10 @@ packages:
       react: ^19.2.8
       react-dom: ^19.2.8
 
-  pankosmia-text_translation-muncher@0.2.5:
+  pankosmia-text_translation-muncher@0.2.6:
     resolution:
       {
-        integrity: sha512-x1zr2NTY+Vjvqty7xovbr4tfVU2IIRrMWcNHnLiA2VSzRKY6N8KbPBzG03PAptUCrVa8SBR52Dbg06Nx2A7V6g==,
+        integrity: sha512-1ZMzDizu7xDcm4FcvQFy1vQvbc8iWP7nUkfG1L1QfDDWP4xmeUQOUIGu19O5ZbquZSMlhZAlU8aHfc2N4T+gaQ==,
       }
     peerDependencies:
       "@emotion/react": 11.14.0
@@ -5402,6 +5409,13 @@ packages:
       react: 19.2.8
       react-dom: 19.2.8
       react-router-dom: 7.9.4
+
+  pankosmia-usfm-editor-utils@0.0.5:
+    resolution:
+      {
+        integrity: sha512-KavHAbSQhsv6uuYX5NOJgDm2Wv06lgg37W+7UpoQ1ufgXVOSPobfzvJHF0N1u6GPLyQRNoIEKm2vJmNMh8Rijg==,
+      }
+    engines: { node: ">=24", pnpm: 11.20.0 }
 
   parent-module@1.0.1:
     resolution:
@@ -9452,6 +9466,12 @@ snapshots:
       jsonfile: 6.2.1
       universalify: 2.0.1
 
+  fs-extra@11.4.1:
+    dependencies:
+      graceful-fs: 4.2.11
+      jsonfile: 6.2.1
+      universalify: 2.0.1
+
   fs-readdir-recursive@1.1.0: {}
 
   fs.realpath@1.0.0: {}
@@ -10596,7 +10616,7 @@ snapshots:
       - supports-color
       - typescript
 
-  pankosmia-text_translation-muncher@0.2.5(7f48d289e1cbf1a12f4d4011eed70323):
+  pankosmia-text_translation-muncher@0.2.6(7f5e2382918427f9d873eb7f14330080):
     dependencies:
       "@emotion/react": 11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
       "@emotion/styled": 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
@@ -10611,6 +10631,7 @@ snapshots:
       notistack: 3.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       pankosmia-lib: 0.0.3
       pankosmia-rcl: 0.8.3(1bfbbf07b38d15b3d4887a0aa062241b)
+      pankosmia-usfm-editor-utils: 0.0.5(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0)
       prop-types: 15.8.1
       proskomma-core: 0.11.3(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0)
       proskomma-json-tools: 0.9.1(supports-color@7.2.0)
@@ -10621,6 +10642,7 @@ snapshots:
       use-file-picker: 2.1.4(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react@19.2.8)
       zip-project: 1.0.0(@types/react@19.2.18)(prop-types@15.8.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     transitivePeerDependencies:
+      - "@babel/core"
       - "@types/react"
       - "@types/react-dom"
       - immer
@@ -10641,6 +10663,14 @@ snapshots:
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
       react-router-dom: 7.18.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+
+  pankosmia-usfm-editor-utils@0.0.5(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0):
+    dependencies:
+      fs-extra: 11.4.1
+      proskomma-core: 0.11.3(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0)
+    transitivePeerDependencies:
+      - "@babel/core"
+      - supports-color
 
   parent-module@1.0.1:
     dependencies:
