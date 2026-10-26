@@ -41,8 +41,8 @@ importers:
         specifier: 0.1.1
         version: 0.1.1(ef5ea3a831d9b8a4fdd05d5b39db17b0)
       pankosmia-bcv-muncher:
-        specifier: 0.2.16
-        version: 0.2.16(d88e90167db8e3e9c6cce278f9cb9f1f)
+        specifier: 0.2.17
+        version: 0.2.17(7e12bf03e39a2362413d23a03430449a)
       pankosmia-bcv_articles-muncher:
         specifier: 0.1.1
         version: 0.1.1(bef1c73ac4636a4986cc01c47075fcd6)
@@ -5194,15 +5194,16 @@ packages:
       react-dom: 19.2.8
       react-router-dom: 7.9.4
 
-  pankosmia-bcv-muncher@0.2.16:
+  pankosmia-bcv-muncher@0.2.17:
     resolution:
       {
-        integrity: sha512-Zi6fFkw2Lwhdj4N7XngZGersEk4BYsgmnZEr99HC7ZCE8O4wI0Adc6nI6E98E9peFxp1O/bJofnYTUjWkK5T4w==,
+        integrity: sha512-YJnvX5HkDbkRbNT/1GH4dv71rNczMcO0sp9X2KfKA6ODoiRz2rK/WAryHBS4j6dcWKM96CyRyRadrTSrb7ew+Q==,
       }
     peerDependencies:
       "@base-ui/react": ^1.9.0
       "@emotion/react": ^11.14.0
       "@emotion/styled": ^11.14.1
+      "@hello-pangea/dnd": ^18.0.1
       "@mui/icons-material": ^9.4.0
       "@mui/material": ^9.3.1
       notistack: ^3.0.2
@@ -10370,11 +10371,12 @@ snapshots:
       - immer
       - supports-color
 
-  pankosmia-bcv-muncher@0.2.16(d88e90167db8e3e9c6cce278f9cb9f1f):
+  pankosmia-bcv-muncher@0.2.17(7e12bf03e39a2362413d23a03430449a):
     dependencies:
       "@base-ui/react": 1.9.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       "@emotion/react": 11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
       "@emotion/styled": 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
+      "@hello-pangea/dnd": 18.0.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       "@mui/icons-material": 9.3.1(@mui/material@9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
       "@mui/material": 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       color: 5.0.3
