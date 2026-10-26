@@ -1,6 +1,6 @@
 {
   "id": "core-local-workspace",
-  "minServerVersion": "0.14.4",
+  "minServerVersion": "0.20.3",
 
   "require": {
     "net": false
