@@ -1,13 +1,11 @@
 import { createRoot } from "react-dom/client";
 import { createHashRouter, RouterProvider, Outlet } from "react-router-dom";
-import { useState, useEffect, useContext } from "react";
+import { useState } from "react";
 
-import { Box, createTheme, ThemeProvider } from "@mui/material";
+import { Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-import { SpaContainer, Header, typographyContext } from "pankosmia-rcl";
-
-import { getAndSetJson } from "pankosmia-lib/http";
+import { SpaContainer } from "pankosmia-rcl";
 
 import { SnackbarProvider, MaterialDesignContent } from "notistack";
 
