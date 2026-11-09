@@ -41,8 +41,8 @@ importers:
         specifier: 0.1.1
         version: 0.1.1(f1b2177362a2d6b22202bcf0a111543a)
       pankosmia-bcv-muncher:
-        specifier: 0.2.19
-        version: 0.2.19(b1ec7f46d3c2476cd7fd5d9bb6f084e8)
+        specifier: 0.2.21
+        version: 0.2.21(b1ec7f46d3c2476cd7fd5d9bb6f084e8)
       pankosmia-bcv_articles-muncher:
         specifier: 0.1.1
         version: 0.1.1(8d03408cc0703b8c83b0138eea2a2963)
@@ -5083,10 +5083,10 @@ packages:
       react-dom: 19.2.8
       react-router-dom: 7.9.4
 
-  pankosmia-bcv-muncher@0.2.19:
+  pankosmia-bcv-muncher@0.2.21:
     resolution:
       {
-        integrity: sha512-NxiO/j1NVNz2aXzMAryJdEr+kfL5d1rpkIzmenxEfPZH9vIfi7pzJcuhoI16RDLhCnOkipRPrb03rgzndI3GJg==,
+        integrity: sha512-Wb2VYTr0/DNYVbTV6fPAU+gGQDWuidRZ6K2AkWT8whHmosPGAW5eqNO8me1LGSXos3csq23a7Wae/nT5k8MT1A==,
       }
     peerDependencies:
       "@base-ui/react": ^1.9.0
@@ -10202,7 +10202,7 @@ snapshots:
       - immer
       - supports-color
 
-  pankosmia-bcv-muncher@0.2.19(b1ec7f46d3c2476cd7fd5d9bb6f084e8):
+  pankosmia-bcv-muncher@0.2.21(b1ec7f46d3c2476cd7fd5d9bb6f084e8):
     dependencies:
       "@base-ui/react": 1.9.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       "@emotion/react": 11.14.0(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0)
