@@ -2,7 +2,7 @@ allowBuilds:
   core-js-pure: true
   esbuild: true
 minimumReleaseAgeExclude:
-  - pankosmia-rcl@0.8.6
+  - pankosmia-rcl@0.8.6 || 0.8.18
   - pankosmia-juxta-muncher@0.2.18
   - pankosmia-translation_plan-muncher@0.3.6 || 0.3.7 || 0.3.8
   - pankosmia-bcv-muncher@0.2.19 || 0.2.20 || 0.2.21
